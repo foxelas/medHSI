@@ -1,13 +1,14 @@
 
 %% Setup
-StartLogger;
-experiment = 'handsOnly';
-dataDate = '20201218';
-%configuration = 'singleLightClose';
-integrationTime = 200;
-normalization = 'byPixel';
-
 Initialization;
+SetSetting('integrationTime', 200);
+SetSetting('normalization', 'byPixel');
+SetSetting('dataDate', 20201218);
+SetSetting('experiment', 'handsOnly');
+
+SetSetting('saveFolder', fullfile('medHsi', GetSetting('experiment')));
+
+StartLogger;
 
 %% Read h5 data
 [~, targetIDs, outRows] = Query([], {'hand', false});
@@ -21,4 +22,7 @@ for i = 1:length(targetIDs)
     SetSetting('dataDate', num2str(dates(i)));
     SetSetting('configuration', configurations{i});
     [spectralData] = ReadHSIData(content, target, experiment);
+    
 end
+
+EndLogger;

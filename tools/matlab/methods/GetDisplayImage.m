@@ -63,15 +63,15 @@ end
 end
 
 function [xyz, illumination] = PrepareParams(z)
-filename = 'parameters/getDisplayHSIparams.mat';
+filename = fullfile(GetRunBaseDir(), GetSetting('paramDir'), 'displayParam.mat'); 
 if ~exist(filename, 'file')
     lambdaIn = GetWavelengths(z, 'raw');
     [lambdaMatch, xFcn, yFcn, zFcn] = colorMatchFcn('1964_FULL');
     xyz = interp1(lambdaMatch', [xFcn; yFcn; zFcn]', lambdaIn, 'pchip', 0);
     [solaxSpec, lambdaMatch] = GetSolaxSpectra();
     illumination = interp1(lambdaMatch, solaxSpec', lambdaIn, 'pchip', 0);
-    save('parameters/getDisplayHSIparams.mat', 'xyz', 'illumination');
+    save(filename, 'xyz', 'illumination');
 else
-    load('parameters/getDisplayHSIparams.mat', 'xyz', 'illumination');
+    load(filename, 'xyz', 'illumination');
 end
 end

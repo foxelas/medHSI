@@ -14,7 +14,7 @@ end
 
 switch method
     case 'real'
-        settingsDir = GetSetting('datasetSettingsDir');
+        settingsDir = GetSetting('importDir');
         inTable = delimread(fullfile(settingsDir, 'LE-9ND55F.csv'), ',', 'num');
         wavelengths = inTable.num(:, 1);
         solaxSpec = inTable.num(:, 2);

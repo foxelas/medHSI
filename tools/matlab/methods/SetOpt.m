@@ -5,28 +5,23 @@ function [] = SetOpt()
 %     SetOpt()
 
 disp('Reading configuration file [config.ini] ...');
-
-currentDir = pwd; 
-projectName = 'medHSI';
-parts = strsplit(currentDir, 'medHSI');
-inputSettingsFile = fullfile(parts{1}, projectName, 'conf', 'config.ini');
+inputSettingsFile = fullfile(GetConfDir(), 'config.ini');
 
 tmp = delimread(inputSettingsFile, {', '}, 'raw');
-options = struct();
 for i = 1:length(tmp.raw)
-    
+
     row = tmp.raw{i};
-    if ~((contains(row, '[') && contains(row, ']')) || contains(row, '#')) 
-        % Ignore section header and commented out lines   
+    if ~((contains(row, '[') && contains(row, ']')) || contains(row, '#'))
+        % Ignore section header and commented out lines
         parts = strsplit(row, '=');
-        varName = strrep(parts{1}, ' ', '');
-        rawValue = []; 
-        if length(parts) > 1 
-            rawValue = strrep(parts{2}, ' ', '');
-        end 
-        
+        varName = strtrim(parts{1});
+        rawValue = [];
+        if length(parts) > 1
+            rawValue = strtrim(parts{2});
+        end
+
         if isempty(rawValue)
-            varValue = []; 
+            varValue = [];
             switch varName
                 case 'inputDir'
                     varValue = fullfile(parentDir, 'input\');
@@ -43,23 +38,23 @@ for i = 1:length(tmp.raw)
                 case 'inDir'
                     varValue = parentDataDir;
             end
-            
+
         elseif strcmpi(rawValue, 'true') || strcmpi(rawValue, 'false') % logical type
-            varValue = strcmp(rawValue, '1');
+            varValue = strcmpi(rawValue, 'true');
         elseif (contains(row, '{') && contains(row, '}')) % array type
             varValue = GetArray(rawValue);
-        else % numeric or string type 
+        else % numeric or string type
             varValue = GetValueWithType(rawValue);
         end
-        
-        eval([varName, '=', 'varValue', ';']);        
-    end 
+
+        eval([varName, '=', 'varValue', ';']);
+    end
 end
 
 fprintf('Data directory is set to %s.\n', dataDir);
 fprintf('Save directory is set to %s.\n', saveDir);
 
-clear parts row varName rawValue varValue i currentDir projectName tmp;
+clear parts row varName rawValue varValue i tmp;
 settingsFile = strrep(inputSettingsFile, '.ini', '.mat');
 save(settingsFile);
 fprintf('Settings loaded from %s and saved in %s.\n', inputSettingsFile, settingsFile);
@@ -68,13 +63,13 @@ end
 
 function [arr] = GetArray(curVal)
 arr = strsplit(curVal, {'{', ', ', '}'});
-arr = cellfun(@(x) GetValueWithType(strrep(x, ' ', '')), arr, 'UniformOutput', 0);
+arr = cellfun(@(x) GetValueWithType(strtrim(x)), arr, 'UniformOutput', 0);
 end
 
 function [updVal] = GetValueWithType(curVal)
-    if ~isnan(str2double(curVal)) % numeric type
-        updVal = str2double(curVal);
-    else % string type  
-        updVal = curVal;
-    end
+if ~isnan(str2double(curVal)) % numeric type
+    updVal = str2double(curVal);
+else % string type
+    updVal = curVal;
+end
 end

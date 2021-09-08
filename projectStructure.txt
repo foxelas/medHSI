@@ -9,8 +9,6 @@ medHSI/
 │  
 ├── imports/
 │   ├── matlab/
-│   │   ├── external/
-│   │   └── files/
 │   └── python/
 │  
 ├── src/
@@ -18,15 +16,16 @@ medHSI/
 │   │   ├── methods/
 │   │   ├── plots/
 │   │   └── scripts/
+│   │     ├── Main.m
+│   │     └── Beautify.m
 │   └── python/
 │  
 ├── tools/
-│   │   ├── methods/
-│   │   ├── parameters/
-│   │   │   └──displayParam.mat
-│   │   └── plots/
-│   ├── Beautify/
-│   └── StartLogger/
+│   └── matlab/
+│       ├── methods/
+│       ├── parameters/
+│       │   └──displayParam.mat
+│       └── plots/
 │  
 ├── LICENSE
 └── README.md

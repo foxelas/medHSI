@@ -5,7 +5,7 @@ function [] = SetSetting(parameter, value)
 %     SetSetting('saveDir', 'out\out')
 %     SetSetting('saveDir')
 
-settingsFile = DirMake('parameters', 'configuration.mat');
+settingsFile = fullfile(GetConfDir(), 'config.mat');
 m = matfile(settingsFile, 'Writable', true);
 if nargin < 2 %write default value
     v = m.options;

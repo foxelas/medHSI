@@ -4,7 +4,7 @@ function [value] = GetSetting(parameter)
 %     Usage:
 %     value = getSetting('saveDir')
 
-settingsFile = DirMake('parameters', 'configuration.mat');
+settingsFile = fullfile(GetConfDir(), 'config.mat');
 variableInfo = who('-file', settingsFile);
 if ismember(parameter, variableInfo)
     m = matfile(settingsFile);
