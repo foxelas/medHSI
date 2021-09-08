@@ -1,0 +1,32 @@
+# File Structure # 
+Project Structure 
+
+medHSI/
+├── conf/
+│   ├── config.ini	
+│   ├── config.mat	
+│   └── defaultConfig.ini
+│  
+├── imports/
+│   ├── matlab/
+│   │   ├── external/
+│   │   └── files/
+│   └── python/
+│  
+├── src/
+│   ├── matlab/
+│   │   ├── methods/
+│   │   ├── plots/
+│   │   └── scripts/
+│   └── python/
+│  
+├── tools/
+│   │   ├── methods/
+│   │   ├── parameters/
+│   │   │   └──displayParam.mat
+│   │   └── plots/
+│   ├── Beautify/
+│   └── StartLogger/
+│  
+├── LICENSE
+└── README.md
