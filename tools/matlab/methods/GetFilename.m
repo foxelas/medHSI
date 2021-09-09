@@ -1,17 +1,18 @@
-function [filename, tableId, outRow] = GetFilename(configuration, content, integrationTime, target, dataDate, id, specialTarget)
+function [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
 
 %% GetFilename Gets the respective filename for configuration value
 %   arguments are received in the order of
-%     'configuration' [light source]
-%     'content' [type of catpured object]
+%     'content' [type of captured object]
+%     'sampleId' [number value for sample id]
+%     'captureDate' [captureDate for object]
+%     'id' [number value for id ]
 %     'integrationTime' [value of integration time]
 %     'target' [details about captured object]
-%     'dataDate' [catpureDate]
-%     'id' [number value for id ]
+%     'configuration' [light source]
 %
 %   Usage:
-%   [filename, tableId, outRow] = GetFilename(configuration, content,
-%       integrationTime, target, dataDate, id, specialTarget)
+%   [filename, tableId, outRow] = GetFilename(content, sampleId, 
+%   captureDate, id, integrationTime, target, configuration, specialTarget)
 
 if nargin < 6
     id = [];
@@ -29,7 +30,7 @@ if ~isempty(integrationTime)
     initialIntegrationTime = integrationTime;
 end
 
-[~, ~, outRow] = Query(configuration, content, integrationTime, target, dataDate, id);
+[~, ~, outRow] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
 outRow = CheckOutRow(outRow, configuration, content, integrationTime, specialTarget, dataDate, id);
 
 filename = outRow.Filename{1};

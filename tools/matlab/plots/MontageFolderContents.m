@@ -19,5 +19,5 @@ montage(imageList);
 title(figTitle);
 
 SetSetting('plotName', fullfile(path, strcat(lower(figTitle), '.jpg')));
-savePlot(fig);
+SavePlot(fig);
 end

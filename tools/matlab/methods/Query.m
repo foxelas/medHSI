@@ -1,26 +1,39 @@
-function [filenames, tableIds, outRows] = Query(configuration, content, integrationTime, target, dataDate, id)
+function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
 
 %% Query Gets the respective filename for configuration value
 %   arguments are received in the order of
 %     'configuration' [light source]
-%     'content' [type of catpured object]
+%     'content' [type of captured object]
 %     'integrationTime' [value of integration time]
 %     'target' [details about captured object]
-%     'dataDate' [catpureDate]
+%     'dataDate' [captureDate]
 %     'id' [number value for id ]
 %
 %   Usage:
-%   [filenames, tableIds, outRows] = Query(configuration, content, integrationTime, target, dataDate, id)
+%   [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
 
 warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
 dataTable = GetDB();
 
-if nargin < 3
-    integrationTime = [];
+if nargin < 7 
+    configuration = []; 
+end 
+if nargin < 6 
     target = [];
-    dataDate = [];
+end 
+if nargin < 5 
+    integrationTime = [];
+end 
+if nargin < 4 
     id = [];
-end
+end 
+if nargin < 3 
+    captureDate = [];
+end 
+
+if nargin < 2 
+    sampleId = [];
+end 
 
 setId = true(numel(dataTable.ID), 1);
 
@@ -28,18 +41,20 @@ if ~isempty(configuration)
     setId = setId & ismember(dataTable.Configuration, configuration);
 end
 
-if nargin >= 2 && ~isempty(content)
+if ~isempty(content)
     [content, isMatchContent] = GetCondition(content);
-    if isMatchContent
+    if isMatchContent %whether content is exact match or just contains 
         setId = setId & ismember(dataTable.Content, content);
     else
         setId = setId & contains(lower(dataTable.Content), lower(content));
     end
 end
-if nargin >= 3 && ~isempty(integrationTime)
+
+if ~isempty(integrationTime)
     setId = setId & ismember(dataTable.IntegrationTime, integrationTime);
 end
-if nargin >= 4 && ~isempty(target)
+
+if ~isempty(target)
     [target, isMatchTarget] = GetCondition(target);
     if isMatchTarget
         setId = setId & ismember(dataTable.Target, target);
@@ -47,12 +62,18 @@ if nargin >= 4 && ~isempty(target)
         setId = setId & contains(lower(dataTable.Target), lower(target));
     end
 end
-if nargin >= 5 && ~isempty(dataDate)
-    setId = setId & ismember(dataTable.CaptureDate, str2num(dataDate));
+
+if ~isempty(captureDate)
+    setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
 end
-if nargin >= 6 && ~isempty(id)
+
+if ~isempty(id)
     setId = setId & ismember(dataTable.ID, id);
 end
+
+if ~isempty(sampleId)
+    setId = setId & ismember(dataTable.SampleID, sampleId);
+end 
 
 outRows = dataTable(setId, :);
 filenames = outRows.Filename;

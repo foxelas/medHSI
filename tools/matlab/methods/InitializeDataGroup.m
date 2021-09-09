@@ -4,22 +4,21 @@ function [] = InitializeDataGroup(experiment, condition)
 %
 %   Usage:
 %   InitializeDataGroup('handsOnly',{'hand', false})
+%   InitializeDataGroup('sample001-tissue', {'tissue', true});
 
-%% Setup
-SetOpt();
-SetSetting('integrationTime', 200);
-SetSetting('normalization', 'byPixel');
-SetSetting('dataDate', 20201218);
+%% Setup 
+disp('Initializing [InitializeDataGroup]...');
+
 SetSetting('experiment', experiment);
 SetSetting('cropBorders', true);
-
-StartLogger;
+SetSetting('saveFolder', fullfile(GetSetting('snapshots'), experiment));
+isTest = GetSetting('isTest');
 
 %% Read h5 data
-[filenames, targetIDs, outRows] = Query([], condition);
+[filenames, targetIDs, outRows] = Query(condition);
 integrationTimes = [outRows.IntegrationTime];
 dates = [outRows.CaptureDate];
-configurations = [outRows.Configuration];
+if isTest; configurations = [outRows.Configuration]; end
 
 for i = 1:length(targetIDs)
     id = targetIDs(i);
@@ -27,29 +26,29 @@ for i = 1:length(targetIDs)
     %content =  GetValueFromTable(outRows, 'Content', i);
     SetSetting('integrationTime', integrationTimes(i));
     SetSetting('dataDate', num2str(dates(i)));
-    SetSetting('configuration', configurations{i});
+    if isTest; SetSetting('configuration', configurations{i}); end 
 
     targetName = num2str(id);
     spectralData = ReadStoredHSI(targetName);
     dispImage = GetDisplayImage(rescale(spectralData), 'rgb');
     figure(1);
     imshow(dispImage);
-    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('experiment'), 'rgb', StrrepAll(filenames{i})));
+    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'rgb', StrrepAll(filenames{i})));
     SavePlot(1);
 
     spectralData = NormalizeHSI(targetName);
     dispImage = GetDisplayImage(rescale(spectralData), 'rgb');
     figure(2);
     imshow(dispImage);
-    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('experiment'), 'normalized', StrrepAll(filenames{i})));
+    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'normalized', StrrepAll(filenames{i})));
     SavePlot(2);
 end
 
-path1 = fullfile(GetSetting('saveDir'), GetSetting('experiment'), 'normalized');
+figure(1); clf;
+path1 = fullfile(GetSetting('saveDir'), GetSetting('saveFolder'), 'normalized');
 Plots(1, @MontageFolderContents, path1, '*.jpg', 'Normalized');
-path1 = fullfile(GetSetting('saveDir'), GetSetting('experiment'), 'rgb');
+figure(2); clf;
+path1 = fullfile(GetSetting('saveDir'), GetSetting('saveFolder'), 'rgb');
 Plots(2, @MontageFolderContents, path1, '*.jpg', 'sRGB');
-
-EndLogger;
 
 end

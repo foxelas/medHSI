@@ -20,15 +20,16 @@ switch method
         error('Unsupported normalization method.');
 end
 
-figure;
-hold on;
-plot(380:780, mean(reshape(white, [size(white, 1) * size(white, 2), size(white, 3)])), 'DisplayName', 'Average White');
-plot(380:780, mean(reshape(black, [size(black, 1) * size(black, 2), size(black, 3)])), 'DisplayName', 'Average Black');
+if GetSetting('disableReflectranceExtremaPlots')
+    figure;
+    hold on;
+    plot(380:780, mean(reshape(white, [size(white, 1) * size(white, 2), size(white, 3)])), 'DisplayName', 'Average White');
+    plot(380:780, mean(reshape(black, [size(black, 1) * size(black, 2), size(black, 3)])), 'DisplayName', 'Average Black');
 
-plot(380:780, min(reshape(white, [size(white, 1) * size(white, 2), size(white, 3)])), 'DisplayName', 'Min White');
-plot(380:780, min(reshape(black, [size(black, 1) * size(black, 2), size(black, 3)])), 'DisplayName', 'Min Black');
+    plot(380:780, min(reshape(white, [size(white, 1) * size(white, 2), size(white, 3)])), 'DisplayName', 'Min White');
+    plot(380:780, min(reshape(black, [size(black, 1) * size(black, 2), size(black, 3)])), 'DisplayName', 'Min Black');
 
-hold off;legend
-min(white(:)-black(:))
-
+    hold off;legend
+    min(white(:)-black(:))
+end 
 end

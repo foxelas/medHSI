@@ -4,5 +4,5 @@ function dataTable = GetDB()
 %   Usage:
 %   dataTable = GetDB()
 
-dataTable = readtable(fullfile(GetSetting('importDir'), strcat(GetSetting('database'), 'DB.xlsx')), 'Sheet', 'capturedData');
+dataTable = readtable(fullfile(GetSetting('importDir'), strcat(GetSetting('database'), GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
 end
