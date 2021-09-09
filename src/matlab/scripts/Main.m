@@ -16,5 +16,3 @@ InitializeDataGroup('handsOnly',{'hand', false});
 SetSetting('isTest', false);
 SetSetting('database', 'psl');
 InitializeDataGroup('sample001-tissue', {'tissue', true});
-
-sampleId = '001';

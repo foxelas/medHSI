@@ -13,6 +13,7 @@ SetSetting('experiment', experiment);
 SetSetting('cropBorders', true);
 SetSetting('saveFolder', fullfile(GetSetting('snapshots'), experiment));
 isTest = GetSetting('isTest');
+saveMatFile = true; 
 
 %% Read h5 data
 [filenames, targetIDs, outRows] = Query(condition);
@@ -22,11 +23,13 @@ if isTest; configurations = [outRows.Configuration]; end
 
 for i = 1:length(targetIDs)
     id = targetIDs(i);
-    %target = GetValueFromTable(outRows, 'Target', i);
-    %content =  GetValueFromTable(outRows, 'Content', i);
+    target = GetValueFromTable(outRows, 'Target', i);
+    content =  GetValueFromTable(outRows, 'Content', i);
     SetSetting('integrationTime', integrationTimes(i));
     SetSetting('dataDate', num2str(dates(i)));
     if isTest; SetSetting('configuration', configurations{i}); end 
+
+    spectralData = ReadHSIData(content, target, experiment);
 
     targetName = num2str(id);
     spectralData = ReadStoredHSI(targetName);
@@ -36,12 +39,14 @@ for i = 1:length(targetIDs)
     SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'rgb', StrrepAll(filenames{i})));
     SavePlot(1);
 
-    spectralData = NormalizeHSI(targetName);
+    spectralData = NormalizeHSI(targetName, GetSetting('normalization'), saveMatFile);
     dispImage = GetDisplayImage(rescale(spectralData), 'rgb');
     figure(2);
     imshow(dispImage);
     SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'normalized', StrrepAll(filenames{i})));
     SavePlot(2);
+    
+    
 end
 
 figure(1); clf;

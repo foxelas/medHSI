@@ -1,12 +1,13 @@
-function spectralData = NormalizeHSI(targetName, option)
+function spectralData = NormalizeHSI(targetName, option, saveFile)
 %NormalizeHSI returns spectral data from HSI image
 %
 %   Usage:
-%   spectralData = NormalizeHSI('sample2',) returns a
+%   spectralData = NormalizeHSI('sample2') returns a
 %   cropped HSI with 'byPixel' normalization
 %
 %   spectralData = NormalizeHSI('sample2', 'raw')
-%
+%   spectralData = NormalizeHSI('sample2', 'byPixel', true)
+
 
 if nargin < 2 || isempty(option)
     option = GetSetting('normalization');
@@ -71,5 +72,13 @@ spectralData(isnan(spectralData)) = 0;
 spectralData(isinf(spectralData)) = 0;
 
 % figure(4);imshow(squeeze(spectralData(:,:,100)));
+
+if saveFile
+    baseDir = DirMake(GetSetting('matDir'), ...
+    strcat(GetSetting('database'), 'Normalized'), targetName);
+
+    targetFilename = strcat(baseDir, '_', GetSetting('normalization') ,'.mat');
+    save(targetFilename, 'spectralData');
+end 
 
 end
