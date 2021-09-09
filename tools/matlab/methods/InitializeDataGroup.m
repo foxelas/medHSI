@@ -5,18 +5,15 @@ function [] = InitializeDataGroup(experiment, condition)
 %   Usage:
 %   InitializeDataGroup('handsOnly',{'hand', false})
 
-StartLogger;
-
 %% Setup
-
-dataDate = '20201218';
-%configuration = 'singleLightClose';
-integrationTime = 200;
-normalization = 'byPixel';
-
-Initialization;
-
+SetOpt();
+SetSetting('integrationTime', 200);
+SetSetting('normalization', 'byPixel');
+SetSetting('dataDate', 20201218);
+SetSetting('experiment', experiment);
 SetSetting('cropBorders', true);
+
+StartLogger;
 
 %% Read h5 data
 [filenames, targetIDs, outRows] = Query([], condition);
@@ -52,5 +49,7 @@ path1 = fullfile(GetSetting('saveDir'), GetSetting('experiment'), 'normalized');
 Plots(1, @MontageFolderContents, path1, '*.jpg', 'Normalized');
 path1 = fullfile(GetSetting('saveDir'), GetSetting('experiment'), 'rgb');
 Plots(2, @MontageFolderContents, path1, '*.jpg', 'sRGB');
+
+EndLogger;
 
 end

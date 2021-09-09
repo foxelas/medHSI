@@ -1,6 +1,6 @@
 
 %% Setup
-Initialization;
+SetOpt();
 SetSetting('integrationTime', 200);
 SetSetting('normalization', 'byPixel');
 SetSetting('dataDate', 20201218);
