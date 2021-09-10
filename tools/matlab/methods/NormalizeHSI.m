@@ -75,10 +75,10 @@ spectralData(isinf(spectralData)) = 0;
 
 if saveFile
     baseDir = DirMake(GetSetting('matDir'), ...
-    strcat(GetSetting('database'), 'Normalized'), targetName);
+        strcat(GetSetting('database'), 'Normalized'), targetName);
 
-    targetFilename = strcat(baseDir, '_', GetSetting('normalization') ,'.mat');
+    targetFilename = strcat(baseDir, '_', GetSetting('normalization'), '.mat');
     save(targetFilename, 'spectralData');
-end 
+end
 
 end

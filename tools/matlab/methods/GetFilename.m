@@ -11,7 +11,7 @@ function [filename, tableId, outRow] = GetFilename(content, sampleId, captureDat
 %     'configuration' [light source]
 %
 %   Usage:
-%   [filename, tableId, outRow] = GetFilename(content, sampleId, 
+%   [filename, tableId, outRow] = GetFilename(content, sampleId,
 %   captureDate, id, integrationTime, target, configuration, specialTarget)
 
 if nargin < 6

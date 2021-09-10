@@ -29,7 +29,7 @@ if GetSetting('disableReflectranceExtremaPlots')
     plot(380:780, min(reshape(white, [size(white, 1) * size(white, 2), size(white, 3)])), 'DisplayName', 'Min White');
     plot(380:780, min(reshape(black, [size(black, 1) * size(black, 2), size(black, 3)])), 'DisplayName', 'Min Black');
 
-    hold off;legend
+    hold off; legend
     min(white(:)-black(:))
-end 
+end
 end

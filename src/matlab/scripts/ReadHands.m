@@ -22,7 +22,7 @@ for i = 1:length(targetIDs)
     SetSetting('dataDate', num2str(dates(i)));
     SetSetting('configuration', configurations{i});
     [spectralData] = ReadHSIData(content, target, experiment);
-    
+
 end
 
 EndLogger;

@@ -23,7 +23,7 @@ if (saveImages)
         DirMake(filepathBW);
 
         filename = fullfile(filepath, strcat(name, '.jpg'));
-%         filename = strrep(filename, ' ', '_');
+        %         filename = strrep(filename, ' ', '_');
         if (cropBorders)
             warning('off');
             export_fig(filename, '-jpg', '-native', '-transparent');

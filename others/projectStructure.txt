@@ -10,7 +10,11 @@ medHSI/
 ├── imports/
 │   ├── matlab/
 │   └── python/
-│  
+│
+├── others/
+│   ├── project_structure.txt
+│   └── to-do.md
+│
 ├── src/
 │   ├── matlab/
 │   │   ├── methods/

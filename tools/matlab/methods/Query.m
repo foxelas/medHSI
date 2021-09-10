@@ -15,25 +15,25 @@ function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, 
 warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
 dataTable = GetDB();
 
-if nargin < 7 
-    configuration = []; 
-end 
-if nargin < 6 
+if nargin < 7
+    configuration = [];
+end
+if nargin < 6
     target = [];
-end 
-if nargin < 5 
+end
+if nargin < 5
     integrationTime = [];
-end 
-if nargin < 4 
+end
+if nargin < 4
     id = [];
-end 
-if nargin < 3 
+end
+if nargin < 3
     captureDate = [];
-end 
+end
 
-if nargin < 2 
+if nargin < 2
     sampleId = [];
-end 
+end
 
 setId = true(numel(dataTable.ID), 1);
 
@@ -43,7 +43,7 @@ end
 
 if ~isempty(content)
     [content, isMatchContent] = GetCondition(content);
-    if isMatchContent %whether content is exact match or just contains 
+    if isMatchContent %whether content is exact match or just contains
         setId = setId & ismember(dataTable.Content, content);
     else
         setId = setId & contains(lower(dataTable.Content), lower(content));
@@ -73,7 +73,7 @@ end
 
 if ~isempty(sampleId)
     setId = setId & ismember(dataTable.SampleID, sampleId);
-end 
+end
 
 outRows = dataTable(setId, :);
 filenames = outRows.Filename;

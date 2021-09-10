@@ -63,7 +63,7 @@ end
 end
 
 function [xyz, illumination] = PrepareParams(z)
-filename = fullfile(GetRunBaseDir(), GetSetting('paramDir'), 'displayParam.mat'); 
+filename = fullfile(GetRunBaseDir(), GetSetting('paramDir'), 'displayParam.mat');
 if ~exist(filename, 'file')
     lambdaIn = GetWavelengths(z, 'raw');
     [lambdaMatch, xFcn, yFcn, zFcn] = colorMatchFcn('1964_FULL');
