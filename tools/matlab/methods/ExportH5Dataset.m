@@ -27,7 +27,7 @@ for i = 1:length(targetIDs)
     targetName = num2str(id);
     spectralData = ReadStoredHSI(targetName, normalization);
 
-    curName = strcat('/sample', num2str(id));
+    curName = strcat('/sample', targetName);
     h5create(fileName, curName, size(spectralData));
     h5write(fileName, curName, spectralData);
 end

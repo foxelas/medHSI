@@ -14,15 +14,7 @@ function [filename, tableId, outRow] = GetFilename(content, sampleId, captureDat
 %   [filename, tableId, outRow] = GetFilename(content, sampleId,
 %   captureDate, id, integrationTime, target, configuration, specialTarget)
 
-if nargin < 6
-    id = [];
-end
-
-if ~isempty(id) && id < 0
-    id = [];
-end
-
-if nargin < 7
+if nargin < 8
     specialTarget = '';
 end
 
@@ -31,7 +23,7 @@ if ~isempty(integrationTime)
 end
 
 [~, ~, outRow] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
-outRow = CheckOutRow(outRow, configuration, content, integrationTime, specialTarget, dataDate, id);
+outRow = CheckOutRow(outRow, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget);
 
 filename = outRow.Filename{1};
 tableId = outRow.ID;
@@ -47,15 +39,15 @@ end
 
 end
 
-function [outR] = CheckOutRow(inR, configuration, content, integrationTime, specialTarget, dataDate, id)
+function [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
 outR = inR;
 if isempty(inR.ID) && ~isempty(specialTarget)
     if strcmp(specialTarget, 'black')
         configuration = 'noLight';
     end
-    [~, ~, outR] = Query(configuration, content, integrationTime, specialTarget, dataDate, id);
+    [~, ~, outR] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
     if isempty(outR.ID) && strcmp(specialTarget, 'black')
-        [~, ~, outR] = Query(configuration, 'capOn', integrationTime, specialTarget, '20210107', id);
+        [~, ~, outR] = Query('capOn', sampleId, '20210107', id, integrationTime, target, configuration);
     end
 end
 

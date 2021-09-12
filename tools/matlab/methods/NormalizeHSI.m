@@ -8,6 +8,7 @@ function spectralData = NormalizeHSI(targetName, option, saveFile)
 %   spectralData = NormalizeHSI('sample2', 'raw')
 %   spectralData = NormalizeHSI('sample2', 'byPixel', true)
 
+SetSetting('fileName', targetName);
 
 if nargin < 2 || isempty(option)
     option = GetSetting('normalization');
@@ -70,6 +71,12 @@ end
 spectralData = max(spectralData, 0);
 spectralData(isnan(spectralData)) = 0;
 spectralData(isinf(spectralData)) = 0;
+
+%% Dependent on selected pre-processing
+if ~strcmp(option, 'raw')
+    fHndl = @Preprocessing;
+    spectralData = fHndl(spectralData);
+end
 
 % figure(4);imshow(squeeze(spectralData(:,:,100)));
 

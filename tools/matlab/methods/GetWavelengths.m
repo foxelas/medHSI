@@ -32,6 +32,8 @@ switch option
             x = 380:splitWavelength;
         elseif m == 240
             x = (splitWavelength + 1):780;
+        elseif m == 311
+            x = 420:730;
         else
             error('Unsupported wavelength range');
         end

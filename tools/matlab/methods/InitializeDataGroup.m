@@ -60,10 +60,16 @@ end
 figure(1);
 clf;
 path1 = fullfile(GetSetting('saveDir'), GetSetting('saveFolder'), 'normalized');
+if exist(fullfile(path1, lower('normalized.jpg')), 'file')
+    delete(fullfile(path1, lower('normalized.jpg')));
+end
 Plots(1, @MontageFolderContents, path1, '*.jpg', 'Normalized');
 figure(2);
 clf;
 path1 = fullfile(GetSetting('saveDir'), GetSetting('saveFolder'), 'rgb');
+if exist(fullfile(path1, lower('sRGB.jpg')), 'file')
+    delete(fullfile(path1, lower('sRGB.jpg')));
+end
 Plots(2, @MontageFolderContents, path1, '*.jpg', 'sRGB');
 
 end

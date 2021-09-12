@@ -19,6 +19,7 @@ if (z < 401)
     spectralImage2 = zeros(m, n, 401);
     spectralImage2(:, :, v) = spectralImage;
     spectralImage = spectralImage2;
+    z = 401;
     clear 'spectralImage2';
 end
 if HasGPU()

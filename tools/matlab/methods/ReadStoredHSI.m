@@ -9,6 +9,10 @@ if nargin < 2
     normalization = 'raw';
 end
 
+if isnumeric(targetName)
+    targetName = num2str(targetName);
+end
+
 if strcmp(normalization, 'raw')
     baseDir = fullfile(GetSetting('matDir'), ...
         strcat(GetSetting('database'), 'Triplets'), targetName);
