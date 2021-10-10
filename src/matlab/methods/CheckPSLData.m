@@ -1,4 +1,8 @@
-function [flag] = CheckPSLData()
+function [flag, fileS] = CheckPSLData()
+%CheckPSLData checks hsm data and prepares the data table structure
+%
+%   Usage: [flag, fileS] = CheckPSLData()
+
     v = dir('D:\elena\mspi\3_skinHSI\skin samples\*.hsm');
     vname = {v.name};
     k = cellfun(@(x) strrep(x, '.hsm', ''), vname, 'UniformOutput', false);
@@ -70,5 +74,6 @@ function [flag] = CheckPSLData()
         disp('Check failed');
     else 
         disp('Check passed');
+        writetable(struct2table(fileS), 'new_import.xlsx')
     end 
 end 

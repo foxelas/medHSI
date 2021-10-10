@@ -33,15 +33,18 @@ end
 function currentFile = AdjustFilename(filename)
 inDir = GetSetting('dataDir');
 
-filenameParts = strsplit(filename, '_');
-dataDate = filenameParts{1};
-if ~contains(inDir, dataDate)
-    filenameParts = strsplit(inDir, '\\saitama');
-    ending = filenameParts{2};
-    filenameParts = strsplit(ending, '_');
-    oldDate = filenameParts{1};
-    inDir = strrep(inDir, oldDate, dataDate);
-end
+% filenameParts = strsplit(filename, '_');
+% dataDate = filenameParts{1};
+% if ~contains(inDir, dataDate)
+%     filenameParts = strsplit(inDir, '\\saitama');
+%     ending = filenameParts{2};
+%     filenameParts = strsplit(ending, '_');
+%     oldDate = filenameParts{1};
+%     inDir = strrep(inDir, oldDate, dataDate);
+% end
 
 currentFile = fullfile(inDir, filename);
+if ~contains(currentFile, '.h5')
+    currentFile = strcat(currentFile, '.h5');
+end 
 end

@@ -28,8 +28,11 @@ if ~exist(strcat(saveName, '_target.mat'), 'file') || ~exist(strcat(saveName, '_
     if ~strcmp(GetSetting('normalization'), 'raw')
 
         %% White image
-        fcWhite = GetFileConditions('whiteReflectance', target);
-        fcWhite = [fcWhite, -1, 'white'];
+        if GetSetting('isTest')
+            fcWhite = GetFileConditions('whiteReflectance', target);
+        else
+            fcWhite = GetFileConditions('white', target);
+        end 
         filename = GetFilename(fcWhite{:});
         [white, ~, wavelengths] = LoadH5Data(filename);
         figure(2);
@@ -52,12 +55,15 @@ if ~exist(strcat(saveName, '_target.mat'), 'file') || ~exist(strcat(saveName, '_
         save(strcat(saveName, '_white.mat'), 'fullReflectanceByPixel', 'uniSpectrum', 'bandmaxSpectrum', '-v7.3');
 
         %% Black Image
-        if blackIsCapOn
-            fcBlack = GetFileConditions('capOn', target);
+        if GetSetting('isTest')
+            if blackIsCapOn
+                fcBlack = GetFileConditions('capOn', target);
+            else
+                fcBlack = GetFileConditions('lightsOff', target);
+            end
         else
-            fcBlack = GetFileConditions('lightsOff', target);
-        end
-        fcBlack = [fcBlack, -1, 'black'];
+            fcBlack = GetFileConditions('black', target);
+        end 
         filename = GetFilename(fcBlack{:});
         [blackReflectance, ~, ~] = LoadH5Data(filename);
         figure(3);
