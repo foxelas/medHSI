@@ -31,3 +31,4 @@ FindSuperpixelAutocorrelation(hsi, 10);
 
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 demo_SuperPCA;
+ApplySuperPCA; 
