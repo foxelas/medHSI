@@ -8,12 +8,9 @@ srgb = GetDisplayImage(hsi, 'rgb');
 fgMask = GetFgMask(srgb);
 
 Xcol = GetPixelsFromMask(hsi, fgMask);
-[idx, C] = kmeans(Xcol, clusterNum);
+[labelsCol, C] = kmeans(Xcol, clusterNum);
 
-fgMaskCol = reshape(fgMask, [size(fgMask,1)*size(fgMask,2), 1]);
-labelsCol = zeros(size(fgMaskCol));
-labelsCol(fgMaskCol) = idx;
-labels = reshape(labelsCol, [size(fgMask,1), size(fgMask,2)]);
+labels = RecoverReducedHsi(labelsCol, size(fgMask), fgMask);
 
 savedir = DirMake(GetSetting('saveDir'), GetSetting('experiment'), targetName);
 SetSetting('plotName', fullfile(savedir, 'kmeans-clustering'));

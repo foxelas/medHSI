@@ -13,7 +13,7 @@ function [redHsis] = ReconstructDimred(scores, imgSizes, masks)
 %   redHsis = ReconstructDimred(scores, imgSizes, masks);
 
 sizeProd = cellfun(@(x) x(1)*x(2), imgSizes);
-hasMask = size(X, 1) ~= sum(sizeProd);
+hasMask = size(scores, 1) ~= sum(sizeProd);
 
 if ~hasMask % case where all image pixels are fed as input data
     splitIndexes = zeros(numel(sizeProd)-1, 1);
