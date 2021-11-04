@@ -1,11 +1,26 @@
+function [] = ApplySuperpixelAnalysis(hsi, targetName, isManual, pixelNum, pcNum)
+%%ApplySuperpixelAnalysis applies SuperPCA on an image
+%
+%   Usage:
+%   ApplySuperpixelAnalysis(hsi, targetName);
+%
+%   ApplyScriptToEachImage(@ApplySuperpixelAnalysis);
+
 %% Apply superpixel analysis on HSI 
 % prequisites: hsi, targetName
 
-isManual = false;
-savedir = DirMake(GetSetting('saveDir'), GetSetting('experiment'), targetName);
+if nargin < 3
+    isManual = false;
+end
 
-numPixel = 20; 
-pcNum = 3;
+if nargin < 4
+    pixelNum = 20; 
+end 
+
+if nargin < 5
+    pcNum = 3;
+end
+savedir = DirMake(GetSetting('saveDir'), GetSetting('experiment'), targetName);
 
 %% Preparation 
 srgb = GetDisplayImage(hsi, 'rgb');
@@ -20,10 +35,10 @@ if isManual
 
     % Use the 1st PCA component for superpixel calculation
     redImage = rescale(squeeze(scores(:, :, 1)));
-    [labels, ~] = superpixels(redImage, numPixel);
+    [labels, ~] = superpixels(redImage, pixelNum);
 else
     %%super-pixels segmentation
-    labels = cubseg(hsi,numPixel);
+    labels = cubseg(hsi,pixelNum);
 
     %%SupePCA based DR
     scores = SuperPCA(hsi,pcNum,labels);
@@ -74,5 +89,7 @@ for i = specimenSuperpixelIds
     title(strcat('Covariance for Superpixel #', num2str(i)));
     SavePlot(7);
     pause(0.5);
+end
+
 end
 
