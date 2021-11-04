@@ -22,6 +22,6 @@ else % isColor = 'boundary'
 end 
 
 title(figTitle);
-% SavePlot(fig);
+SavePlot(fig);
 
 end

@@ -8,15 +8,19 @@ SetSetting('normalization', 'byPixel');
 SetSetting('saveDir', fullfile(GetSetting('saveDir'), '001-DataTest'));
 SetSetting('cropBorders', true);
 
-%%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
 SetSetting('isTest', true);
 SetSetting('database', 'calib');
-% InitializeDataGroup('handsOnly',{'hand', false});
+InitializeDataGroup('handsOnly',{'hand', false});
 
+%%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 SetSetting('isTest', false);
 SetSetting('database', 'psl');
-% InitializeDataGroup('sample001-tissue', {'tissue', true});
 
+%%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
+InitializeDataGroup('until_september_tissue', {'tissue', true});
+
+%%%%%%%%%%%%%%%%%%%%% Export H5 %%%%%%%%%%%%%%%%%%%%%
 SetSetting('normalization', 'raw');
 ExportH5Dataset({'tissue', true});
 
@@ -29,6 +33,8 @@ SetSetting('fileName', num2str(fileNum));
 hsi = ReadStoredHSI(fileNum, GetSetting('normalization'));
 FindSuperpixelAutocorrelation(hsi, 10);
 
-%%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% SuperPCA %%%%%%%%%%%%%%%%%%%%%
 demo_SuperPCA;
 ApplySuperPCA; 
+
+t20211104_ApplyScriptoEachImage;

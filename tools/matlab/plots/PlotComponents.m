@@ -8,14 +8,17 @@ if nargin < 3
     figStart = 1; 
 end 
 
+plotName = GetSetting('plotName');
 for i = 1:pcNum
-    figure(figStart + i - 1);
+    fig = figStart + i - 1;
+    figure(fig);
     img = squeeze(hsi(:, :, i));
     mask = (img ~= 0);
     h = imagesc(img, 'AlphaData', mask);
     title(strcat('PC', num2str(i)));
     colorbar;
-    % SavePlot(fig);
+    SetSetting('plotName', strcat(plotName, num2str(i)));
+    SavePlot(fig);
 end 
 
 end 

@@ -22,5 +22,5 @@ set(gca, 'YTick', 1:50:311, 'YTickLabel', [1:50:311]+420-1)
 title(figTitle);
 c = colorbar;
 
-% SavePlot(fig)
+SavePlot(fig)
 end

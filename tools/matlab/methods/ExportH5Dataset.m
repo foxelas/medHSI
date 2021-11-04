@@ -16,8 +16,6 @@ else
 end
 
 %% Read h5 data
-targetSuffix = 'raw';
-
 [~, targetIDs, outRows] = Query(condition);
 
 for i = 1:length(targetIDs)

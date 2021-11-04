@@ -15,7 +15,8 @@ for i = 1:numel(fileList)
     imageList{i} = imread(fullfile(fileList(i).folder, fileList(i).name));
 end
 
-montage(imageList);
+r = ceil(numel(fileList) / 4);
+montage(imageList, 'Size',[r 4]);
 title(figTitle);
 
 SetSetting('plotName', fullfile(path, strcat(lower(figTitle), '.jpg')));

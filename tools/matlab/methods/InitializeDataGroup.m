@@ -17,6 +17,12 @@ saveMatFile = true;
 
 %% Read h5 data
 [filenames, targetIDs, outRows] = Query(condition);
+
+% Sort by sampleID 
+[outRows,sortId] = sortrows(outRows,{'SampleID', 'IsUnfixed'},{'ascend', 'descend'});
+filenames = filenames(sortId);
+targetIDs = targetIDs(sortId);
+
 integrationTimes = [outRows.IntegrationTime];
 dates = [outRows.CaptureDate];
 if isTest;
@@ -32,6 +38,8 @@ for i = 1:length(targetIDs)
     if isTest;
         SetSetting('configuration', configurations{i});
     end
+    
+    saveName =  StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'})+2\2)-2)*(-1)), '-', filenames{i}));
 
     %% write HSI in .mat file
     spectralData = ReadHSIData(content, target, experiment);
@@ -42,7 +50,7 @@ for i = 1:length(targetIDs)
     dispImage = GetDisplayImage(rescale(spectralData), 'rgb');
     figure(1);
     imshow(dispImage);
-    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'rgb', StrrepAll(filenames{i})));
+    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'rgb',saveName));
     SavePlot(1);
 
     %% write normalized HSI in .mat file
@@ -52,7 +60,7 @@ for i = 1:length(targetIDs)
     dispImage = GetDisplayImage(rescale(spectralData), 'rgb');
     figure(2);
     imshow(dispImage);
-    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'normalized', StrrepAll(filenames{i})));
+    SetSetting('plotName', DirMake(GetSetting('saveDir'), GetSetting('saveFolder'), 'normalized', saveName));
     SavePlot(2);
 end
 
