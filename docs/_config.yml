@@ -18,15 +18,15 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-baseurl: /blog # the subpath of your site, e.g. /blog
+baseurl: /medHSI # the subpath of your site, e.g. /blog
 domain: foxelas.github.io
 url: https://foxelas.github.io # the base hostname & protocol for your site, e.g. http://example.com
 
-title: foxelas' blog page
+title: MedHSI
 description: > # this means to ignore newlines until "twitter_username:"
   Note keeping.
-#  Don't take the /blog seriously, 
-#  instead focus on the info in the main domain.
+#  Quick description on how to use this repo
+#  to process hyperspectral images in pathology
 
 # social links
 twitter_username: foxelas
@@ -38,7 +38,8 @@ show_excerpts: false # set to true to show excerpts on the homepage
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
 header_pages:
- - about.md
+ - structure.md
+ - todo.md
 
 # Build settings
 theme: minima
