@@ -24,6 +24,8 @@ url: https://foxelas.github.io # the base hostname & protocol for your site, e.g
 
 title: MedHSI
 author: foxelas
+rss: rss
+
 description: > # this means to ignore newlines until "twitter_username:"
   Quick description on how to use this repo
   to process hyperspectral images in pathology
@@ -32,7 +34,6 @@ description: > # this means to ignore newlines until "twitter_username:"
 # social links
 twitter_username: foxelas
 github_username:  foxelas
-rss: rss
 
 show_excerpts: false # set to true to show excerpts on the homepage
 
