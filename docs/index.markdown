@@ -14,7 +14,7 @@ Hyper-Spectral Image (HSI) Processing for medical images, specifically for macro
 You can clone or download a .zip file at [github.com/foxelas/medHSI](https://github.com/foxelas/medHSI/tree/main)
 
 ### Usage 
-Check [Project Structure]{% link _pages/structure.md %}.
+Check [Project Structure]({{ site.baseurl }}{% link _pages/structure.md %}).
 
 ### Collaborators
   * Obi laboratory [homepage](http://www-obi.isl.titech.ac.jp/)
