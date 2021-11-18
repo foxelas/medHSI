@@ -3,7 +3,7 @@ layout: page
 title: Project Structure
 permalink: /structure/
 ---
-## Contents 
+### Contents 
 
 medHSI/  
 ├── conf/  

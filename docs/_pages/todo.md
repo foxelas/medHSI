@@ -1,6 +1,6 @@
 ---
 layout: page
-title: To-do list
+title: To do list
 permalink: /todo/
 ---
 ### In matlab
