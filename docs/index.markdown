@@ -3,7 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
-title: MedHSI
+title: About
 ---
 
 ## An organized set of functions for Hyperspectral Images
