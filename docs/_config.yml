@@ -23,8 +23,7 @@ domain: foxelas.github.io
 url: https://foxelas.github.io # the base hostname & protocol for your site, e.g. http://example.com
 
 title: MedHSI
-author: 
-  name: foxelas
+author: foxelas
 description: > # this means to ignore newlines until "twitter_username:"
   Quick description on how to use this repo
   to process hyperspectral images in pathology
