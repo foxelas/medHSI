@@ -3,7 +3,9 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
+title: MedHSI
 ---
+
 ## An organized set of functions for Hyperspectral Images
 
 Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology related tasks (Obi laboratory, Tokyo Institute of Technology in collaboration with Kobayashi laboratory, Saitama Medical University)

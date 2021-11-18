@@ -24,9 +24,9 @@ url: https://foxelas.github.io # the base hostname & protocol for your site, e.g
 
 title: MedHSI
 description: > # this means to ignore newlines until "twitter_username:"
-  Note keeping.
-#  Quick description on how to use this repo
-#  to process hyperspectral images in pathology
+  Quick description on how to use this repo
+  to process hyperspectral images in pathology
+# Note keeping 
 
 # social links
 twitter_username: foxelas
@@ -39,8 +39,8 @@ show_excerpts: false # set to true to show excerpts on the homepage
 # this and add the path to the pages in order as they should show up
 header_pages:
  - about.md
-# - structure.md
-# - todo.md
+ - _pages/structure.md
+ - _pages/todo.md
 
 
 # Build settings
@@ -49,8 +49,8 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
   
-# include:
-# - _pages
+include:
+ - _pages
  
 # Exclude from processing.
 # The following items will not be processed, by default.
