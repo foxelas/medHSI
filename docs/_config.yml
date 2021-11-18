@@ -48,8 +48,8 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
   
-#include:
-# - _pages
+include:
+ - _pages
  
 # Exclude from processing.
 # The following items will not be processed, by default.
