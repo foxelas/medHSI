@@ -13,10 +13,17 @@ SetSetting('isTest', true);
 SetSetting('database', 'calib');
 InitializeDataGroup('handsOnly', {'hand', false});
 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 SetSetting('isTest', false);
 SetSetting('database', 'psl');
-
+SetSetting('normalization', 'byPixel');
 CheckPSLData();
 
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%

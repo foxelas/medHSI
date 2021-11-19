@@ -59,6 +59,8 @@ if ~isempty(figTitle)
     title(figTitle);
 end
 
-SetSetting('plotName', fullfile(path, strcat(lower(saveName), '.jpg')));
+%save in parent dir 
+[pathstr, ~, ~] = fileparts(path);
+SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
 SavePlot(fig);
 end

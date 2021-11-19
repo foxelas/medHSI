@@ -64,12 +64,17 @@ fgMask = imclose(fgMask, strel('disk', diam*closingCoefficient, 4));
 
 fgMask = closeSmallHolesInTheBackground(fgMask, diam*bigHoleCoefficient);
 
-fgMask = imfill(fgMask, 8, 'holes');
-fgMask = imopen(fgMask, strel('disk', diam*openingCoefficient, 4));
-fgMask = bwareaopen(fgMask, ceil(m*n/500), 8);
-%specimenMask = imopen(specimenMask,strel('disk',diam * openingCoefficient,4));
+fgMaskBase = imfill(fgMask, 8, 'holes');
+fgMask = imopen(fgMaskBase, strel('disk', diam*openingCoefficient, 4));
 
-% cluster1 = Irgb .* double(specimenMask);
+%Threshold so that masks should be larger than 30 pixels
+if sum(fgMask(:)) < 30
+    fgMask = fgMaskBase;
+else
+    fgMask = bwareaopen(fgMask, ceil(m*n/500), 8);
+    %specimenMask = imopen(specimenMask,strel('disk',diam * openingCoefficient,4));
+    % cluster1 = Irgb .* double(specimenMask);
+end
 
 filepath = DirMake(GetSetting('saveDir'), GetSetting('backgroundRemoval'), ...
     GetSetting('database'), strcat(GetSetting('fileName'), '.jpg'));
