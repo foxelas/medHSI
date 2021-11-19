@@ -12,9 +12,16 @@ end
 
 %% Read h5 data
 [~, targetIDs, outRows] = Query(condition);
-isUnfixedCol = cell2mat([outRows.IsUnfixed]);
-unfixedId = isUnfixedCol == '1';
-targetIDs = targetIDs(unfixedId);
+sType = 'all'; %'all', 'fix', 'raw'
+if strcmp(sType, 'raw')
+    isUnfixedCol = cell2mat([outRows.IsUnfixed]);
+    unfixedId = isUnfixedCol == '1';
+    targetIDs = targetIDs(unfixedId);
+elseif strcmp(sType, 'fix')
+    isUnfixedCol = cell2mat([outRows.IsUnfixed]);
+    unfixedId = isUnfixedCol == '0';
+    targetIDs = targetIDs(unfixedId);
+end
 
 for i = 1:length(targetIDs)
     id = targetIDs(i);

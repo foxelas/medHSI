@@ -46,4 +46,4 @@ FindSuperpixelAutocorrelation(hsi, 10);
 demo_SuperPCA;
 ApplySuperPCA;
 
-t20211104_ApplyScriptoEachImage;
+t20211104_ApplyScriptToEachImage;

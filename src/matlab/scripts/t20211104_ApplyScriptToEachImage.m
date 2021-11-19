@@ -1,6 +1,6 @@
 
 %% Apply script of each of the data
-settingNum = 3;
+settingNum = 1;
 RunSettings(settingNum);
 
 %% Change to Relevant Script
@@ -13,7 +13,7 @@ end
 close all;
 
 if settingNum < 3
-    GetMontagetCollection('eigenvectors');
+    GetMontagetCollection('eigenvector');
     GetMontagetCollection('superpixel_mask');
     GetMontagetCollection('pc1');
     GetMontagetCollection('pc2');
@@ -26,7 +26,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%% Additional Functions %%%%%%%%%%%%%%%%%%%%%%%%
 function GetMontagetCollection(target)
-criteria = struct('TargetDir', 'subfolders', 'TargetName', strcat(target, '.jpg'));
+criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
 Plots(1, @MontageFolderContents, [], criteria);
 end
 
@@ -54,6 +54,7 @@ switch numVal
         SetSetting('database', 'psl');
         SetSetting('normalization', 'byPixel');
         SetSetting('experiment', 'T20211104-Kmeans');
+        
     otherwise
 end
 end

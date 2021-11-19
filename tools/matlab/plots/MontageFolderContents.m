@@ -23,7 +23,7 @@ if nargin < 3
     figTitle = [];
 end
 
-
+[pathstr, ~, ~] = fileparts(path);
 isOneFolder = ~(isstruct(criteria) && strcmpi(criteria.TargetDir, 'subfolders'));
 if ~isOneFolder
     target = criteria.TargetName;
@@ -33,9 +33,11 @@ if ~isOneFolder
     fileList = fileList(dirFlags);
     imageList = cell(numel(fileList)-2, 1);
     for i = 3:numel(fileList)
-        imageList{i-2} = imread(fullfile(fileList(i).folder, fileList(i).name, target));
+        imageList{i-2} = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
     end
     saveName = target;
+    pathstr = path;
+    
 else
     if isstruct(criteria) && strcmpi(criteria.TargetDir, 'currentFolder')
         target = criteria.TargetName;
@@ -60,7 +62,6 @@ if ~isempty(figTitle)
 end
 
 %save in parent dir 
-[pathstr, ~, ~] = fileparts(path);
 SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
 SavePlot(fig);
 end

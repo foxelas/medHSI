@@ -61,15 +61,18 @@ counts = histc(v(:), a);
 specimenSuperpixelIds = a(counts > 300)';
 
 %% Plot eigenvectors
-basename = fullfile(savedir, 'eigenvector');
+numComp = 3;
+wavelengths = GetWavelengths(size(Xcol, 2));
+basename = fullfile(savedir, 'eigenvectors');
 SetSetting('plotName', basename);
-Plots(6, @PlotEigenvectors, coeff, 420:730, 3);
+coeff = pca(Xcol, 'NumComponents', numComp);
+Plots(6, @PlotEigenvectors, coeff, wavelengths, numComp);
 for i = specimenSuperpixelIds
     superpixelMask = labels == i;
     Xcol = GetPixelsFromMask(hsi, superpixelMask);
-    coeff = pca(Xcol, 'NumComponents', 3);
+    coeff = pca(Xcol, 'NumComponents', numComp);
     SetSetting('plotName', strcat(basename, num2str(i)));
-    Plots(6, @PlotEigenvectors, coeff, 420:730, 3);
+    Plots(6, @PlotEigenvectors, coeff, wavelengths, numComp);
     title(strcat('Eigenvectors for Superpixel #', num2str(i)));
     SavePlot(6);
     pause(0.5);
