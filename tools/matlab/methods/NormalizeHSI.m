@@ -85,7 +85,7 @@ if saveFile
         strcat(GetSetting('database'), 'Normalized'), targetName);
 
     targetFilename = strcat(baseDir, '_', GetSetting('normalization'), '.mat');
-    save(targetFilename, 'spectralData');
+    save(targetFilename, 'spectralData', '-v7.3');
 end
 
 end

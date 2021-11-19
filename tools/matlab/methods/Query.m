@@ -81,6 +81,11 @@ outRows = dataTable(setId, :);
 filenames = outRows.Filename;
 tableIds = outRows.ID;
 
+% Sort by sampleID
+[outRows, sortId] = sortrows(outRows, {'SampleID', 'IsUnfixed'}, {'ascend', 'descend'});
+filenames = filenames(sortId);
+tableIds = tableIds(sortId);
+
 end
 
 function [keyValue, isMatch] = GetCondition(value)

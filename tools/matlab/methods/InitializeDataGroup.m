@@ -18,18 +18,13 @@ saveMatFile = true;
 %% Read h5 data
 [filenames, targetIDs, outRows] = Query(condition);
 
-% Sort by sampleID
-[outRows, sortId] = sortrows(outRows, {'SampleID', 'IsUnfixed'}, {'ascend', 'descend'});
-filenames = filenames(sortId);
-targetIDs = targetIDs(sortId);
-
 integrationTimes = [outRows.IntegrationTime];
 dates = [outRows.CaptureDate];
 if isTest
     configurations = [outRows.Configuration];
 end
 
-for i = 1:length(targetIDs)
+for i = 19 %1:length(targetIDs)
     id = targetIDs(i);
     target = GetValueFromTable(outRows, 'Target', i);
     content = GetValueFromTable(outRows, 'Content', i);
@@ -76,4 +71,5 @@ Plots(2, @MontageFolderContents, path2, '*.jpg', 'sRGB');
 Plots(5, @MontageFolderContents, path2, '*raw.jpg', 'sRGB raw');
 Plots(6, @MontageFolderContents, path2, '*fix.jpg', 'sRGB fix');
 
+close all;
 end
