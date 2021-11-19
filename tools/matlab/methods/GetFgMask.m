@@ -5,11 +5,11 @@ function fgMask = GetFgMask(hsi)
 %   Usage:
 %   fgMask = GetFgMask(hsi);
 
-if ndims(hsi) > 3 
+if ndims(hsi) > 3
     srgb = GetDisplayImage(hsi, 'rgb');
-else 
+else
     srgb = hsi;
-end 
+end
 fgMask = ~(squeeze(srgb(:, :, 1)) == 0 & squeeze(srgb(:, :, 1)) == 0 & squeeze(srgb(:, :, 1)) == 0);
 
 end

@@ -32,7 +32,7 @@ if ~exist(strcat(saveName, '_target.mat'), 'file') || ~exist(strcat(saveName, '_
             fcWhite = GetFileConditions('whiteReflectance', target);
         else
             fcWhite = GetFileConditions('white', target);
-        end 
+        end
         filename = GetFilename(fcWhite{:});
         [white, ~, wavelengths] = LoadH5Data(filename);
         figure(2);
@@ -63,7 +63,7 @@ if ~exist(strcat(saveName, '_target.mat'), 'file') || ~exist(strcat(saveName, '_
             end
         else
             fcBlack = GetFileConditions('black', target);
-        end 
+        end
         filename = GetFilename(fcBlack{:});
         [blackReflectance, ~, ~] = LoadH5Data(filename);
         figure(3);

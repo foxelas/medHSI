@@ -10,9 +10,9 @@ disp('Initializing [InitializeDataGroup]...');
 
 normalization = GetSetting('normalization');
 if strcmp(normalization, 'raw')
-    fileName = DirMake(GetSetting('outputDir'), 'Datasets', strcat('hsi_raw_full', '.h5'));
+    fileName = DirMake(GetSetting('outputDir'), GetSetting('datasets'), strcat('hsi_raw_full', '.h5'));
 else
-    fileName = DirMake(GetSetting('outputDir'), 'Datasets', strcat('hsi_normalized_full', '.h5'));
+    fileName = DirMake(GetSetting('outputDir'), GetSetting('datasets'), strcat('hsi_normalized_full', '.h5'));
 end
 
 %% Read h5 data

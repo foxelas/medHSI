@@ -13,13 +13,12 @@ if nargin < 3
 end
 
 
-
 if GetSetting('isTest')
     fileConditions = {content, [], GetSetting('dataDate'), id, ...
         GetSetting('integrationTime'), target, GetSetting('configuration')};
 else
     fileConditions = {content, [], GetSetting('dataDate'), id, ...
         GetSetting('integrationTime'), target, []};
-end 
+end
 
 end

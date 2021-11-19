@@ -19,9 +19,9 @@ Plots(1, @PlotSuperpixels, srgb, labels, '', 'color', fgMask);
 names = cell(clusterNum, 1);
 for i = 1:clusterNum
     names{i} = strcat('Centroid', num2str(i));
-end 
+end
 SetSetting('plotName', fullfile(savedir, 'kmeans-centroids'));
-Plots(2, @PlotSpectra, C, GetWavelengths(size(hsi,3)), names, 'Kmeans centroids');
+Plots(2, @PlotSpectra, C, GetWavelengths(size(hsi, 3)), names, 'Kmeans centroids');
 ylim([0, 0.001]);
 SavePlot(2);
-end 
+end

@@ -75,6 +75,8 @@ if ~isempty(sampleId)
     setId = setId & ismember(dataTable.SampleID, sampleId);
 end
 
+setId = SelectDatabaseSamples(dataTable, setId);
+
 outRows = dataTable(setId, :);
 filenames = outRows.Filename;
 tableIds = outRows.ID;

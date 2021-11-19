@@ -4,9 +4,9 @@ function [] = PlotComponents(hsi, pcNum, figStart)
 %   Usage:
 %   PlotComponents(hsi, 3, 4);
 
-if nargin < 3 
-    figStart = 1; 
-end 
+if nargin < 3
+    figStart = 1;
+end
 
 plotName = GetSetting('plotName');
 for i = 1:pcNum
@@ -19,6 +19,6 @@ for i = 1:pcNum
     colorbar;
     SetSetting('plotName', strcat(plotName, num2str(i)));
     SavePlot(fig);
-end 
+end
 
-end 
+end

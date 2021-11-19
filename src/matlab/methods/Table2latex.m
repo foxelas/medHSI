@@ -76,7 +76,7 @@ end
 
 function xnew = convertCell(x)
 if ischar(x)
-    xnew = strrep(x, '%', '\\%%'); 
+    xnew = strrep(x, '%', '\\%%');
     xnew = strrep(xnew, '&', '\\&');
     xnew = strrep(xnew, '_', '\\_');
 elseif isnumeric(x)

@@ -9,14 +9,14 @@ function [] = MontageFolderContents(path, criteria, figTitle, fig)
 
 if isempty(path)
     path = fullfile(GetSetting('saveDir'), GetSetting('experiment'));
-end 
+end
 
 if nargin < 2
     criteria = [];
-end 
+end
 
 if isempty(criteria)
-   criteria = '*';
+    criteria = '*';
 end
 
 if nargin < 3
@@ -27,16 +27,16 @@ end
 isOneFolder = ~(isstruct(criteria) && strcmpi(criteria.TargetDir, 'subfolders'));
 if ~isOneFolder
     target = criteria.TargetName;
-    dirBase =path;
+    dirBase = path;
     fileList = dir(dirBase);
     dirFlags = [fileList.isdir];
     fileList = fileList(dirFlags);
     imageList = cell(numel(fileList)-2, 1);
     for i = 3:numel(fileList)
         imageList{i-2} = imread(fullfile(fileList(i).folder, fileList(i).name, target));
-    end 
+    end
     saveName = target;
-else   
+else
     if isstruct(criteria) && strcmpi(criteria.TargetDir, 'currentFolder')
         target = criteria.TargetName;
     elseif ~isstruct(criteria)
@@ -53,8 +53,8 @@ else
 end
 
 
-r = ceil(numel(imageList) / 4);
-montage(imageList, 'Size',[r 4]);
+r = ceil(numel(imageList)/4);
+montage(imageList, 'Size', [r, 4]);
 if ~isempty(figTitle)
     title(figTitle);
 end

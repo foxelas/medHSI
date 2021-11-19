@@ -46,5 +46,5 @@ inDir = GetSetting('dataDir');
 currentFile = fullfile(inDir, filename);
 if ~contains(currentFile, '.h5')
     currentFile = strcat(currentFile, '.h5');
-end 
+end
 end

@@ -11,14 +11,16 @@ SetSetting('cropBorders', true);
 %%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
 SetSetting('isTest', true);
 SetSetting('database', 'calib');
-InitializeDataGroup('handsOnly',{'hand', false});
+InitializeDataGroup('handsOnly', {'hand', false});
 
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 SetSetting('isTest', false);
 SetSetting('database', 'psl');
 
+CheckPSLData();
+
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-InitializeDataGroup('until_september_tissue', {'tissue', true});
+InitializeDataGroup('u20211119', {'tissue', true});
 
 %%%%%%%%%%%%%%%%%%%%% Export H5 %%%%%%%%%%%%%%%%%%%%%
 SetSetting('normalization', 'raw');
@@ -35,6 +37,6 @@ FindSuperpixelAutocorrelation(hsi, 10);
 
 %%%%%%%%%%%%%%%%%%%%% SuperPCA %%%%%%%%%%%%%%%%%%%%%
 demo_SuperPCA;
-ApplySuperPCA; 
+ApplySuperPCA;
 
 t20211104_ApplyScriptoEachImage;

@@ -6,7 +6,7 @@ function [] = ApplySuperpixelAnalysis(hsi, targetName, isManual, pixelNum, pcNum
 %
 %   ApplyScriptToEachImage(@ApplySuperpixelAnalysis);
 
-%% Apply superpixel analysis on HSI 
+%% Apply superpixel analysis on HSI
 % prequisites: hsi, targetName
 
 if nargin < 3
@@ -14,21 +14,21 @@ if nargin < 3
 end
 
 if nargin < 4
-    pixelNum = 20; 
-end 
+    pixelNum = 20;
+end
 
 if nargin < 5
     pcNum = 3;
 end
 savedir = DirMake(GetSetting('saveDir'), GetSetting('experiment'), targetName);
 
-%% Preparation 
+%% Preparation
 srgb = GetDisplayImage(hsi, 'rgb');
 fgMask = GetFgMask(srgb);
 
 %% Calculate superpixels
 if isManual
-    %%Apply PCA to entire image 
+    %%Apply PCA to entire image
     [coeff, scores, latent, explained, ~] = DimredHSI(hsi, 'pca', pcNum, fgMask);
     explained(1:pcNum);
     latent(1:pcNum);
@@ -38,11 +38,11 @@ if isManual
     [labels, ~] = superpixels(redImage, pixelNum);
 else
     %%super-pixels segmentation
-    labels = cubseg(hsi,pixelNum);
+    labels = cubseg(hsi, pixelNum);
 
     %%SupePCA based DR
-    scores = SuperPCA(hsi,pcNum,labels);
-end 
+    scores = SuperPCA(hsi, pcNum, labels);
+end
 
 SetSetting('plotName', fullfile(savedir, 'superpixel_segments'));
 Plots(1, @PlotSuperpixels, srgb, labels);
@@ -50,17 +50,17 @@ SetSetting('plotName', fullfile(savedir, 'superpixel_mask'));
 Plots(2, @PlotSuperpixels, srgb, labels, '', 'color', fgMask);
 SetSetting('plotName', fullfile(savedir, 'pc'));
 PlotComponents(scores, pcNum, 3);
-    
+
 pause(0.5);
 
-%% Keep only specimen superpixels 
+%% Keep only specimen superpixels
 Xcol = GetPixelsFromMask(hsi, fgMask);
 v = labels(fgMask);
 a = unique(v);
 counts = histc(v(:), a);
 specimenSuperpixelIds = a(counts > 300)';
 
-%% Plot eigenvectors 
+%% Plot eigenvectors
 basename = fullfile(savedir, 'eigenvector');
 SetSetting('plotName', basename);
 Plots(6, @PlotEigenvectors, coeff, 420:730, 3);
@@ -75,7 +75,7 @@ for i = specimenSuperpixelIds
     pause(0.5);
 end
 
-%% Plot statistics 
+%% Plot statistics
 statistic = 'covariance';
 basename = fullfile(savedir, statistic);
 SetSetting('plotName', basename);
@@ -92,4 +92,3 @@ for i = specimenSuperpixelIds
 end
 
 end
-
