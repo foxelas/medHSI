@@ -1,19 +1,19 @@
 
 %% Apply script of each of the data
-settingNum = 1;
+settingNum = 2;
 RunSettings(settingNum);
 
 %% Change to Relevant Script
 if settingNum < 3
-    ApplyScriptToEachImage(@ApplySuperpixelAnalysis, []);
+    ApplyScriptToEachImage(@ApplySuperpixelAnalysis);
 elseif settingNum == 3
-    ApplyScriptToEachImage(@ApplyKmeans, [], 5);
+    ApplyScriptToEachImage(@ApplyKmeans, [], [], 5);
 end
 
 close all;
 
 if settingNum < 3
-    GetMontagetCollection('eigenvector');
+    GetMontagetCollection('eigenvectors');
     GetMontagetCollection('superpixel_mask');
     GetMontagetCollection('pc1');
     GetMontagetCollection('pc2');
@@ -28,6 +28,10 @@ end
 function GetMontagetCollection(target)
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
 Plots(1, @MontageFolderContents, [], criteria);
+criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'fix');
+Plots(2, @MontageFolderContents, [], criteria, strcat(target, ' for fix'));
+criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'raw');
+Plots(3, @MontageFolderContents, [], criteria, strcat(target, ' for ex-vivo'));
 end
 
 function RunSettings(numVal)

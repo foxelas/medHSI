@@ -1,27 +1,19 @@
-function [varargout] = ApplyScriptToEachImage(functionName, condition, varargin)
+function [varargout] = ApplyScriptToEachImage(functionName, condition, target, varargin)
 %%ApplyScriptToEachImage applys a script on each of the data samples who
 %%fullfill the condition
 %
 %   Usage:
 %   ApplyScriptToEachImage(@ApplyKmeans);
-%   ApplyScriptToEachImage(@ApplyKmeans, {'tissue', true});
+%   ApplyScriptToEachImage(@ApplyKmeans, {'tissue', true}, []);
 
-if nargin < 2 || isempty(condition)
-    condition = {'tissue', true};
-end
+if nargin < 2
+    condition = [];
+    target = [];
+    varargin = {};
+end 
 
 %% Read h5 data
-[~, targetIDs, outRows] = Query(condition);
-sType = 'all'; %'all', 'fix', 'raw'
-if strcmp(sType, 'raw')
-    isUnfixedCol = cell2mat([outRows.IsUnfixed]);
-    unfixedId = isUnfixedCol == '1';
-    targetIDs = targetIDs(unfixedId);
-elseif strcmp(sType, 'fix')
-    isUnfixedCol = cell2mat([outRows.IsUnfixed]);
-    unfixedId = isUnfixedCol == '0';
-    targetIDs = targetIDs(unfixedId);
-end
+[targetIDs, ~] = GetTargetIndexes(condition, target);
 
 for i = 1:length(targetIDs)
     id = targetIDs(i);

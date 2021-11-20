@@ -4,7 +4,9 @@ function [] = MontageFolderContents(path, criteria, figTitle, fig)
 %   Usage:
 %   MontageFolderContents(path, criteria, figTitle, fig)
 %
-%   criteria = struct('TargetDir', 'subfolders', 'TargetName', strcat(target, '.jpg'));
+%   criteria = struct('TargetDir', 'subfolders', ...
+%       'TargetName', strcat(target, '.jpg'), ...
+%       'TargetType', 'fix');
 %   Plots(1, @MontageFolderContents, [], criteria);
 
 if isempty(path)
@@ -31,11 +33,24 @@ if ~isOneFolder
     fileList = dir(dirBase);
     dirFlags = [fileList.isdir];
     fileList = fileList(dirFlags);
+    hasTargetType = isfield(criteria, 'TargetType');
     imageList = cell(numel(fileList)-2, 1);
-    for i = 3:numel(fileList)
-        imageList{i-2} = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
+    if hasTargetType
+        [targetIDs, ~] = GetTargetIndexes([], criteria.TargetType);
+        imageList = cell(numel(targetIDs), 1);
     end
-    saveName = target;
+    c = 1;
+    for i = 3:numel(fileList)
+        if (hasTargetType & find(targetIDs == str2double(fileList(i).name)) ) | ~hasTargetType
+            imageList{c} = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
+            c = c + 1;
+        end 
+    end
+    if ~isempty(figTitle) 
+        saveName = figTitle;
+    else
+        saveName = target;
+    end
     pathstr = path;
     
 else
@@ -58,7 +73,7 @@ end
 r = ceil(numel(imageList)/4);
 montage(imageList, 'Size', [r, 4]);
 if ~isempty(figTitle)
-    title(figTitle);
+    title(strrep(figTitle, '_', ' '));
 end
 
 %save in parent dir 
