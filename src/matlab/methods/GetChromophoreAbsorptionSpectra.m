@@ -33,21 +33,20 @@ plot(eumelaninLambda, extCoeffEumelanin2, 'DisplayName', 'Eumelanin', 'LineWidth
 plot(hbLambda, extCoeffHbO, 'DisplayName', 'HbO', 'LineWidth', 2); %cm-1/M
 plot(hbLambda, extCoeffHbR, 'DisplayName', 'HbR', 'LineWidth', 2); %cm-1/M
 hold off
-xlim([300, 800]);
+% xlim([300, 800]);
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Extinction Coefficient (cm^{-1}/ M)', 'FontSize', 15);
-l = legend('Location', 'northeastoutside');
+l = legend('Location', 'northeast');
 l.FontSize = 13;
 
 set(gca, 'yscale', 'log');
 %set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0, 1, 1]);
 
-saveEps = getSetting('saveEps');
 SetSetting('saveEps', true);
-SetSetting('plotName', fullfile(GetSetting('saveDir'), getSetting('common'), 'skinChromophoreExtinctionCoeff'));
+SetSetting('plotName', fullfile(GetSetting('outputDir'), GetSetting('common'), 'skinChromophoreExtinctionCoeff'));
 SavePlot(fig);
 %     SetSetting('saveEps', saveEps);
 
-save('parameters\extinctionCoefficients.mat', 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
+save( fullfile(GetSetting('paramDir'), 'extinctionCoefficients.mat'), 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
 
 end

@@ -42,10 +42,12 @@ if (saveImages)
             namext = strcat(name, '.eps');
             if (saveInBW)
                 filename = fullfile(filepathBW, namext);
-                export_fig(filename, '-eps', '-transparent', '-r900', '-gray');
+                saveas(fig,filename, 'eps');
+%                 export_fig(filename, '-eps', '-transparent', '-r900', '-gray');
             else
                 filename = fullfile(filepath, namext);
-                export_fig(filename, '-eps', '-transparent', '-r900', '-RGB');
+                saveas(fig,filename, 'epsc');
+%                 export_fig(filename, '-eps', '-transparent', '-r900', '-RGB');
             end
         end
     else
