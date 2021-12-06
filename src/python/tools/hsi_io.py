@@ -113,11 +113,15 @@ def load_hsi_old(folder, indexes=None, hasNorm=0, varname='hsi'):
                 hsis.append(hsi)
     return hsis
 
-def load_dataset(fpath, sampleType='pixel'):
+def load_dataset(fpath, sampleType='pixel', ash5=0):
     f = load_from_h5(fpath)
     hsiList = []
     for keyz in list(f.keys()):
-        hsiList.append(f[keyz])
+        if ash5 == 1:
+            val = f[keyz]
+        else:
+            val = f[keyz][:]
+        hsiList.append(val)
     dataList = []
     if sampleType == 'pixel':
         dataList = flatten_hsis(hsiList)
