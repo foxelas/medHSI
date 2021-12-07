@@ -235,6 +235,7 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
 
 ######################### Plotting #########################
 import skimage.util
+import skimage.io
 
 def simple_plot(y, figTitle, xLabel, yLabel, fpath):
     plt.plot(np.arange(len(y))+1, y)
@@ -257,69 +258,13 @@ def show_image(x, figTitle = None, hasGreyScale = False, fpath = ""):
         plt.savefig(pltFname)
         print('Save figure at:'+ pltFname)
     plt.show()
-
-from PIL import Image
-
-row_size = 4
-margin = 3
-
-def show_montage(hsiList, imgType = 'srgb', channel = 150):
-    images = [get_display_image(x) for x in hsiList]
-
-    width = max(image.shape[0] + margin for image in images)*row_size
-    height = sum(image.shape[1] + margin for image in images)
-    montage = Image.new(mode='RGBA', size=(width, height), color=(0,0,0,0))
     
-    max_x = 0
-    max_y = 0
-    offset_x = 0
-    offset_y = 0
-    for i,image in enumerate(images):
-        montage.paste(image, (max_x,max_y,offset_x, offset_y))
-    
-        max_x = max(max_x, offset_x + image.shape[0])
-        max_y = max(max_y, offset_y + image.shape[1])
-    
-        if i % row_size == row_size-1:
-            offset_y = max_y + margin
-            offset_x = 0
-        else:
-            offset_x += margin + image.shape[0]
-    
-    montage = montage.crop((0, 0, max_x, max_y))
-    #montage.save(output_fn)
-    return 
-    
+def show_montage(dataList, imgType = 'srgb', channel = 150):
+    #Needs to have same number of dimensions for each image, type float single
+    hsiList = np.array([get_display_image(x, imgType, channel) for x in dataList], dtype=object)
+    m = skimage.util.montage(np.array(hsiList, dtype="float32"), multichannel=True)
+    filename = os.path.join(conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
+    skimage.io.imsave(filename, m)
 
-fpath = 'D:\\elena\\mspi\\output\\000-Datasets\\hsi_normalized_full.h5'
-dataList = load_dataset(fpath, 'image')
 
-#hsi = dataList[0]
-#dispImage_= get_display_image(hsi, 'srgb')
-#show_image(dispImage_, None)
-#show_montage(dataList)
 
-hsiList = dataList
-images = [get_display_image(x) for x in hsiList]
-
-width = max(image.shape[0] + margin for image in images)*row_size
-height = sum(image.shape[1] + margin for image in images)
-montage = Image.new(mode='RGBA', size=(width, height), color=(0,0,0,0))
-
-max_x = 0
-max_y = 0
-offset_x = 0
-offset_y = 0
-for i,image in enumerate(images):
-    montage.paste(image, (max_x,max_y,offset_x, offset_y))
-
-    max_x = max(max_x, offset_x + image.shape[0])
-    max_y = max(max_y, offset_y + image.shape[1])
-
-    if i % row_size == row_size-1:
-        offset_y = max_y + margin
-        offset_x = 0
-    else:
-        offset_x += margin + image.shape[0]
-
-montage = montage.crop((0, 0, max_x, max_y))
