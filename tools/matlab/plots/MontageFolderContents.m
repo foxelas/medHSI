@@ -18,7 +18,7 @@ if nargin < 2
 end
 
 if isempty(criteria)
-    criteria = '*';
+    criteria = '*.jpg';
 end
 
 if nargin < 3
@@ -69,6 +69,7 @@ else
     saveName = figTitle;
 end
 
+imageList = imageList(1:end-2);
 
 r = ceil(numel(imageList)/4);
 montage(imageList, 'Size', [r, 4]);
