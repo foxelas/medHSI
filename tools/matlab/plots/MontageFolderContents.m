@@ -69,7 +69,7 @@ else
     saveName = figTitle;
 end
 
-imageList = imageList(1:end-2);
+% imageList = imageList(1:end-2);
 
 r = ceil(numel(imageList)/4);
 montage(imageList, 'Size', [r, 4]);
