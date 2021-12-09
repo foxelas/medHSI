@@ -10,18 +10,26 @@ title: About
 
 Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology related tasks (Obi laboratory, Tokyo Institute of Technology in collaboration with Kobayashi laboratory, Saitama Medical University)
 
-### Download 
+### Download
+
 You can clone or download a .zip file at [github.com/foxelas/medHSI](https://github.com/foxelas/medHSI/tree/main)
 
-### Usage 
+### Usage
+
 Check [Project Structure]({{ site.baseurl }}{% link _pages/structure.md %}).
 
+### Contact
+
+If you find any mistakes or bugs, contact me by email at ealoupogianni[ at ]outlook.com.
+
 ### Collaborators
-  * Obi laboratory [homepage](http://www-obi.isl.titech.ac.jp/)
-  * Kobayashi laboratory
-  * Sasaki pathology laboratory
-  
+
+- Obi laboratory [homepage](http://www-obi.isl.titech.ac.jp/)
+- Kobayashi laboratory
+- Sasaki pathology laboratory
+
 ### Affiliations
-  * Tokyo Institute of Technology, Department of Infomation and Communications Engineering
-  * Saitama Medical University, Faculty of Medical Care
-  * Saitama Medical University Hospital, Faculty of Medicine
+
+- Tokyo Institute of Technology, Department of Infomation and Communications Engineering
+- Saitama Medical University, Faculty of Medical Care
+- Saitama Medical University Hospital, Faculty of Medicine
