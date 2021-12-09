@@ -41,3 +41,8 @@ SVMModel = fitcsvm(X,y,'KernelScale','auto','Standardize',false, 'Verbose', 1, '
 
 CVSVMModel = crossval(SVMModel);
 classLoss = kfoldLoss(CVSVMModel)
+
+savedir = fullfile(GetSetting('outputDir'), GetSetting('experiment'), 'svm_model.mat');
+effectiveDate = date();
+
+save(savedir, 'CVSVMModel', 'classLoss', 'effectiveDate');
