@@ -44,4 +44,4 @@ classLoss = kfoldLoss(CVSVMModel)
 
 savedir = DirMake(GetSetting('outputDir'), GetSetting('experiment'), 'svm_model.mat');
 effectiveDate = date();
-save(savedir, 'CVSVMModel', 'classLoss', 'effectiveDate');
+save(savedir, 'SVMModel', 'classLoss', 'effectiveDate');
