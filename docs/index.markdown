@@ -3,16 +3,15 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
-title: About
+title: An organized set of functions for Hyperspectral Images
 ---
 
-## An organized set of functions for Hyperspectral Images
-
-Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology related tasks (Obi laboratory, Tokyo Institute of Technology in collaboration with Kobayashi laboratory, Saitama Medical University)
+Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology-related tasks.
+The methods are tested on hyper-spectral images (in the visible range) of Pigmented Skin Lesions.
 
 ### Download
 
-You can clone or download a .zip file at [github.com/foxelas/medHSI](https://github.com/foxelas/medHSI/tree/main)
+You can clone or download a [.zip](https://github.com/foxelas/medHSI/archive/refs/heads/main.zip) file at [github.com/foxelas/medHSI](https://github.com/foxelas/medHSI/)
 
 ### Usage
 
@@ -21,15 +20,3 @@ Check [Project Structure]({{ site.baseurl }}{% link _pages/structure.md %}).
 ### Contact
 
 If you find any mistakes or bugs, contact me by email at ealoupogianni[ at ]outlook.com.
-
-### Collaborators
-
-- Obi laboratory [homepage](http://www-obi.isl.titech.ac.jp/)
-- Kobayashi laboratory
-- Sasaki pathology laboratory
-
-### Affiliations
-
-- Tokyo Institute of Technology, Department of Infomation and Communications Engineering
-- Saitama Medical University, Faculty of Medical Care
-- Saitama Medical University Hospital, Faculty of Medicine
