@@ -4,6 +4,8 @@ title: Project Structure
 permalink: /structure/
 ---
 
+Built mainly with MATLAB and Python.
+
 ### Instructions
 
 - Download the [zip](https://github.com/foxelas/medHSI/archive/refs/heads/main.zip) file and extract
