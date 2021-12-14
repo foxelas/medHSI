@@ -3,7 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
-title: An organized set of functions for Hyperspectral Images
+title: An organized processing framework for Hyper-Spectral Images in Medicine
 ---
 
 Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology-related tasks.
