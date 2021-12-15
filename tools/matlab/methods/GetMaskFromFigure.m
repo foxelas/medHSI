@@ -1,20 +1,20 @@
-function [mask, maskedPixels] = GetMaskFromFigure(I)
+function [mask, maskedPixels] = GetMaskFromFigure(hsi)
 %GetMaskFromFigure returns a mask corresponding to a polygon selection on
 %the figure, as well as the marked pixel vectors belogning to the mask.
 %
 %   Usage:
 %   [mask, maskedPixels] = GetMaskFromFigure(I)
 
-[~, ~, w] = size(I);
+[~, ~, w] = size(hsi);
 if w > 3
-    Irgb = GetDisplayImage(I);
+    Irgb = GetDisplayImage(hsi);
 else
-    Irgb = I;
+    Irgb = hsi;
 end
-[m, n, ~] = size(I);
+[m, n, ~] = size(hsi);
 
 mask = roipoly(Irgb);
 title('Draw polygon')
 
-maskedPixels = GetPixelsFromMask(I, mask);
+maskedPixels = GetPixelsFromMask(hsi, mask);
 end

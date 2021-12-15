@@ -5,7 +5,7 @@ function [] = SetOpt()
 %     SetOpt()
 
 disp('Reading configuration file [config.ini] ...');
-inputSettingsFile = fullfile(GetConfDir(), 'config.ini');
+inputSettingsFile = fullfile(config.GetConfDir(), 'config.ini');
 
 tmp = delimread(inputSettingsFile, {', '}, 'raw');
 for i = 1:length(tmp.raw)

@@ -1,21 +1,22 @@
-SetOpt();
-SetSetting('isTest', false);
-SetSetting('database', 'psl');
+config.SetOpt();
+config.SetSetting('isTest', false);
+config.SetSetting('database', 'psl');
 %% Read h5 data
-[targetIDs, outRows] = GetTargetIndexes({'tissue', true},  'fix');
+[targetIDs, outRows] = DB.GetTargetIndexes({'tissue', true},  'fix');
 
 %%
-dirpath = fullfile(GetSetting('outputDir'),GetSetting('labelsManual'));
+dirpath = fullfile(config.GetSetting('outputDir'),config.GetSetting('labelsManual'));
 dirList = dir(fullfile(dirpath, '*.jpg'));
 
 close all;
-savedir = DirMake(GetSetting('matDir'), strcat(GetSetting('database'), 'Labels\'));
-maskdir = DirMake(GetSetting('outputDir'), GetSetting('labels'), '\');
-applieddir = DirMake(GetSetting('outputDir'), GetSetting('labelsApplied'), '\');
+savedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
+maskdir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labels'), '\');
+applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsApplied'), '\');
+basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshots'),  'normalized\');
 
-for i=1:2:numel(dirList)
-    imBase = im2double(imread(fullfile(dirList(i).folder, dirList(i).name)));
-    imLab = imread(fullfile(dirList(i+1).folder, dirList(i+1).name));
+for i=1:numel(dirList)
+    imBase = im2double(imread(fullfile(basedir, dirList(i).name)));
+    imLab = imread(fullfile(dirList(i).folder, dirList(i).name));
 
     figure(1);imshow(imBase);
     figure(2);imshow(imLab);

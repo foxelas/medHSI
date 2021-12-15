@@ -1,9 +1,9 @@
-function dispImage = GetDisplayImage(spectralImage, method, channel)
+function dispImage = GetDisplayImage(hsi, method, channel)
 %GetDisplayImage returns the display image from an HSI image
 %
 %   Usage:
-%   dispImage = GetDisplayImage(spectralImage, 'rgb')
-%   dispImage = GetDisplayImage(spectralImage, 'channel', 200)
+%   dispImage = GetDisplayImage(hsi, 'rgb')
+%   dispImage = GetDisplayImage(hsi, 'channel', 200)
 
 if nargin < 2
     method = 'rgb';
@@ -13,19 +13,19 @@ if nargin < 3
     channel = 100;
 end
 
-[m, n, z] = size(spectralImage);
+[m, n, z] = size(hsi);
 if (z < 401)
     v = GetWavelengths(z, 'index');
     spectralImage2 = zeros(m, n, 401);
-    spectralImage2(:, :, v) = spectralImage;
-    spectralImage = spectralImage2;
+    spectralImage2(:, :, v) = hsi;
+    hsi = spectralImage2;
     z = 401;
     clear 'spectralImage2';
 end
 if HasGPU()
-    spectralImage_ = gpuArray(spectralImage);
+    spectralImage_ = gpuArray(hsi);
 else
-    spectralImage_ = spectralImage;
+    spectralImage_ = hsi;
 end
 clear 'spectralImage';
 

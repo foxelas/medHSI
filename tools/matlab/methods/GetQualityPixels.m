@@ -17,6 +17,8 @@ if ndims(I) == 2
     idxs = spectralMean > meanLimit & spectralMax < maxLimit & spectralMean > 0;
     newI = I(idxs, :);
 else
-    disp('Not supported')
+    [m, n, w] = size(I);
+    I2d = reshape(I, [m * n, w]);
+    [newI, idxs] = GetQualityPixels(I2d, meanLimit, maxLimit);
 end
 end

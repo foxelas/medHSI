@@ -88,7 +88,7 @@ if ~flag
     disp('Check failed');
 else
     disp('Check passed');
-    filename = DirMake(GetSetting('saveDir'), GetSetting('datasets'), 'last_import.xlsx');
+    filename = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('datasets'), 'last_import.xlsx');
     writetable(struct2table(fileS), filename);
     fprintf('File written in %s. \n', filename);
 end

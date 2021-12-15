@@ -1,16 +1,16 @@
 %Date: 2021-12-08
 
-SetOpt();
-SetSetting('isTest', false);
-SetSetting('database', 'psl');
-SetSetting('normalization', 'byPixel');
-SetSetting('experiment', 'T20211208-SVM');
+config.SetOpt();
+config.SetSetting('isTest', false);
+config.SetSetting('database', 'psl');
+config.SetSetting('normalization', 'byPixel');
+config.SetSetting('experiment', 'T20211215-SVM');
         
 %% Read h5 data
-[targetIDs, outRows] = GetTargetIndexes({'tissue', true},  'fix');
+[targetIDs, outRows] = DB.GetTargetIndexes({'tissue', true},  'fix');
 
-labeldir = DirMake(GetSetting('matDir'), strcat(GetSetting('database'), 'Labels\'));
-imgadedir = DirMake(GetSetting('matDir'), strcat(GetSetting('database'), 'Normalized\'));
+labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
+imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Normalized\'));
 
 % ApplyScriptToEacRhImage(@reshape, {'tissue', true},  'fix');
 
@@ -21,15 +21,16 @@ for i = 1:length(targetIDs)
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    hsi = ReadStoredHSI(targetName, GetSetting('normalization'));
-    [m,n,z] = size(hsi);
+    I = hsi;
+    I.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
+    [m,n,z] = I.Size();
    
     labelfile =  fullfile(labeldir, strcat(num2str(id), '_label.mat'));
     if exist(labelfile, 'file')
         load(labelfile, 'labelMask');
         
-        fgMask = GetFgMask(hsi);
-        Xcol = GetPixelsFromMask(hsi, fgMask);
+        fgMask = I.GetFgMask();
+        Xcol = I.GetPixelsFromMask(fgMask);
         X = [X ; Xcol];
         ycol = GetPixelsFromMask(labelMask(1:m, 1:n), fgMask);
         y = [y; ycol];
@@ -42,6 +43,6 @@ SVMModel = fitcsvm(X,y,'KernelScale','auto','Standardize',false, 'Verbose', 1, '
 CVSVMModel = crossval(SVMModel);
 classLoss = kfoldLoss(CVSVMModel)
 
-savedir = DirMake(GetSetting('outputDir'), GetSetting('experiment'), 'svm_model.mat');
+savedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'svm_model.mat');
 effectiveDate = date();
 save(savedir, 'SVMModel', 'classLoss', 'effectiveDate');

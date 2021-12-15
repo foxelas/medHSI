@@ -1,4 +1,4 @@
-function spectrumCurves = GetSpectraFromMask(target, subMasks, targetMask)
+function spectrumCurves = GetSpectraFromMask(hsi, subMasks, targetMask)
 %%GetSpectraFromMask returns the average spectrum of a specific ROI mask
 %
 %   Usage:
@@ -7,10 +7,10 @@ function spectrumCurves = GetSpectraFromMask(target, subMasks, targetMask)
 hasMasks = nargin > 1;
 
 if nargin > 2
-    target = cropROI(target, targetMask);
+    hsi = cropROI(hsi, targetMask);
 end
 
-[~, ~, w] = size(target);
+[~, ~, w] = size(hsi);
 
 if hasMasks
     y = size(subMasks, 3);
@@ -19,7 +19,7 @@ if hasMasks
     isSinglePoint = sum(subMasks(:, :, 1), 'all') == 1;
     for k = 1:y
         subMask = subMasks(:, :, k);
-        patchSpectra = cropROI(target, subMask);
+        patchSpectra = cropROI(hsi, subMask);
         if isSinglePoint
             spectrumCurves(k, :) = patchSpectra;
         else
@@ -28,7 +28,7 @@ if hasMasks
     end
 else
     spectrumCurves = zeros(1, w);
-    spectrumCurves(1, :) = mean(reshape(target, [size(target, 1) * size(target, 2), w]));
+    spectrumCurves(1, :) = mean(reshape(hsi, [size(hsi, 1) * size(hsi, 2), w]));
 end
 
 end
