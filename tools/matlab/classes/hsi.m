@@ -10,6 +10,7 @@ classdef hsi
 %         Dimred
 %         NormalizeImage
 %         GetDisplayImage
+%         GetDisplayRescaledImage
 %         GetPixelsFromMask
 %         GetMaskFromFigure
 %         GetFgMask
@@ -33,6 +34,10 @@ classdef hsi
         
         function dispImage = GetDisplayImage(obj, method, channel)
             dispImage = GetDisplayImage(obj.Value, method, channel);
+        end
+        
+        function dispImage = GetDisplayRescaledImage(obj, method, channel)
+            dispImage = GetDisplayImage(rescale(obj.Value), method, channel);
         end
         
         function [maskedPixels] = GetPixelsFromMask(obj, mask)
@@ -70,19 +75,19 @@ classdef hsi
                 hasPixelSelection = false;
             end
 
-            hsi = obj.Value;
-            if ndims(hsi) > 2
-                [b, m, n] = size(hsi);
-                hsi = reshape(hsi, b, m*n)';
+            hsIm = obj.Value;
+            if ndims(hsIm) > 2
+                [b, m, n] = size(hsIm);
+                hsIm = reshape(hsIm, b, m*n)';
             end
 
             if hasPixelSelection
-                spectralMean = mean(hsi, 2);
-                spectralMax = max(hsi, [], 2);
+                spectralMean = mean(hsIm, 2);
+                spectralMax = max(hsIm, [], 2);
                 acceptablePixels = spectralMean > 0.2 & spectralMax < 0.99;
-                tempI = hsi(acceptablePixels, :);
+                tempI = hsIm(acceptablePixels, :);
             else
-                tempI = hsi;
+                tempI = hsIm;
             end
             c = corr(tempI);
         end
@@ -95,9 +100,9 @@ classdef hsi
         %
         %   YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS
 
-        hsi = obj.Value;
-        hsi = hsi(:, :, [420:730]-380);
-        [updI, ~] = RemoveBackground(hsi);
+        hsIm = obj.Value;
+        hsIm = hsIm(:, :, [420:730]-380);
+        [updI, ~] = hsi.RemoveBackground(hsIm);
         pHsi = updI;
 
         end

@@ -39,9 +39,9 @@ for i=1:numel(dirList)
     savename = fullfile(savedir, strcat(num2str(id), '_label.mat'));
     save(savename, 'labelMask');
     
-    SetSetting('plotName', fullfile(maskdir, dirList(i).name));
+    config.SetSetting('plotName', fullfile(maskdir, dirList(i).name));
     SavePlot(2);
 
-    SetSetting('plotName', fullfile(applieddir, dirList(i).name));
+    config.SetSetting('plotName', fullfile(applieddir, dirList(i).name));
     SavePlot(3);
 end

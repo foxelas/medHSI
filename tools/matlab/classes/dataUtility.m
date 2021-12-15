@@ -78,7 +78,7 @@ classdef dataUtility
 
         switch options
             case 'add'
-                x = getWavelengths(m, 'index');
+                x = hsiUtility.GetWavelengths(m, 'index');
                 if m > 100
                     outSpectrum = zeros(401, 1);
                 else

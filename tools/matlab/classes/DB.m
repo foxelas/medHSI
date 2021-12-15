@@ -154,26 +154,8 @@ classdef DB
                 initialIntegrationTime = integrationTime;
             end
             
-            function [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
-                outR = inR;
-                if isempty(inR.ID) && ~isempty(specialTarget)
-                    if strcmp(specialTarget, 'black')
-                        configuration = 'noLight';
-                    end
-                    [~, ~, outR] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
-                    if isempty(outR.ID) && strcmp(specialTarget, 'black')
-                        [~, ~, outR] = Query('capOn', sampleId, '20210107', id, integrationTime, target, configuration);
-                    end
-                end
-
-                if numel(outR.ID) > 1
-                    warning('Taking the first from multiple rows that satisfy the conditions.');
-                    outR = outR(1, :);
-                end
-            end
-            
-            [~, ~, outRow] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
-            outRow = CheckOutRow(outRow, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget);
+            [~, ~, outRow] = DB.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
+            outRow = DB.CheckOutRow(outRow, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget);
 
             filename = outRow.Filename{1};
             tableId = outRow.ID;
@@ -189,6 +171,24 @@ classdef DB
 
         end
     
+        function [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
+            outR = inR;
+            if isempty(inR.ID) && ~isempty(specialTarget)
+                if strcmp(specialTarget, 'black')
+                    configuration = 'noLight';
+                end
+                [~, ~, outR] = DB.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
+                if isempty(outR.ID) && strcmp(specialTarget, 'black')
+                    [~, ~, outR] = DB.Query('capOn', sampleId, '20210107', id, integrationTime, target, configuration);
+                end
+            end
+
+            if numel(outR.ID) > 1
+                warning('Taking the first from multiple rows that satisfy the conditions.');
+                outR = outR(1, :);
+            end
+        end
+            
         function [setId] = SelectDatabaseSamples(dataTable, setId)
             %SelectDatabaseSamples from DataInfo table in order to ignore incorrect
             %samples inside Query.m
