@@ -6,17 +6,17 @@ if hasRead
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\94_white.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\94_black.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\94_target.mat')
-    raw1 = hsi;
+    raw1 = Hsi;
     raw1.Value = spectralData;
-    norm1 = hsi;
+    norm1 = Hsi;
     norm1.Value = raw1.Normalize(fullReflectanceByPixel, blackReflectance);
 
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\67_white.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\67_black.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\67_target.mat')
-    raw2 = hsi;
+    raw2 = Hsi;
     raw2.Value = spectralData;
-    norm2 = hsi;    
+    norm2 = Hsi;    
     norm2 = raw2.Normalize(fullReflectanceByPixel, blackReflectance);
 
     allowDrawMask = false;

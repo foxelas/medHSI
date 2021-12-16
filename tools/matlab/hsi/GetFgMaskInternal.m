@@ -1,14 +1,14 @@
-function fgMask = GetFgMask(hsi)
+function fgMask = GetFgMask(hsIm)
 %%GetFgMask returns the foreground mask for an image where background
 %%pixels are black
 %
 %   Usage:
-%   fgMask = GetFgMask(hsi);
+%   fgMask = GetFgMask(hsIm);
 
-if ndims(hsi) > 3
-    srgb = GetDisplayImage(hsi, 'rgb');
+if ndims(hsIm) > 3
+    srgb = GetDisplayImage(hsIm, 'rgb');
 else
-    srgb = hsi;
+    srgb = hsIm;
 end
 fgMask = ~(squeeze(srgb(:, :, 1)) == 0 & squeeze(srgb(:, :, 1)) == 0 & squeeze(srgb(:, :, 1)) == 0);
 

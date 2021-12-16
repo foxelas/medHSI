@@ -13,20 +13,21 @@ if nargin < 2
 end 
 
 %% Read h5 data
-[targetIDs, ~] = GetTargetIndexes(condition, target);
+[targetIDs, ~] = DB.GetTargetIndexes(condition, target);
 
 for i = 1:length(targetIDs)
     id = targetIDs(i);
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    hsi = ReadStoredHSI(targetName, GetSetting('normalization'));
-
+    hsIm = Hsi;
+    hsIm.Value = HsiUtility.ReadStoredHSI(targetName, Config.GetSetting('normalization'));
+    
     %% Change to Relevant Script
     if nargout(functionName) > 0
-        varargout{:} = functionName(hsi, targetName, varargin{:});
+        varargout{:} = functionName(hsIm, targetName, varargin{:});
     else
-        functionName(hsi, targetName, varargin{:});
+        functionName(hsIm, targetName, varargin{:});
     end
 end
 

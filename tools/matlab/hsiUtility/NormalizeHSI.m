@@ -18,7 +18,7 @@ baseDir = fullfile(GetSetting('matDir'), strcat(GetSetting('database'), 'Triplet
 
 targetFilename = strcat(baseDir, '_target.mat');
 load(targetFilename, 'spectralData');
-hsIm = hsi;
+hsIm = Hsi;
 hsIm.Value = spectralData;
 [m, n, w] = hsIm.Size();
 

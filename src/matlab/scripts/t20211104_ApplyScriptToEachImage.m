@@ -27,11 +27,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%% Additional Functions %%%%%%%%%%%%%%%%%%%%%%%%
 function GetMontagetCollection(target)
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
-Plots(1, @MontageFolderContents, [], criteria);
+Plots.MontageFolderContents(1, [], criteria);
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'fix');
-Plots(2, @MontageFolderContents, [], criteria, strcat(target, ' for fix'));
+Plots.MontageFolderContents(2, [], criteria, strcat(target, ' for fix'));
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'raw');
-Plots(3, @MontageFolderContents, [], criteria, strcat(target, ' for ex-vivo'));
+Plots.MontageFolderContents(3, [], criteria, strcat(target, ' for ex-vivo'));
 end
 
 function RunSettings(numVal)

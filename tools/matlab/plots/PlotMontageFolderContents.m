@@ -36,7 +36,7 @@ if ~isOneFolder
     hasTargetType = isfield(criteria, 'TargetType');
     imageList = cell(numel(fileList)-2, 1);
     if hasTargetType
-        [targetIDs, ~] = GetTargetIndexes([], criteria.TargetType);
+        [targetIDs, ~] = DB.GetTargetIndexes([], criteria.TargetType);
         imageList = cell(numel(targetIDs), 1);
     end
     c = 1;
@@ -78,6 +78,6 @@ if ~isempty(figTitle)
 end
 
 %save in parent dir 
-SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
+Config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
 SavePlot(fig);
 end

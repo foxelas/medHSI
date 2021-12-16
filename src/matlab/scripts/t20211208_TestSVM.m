@@ -21,7 +21,7 @@ for i = 1:length(targetIDs)
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    I = hsi;
+    I = Hsi;
     I.Value = HsiUtility.ReadStoredHSI(targetName, Config.GetSetting('normalization'));
     [m,n,z] = I.Size();
    
@@ -32,7 +32,7 @@ for i = 1:length(targetIDs)
         fgMask = I.GetFgMask();
         Xcol = I.GetPixelsFromMask(fgMask);
         X = [X ; Xcol];
-        ycol = GetPixelsFromMask(labelMask(1:m, 1:n), fgMask);
+        ycol = GetPixelsFromMaskInternal(labelMask(1:m, 1:n), fgMask);
         y = [y; ycol];
     end
 end

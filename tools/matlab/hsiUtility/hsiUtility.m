@@ -54,7 +54,7 @@ classdef HsiUtility
                 end
 
             case 'index'
-                x = GetWavelengths(m, 'raw');
+                x = HsiUtility.GetWavelengths(m, 'raw');
                 x = x - 380 + 1;
 
             case 'babel'
@@ -153,7 +153,7 @@ classdef HsiUtility
 
             %% load HSI from .mat file to verify it is working and to prepare preview images
             targetName = num2str(id);
-            spectralData = hsi;
+            spectralData = Hsi;
             spectralData.Value = DataUtility.ReadStoredHSI(targetName);
             dispImage = spectralData.GetDisplayRescaledImage('rgb');
             figure(1);

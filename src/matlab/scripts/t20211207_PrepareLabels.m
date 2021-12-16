@@ -20,7 +20,7 @@ for i=1:numel(dirList)
 
     figure(1);imshow(imBase);
     figure(2);imshow(imLab);
-    fgMask = GetFgMask(imBase);
+    fgMask = GetFgMaskInternal(imBase);
     labelMask =  rgb2gray(imLab) <= 127;
     labelMask = imfill(labelMask, 'holes');
 %     se = strel('disk',3);

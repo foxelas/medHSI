@@ -1,5 +1,5 @@
 classdef Apply
-    methods
+    methods(Static)
 %% Contents 
 %
 %   Static:
@@ -7,16 +7,16 @@ classdef Apply
 %         [result] = RowFunc(funcName, varargin)
 %         [varargout] = OnQualityPixels(func, varargin)
 
-        function [varargout] = ScriptToEachImage(functionName, condition, target, varargin)
-            [varargout] = ApplyScriptToEachImage(functionName, condition, target, varargin);
+        function [varargout] = ScriptToEachImage(varargin)
+            [varargout] = ApplyScriptToEachImage(varargin{:});
         end
         
-        function [result] = RowFunc(funcName, varargin)
-            [result] = ApplyRowFunc(funcName, varargin);
+        function [result] = RowFunc(varargin)
+            [result] = ApplyRowFunc(varargin{:});
         end
         
-        function [varargout] = OnQualityPixels(func, varargin)
-            [varargout] = ApplyOnQualityPixels(func, varargin);
+        function [varargout] = OnQualityPixels(varargin)
+            [varargout] = ApplyOnQualityPixels(varargin{:});
         end
     end
 end

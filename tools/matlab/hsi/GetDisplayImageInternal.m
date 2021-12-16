@@ -1,9 +1,9 @@
-function dispImage = GetDisplayImage(hsi, method, channel)
+function dispImage = GetDisplayImage(hsIm, method, channel)
 %GetDisplayImage returns the display image from an HSI image
 %
 %   Usage:
-%   dispImage = GetDisplayImage(hsi, 'rgb')
-%   dispImage = GetDisplayImage(hsi, 'channel', 200)
+%   dispImage = GetDisplayImage(hsIm, 'rgb')
+%   dispImage = GetDisplayImage(hsIm, 'channel', 200)
 
 if nargin < 2
     method = 'rgb';
@@ -13,19 +13,19 @@ if nargin < 3
     channel = 100;
 end
 
-[m, n, z] = size(hsi);
+[m, n, z] = size(hsIm);
 if (z < 401)
-    v = GetWavelengths(z, 'index');
+    v = HsiUtility.GetWavelengths(z, 'index');
     spectralImage2 = zeros(m, n, 401);
-    spectralImage2(:, :, v) = hsi;
-    hsi = spectralImage2;
+    spectralImage2(:, :, v) = hsIm;
+    hsIm = spectralImage2;
     z = 401;
     clear 'spectralImage2';
 end
-if HasGPU()
-    spectralImage_ = gpuArray(hsi);
+if Config.HasGPU()
+    spectralImage_ = gpuArray(hsIm);
 else
-    spectralImage_ = hsi;
+    spectralImage_ = hsIm;
 end
 clear 'spectralImage';
 
@@ -55,7 +55,7 @@ switch method
         error('Unsupported method for display image reconstruction');
 end
 
-if HasGPU()
+if Config.HasGPU()
     dispImage = gather(dispImage_);
 else
     dispImage = dispImage_;
@@ -64,9 +64,9 @@ end
 end
 
 function [xyz, illumination] = PrepareParams(z)
-filename = fullfile(GetRunBaseDir(), GetSetting('paramDir'), 'displayParam.mat');
+filename = fullfile(Config.GetRunBaseDir(), Config.GetSetting('paramDir'), 'displayParam.mat');
 if ~exist(filename, 'file')
-    lambdaIn = GetWavelengths(z, 'raw');
+    lambdaIn = HsiUtility.GetWavelengths(z, 'raw');
     [lambdaMatch, xFcn, yFcn, zFcn] = colorMatchFcn('1964_FULL');
     xyz = interp1(lambdaMatch', [xFcn; yFcn; zFcn]', lambdaIn, 'pchip', 0);
     [solaxSpec, lambdaMatch] = GetSolaxSpectra();

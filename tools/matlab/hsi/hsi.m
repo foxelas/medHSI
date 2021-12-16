@@ -32,44 +32,44 @@ classdef Hsi
             [m, n, w] = size(obj.Value);
         end
         
-        function [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, mask)
-            [coeff, scores, latent, explained, objective] = DimredHSI(obj.Value, method, q, mask);
+        function [coeff, scores, latent, explained, objective] = Dimred(obj,varargin)
+            [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, varargin{:});
         end
         
-        function [obj] = Normalize(obj, white, black, method)
-            obj.Value = NormalizeImage(obj.Value, white, black, method);
+        function [obj] = Normalize(obj, varargin)
+            obj.Value = NormalizeInternal(obj.Value, varargin{:});
         end
         
-        function [dispImage] = GetDisplayImage(obj, method, channel)
-            dispImage = GetDisplayImage(obj.Value, method, channel);
+        function [dispImage] = GetDisplayImage(obj, varargin)
+            dispImage = GetDisplayImageInternal(obj.Value, varargin{:});
         end
         
-        function [dispImage] = GetDisplayRescaledImage(obj, method, channel)
-            dispImage = GetDisplayImage(rescale(obj.Value), method, channel);
+        function [dispImage] = GetDisplayRescaledImage(obj, varargin)
+            dispImage = GetDisplayImageInternal(rescale(obj.Value), varargin{:});
         end
         
-        function [maskedPixels] = GetPixelsFromMask(obj, mask)
-            maskedPixels = GetPixelsFromMask(obj.Value, mask);
+        function [maskedPixels] = GetPixelsFromMask(obj, varargin)
+            maskedPixels = GetPixelsFromMaskInternal(obj.Value, varargin{:});
         end
         
         function [mask, maskedPixels] = GetMaskFromFigure(obj)
-            [mask, maskedPixels] = GetMaskFromFigure(obj.Value);
+            [mask, maskedPixels] = GetMaskFromFigureInternal(obj.Value);
         end 
         
         function [fgMask] = GetFgMask(obj)
-            fgMask = GetFgMask(obj.Value);
+            fgMask = GetFgMaskInternal(obj.Value);
         end
         
-        function [spectrumCurves] = GetSpectraFromMask(obj, subMasks, targetMask)
-             spectrumCurves = GetSpectraFromMask(obj.Value, subMasks, targetMask);
+        function [spectrumCurves] = GetSpectraFromMask(obj, varargin)
+             spectrumCurves = GetSpectraFromMaskInternal(obj.Value, varargin{:});
         end
         
-        function [newI, idxs] = GetQualityPixels(obj, meanLimit, maxLimit)
-            [newI, idxs] = GetQualityPixels(obj.Value, meanLimit, maxLimit);
+        function [newI, idxs] = GetQualityPixels(obj, varargin)
+            [newI, idxs] = GetQualityPixelsInternal(obj.Value, varargin{:});
         end
         
-        function [updI, fgMask] = RemoveBackground(obj, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
-            [updI, fgMask] = RemoveBackground(obj.Value, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient);
+        function [updI, fgMask] = RemoveBackground(obj, varargin)
+            [updI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
         end
         
         function [c] = GetBandCorrelation(obj, hasPixelSelection)
