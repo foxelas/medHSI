@@ -1,8 +1,8 @@
-function [lineColorMap] = GetLineColorMap(style, names)
-%     GETLINECOLORMAP returns a linecolor map based on the style
+function [lineColorMap] = PlotGetLineColorMap(style, names)
+%     PLOTGETLINECOLORMAP returns a linecolor map based on the style
 %
 %     Usage:
-%     [lineColorMap] = GetLineColorMap('class')
+%     [lineColorMap] = PlotGetLineColorMap('class')
 
 if (nargin < 1)
     style = 'class';

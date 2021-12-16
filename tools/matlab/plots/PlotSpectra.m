@@ -1,4 +1,4 @@
-function[] = PlotSpectra(spectra, wavelengths, names, figTitle, fig)
+function [] = PlotSpectra(spectra, wavelengths, names, figTitle, fig)
 %%PLOTSPECTRA plots one or more spectra together
 %
 %   Usage:

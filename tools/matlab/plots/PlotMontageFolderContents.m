@@ -1,13 +1,13 @@
-function [] = MontageFolderContents(path, criteria, figTitle, fig)
-% MontageFolderContents returns the images in a path as a montage
+function [] = PlotMontageFolderContents(path, criteria, figTitle, fig)
+% PlotMontageFolderContents returns the images in a path as a montage
 %
 %   Usage:
-%   MontageFolderContents(path, criteria, figTitle, fig)
+%   PlotMontageFolderContents(path, criteria, figTitle, fig)
 %
 %   criteria = struct('TargetDir', 'subfolders', ...
 %       'TargetName', strcat(target, '.jpg'), ...
 %       'TargetType', 'fix');
-%   Plots(1, @MontageFolderContents, [], criteria);
+%   Plots.MontageFolderContents(1, [], criteria);
 
 if isempty(path)
     path = fullfile(GetSetting('saveDir'), GetSetting('experiment'));
