@@ -1,5 +1,4 @@
-function normI = NormalizeImage(I, white, black, method)
-
+function normI = NormalizeInternal(I, white, black, method)
 %% Normalize a given array I with max and min arrays, white and black
 %  according to methon 'method'
 %

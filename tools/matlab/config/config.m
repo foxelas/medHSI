@@ -1,29 +1,35 @@
 classdef Config  
     methods (Static)                  
         function [] = SetOpt()
+%     SETOPT sets parameters for running from conf/Config.ini
+%
+%     Usage:
+%     SetOpt()
             SetOpt();
         end
         
-        %% GETRUNBASEDIR returns the base dir for the current project
         function [curDir] = GetRunBaseDir()
+        %% GETRUNBASEDIR returns the base dir for the current project
+
             currentDir = pwd;
             projectName = 'medHSI';
             parts = strsplit(currentDir, 'medHSI');
             curDir = fullfile(parts{1}, projectName);
         end
         
-        %% GETCONFDIR returns the configuration dir for the current project
         function [curDir] = GetConfDir()
+        %% GETCONFDIR returns the configuration dir for the current project
 
         curDir = fullfile(Config.GetRunBaseDir(), 'conf');
 
         end
 
+
+        function [filepath] = DirMake(varargin)
         %% DirMake creates a new directory
         %
         %     Usage:
         %     [filepath] = DirMake(filepath)
-        function [filepath] = DirMake(varargin)
             if nargin == 1
                 filepath = varargin{1};
             else
@@ -38,12 +44,13 @@ classdef Config
             end
         end
 
+
+        function [fileConditions] = GetFileConditions(content, target, id)
         %% GETFILECONDITIONS returns the conditions necessary for finding the
         %%filename of the file to be read
         %
         %   Usage:
         %   fileConditions = GetFileConditions(content, target)
-        function [fileConditions] = GetFileConditions(content, target, id)
 
             if nargin < 2
                 target = [];
@@ -62,19 +69,20 @@ classdef Config
             end
         end
         
+      
+        function sourceDir = GetSource()
         %     GETSOURCE returns the source directory
         %
         %     Usage:
-        %     sourceDir = GetSource()        
-        function sourceDir = GetSource()
+        %     sourceDir = GetSource()  
             sourceDir = fullfile('..', '..', '..');
         end
  
+        function [hasGpu] = HasGPU()
         %%HASGPU informs whether there is gpu available
         %
         %   Usage:
         %   hasGpu = HasGPU()
-        function [hasGpu] = HasGPU()
             v = dbstack;
             if numel(v) > 1
                 parentName = v(2).name;
@@ -92,11 +100,11 @@ classdef Config
             hasGpu = Config.GetSetting('pcHasGPU');
         end
 
+        function [value] = GetSetting(parameter)
         %% GETSETTING returns the value of a configurationParameter
         %
         %     Usage:
         %     value = getSetting('saveDir')
-        function [value] = GetSetting(parameter)
             settingsFile = fullfile(Config.GetConfDir(), 'Config.mat');
             variableInfo = who('-file', settingsFile);
             if ismember(parameter, variableInfo)
@@ -107,12 +115,13 @@ classdef Config
             end
         end
 
+
+        function [] = SetSetting(parameter, value)
         %% SETSETTING sets a parameter according to a value or by default
         %
         %     Usage:
         %     SetSetting('saveDir', 'out\out')
         %     SetSetting('saveDir')
-        function [] = SetSetting(parameter, value)
             settingsFile = fullfile(Config.GetConfDir(), 'Config.mat');
             m = matfile(settingsFile, 'Writable', true);
             if nargin < 2 %write default value
@@ -125,11 +134,11 @@ classdef Config
             Config.NotifySetting(parameter, value);
         end
 
+        function [] = NotifySetting(paramName, paramValue)
         %% NOTIFYSETTING notifies about configuration parameter change
         %
         %     Usage:
         %     NotifySetting('saveDir', '\out\dir\')
-        function [] = NotifySetting(paramName, paramValue)
             onOffOptions = {'OFF', 'ON'};
             if islogical(paramValue)
                 fprintf('--Setting [%s] to %s.\n', paramName, onOffOptions{paramValue+1});

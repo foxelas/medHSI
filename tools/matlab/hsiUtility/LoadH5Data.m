@@ -4,7 +4,6 @@ function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %   Usage:
 %   [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %   returns spectralData, XYZ image and capture wavelengths
-%
 
 database = GetSetting('database');
 filename = strrep(filename, '.hsm', '.h5');

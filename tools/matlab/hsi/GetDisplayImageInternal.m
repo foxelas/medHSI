@@ -1,4 +1,4 @@
-function dispImage = GetDisplayImage(hsIm, method, channel)
+function dispImage = GetDisplayImageInternal(hsIm, method, channel)
 %GetDisplayImage returns the display image from an HSI image
 %
 %   Usage:

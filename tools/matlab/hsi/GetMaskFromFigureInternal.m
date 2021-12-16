@@ -1,4 +1,4 @@
-function [mask, maskedPixels] = GetMaskFromFigure(hsIm)
+function [mask, maskedPixels] = GetMaskFromFigureInternal(hsIm)
 %GetMaskFromFigure returns a mask corresponding to a polygon selection on
 %the figure, as well as the marked pixel vectors belogning to the mask.
 %
@@ -16,5 +16,5 @@ end
 mask = roipoly(Irgb);
 title('Draw polygon')
 
-maskedPixels = GetPixelsFromMask(hsIm, mask);
+maskedPixels = GetPixelsFromMaskInternal(hsIm, mask);
 end

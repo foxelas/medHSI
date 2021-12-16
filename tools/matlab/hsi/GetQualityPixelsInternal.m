@@ -1,4 +1,4 @@
-function [newI, idxs] = GetQualityPixels(I, meanLimit, maxLimit)
+function [newI, idxs] = GetQualityPixelsInternal(I, meanLimit, maxLimit)
 %     GETQUALITYPIXELS removes over-saturated and under-exposed pixels from base image
 %
 %     Usage:
@@ -19,6 +19,6 @@ if ndims(I) == 2
 else
     [m, n, w] = size(I);
     I2d = reshape(I, [m * n, w]);
-    [newI, idxs] = GetQualityPixels(I2d, meanLimit, maxLimit);
+    [newI, idxs] = GetQualityPixelsinternal(I2d, meanLimit, maxLimit);
 end
 end

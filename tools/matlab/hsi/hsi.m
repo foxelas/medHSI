@@ -33,10 +33,28 @@ classdef Hsi
         end
         
         function [coeff, scores, latent, explained, objective] = Dimred(obj,varargin)
+%Dimred reduces the dimensions of an image dataset
+%
+%   Input arguments
+%   X: input data as a matrix with MxN observations and Z columns
+%   methods: 'rica', 'pca'
+%   q: number of components to be retained
+%   mask: 2x2 logical array marking pixels to be used in PCA calculation
+%
+%   Usage:
+%   [coeff, scores, latent, explained, objective] = Dimred(X, method, q, mask)
+%   [coeff, scores, latent, explained, ~] = Dimred(X, 'pca', 10)
+%   [coeff, scores, ~, ~, objective] = Dimred(X, 'rica', 40)
             [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, varargin{:});
         end
         
         function [obj] = Normalize(obj, varargin)
+%% Normalize a given array I with max and min arrays, white and black
+%  according to methon 'method'
+%
+%   Usage:
+%   normI = NormalizeImage(I, white, black, method)
+
             obj.Value = NormalizeInternal(obj.Value, varargin{:});
         end
         
@@ -49,26 +67,52 @@ classdef Hsi
         end
         
         function [maskedPixels] = GetPixelsFromMask(obj, varargin)
+%% GetPixelsFromMask returns flattened pixels according to a 2D mask
+
             maskedPixels = GetPixelsFromMaskInternal(obj.Value, varargin{:});
         end
         
         function [mask, maskedPixels] = GetMaskFromFigure(obj)
+%% GetPixelsFromMask returns flattened pixels according to a 2D mask
+
             [mask, maskedPixels] = GetMaskFromFigureInternal(obj.Value);
         end 
         
         function [fgMask] = GetFgMask(obj)
+%%GetFgMask returns the foreground mask for an image where background
+%%pixels are black
+%
+%   Usage:
+%   fgMask = GetFgMask(hsIm);
             fgMask = GetFgMaskInternal(obj.Value);
         end
         
         function [spectrumCurves] = GetSpectraFromMask(obj, varargin)
+%%GetSpectraFromMask returns the average spectrum of a specific ROI mask
+%
+%   Usage:
+%   spectrumCurves = GetSpectraFromMask(target, subMasks, targetMask)
              spectrumCurves = GetSpectraFromMaskInternal(obj.Value, varargin{:});
         end
         
         function [newI, idxs] = GetQualityPixels(obj, varargin)
+%     GETQUALITYPIXELS removes over-saturated and under-exposed pixels from base image
+%
+%     Usage:
+%     [newI, idxs] = GetQualityPixels(I, meanLimit, maxLimit)
+
             [newI, idxs] = GetQualityPixelsInternal(obj.Value, varargin{:});
         end
         
         function [updI, fgMask] = RemoveBackground(obj, varargin)
+        %     REMOVEBACKGROUND removes the background from the specimen image
+        %
+        %     Usage:
+        %     [updatedHSI, foregroundMask] = RemoveBackground(I)
+        %     [updatedHSI, foregroundMask] = RemoveBackground(I, colorLevelsForKMeans,
+        %         attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
+        %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
+
             [updI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
         end
         

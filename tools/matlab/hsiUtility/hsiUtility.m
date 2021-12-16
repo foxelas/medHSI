@@ -5,7 +5,7 @@ classdef HsiUtility
 %     Static:
 %         [x] = GetWavelengths(m, option)
 %         [] = ExportH5Dataset(condition)
-%         [] = ExportH5Dataset(condition)
+%         [] = InitializeDataGroup(experiment, condition)
 %         [spectralData] = NormalizeHSI(targetName, option, saveFile)
 %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %         [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
@@ -188,26 +188,66 @@ classdef HsiUtility
         end
         
         function [spectralData] = NormalizeHSI(targetName, option, saveFile)
+%NormalizeHSI returns spectral data from HSI image
+%
+%   Usage:
+%   spectralData = NormalizeHSI('sample2') returns a
+%   cropped HSI with 'byPixel' normalization
+%
+%   spectralData = NormalizeHSI('sample2', 'raw')
+%   spectralData = NormalizeHSI('sample2', 'byPixel', true)
              spectralData = NormalizeHSI(targetName, option, saveFile);
         end
         
         function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
+%LOADH5DATA loads info from h5 file
+%
+%   Usage:
+%   [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
+%   returns spectralData, XYZ image and capture wavelengths
             [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
         end
         
         function [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
+%%ReadHSIData returns the three images necessary for data analysis
+%
+%   Usage:
+%   [raw] = ReadHSIData(target, experiment, blackIsCapOn)
+
             [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn);
         end
         
         function [spectralData] = ReadStoredHSI(targetName, normalization)
+% ReadStoredHSI reads a stored HSI from a _target mat file
+%
+%   Usage:
+%   [spectralData] = ReadStoredHSI(targetName)
+%   [spectralData] = ReadStoredHSI(targetName, 'byPixel')
             [spectralData] = ReadStoredHSI(targetName, normalization);
         end
         
         function [redHsis] = ReconstructDimred(scores, imgSizes, masks)
+% ReconstructDimred reconstructs reduced data to original dimension
+%
+%   Input arguments:
+%   scores: reduced dimension data
+%   imgSizes: cell array with original sizes of input data
+%   masks: cell array of masks per data sample
+%
+%   Returns:
+%   Reduced data with original spatial dimensions
+%
+%   Usage:
+%   redHsis = ReconstructDimred(scores, imgSizes, masks);
             [redHsis] = ReconstructDimred(scores, imgSizes, masks);
         end
         
         function [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
+% RecoverReducedHsi returns an image that matches the spatial dimensions
+%   of the original hsi
+%
+%   Usage:
+%   [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
             [outHsi] = RecoverReducedHsi(redHsi, origSize, mask);
         end
     end

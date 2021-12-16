@@ -1,4 +1,4 @@
-function [updI, fgMask] = RemoveBackground(I, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
+function [updI, fgMask] = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
 %     REMOVEBACKGROUND removes the background from the specimen image
 %
 %     Usage:

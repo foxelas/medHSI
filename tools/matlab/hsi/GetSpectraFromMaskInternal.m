@@ -1,4 +1,4 @@
-function spectrumCurves = GetSpectraFromMask(hsi, subMasks, targetMask)
+function spectrumCurves = GetSpectraFromMaskInternal(hsi, subMasks, targetMask)
 %%GetSpectraFromMask returns the average spectrum of a specific ROI mask
 %
 %   Usage:

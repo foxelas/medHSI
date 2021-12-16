@@ -1,4 +1,4 @@
-function fgMask = GetFgMask(hsIm)
+function fgMask = GetFgMaskInternal(hsIm)
 %%GetFgMask returns the foreground mask for an image where background
 %%pixels are black
 %

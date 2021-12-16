@@ -1,4 +1,4 @@
-function [coeff, scores, latent, explained, objective] = DimredHSI(X, method, q, mask)
+function [coeff, scores, latent, explained, objective] = DimredInternal(X, method, q, mask)
 %Dimred reduces the dimensions of an image dataset
 %
 %   Input arguments
@@ -16,7 +16,7 @@ function [coeff, scores, latent, explained, objective] = DimredHSI(X, method, q,
 hasMask = nargin > 3;
 
 if hasMask
-    Xcol = GetPixelsFromMask(X, mask);
+    Xcol = GetPixelsFromMaskInternal(X, mask);
 else
     Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
 end
@@ -25,7 +25,7 @@ end
 [coeff, scores, latent, explained, objective] = Dimred(Xcol, method, q);
 
 if hasMask
-    scores = RecoverReducedHsi(scores, size(X), mask);
+    scores = Hsiutility.RecoverReducedHsi(scores, size(X), mask);
 else
     scores = reshape(scores, [size(X, 1), size(X, 2), q]);
 end
