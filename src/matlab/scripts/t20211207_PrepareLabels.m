@@ -15,7 +15,7 @@ applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('l
 basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshots'),  'normalized\');
 
 for i=1:numel(dirList)
-    imBase = im2double(imread(fullfile(basedir, dirList(i).name)));
+    imBase = im2double(imread(fullfile(basedir, strrep(dirList(i).name, '_manual', ''))));
     imLab = imread(fullfile(dirList(i).folder, dirList(i).name));
 
     figure(1);imshow(imBase);
