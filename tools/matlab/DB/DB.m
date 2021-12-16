@@ -10,6 +10,7 @@ classdef DB
         %         [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
         %         [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
         %         [setId] = SelectDatabaseSamples(dataTable, setId)
+        %         [fileConditions] = GetFileConditions(content, target, id)
 
         function [dataTable] = GetDB()
 
@@ -207,8 +208,33 @@ classdef DB
             %
             %   Usage:
             %   [setId] = SelectDatabaseSamples(dataTable, setId)
+            if strcmpi(Config.GetSetting('database'), 'psl') 
+                setId = setId & ~contains(lower(dataTable.SampleID), 'b');
+            end
+        end
+        
+        function [fileConditions] = GetFileConditions(content, target, id)
 
-            setId = setId & ~contains(lower(dataTable.SampleID), 'b');
+            %% GETFILECONDITIONS returns the conditions necessary for finding the
+            %%filename of the file to be read
+            %
+            %   Usage:
+            %   fileConditions = GetFileConditions(content, target)
+
+            if nargin < 2
+                target = [];
+            end
+            if nargin < 3
+                id = [];
+            end
+
+            if Config.GetSetting('isTest')
+                fileConditions = {content, [], Config.GetSetting('dataDate'), id, ...
+                    Config.GetSetting('integrationTime'), target, Config.GetSetting('configuration')};
+            else
+                fileConditions = {content, [], Config.GetSetting('dataDate'), id, ...
+                    Config.GetSetting('integrationTime'), target, []};
+            end
         end
     end
 end

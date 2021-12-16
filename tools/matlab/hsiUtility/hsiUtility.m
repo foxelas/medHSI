@@ -7,6 +7,8 @@ classdef HsiUtility
         %         [] = ExportH5Dataset(condition)
         %         [] = InitializeDataGroup(experiment, condition)
         %         [spectralData] = NormalizeHSI(targetName, option, saveFile)
+        %         [dispImage] = GetDisplayImage(varargin)
+        %         [spectrumCurves] = GetSpectraFromMask(varargin)
         %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
         %         [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
         %         [spectralData] = ReadStoredHSI(targetName, normalization)
@@ -188,7 +190,7 @@ classdef HsiUtility
             close all;
         end
 
-        function [spectralData] = NormalizeHSI(targetName, option, saveFile)
+        function [spectralData] = NormalizeHSI(varargin)
             %NormalizeHSI returns spectral data from HSI image
             %
             %   Usage:
@@ -197,9 +199,21 @@ classdef HsiUtility
             %
             %   spectralData = NormalizeHSI('sample2', 'raw')
             %   spectralData = NormalizeHSI('sample2', 'byPixel', true)
-            spectralData = NormalizeHSI(targetName, option, saveFile);
+            spectralData = NormalizeHSI(varargin{:});
         end
 
+        function [dispImage] = GetDisplayImage(varargin)
+            dispImage = GetDisplayImageInternal(varargin{:});
+        end
+        
+        function [spectrumCurves] = GetSpectraFromMask(varargin)
+            %%GetSpectraFromMask returns the average spectrum of a specific ROI mask
+            %
+            %   Usage:
+            %   spectrumCurves = GetSpectraFromMask(target, subMasks, targetMask)
+            spectrumCurves = GetSpectraFromMaskInternal(varargin{:});
+        end
+        
         function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
             %LOADH5DATA loads info from h5 file
             %
@@ -209,22 +223,22 @@ classdef HsiUtility
             [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
         end
 
-        function [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
+        function [spectralData] = ReadHSIData(varargin)
             %%ReadHSIData returns the three images necessary for data analysis
             %
             %   Usage:
             %   [raw] = ReadHSIData(target, experiment, blackIsCapOn)
 
-            [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn);
+            [spectralData] = ReadHSIData(varargin{:});
         end
 
-        function [spectralData] = ReadStoredHSI(targetName, normalization)
+        function [spectralData] = ReadStoredHSI(varargin)
             % ReadStoredHSI reads a stored HSI from a _target mat file
             %
             %   Usage:
             %   [spectralData] = ReadStoredHSI(targetName)
             %   [spectralData] = ReadStoredHSI(targetName, 'byPixel')
-            [spectralData] = ReadStoredHSI(targetName, normalization);
+            [spectralData] = ReadStoredHSI(varargin{:});
         end
 
         function [redHsis] = ReconstructDimred(scores, imgSizes, masks)
