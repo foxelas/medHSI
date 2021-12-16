@@ -1,16 +1,16 @@
 %Date: 2021-12-08
 
-SetOpt();
-SetSetting('isTest', false);
-SetSetting('database', 'psl');
-SetSetting('normalization', 'byPixel');
-SetSetting('experiment', 'T20211208-SVM');
-        
-%% Read h5 data
-[targetIDs, outRows] = GetTargetIndexes({'tissue', true},  'fix');
+Config.SetOpt();
+Config.SetSetting('isTest', false);
+Config.SetSetting('database', 'psl');
+Config.SetSetting('normalization', 'byPixel');
+Config.SetSetting('experiment', 'T20211215-SVM');
 
-labeldir = DirMake(GetSetting('matDir'), strcat(GetSetting('database'), 'Labels\'));
-imgadedir = DirMake(GetSetting('matDir'), strcat(GetSetting('database'), 'Normalized\'));
+%% Read h5 data
+[targetIDs, outRows] = DB.GetTargetIndexes({'tissue', true}, 'fix');
+
+labeldir = Config.DirMake(Config.GetSetting('matDir'), strcat(Config.GetSetting('database'), 'Labels\'));
+imgadedir = Config.DirMake(Config.GetSetting('matDir'), strcat(Config.GetSetting('database'), 'Normalized\'));
 
 % ApplyScriptToEacRhImage(@reshape, {'tissue', true},  'fix');
 
@@ -21,27 +21,28 @@ for i = 1:length(targetIDs)
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    hsi = ReadStoredHSI(targetName, GetSetting('normalization'));
-    [m,n,z] = size(hsi);
-   
-    labelfile =  fullfile(labeldir, strcat(num2str(id), '_label.mat'));
+    I = Hsi;
+    I.Value = HsiUtility.ReadStoredHSI(targetName, Config.GetSetting('normalization'));
+    [m, n, z] = I.Size();
+
+    labelfile = fullfile(labeldir, strcat(num2str(id), '_label.mat'));
     if exist(labelfile, 'file')
         load(labelfile, 'labelMask');
-        
-        fgMask = GetFgMask(hsi);
-        Xcol = GetPixelsFromMask(hsi, fgMask);
-        X = [X ; Xcol];
-        ycol = GetPixelsFromMask(labelMask(1:m, 1:n), fgMask);
+
+        fgMask = I.GetFgMask();
+        Xcol = I.GetPixelsFromMask(fgMask);
+        X = [X; Xcol];
+        ycol = GetPixelsFromMaskInternal(labelMask(1:m, 1:n), fgMask);
         y = [y; ycol];
     end
 end
 
 rng(1);
-SVMModel = fitcsvm(X,y,'KernelScale','auto','Standardize',false, 'Verbose', 1, 'NumPrint', 1000, 'IterationLimit', 10^5);
+SVMModel = fitcsvm(X, y, 'KernelScale', 'auto', 'Standardize', false, 'Verbose', 1, 'NumPrint', 1000, 'IterationLimit', 10^5);
 
 CVSVMModel = crossval(SVMModel);
 classLoss = kfoldLoss(CVSVMModel)
 
-savedir = DirMake(GetSetting('outputDir'), GetSetting('experiment'), 'svm_model.mat');
+savedir = Config.DirMake(Config.GetSetting('outputDir'), Config.GetSetting('experiment'), 'svm_model.mat');
 effectiveDate = date();
 save(savedir, 'SVMModel', 'classLoss', 'effectiveDate');
