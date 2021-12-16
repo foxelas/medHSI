@@ -19,31 +19,34 @@ medHSI/
 ├── conf/  
 │ ├── config.ini  
 │ ├── config.mat  
-│ └── defaultConfig.ini  
-│  
-├── imports/  
-│ ├── matlab/  
-│ └── python/  
-│  
-├── others/  
-│ ├── project_structure.txt  
-│ └── to-do.md  
+│ └── defaultConfig.ini   
 │  
 ├── src/  
 │ ├── matlab/  
-│ │ ├── methods/  
-│ │ ├── plots/  
-│ │ └── scripts/  
+│ │ ├── methods/    
+│ │ ├── scripts/  
 │ │ ├── Main.m  
 │ │ └── Beautify.m  
 │ └── python/  
 │  
 ├── tools/  
-│ └── matlab/  
-│ ├── methods/  
-│ ├── parameters/  
-│ │ └──displayParam.mat  
-│ └── plots/  
+│ └── matlab/ 
+│ │	  ├── DB/
+│ │	  ├── apply/
+│ │	  ├── config/
+│ │	  ├── dataUtility/
+│ │	  ├── hsi/
+│ │	  ├── hsiUtility/
+│ │	  ├── methods/
+│ │	  ├── metrics/
+│ │	  ├── plots/
+│ │	  ├──utilities/
+│ │	  └── parameters/
+│ │	   	├──displayParam.mat    
+│ │	    ├──displayParam_311.mat  
+│ │	    └──extinctionCoefficients.mat  
+│ │
+│ └── python/  
 │  
 ├── LICENSE  
 └── README.md
