@@ -1,6 +1,0 @@
-conf/config.mat
-*.asv
-*.ipynb_checkpoints/*
-*-checkpoint.ipynb
-.ipynb_checkpoints
-*__pycache__*
