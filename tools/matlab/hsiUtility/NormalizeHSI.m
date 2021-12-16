@@ -18,7 +18,9 @@ baseDir = fullfile(GetSetting('matDir'), strcat(GetSetting('database'), 'Triplet
 
 targetFilename = strcat(baseDir, '_target.mat');
 load(targetFilename, 'spectralData');
-[m, n, w] = size(spectralData);
+hsIm = hsi;
+hsIm.Value = spectralData;
+[m, n, w] = hsIm.Size();
 
 whiteFilename = strcat(baseDir, '_white.mat');
 
@@ -48,43 +50,46 @@ switch option
 
     case 'forExternalNormalization'
         useBlack = false;
-        spectralData = (spectralData - blackReflectance);
+        hsIm = hsIm.Minus(blackReflectance);
 
     otherwise
         error('Unsupported setting for normalization.');
 end
 
 if useBlack
-    if ~isequal(size(spectralData), size(blackReflectance))
-        cropMask = getCaptureROImask(m, n);
+    if ~isequal(hsIm.Size(), size(blackReflectance))
+        error('Not implemented error');
+        %cropMask = getCaptureROImask(m, n);
         blackReflectance = blackReflectance(any(cropMask, 2), any(cropMask, 1), :);
         warning('Crop the image value: black');
     end
-    if ~isequal(size(spectralData), size(whiteReflectance))
-        cropMask = getCaptureROImask(m, n);
+    if ~isequal(hsIm.Size(), size(whiteReflectance))
+        error('Not implemented error');
+        %cropMask = getCaptureROImask(m, n);
         whiteReflectance = whiteReflectance(any(cropMask, 2), any(cropMask, 1), :);
         warning('Crop the image value: white');
     end
-    NormalizeImage(spectralData, whiteReflectance, blackReflectance);
+    hsIm = hsIm.Normalize(whiteReflectance, blackReflectance);
 end
 
-spectralData = max(spectralData, 0);
-spectralData(isnan(spectralData)) = 0;
-spectralData(isinf(spectralData)) = 0;
+hsIm = hsIm.Max(0);
+hsIm = hsIm.Update(hsIm.IsNan(), 0);
+hsIm = hsIm.Update(hsIm.IsInf(), 0);
 
 %% Dependent on selected pre-processing
 if ~strcmp(option, 'raw')
     fHndl = @Preprocessing;
-    spectralData = fHndl(spectralData);
+    hsIm = fHndl(hsIm);
 end
 
+spectralData = hsIm.Value;
 % figure(4);imshow(squeeze(spectralData(:,:,100)));
 
 if saveFile
-    baseDir = DirMake(GetSetting('matDir'), ...
-        strcat(GetSetting('database'), 'Normalized'), targetName);
+    baseDir = config.DirMake(config.GetSetting('matDir'), ...
+        strcat(config.GetSetting('database'), 'Normalized'), targetName);
 
-    targetFilename = strcat(baseDir, '_', GetSetting('normalization'), '.mat');
+    targetFilename = strcat(baseDir, '_', config.GetSetting('normalization'), '.mat');
     save(targetFilename, 'spectralData', '-v7.3');
 end
 

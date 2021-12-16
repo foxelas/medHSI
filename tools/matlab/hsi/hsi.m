@@ -6,19 +6,27 @@ classdef hsi
 %% Contents 
 %
 %   Non-Static:
-%         Size
-%         Dimred
-%         NormalizeImage
-%         GetDisplayImage
-%         GetDisplayRescaledImage
-%         GetPixelsFromMask
-%         GetMaskFromFigure
-%         GetFgMask
-%         GetSpectraFromMask
-%         GetQualityPixels
-%         RemoveBackground
-%         GetBandCorrelation
-%         Preprocessing
+%         [setId] = SelectDatabaseSamples(dataTable, setId)
+%         [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, mask)
+%         [obj] = Normalize(obj, white, black, method)
+%         [dispImage] = GetDisplayImage(obj, method, channel)
+%         [dispImage] = GetDisplayRescaledImage(obj, method, channel)
+%         [maskedPixels] = GetPixelsFromMask(obj, mask)
+%         [mask, maskedPixels] = GetMaskFromFigure(obj)
+%         [fgMask] = GetFgMask(obj)
+%         [spectrumCurves] = GetSpectraFromMask(obj, subMasks, targetMask)
+%         [newI, idxs] = GetQualityPixels(obj, meanLimit, maxLimit)
+%         [updI, fgMask] = RemoveBackground(obj, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
+%         [c] = GetBandCorrelation(obj, hasPixelSelection)
+%         [col] = ToColumn(obj)
+%         [obj] = Plus(obj,hsiIm)
+%         [obj] = Minus(obj,hsiIm)
+%         [obj] = Max(obj, value)
+%         [ind] = IsNan(obj)
+%         [ind] = IsInf(obj)
+%         [obj] = Index(obj, obj2)
+%         [obj] = Update(obj, ind, vals)
+%         [pHsi] = Preprocessing(obj)
 %
         function [m, n, w] = Size(obj)
             [m, n, w] = size(obj.Value);
@@ -28,15 +36,15 @@ classdef hsi
             [coeff, scores, latent, explained, objective] = DimredHSI(obj.Value, method, q, mask);
         end
         
-        function normI = NormalizeImage(obj, white, black, method)
-            normI = NormalizeImage(obj.Value, white, black, method);
+        function [obj] = Normalize(obj, white, black, method)
+            obj.Value = NormalizeImage(obj.Value, white, black, method);
         end
         
-        function dispImage = GetDisplayImage(obj, method, channel)
+        function [dispImage] = GetDisplayImage(obj, method, channel)
             dispImage = GetDisplayImage(obj.Value, method, channel);
         end
         
-        function dispImage = GetDisplayRescaledImage(obj, method, channel)
+        function [dispImage] = GetDisplayRescaledImage(obj, method, channel)
             dispImage = GetDisplayImage(rescale(obj.Value), method, channel);
         end
         
@@ -48,11 +56,11 @@ classdef hsi
             [mask, maskedPixels] = GetMaskFromFigure(obj.Value);
         end 
         
-        function fgMask = GetFgMask(obj)
+        function [fgMask] = GetFgMask(obj)
             fgMask = GetFgMask(obj.Value);
         end
         
-        function spectrumCurves = GetSpectraFromMask(obj, subMasks, targetMask)
+        function [spectrumCurves] = GetSpectraFromMask(obj, subMasks, targetMask)
              spectrumCurves = GetSpectraFromMask(obj.Value, subMasks, targetMask);
         end
         
@@ -90,6 +98,42 @@ classdef hsi
                 tempI = hsIm;
             end
             c = corr(tempI);
+        end
+        
+        function [col] = ToColumn(obj)
+            image = obj.Value;
+            col = reshape(image, [size(image, 1) * size(image, 2), size(image, 3)]);
+        end
+        
+        function [obj] = Plus(obj,hsiIm)
+            obj.Value = obj.Value + hsiIm;
+        end
+        
+        function [obj] = Minus(obj,hsiIm)
+            obj.Value = obj.Value - hsiIm;
+        end
+        
+        function [obj] = Max(obj, value)
+            obj.Value = max(obj.Value, value);
+        end
+        
+        function [ind] = IsNan(obj)
+            ind = isnan(obj.Value);
+        end
+        
+        function [ind] = IsInf(obj)
+            ind = isinf(obj.Value);
+        end
+        
+        function [obj] = Index(obj, obj2)
+            hsIm = obj.Value;
+            obj.Value = hsIm(obj2.Value);
+        end
+        
+        function [obj] = Update(obj, ind, vals)
+            hsIm = obj.Value;
+            hsIm(ind) = vals;
+            obj.Value = hsIm;
         end
         
         function [pHsi] = Preprocessing(obj)

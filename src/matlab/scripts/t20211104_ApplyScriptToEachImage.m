@@ -5,9 +5,9 @@ RunSettings(settingNum);
 
 %% Change to Relevant Script
 if settingNum < 3
-    ApplyScriptToEachImage(@ApplySuperpixelAnalysis);
+    apply.ScriptToEachImage(@ApplySuperpixelAnalysis);
 elseif settingNum == 3
-    ApplyScriptToEachImage(@ApplyKmeans, [], [], 5);
+    apply.ScriptToEachImage(@ApplyKmeans, [], [], 5);
 end
 
 close all;
@@ -40,24 +40,24 @@ switch numVal
     case 1
 
         %% Settings 1
-        SetSetting('isTest', false);
-        SetSetting('database', 'psl');
-        SetSetting('normalization', 'byPixel');
-        SetSetting('experiment', 'T20211104-SuperPCA-manual');
+        config.SetSetting('isTest', false);
+        config.SetSetting('database', 'psl');
+        config.SetSetting('normalization', 'byPixel');
+        config.SetSetting('experiment', 'T20211104-SuperPCA-manual');
     case 2
 
         %% Settings 2
-        SetSetting('isTest', false);
-        SetSetting('database', 'psl');
-        SetSetting('normalization', 'byPixel');
-        SetSetting('experiment', 'T20211104-SuperPCA');
+        config.SetSetting('isTest', false);
+        config.SetSetting('database', 'psl');
+        config.SetSetting('normalization', 'byPixel');
+        config.SetSetting('experiment', 'T20211104-SuperPCA');
     case 3
 
         %% Settings 3
-        SetSetting('isTest', false);
-        SetSetting('database', 'psl');
-        SetSetting('normalization', 'byPixel');
-        SetSetting('experiment', 'T20211104-Kmeans');
+        config.SetSetting('isTest', false);
+        config.SetSetting('database', 'psl');
+        config.SetSetting('normalization', 'byPixel');
+        config.SetSetting('experiment', 'T20211104-Kmeans');
         
     otherwise
 end

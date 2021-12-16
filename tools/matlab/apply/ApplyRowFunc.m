@@ -1,4 +1,4 @@
-function result = ApplyRowFunc(funcName, varargin)
+function [result] = ApplyRowFunc(funcName, varargin)
 %APPLYROWFUNC applies a function on each row
 %
 %   Usage:

@@ -6,27 +6,31 @@ if hasRead
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\94_white.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\94_black.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\94_target.mat')
-    raw1 = spectralData;
-    norm1 = NormalizeImage(spectralData, fullReflectanceByPixel, blackReflectance);
+    raw1 = hsi;
+    raw1.Value = spectralData;
+    norm1 = hsi;
+    norm1.Value = raw1.Normalize(fullReflectanceByPixel, blackReflectance);
 
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\67_white.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\67_black.mat')
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\67_target.mat')
-    raw2 = spectralData;
-    norm2 = NormalizeImage(spectralData, fullReflectanceByPixel, blackReflectance);
+    raw2 = hsi;
+    raw2.Value = spectralData;
+    norm2 = hsi;    
+    norm2 = raw2.Normalize(fullReflectanceByPixel, blackReflectance);
 
     allowDrawMask = false;
     if allowDrawMask
-        [mask2, maskedPixels2] = GetMaskFromFigure(norm2);
+        [mask2, maskedPixels2] = norm2.GetMaskFromFigure();
         save('norm2_goodPixels.mat', 'norm2', 'mask2', 'maskedPixels2');
 
-        [mask1, maskedPixels1] = GetMaskFromFigure(norm1);
+        [mask1, maskedPixels1] = norm1.GetMaskFromFigure();
         save('norm1_goodPixels.mat', 'norm1', 'mask1', 'maskedPixels1', '-v7.3');
     else
         load('D:\elena\Google Drive\titech\research\experiments\output\hsi\python\pca\exp4_norm_cropped_sample_only\norm1_goodPixels.mat');
         load('D:\elena\Google Drive\titech\research\experiments\output\hsi\python\pca\exp4_norm_cropped_sample_only\norm2_goodPixels.mat');
-        maskedPixels2 = GetPixelsFromMask(norm2, mask2);
-        maskedPixels1 = GetPixelsFromMask(norm1, mask1);
+        maskedPixels2 = norm2.GetPixelsFromMask(mask2);
+        maskedPixels1 = norm1.GetPixelsFromMask(mask1);
     end
 
     Xraw401 = [reshape(raw1, [size(raw1, 1) * size(raw1, 2), size(raw1, 3)]); reshape(raw2, [size(raw2, 1) * size(raw2, 2), size(raw2, 3)])];

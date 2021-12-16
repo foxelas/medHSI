@@ -1,5 +1,15 @@
 classdef dataUtility  
     methods (Static)
+%% Contents 
+%
+%   Static:
+%         [outname] = StrrepAll(inname, isLegacy)
+%         [value] = GetValueFromTable(tab, field, id)
+%         [bbox] = GetBoundingBoxMask(corners)
+%         [newSpectrum, newX] = SpectrumCut(oldSpectrum, x)
+%         [outSpectrum] = SpectrumPad(inSpectrum, options)
+%         [reorderedSpectra, labels] = ReorderSpectra(target, chartColorOrder, spectraColorOrder, wavelengths, spectralWavelengths)
+
         function [outname] = StrrepAll(inname, isLegacy)
         %     StrrepAll fomats an inname to outname
         %

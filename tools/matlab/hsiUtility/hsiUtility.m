@@ -3,15 +3,15 @@ classdef hsiUtility
 % Contents
 % 
 %     Static:
-%         GetWavelengths
-%         ExportH5Dataset
-%         InitializeDataGroup
-%         NormalizeHSI
-%         LoadH5Data
-%         ReadHSIData
-%         ReadStoredHSI
-%         ReconstructDimred
-%         RecoverReducedHsi
+%         [x] = GetWavelengths(m, option)
+%         [] = ExportH5Dataset(condition)
+%         [] = ExportH5Dataset(condition)
+%         [spectralData] = NormalizeHSI(targetName, option, saveFile)
+%         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
+%         [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
+%         [spectralData] = ReadStoredHSI(targetName, normalization)
+%         [redHsis] = ReconstructDimred(scores, imgSizes, masks)
+%         [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
         
         function [x] = GetWavelengths(m, option)
         %GETWAVELENGTHS returns the wavelengths
@@ -187,7 +187,7 @@ classdef hsiUtility
         close all;
         end
         
-        function spectralData = NormalizeHSI(targetName, option, saveFile)
+        function [spectralData] = NormalizeHSI(targetName, option, saveFile)
              spectralData = NormalizeHSI(targetName, option, saveFile);
         end
         

@@ -1,11 +1,20 @@
 classdef DB  
     methods (Static)
+%% Contents 
+%
+%   Static:
+%         [dataTable] = GetDB()
+%         [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
+%         [targetIDs, outRows] = GetTargetIndexes(content, target)
+%         [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
+%         [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
+%         [setId] = SelectDatabaseSamples(dataTable, setId)
+
+        function [dataTable] = GetDB()
         %% GetDB returns the db structure as a table
         %
         %   Usage:
         %   dataTable = GetDB()
-        function dataTable = GetDB()
-        
         dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
             config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
         end
