@@ -208,11 +208,11 @@ classdef DB
             %
             %   Usage:
             %   [setId] = SelectDatabaseSamples(dataTable, setId)
-            if strcmpi(Config.GetSetting('database'), 'psl') 
+            if strcmpi(Config.GetSetting('database'), 'psl')
                 setId = setId & ~contains(lower(dataTable.SampleID), 'b');
             end
         end
-        
+
         function [fileConditions] = GetFileConditions(content, target, id)
 
             %% GETFILECONDITIONS returns the conditions necessary for finding the

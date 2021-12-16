@@ -205,7 +205,7 @@ classdef HsiUtility
         function [dispImage] = GetDisplayImage(varargin)
             dispImage = GetDisplayImageInternal(varargin{:});
         end
-        
+
         function [spectrumCurves] = GetSpectraFromMask(varargin)
             %%GetSpectraFromMask returns the average spectrum of a specific ROI mask
             %
@@ -213,7 +213,7 @@ classdef HsiUtility
             %   spectrumCurves = GetSpectraFromMask(target, subMasks, targetMask)
             spectrumCurves = GetSpectraFromMaskInternal(varargin{:});
         end
-        
+
         function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
             %LOADH5DATA loads info from h5 file
             %
