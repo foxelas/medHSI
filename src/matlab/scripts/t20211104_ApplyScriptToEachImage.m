@@ -1,6 +1,6 @@
 
 %% Apply script of each of the data
-settingNum = 3;
+settingNum = 2;
 RunSettings(settingNum);
 
 %% Change to Relevant Script

@@ -15,7 +15,7 @@ classdef Apply
 %   ApplyScriptToEachImage(@ApplyKmeans);
 %   ApplyScriptToEachImage(@ApplyKmeans, {'tissue', true}, []);
 
-            [varargout] = ApplyScriptToEachImage(varargin{:});
+            varargout{:} = ApplyScriptToEachImage(varargin{:});
         end
         
         function [result] = RowFunc(varargin)
@@ -34,7 +34,7 @@ classdef Apply
 %   Usage:
 %   [coeff] = ApplyOnQualityPixels(@doPixelPCA, colMsi);
 %   applies function 'doPixelPCA' on good quality pixels of array colMsi
-            [varargout] = ApplyOnQualityPixels(varargin{:});
+            varargout{:} = ApplyOnQualityPixels(varargin{:});
         end
     end
 end

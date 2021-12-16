@@ -17,7 +17,7 @@ classdef Plots
 %         [lineColorMap] = GetLineColorMap(style, names)
 
 
-        function [] = Apply(fig, funcName, varargin)
+        function [varargout] = Apply(fig, funcName, varargin)
         %PLOTS wraps plotting functions
         %
         %   Usage:
@@ -40,7 +40,13 @@ classdef Plots
             end
             newVarargin{length(newVarargin)+1} = fig;
 
-            funcName(newVarargin{:});
+            if nargout(funcName) > 0
+                varargout{:} = funcName(newVarargin{:});
+            else
+                funcName(newVarargin{:});
+                varargout{:} = {};
+            end
+    
         end
         
         function [] = SavePlot(fig)
@@ -52,7 +58,7 @@ classdef Plots
             SavePlot(fig);
         end
         
-        function [] = MontageFolderContents(fig, path, criteria, figTitle)
+        function [] = MontageFolderContents(fig, varargin)
 % PlotMontageFolderContents returns the images in a path as a montage
 %
 %   Usage:
@@ -62,91 +68,91 @@ classdef Plots
 %       'TargetName', strcat(target, '.jpg'), ...
 %       'TargetType', 'fix');
 %   Plots.MontageFolderContents(1, [], criteria);
-            Plots.Apply(fig, @PlotMontageFolderContents, path, criteria, figTitle);
+            Plots.Apply(fig, @PlotMontageFolderContents, varargin{:});
         end
         
-        function [] = Superpixels(fig, baseImage, labels, figTitle, plotType, fgMask)
+        function [] = Superpixels(fig, varargin)
 % PlotSuperpixels plots the results of superpixel segmentation on the image
 %
 %   Usage:
 %   PlotSuperpixels(baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', [], 1);
 %   PlotSuperpixels(baseImage, labels, 'Superpixels of image 3', 'color', fgMask, 1);
 
-            Plots.Apply(fig, @PlotSuperpixels, baseImage, labels, figTitle, plotType, fgMask);
+            Plots.Apply(fig, @PlotSuperpixels,  varargin{:});
         end
         
-        function [] = SubimageMontage(fig, hsi, figTitle, limit)
+        function [] = SubimageMontage(fig,  varargin)
 % PlotSubimageMontage plots all or selected members of an hsi
 % as a montage figure
 %
 %   Usage:
 %   PlotSubimageMontage(hsi, figTitle, limit, fig);
 
-            Plots.Apply(fig, @PlotSubimageMontage, hsi, figTitle, limit);
+            Plots.Apply(fig, @PlotSubimageMontage,  varargin{:});
         end
         
-        function [] = Spectra(fig, spectra, wavelengths, names, figTitle)
+        function [] = Spectra(fig,  varargin)
 %%PLOTSPECTRA plots one or more spectra together
 %
 %   Usage:
 %   PlotSpectra(spectra, wavelengths, names, figTitle, fig);
 %   PlotSpectra(spectra)
 
-            Plots.Apply(fig, @PlotSpectra, spectra, wavelengths, names, figTitle);
+            Plots.Apply(fig, @PlotSpectra, varargin{:});
         end
         
-        function [] = Overlay(fig, baseIm, topIm, figTitle)
+        function [] = Overlay(fig,  varargin)
 % PlotOverlay plots an image with an overlay mask
 %
 %   Usage:
 %   PlotOverlay(baseIm, topIm, figTitle, fig)
 
-            Plots.Apply(fig, @PlotOverlay, baseIm, topIm, figTitle);
+            Plots.Apply(fig, @PlotOverlay,  varargin{:});
         end
         
-        function [] = Eigenvectors(fig, coeff, xValues, pcNum)
+        function [] = Eigenvectors(fig,  varargin)
 % PlotEigenvectors plots eigenvectors of a deconmposition
 %
 %   Usage:
 %   PlotEigenvectors(coeff, xValues, pcNum, fig)
 
-            Plots.Apply(fig, @PlotEigenvectors, coeff, xValues, pcNum);
+            Plots.Apply(fig, @PlotEigenvectors,  varargin{:});
         end
         
-        function [] = DualMontage(fig, left, right, figTitle)
-            Plots.Apply(fig, @PlotDualMontage, left, right, figTitle);
+        function [] = DualMontage(fig,  varargin)
+            Plots.Apply(fig, @PlotDualMontage,  varargin{:});
         end
         
         function [] = Dimred(method, dimredResult, w, redHsis)
             PlotDimred(method, dimredResult, w, redHsis);
         end
         
-        function [] = Components(hsi, pcNum, figStart)
+        function [] = Components( varargin)
 %PLOTCOMPONENTS plots a pcNum number of PCs, starting at figure figStart
 %
 %   Usage:
 %   PlotComponents(hsi, 3, 4);
 
-            PlotComponents(hsi, pcNum, figStart);
+            PlotComponents( varargin{:});
         end
         
-        function [lineColorMap] = GetLineColorMap(style, names)
+        function [lineColorMap] = GetLineColorMap( varargin)
 %     PLOTGETLINECOLORMAP returns a linecolor map based on the style
 %
 %     Usage:
 %     [lineColorMap] = PlotGetLineColorMap('class')
 
-            [lineColorMap] = PlotGetLineColorMap(style, names);
+            [lineColorMap] = PlotGetLineColorMap( varargin{:});
         end
         
-        function [imCorr] = BandStatistics(inVectors, statistic, fig)
+        function [imCorr] = BandStatistics(fig, varargin)
 % PlotBandStatistics plots the correlation among spectral bands
 %
 %   Usage:
 %   [imCorr] = PlotBandStatistics(inVectors, 'correlation', fig)
 %   [imCorr] = PlotBandStatistics(inVectors, 'covariance', fig)
 
-            [imCorr] = PlotBandStatistics(inVectors, statistic, fig);
+            [imCorr] = Plots.Apply(fig, @PlotBandStatistics, varargin{:});
         end
 
     end

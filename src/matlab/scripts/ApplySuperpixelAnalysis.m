@@ -1,4 +1,4 @@
-function [] = ApplySuperpixelAnalysis(hsi, targetName, isManual, pixelNum, pcNum)
+function [] = ApplySuperpixelAnalysis(hsIm, targetName, isManual, pixelNum, pcNum)
 %%ApplySuperpixelAnalysis applies SuperPCA on an image
 %
 %   Usage:
@@ -20,16 +20,16 @@ end
 if nargin < 5
     pcNum = 3;
 end
-savedir = DirMake(GetSetting('saveDir'), GetSetting('experiment'), targetName);
+savedir = Config.DirMake(Config.GetSetting('saveDir'), Config.GetSetting('experiment'), targetName);
 
 %% Preparation
-srgb = GetDisplayImage(hsi, 'rgb');
-fgMask = GetFgMask(srgb);
+srgb = hsIm.GetDisplayImage('rgb');
+fgMask = GetFgMaskInternal(srgb);
 
 %% Calculate superpixels
 if isManual
     %%Apply PCA to entire image
-    [coeff, scores, latent, explained, ~] = DimredHSI(hsi, 'pca', pcNum, fgMask);
+    [coeff, scores, latent, explained, ~] = hsIm.Dimred('pca', pcNum, fgMask);
     explained(1:pcNum);
     latent(1:pcNum);
 
@@ -38,23 +38,23 @@ if isManual
     [labels, ~] = superpixels(redImage, pixelNum);
 else
     %%super-pixels segmentation
-    labels = cubseg(hsi, pixelNum);
+    labels = hsIm.Cubseg(pixelNum);
 
     %%SupePCA based DR
-    scores = SuperPCA(hsi, pcNum, labels);
+    scores = hsIm.SPCA(pcNum, labels);
 end
 
-SetSetting('plotName', fullfile(savedir, 'superpixel_segments'));
-Plots(1, @PlotSuperpixels, srgb, labels);
-SetSetting('plotName', fullfile(savedir, 'superpixel_mask'));
-Plots(2, @PlotSuperpixels, srgb, labels, '', 'color', fgMask);
-SetSetting('plotName', fullfile(savedir, 'pc'));
-PlotComponents(scores, pcNum, 3);
+Config.SetSetting('plotName', fullfile(savedir, 'superpixel_segments'));
+Plots.Superpixels(1, srgb, labels);
+Config.SetSetting('plotName', fullfile(savedir, 'superpixel_mask'));
+Plots.Superpixels(2, srgb, labels, '', 'color', fgMask);
+Config.SetSetting('plotName', fullfile(savedir, 'pc'));
+Plots.Components(scores, pcNum, 3);
 
 pause(0.5);
 
 %% Keep only specimen superpixels
-Xcol = GetPixelsFromMask(hsi, fgMask);
+Xcol = hsIm.GetPixelsFromMask(fgMask);
 v = labels(fgMask);
 a = unique(v);
 counts = histc(v(:), a);
@@ -62,35 +62,35 @@ specimenSuperpixelIds = a(counts > 300)';
 
 %% Plot eigenvectors
 numComp = 3;
-wavelengths = GetWavelengths(size(Xcol, 2));
+wavelengths = HsiUtility.GetWavelengths(size(Xcol, 2));
 basename = fullfile(savedir, 'eigenvectors');
-SetSetting('plotName', basename);
-coeff = pca(Xcol, 'NumComponents', numComp);
-Plots(6, @PlotEigenvectors, coeff, wavelengths, numComp);
+Config.SetSetting('plotName', basename);
+coeff = Dimred(Xcol, 'pca', numComp);
+Plots.Eigenvectors(6, coeff, wavelengths, numComp);
 for i = specimenSuperpixelIds
     superpixelMask = labels == i;
-    Xcol = GetPixelsFromMask(hsi, superpixelMask);
-    coeff = pca(Xcol, 'NumComponents', numComp);
-    SetSetting('plotName', strcat(basename, num2str(i)));
-    Plots(6, @PlotEigenvectors, coeff, wavelengths, numComp);
+    Xcol = hsIm.GetPixelsFromMask(superpixelMask);
+    coeff = Dimred(Xcol, 'pca', numComp);
+    Config.SetSetting('plotName', strcat(basename, num2str(i)));
+    Plots.Eigenvectors(6, coeff, wavelengths, numComp);
     title(strcat('Eigenvectors for Superpixel #', num2str(i)));
-    SavePlot(6);
+    Plots.SavePlot(6);
     pause(0.5);
 end
 
 %% Plot statistics
 statistic = 'covariance';
 basename = fullfile(savedir, statistic);
-SetSetting('plotName', basename);
-Plots(7, @PlotBandStatistics, Xcol, statistic);
+Config.SetSetting('plotName', basename);
+Plots.BandStatistics(7, Xcol, statistic);
 
 for i = specimenSuperpixelIds
     superpixelMask = labels == i;
-    Xcol = GetPixelsFromMask(hsi, superpixelMask);
-    SetSetting('plotName', strcat(basename, num2str(i)));
-    Plots(7, @PlotBandStatistics, Xcol, statistic);
+    Xcol = hsIm.GetPixelsFromMask(superpixelMask);
+    Config.SetSetting('plotName', strcat(basename, num2str(i)));
+    Plots.BandStatistics(7, Xcol, statistic);
     title(strcat('Covariance for Superpixel #', num2str(i)));
-    SavePlot(7);
+    Plots.SavePlot(7);
     pause(0.5);
 end
 

@@ -27,6 +27,8 @@ classdef Hsi
 %         [obj] = Index(obj, obj2)
 %         [obj] = Update(obj, ind, vals)
 %         [pHsi] = Preprocessing(obj)
+%         [labels] = Cubseg(obj, pixelNum)
+%         [scores] = SPCA(obj, pcNum, labels)
 %
         function [m, n, w] = Size(obj)
             [m, n, w] = size(obj.Value);
@@ -194,6 +196,17 @@ classdef Hsi
         pHsi = updI;
 
         end
+        
+        function [labels] = Cubseg(obj, varargin)
+        %%super-pixels segmentation
+            labels = cubseg(obj.Value, varargin{:});
+        end
+
+        function [scores] = SPCA(obj, varargin)
+        %%SupePCA based DR
+            scores = SuperPCA(obj.Value, varargin{:});
+        end
+    
     end
     
 end

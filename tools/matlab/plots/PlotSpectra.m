@@ -7,7 +7,7 @@ function [] = PlotSpectra(spectra, wavelengths, names, figTitle, fig)
 
 [~, n] = size(spectra);
 if isempty(wavelengths)
-    wavelengths = GetWavelengths(n);
+    wavelengths = HsiUtility.GetWavelengths(n);
 end
 
 if isempty(names)
@@ -22,7 +22,7 @@ if isempty(figTitle)
     figTitle = 'Calculated Spectra';
 end
 
-lineColorMap = GetLineColorMap('custom', names);
+lineColorMap = Plots.GetLineColorMap('custom', names);
 key = keys(lineColorMap);
 
 hold on
@@ -43,6 +43,6 @@ ylim([0, 5 * 10^(-3)]);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-SavePlot(fig);
+Plots.SavePlot(fig);
 
 end

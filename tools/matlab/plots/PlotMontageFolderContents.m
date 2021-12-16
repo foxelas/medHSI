@@ -10,7 +10,7 @@ function [] = PlotMontageFolderContents(path, criteria, figTitle, fig)
 %   Plots.MontageFolderContents(1, [], criteria);
 
 if isempty(path)
-    path = fullfile(GetSetting('saveDir'), GetSetting('experiment'));
+    path = fullfile(Config.GetSetting('saveDir'), Config.GetSetting('experiment'));
 end
 
 if nargin < 2

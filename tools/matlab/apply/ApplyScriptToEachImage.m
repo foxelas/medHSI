@@ -28,6 +28,7 @@ for i = 1:length(targetIDs)
         varargout{:} = functionName(hsIm, targetName, varargin{:});
     else
         functionName(hsIm, targetName, varargin{:});
+        varargout{:} = {};
     end
 end
 
