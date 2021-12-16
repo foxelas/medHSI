@@ -1,19 +1,15 @@
-function [values, valueNames, additionalValues] = GetExpectedValues(name, option)
-%GETEXPECTEDVALUES fetches expected values
+function [values, valueNames, additionalValues] = GetColorchartValues(name)
+%GetColorchartValues fetches expected values
 %
 %   Usage:
-%   [values, valueNames, additionalValues] = GetExpectedValues() returns
+%   [values, valueNames, additionalValues] = GetColorchartValues() returns
 %   the expected values for colorchart spectra
 %
-%   [values] = GetExpectedValues('colorchartRGB') returns the expected
+%   [values] = GetColorchartValues('colorchartRGB') returns the expected
 %   values for colorchart RGB space
 %
-%   [values] = GetExpectedValues('colorchartLab') returns the
+%   [values] = GetColorchartValues('colorchartLab') returns the
 %   expected values for colorchart Lab space
-%
-%   [values] = GetExpectedValues('colorchartOrder',
-%   'capture_average_comparison') returns the expected values for
-%   colorchart patch order
 %
 
 if nargin < 1
@@ -24,7 +20,7 @@ valueNames = [];
 additionalValues = [];
 switch name
     case 'colorchartSpectra'
-        filename = fullfile(getSetting('importDir'), 'ColorChecker_RGB_and_spectra.txt');
+        filename = fullfile(Config.GetSetting('importDir'), 'ColorChecker_RGB_and_spectra.txt');
         outstruct = delimread(filename, '\t', {'text', 'num'});
         valueNames = outstruct.text;
         valueNames = valueNames(2:length(valueNames));
@@ -32,21 +28,21 @@ switch name
         values = outstruct.num(2:end, :);
 
     case 'colorchartRGB'
-        filename = fullfile(getSetting('importDir'), 'ColorCheckerMicro_Matte_RGB_values.txt');
+        filename = fullfile(Config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_RGB_values.txt');
         outstruct = delimread(filename, '\t', 'num');
         values = outstruct.num;
 
     case 'colorchartLab'
-        filename = fullfile(getSetting('importDir'), 'ColorCheckerMicro_Matte_Lab_values.txt');
+        filename = fullfile(Config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_Lab_values.txt');
         outstruct = delimread(filename, '\t', 'num');
         values = outstruct.num;
 
     case 'colorchartOrder'
-        colorPatchOrder = getSetting('colorPatchOrder');
+        colorPatchOrder = Config.GetSetting('colorPatchOrder');
         if isempty(colorPatchOrder)
             colorPatchOrder = 'darkSkinBottom';
         end
-        outstruct = delimread(fullfile(getSetting('datasetSettingsDir'), strcat(colorPatchOrder, 'PatchOrder.txt')), '\t', 'text');
+        outstruct = delimread(fullfile(Config.GetSetting('importDir'), strcat(colorPatchOrder, 'PatchOrder.txt')), '\t', 'text');
         values = outstruct.text;
 
     otherwise
