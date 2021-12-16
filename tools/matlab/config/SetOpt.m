@@ -1,11 +1,11 @@
 function [] = SetOpt()
-%     SETOPT sets parameters for running from conf/config.ini
+%     SETOPT sets parameters for running from conf/Config.ini
 %
 %     Usage:
 %     SetOpt()
 
-disp('Reading configuration file [config.ini] ...');
-inputSettingsFile = fullfile(config.GetConfDir(), 'config.ini');
+disp('Reading configuration file [Config.ini] ...');
+inputSettingsFile = fullfile(Config.GetConfDir(), 'Config.ini');
 
 tmp = delimread(inputSettingsFile, {', '}, 'raw');
 for i = 1:length(tmp.raw)

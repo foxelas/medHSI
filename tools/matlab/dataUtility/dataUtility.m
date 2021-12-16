@@ -1,4 +1,4 @@
-classdef dataUtility  
+classdef DataUtility  
     methods (Static)
 %% Contents 
 %
@@ -88,7 +88,7 @@ classdef dataUtility
 
         switch options
             case 'add'
-                x = hsiUtility.GetWavelengths(m, 'index');
+                x = HsiUtility.GetWavelengths(m, 'index');
                 if m > 100
                     outSpectrum = zeros(401, 1);
                 else

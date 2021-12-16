@@ -1,4 +1,4 @@
-classdef apply
+classdef Apply
     methods
 %% Contents 
 %

@@ -1,4 +1,4 @@
-classdef config  
+classdef Config  
     methods (Static)                  
         function [] = SetOpt()
             SetOpt();
@@ -15,7 +15,7 @@ classdef config
         %% GETCONFDIR returns the configuration dir for the current project
         function [curDir] = GetConfDir()
 
-        curDir = fullfile(config.GetRunBaseDir(), 'conf');
+        curDir = fullfile(Config.GetRunBaseDir(), 'conf');
 
         end
 
@@ -32,7 +32,7 @@ classdef config
             fileDir = fileparts(filepath);
             if ~exist(fileDir, 'dir')
                 mkdir(fileDir);
-                if ~contains(fileDir, config.GetSetting('saveDir'))
+                if ~contains(fileDir, Config.GetSetting('saveDir'))
                     addpath(fileDir);
                 end
             end
@@ -54,11 +54,11 @@ classdef config
 
 
             if GetSetting('isTest')
-                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
-                    config.GetSetting('integrationTime'), target, GetSetting('configuration')};
+                fileConditions = {content, [], Config.GetSetting('dataDate'), id, ...
+                    Config.GetSetting('integrationTime'), target, GetSetting('configuration')};
             else
-                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
-                    config.GetSetting('integrationTime'), target, []};
+                fileConditions = {content, [], Config.GetSetting('dataDate'), id, ...
+                    Config.GetSetting('integrationTime'), target, []};
             end
         end
         
@@ -86,10 +86,10 @@ classdef config
                 %pcName = char(java.net.InetAddress.getLocalHost.getHostName);
                 %if stcmp(pcName, 'GPU-PC2') == 0
                 if length(ver('parallel')) == 1
-                    config.SetSetting('pcHasGPU', true);
+                    Config.SetSetting('pcHasGPU', true);
                 end
             end
-            hasGpu = config.GetSetting('pcHasGPU');
+            hasGpu = Config.GetSetting('pcHasGPU');
         end
 
         %% GETSETTING returns the value of a configurationParameter
@@ -97,7 +97,7 @@ classdef config
         %     Usage:
         %     value = getSetting('saveDir')
         function [value] = GetSetting(parameter)
-            settingsFile = fullfile(config.GetConfDir(), 'config.mat');
+            settingsFile = fullfile(Config.GetConfDir(), 'Config.mat');
             variableInfo = who('-file', settingsFile);
             if ismember(parameter, variableInfo)
                 m = matfile(settingsFile);
@@ -113,7 +113,7 @@ classdef config
         %     SetSetting('saveDir', 'out\out')
         %     SetSetting('saveDir')
         function [] = SetSetting(parameter, value)
-            settingsFile = fullfile(config.GetConfDir(), 'config.mat');
+            settingsFile = fullfile(Config.GetConfDir(), 'Config.mat');
             m = matfile(settingsFile, 'Writable', true);
             if nargin < 2 %write default value
                 v = m.options;
@@ -122,7 +122,7 @@ classdef config
             else
                 m.(parameter) = value;
             end
-            config.NotifySetting(parameter, value);
+            Config.NotifySetting(parameter, value);
         end
 
         %% NOTIFYSETTING notifies about configuration parameter change

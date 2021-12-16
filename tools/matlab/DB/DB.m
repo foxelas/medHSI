@@ -15,8 +15,8 @@ classdef DB
         %
         %   Usage:
         %   dataTable = GetDB()
-        dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
-            config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
+        dataTable = readtable(fullfile(Config.GetSetting('importDir'), strcat(Config.GetSetting('database'), ...
+            Config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
         end
         
         function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)

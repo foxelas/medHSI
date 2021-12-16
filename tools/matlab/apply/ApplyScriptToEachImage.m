@@ -1,5 +1,5 @@
 function [varargout] = ApplyScriptToEachImage(functionName, condition, target, varargin)
-%%ApplyScriptToEachImage applys a script on each of the data samples who
+%%ApplyScriptToEachImage applies a script on each of the data samples who
 %%fullfill the condition
 %
 %   Usage:
