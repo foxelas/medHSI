@@ -1,8 +1,16 @@
+clear all;
+close all;
 
 %% Apply beautifier
-MBeautify.formatFiles('D:\elena\Google Drive\titech\research\experiments\medHSI\src\matlab\plots\', '*.m')
-MBeautify.formatFiles('D:\elena\Google Drive\titech\research\experiments\medHSI\src\matlab\scripts\', '*.m')
-MBeautify.formatFiles('D:\elena\Google Drive\titech\research\experiments\medHSI\src\matlab\methods\', '*.m')
+basedir = fullfile(Config.GetSetting('parentDir'), 'medHSI\');
+MBeautify.formatFiles(fullfile(basedir, 'src\matlab\plots\'), '*.m');
+MBeautify.formatFiles(fullfile(basedir, 'src\matlab\scripts\'), '*.m');
+MBeautify.formatFiles(fullfile(basedir, 'src\matlab\methods\'), '*.m');
 
-MBeautify.formatFiles('D:\elena\Google Drive\titech\research\experiments\medHSI\tools\matlab\plots\', '*.m')
-MBeautify.formatFiles('D:\elena\Google Drive\titech\research\experiments\medHSI\tools\matlab\methods\', '*.m')
+toolsdir = fullfile(basedir, 'tools\matlab\');
+dirList = dir(toolsdir);
+for i = 3:numel(dirList)
+    MBeautify.formatFiles(fullfile(toolsdir, dirList(i).name), '*.m');
+end
+
+clear all;

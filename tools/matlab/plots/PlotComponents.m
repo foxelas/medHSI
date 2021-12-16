@@ -4,11 +4,11 @@ function [] = PlotComponents(hsi, pcNum, figStart)
 %   Usage:
 %   PlotComponents(hsi, 3, 4);
 
-if nargin < 3 
-    figStart = 1; 
-end 
+if nargin < 3
+    figStart = 1;
+end
 
-plotName = GetSetting('plotName');
+plotName = Config.GetSetting('plotName');
 for i = 1:pcNum
     fig = figStart + i - 1;
     figure(fig);
@@ -17,8 +17,8 @@ for i = 1:pcNum
     h = imagesc(img, 'AlphaData', mask);
     title(strcat('PC', num2str(i)));
     colorbar;
-    SetSetting('plotName', strcat(plotName, num2str(i)));
-    SavePlot(fig);
-end 
+    Config.SetSetting('plotName', strcat(plotName, num2str(i)));
+    Plots.SavePlot(fig);
+end
 
-end 
+end

@@ -6,14 +6,14 @@ function [imCorr] = PlotBandStatistics(inVectors, statistic, fig)
 %   [imCorr] = PlotBandStatistics(inVectors, 'covariance', fig)
 
 if strcmpi(statistic, 'correlation')
-    imCorr = corr(inVectors); 
+    imCorr = corr(inVectors);
     figTitle = 'Correlation among bands';
-elseif strcmpi(statistic, 'covariance')    
+elseif strcmpi(statistic, 'covariance')
     imCorr = cov(inVectors);
     figTitle = 'Covariance among bands';
-else 
+else
     error('Unsupported statistic');
-end 
+end
 
 figure(fig);
 imagesc(imCorr);

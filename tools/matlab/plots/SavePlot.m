@@ -4,23 +4,23 @@ function [] = SavePlot(fig)
 %   Usage:
 %   SavePlot(2);
 
-saveImages = GetSetting('saveImages');
+saveImages = Config.GetSetting('saveImages');
 
 if (saveImages)
     figure(fig);
-    saveInHQ = GetSetting('saveInHQ');
-    saveInBW = GetSetting('saveInBW');
-    plotName = GetSetting('plotName');
-    cropBorders = GetSetting('cropBorders');
-    saveEps = GetSetting('saveEps');
+    saveInHQ = Config.GetSetting('saveInHQ');
+    saveInBW = Config.GetSetting('saveInBW');
+    plotName = Config.GetSetting('plotName');
+    cropBorders = Config.GetSetting('cropBorders');
+    saveEps = Config.GetSetting('saveEps');
 
     if (~isempty(plotName))
         filename = strrep(plotName, '.mat', '');
 
         [filepath, name, ~] = fileparts(filename);
         filepathBW = fullfile(filepath, 'bw');
-        DirMake(filepath);
-        DirMake(filepathBW);
+        Config.DirMake(filepath);
+        Config.DirMake(filepathBW);
 
         filename = fullfile(filepath, strcat(name, '.jpg'));
         %         filename = strrep(filename, ' ', '_');
@@ -42,10 +42,12 @@ if (saveImages)
             namext = strcat(name, '.eps');
             if (saveInBW)
                 filename = fullfile(filepathBW, namext);
-                export_fig(filename, '-eps', '-transparent', '-r900', '-gray');
+                saveas(fig, filename, 'eps');
+                %                 export_fig(filename, '-eps', '-transparent', '-r900', '-gray');
             else
                 filename = fullfile(filepath, namext);
-                export_fig(filename, '-eps', '-transparent', '-r900', '-RGB');
+                saveas(fig, filename, 'epsc');
+                %                 export_fig(filename, '-eps', '-transparent', '-r900', '-RGB');
             end
         end
     else
