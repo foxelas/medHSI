@@ -58,7 +58,7 @@ switch numVal
         Config.SetSetting('database', 'psl');
         Config.SetSetting('normalization', 'byPixel');
         Config.SetSetting('experiment', 'T20211104-Kmeans');
-        
+
     otherwise
 end
 end

@@ -16,7 +16,7 @@ if hasRead
     load('D:\elena\mspi\matfiles\hsi\calibTriplets\67_target.mat')
     raw2 = Hsi;
     raw2.Value = spectralData;
-    norm2 = Hsi;    
+    norm2 = Hsi;
     norm2 = raw2.Normalize(fullReflectanceByPixel, blackReflectance);
 
     allowDrawMask = false;

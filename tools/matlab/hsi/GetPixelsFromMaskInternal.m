@@ -1,4 +1,5 @@
 function [maskedPixels] = GetPixelsFromMaskInternal(hsi, mask)
+
 %% GetPixelsFromMask returns flattened pixels according to a 2D mask
 
 [m, n, w] = size(hsi);

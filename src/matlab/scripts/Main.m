@@ -14,10 +14,6 @@ SetSetting('database', 'calib');
 InitializeDataGroup('handsOnly', {'hand', false});
 
 
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%

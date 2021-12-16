@@ -10,7 +10,7 @@ if nargin < 2
     condition = [];
     target = [];
     varargin = {};
-end 
+end
 
 %% Read h5 data
 [targetIDs, ~] = DB.GetTargetIndexes(condition, target);
@@ -22,7 +22,7 @@ for i = 1:length(targetIDs)
     targetName = num2str(id);
     hsIm = Hsi;
     hsIm.Value = HsiUtility.ReadStoredHSI(targetName, Config.GetSetting('normalization'));
-    
+
     %% Change to Relevant Script
     if nargout(functionName) > 0
         varargout{:} = functionName(hsIm, targetName, varargin{:});

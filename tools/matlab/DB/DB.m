@@ -1,25 +1,28 @@
-classdef DB  
+classdef DB
     methods (Static)
-%% Contents 
-%
-%   Static:
-%         [dataTable] = GetDB()
-%         [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
-%         [targetIDs, outRows] = GetTargetIndexes(content, target)
-%         [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
-%         [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
-%         [setId] = SelectDatabaseSamples(dataTable, setId)
+
+        %% Contents
+        %
+        %   Static:
+        %         [dataTable] = GetDB()
+        %         [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
+        %         [targetIDs, outRows] = GetTargetIndexes(content, target)
+        %         [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
+        %         [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
+        %         [setId] = SelectDatabaseSamples(dataTable, setId)
 
         function [dataTable] = GetDB()
-        %% GetDB returns the db structure as a table
-        %
-        %   Usage:
-        %   dataTable = GetDB()
-        dataTable = readtable(fullfile(Config.GetSetting('importDir'), strcat(Config.GetSetting('database'), ...
-            Config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
+
+            %% GetDB returns the db structure as a table
+            %
+            %   Usage:
+            %   dataTable = GetDB()
+            dataTable = readtable(fullfile(Config.GetSetting('importDir'), strcat(Config.GetSetting('database'), ...
+                Config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
         end
-        
+
         function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
+
             %% Query Gets the respective filename for configuration value
             %   arguments are received in the order of
             %     'configuration' [light source]
@@ -126,7 +129,7 @@ classdef DB
             %   [targetIDs, outRows] = GetTargetIndexes([], 'fix'); %fix
             %   [targetIDs, outRows] = GetTargetIndexes({'tissue', true}, 'raw'); %raw
 
-            if nargin < 1 || isempty(content) 
+            if nargin < 1 || isempty(content)
                 content = {'tissue', true};
             end
 
@@ -135,10 +138,10 @@ classdef DB
             else
                 target = {target, false};
             end
-            [~, targetIDs, outRows] = DB.Query(content, [], [], [], [], target, []);    
+            [~, targetIDs, outRows] = DB.Query(content, [], [], [], [], target, []);
 
         end
-    
+
         function [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
 
             %% GetFilename Gets the respective filename for configuration value
@@ -162,7 +165,7 @@ classdef DB
             if ~isempty(integrationTime)
                 initialIntegrationTime = integrationTime;
             end
-            
+
             [~, ~, outRow] = DB.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
             outRow = DB.CheckOutRow(outRow, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget);
 
@@ -179,7 +182,7 @@ classdef DB
             end
 
         end
-    
+
         function [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
             outR = inR;
             if isempty(inR.ID) && ~isempty(specialTarget)
@@ -197,7 +200,7 @@ classdef DB
                 outR = outR(1, :);
             end
         end
-            
+
         function [setId] = SelectDatabaseSamples(dataTable, setId)
             %SelectDatabaseSamples from DataInfo table in order to ignore incorrect
             %samples inside Query.m

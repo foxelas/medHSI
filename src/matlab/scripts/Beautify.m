@@ -1,9 +1,9 @@
-clear all; 
-close all; 
+clear all;
+close all;
 
 %% Apply beautifier
 basedir = fullfile(Config.GetSetting('parentDir'), 'medHSI\');
-MBeautify.formatFiles(fullfile(basedir, 'src\matlab\plots\'), '*.m');s
+MBeautify.formatFiles(fullfile(basedir, 'src\matlab\plots\'), '*.m');
 MBeautify.formatFiles(fullfile(basedir, 'src\matlab\scripts\'), '*.m');
 MBeautify.formatFiles(fullfile(basedir, 'src\matlab\methods\'), '*.m');
 
@@ -13,4 +13,4 @@ for i = 3:numel(dirList)
     MBeautify.formatFiles(fullfile(toolsdir, dirList(i).name), '*.m');
 end
 
-clear all; 
+clear all;

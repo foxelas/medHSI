@@ -41,18 +41,18 @@ if ~isOneFolder
     end
     c = 1;
     for i = 3:numel(fileList)
-        if (hasTargetType & find(targetIDs == str2double(fileList(i).name)) ) | ~hasTargetType
+        if (hasTargetType & find(targetIDs == str2double(fileList(i).name))) | ~hasTargetType
             imageList{c} = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
             c = c + 1;
-        end 
+        end
     end
-    if ~isempty(figTitle) 
+    if ~isempty(figTitle)
         saveName = figTitle;
     else
         saveName = target;
     end
     pathstr = path;
-    
+
 else
     if isstruct(criteria) && strcmpi(criteria.TargetDir, 'currentFolder')
         target = criteria.TargetName;
@@ -77,7 +77,7 @@ if ~isempty(figTitle)
     title(strrep(figTitle, '_', ' '));
 end
 
-%save in parent dir 
+%save in parent dir
 Config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
 SavePlot(fig);
 end

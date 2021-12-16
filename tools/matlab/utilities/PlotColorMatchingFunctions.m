@@ -4,10 +4,10 @@ close all;
 
 filename = fullfile(Config.GetRunBaseDir(), Config.GetSetting('paramDir'), 'displayParam.mat');
 
-z = 401; 
+z = 401;
 lambdaIn = HsiUtility.GetWavelengths(z, 'raw');
 load(filename, 'xyz');
-    
+
 %% Plots XYZ curve
 figure(1);
 hold on

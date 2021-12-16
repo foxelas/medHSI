@@ -47,6 +47,6 @@ SetSetting('plotName', fullfile(GetSetting('outputDir'), GetSetting('common'), '
 SavePlot(fig);
 %     SetSetting('saveEps', saveEps);
 
-save( fullfile(GetSetting('paramDir'), 'extinctionCoefficients.mat'), 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
+save(fullfile(GetSetting('paramDir'), 'extinctionCoefficients.mat'), 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
 
 end

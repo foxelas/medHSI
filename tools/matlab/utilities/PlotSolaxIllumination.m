@@ -1,9 +1,10 @@
+
 %% Plots Color Matching Functions
 close all;
 
 filename = fullfile(Config.GetRunBaseDir(), Config.GetSetting('paramDir'), 'displayParam.mat');
 
-z = 401; 
+z = 401;
 lambdaIn = HsiUtility.GetWavelengths(z, 'raw');
 load(filename, 'illumination');
 
