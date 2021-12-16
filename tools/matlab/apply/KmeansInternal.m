@@ -1,8 +1,8 @@
-function [labels] = ApplyKmeans(hsIm, targetName, clusterNum)
-%%ApplyKmeans performs Kmeans clustering on the HSI
+function [labels] = KmeansInternal(hsIm, targetName, clusterNum)
+%%KmeansClustering performs Kmeans clustering on the HSI
 %
 %   Usage:
-%   labels = ApplyKmeans(hsi, '158', 5);
+%   labels = KmeansInternal(hsi, '158', 5);
 
 srgb = hsIm.GetDisplayImage('rgb');
 fgMask = GetFgMaskInternal(srgb);

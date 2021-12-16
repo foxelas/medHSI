@@ -1,13 +1,13 @@
 
 %% Apply script of each of the data
-settingNum = 2;
+settingNum = 3;
 RunSettings(settingNum);
 
 %% Change to Relevant Script
 if settingNum < 3
-    Apply.ScriptToEachImage(@ApplySuperpixelAnalysis);
+    Apply.ScriptToEachImage(@Apply.SuperpixelAnalysis);
 elseif settingNum == 3
-    Apply.ScriptToEachImage(@ApplyKmeans, [], [], 5);
+    Apply.ScriptToEachImage(@Apply.Kmeans, [], [], 5);
 end
 
 close all;

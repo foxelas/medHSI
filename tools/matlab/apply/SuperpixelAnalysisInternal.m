@@ -1,10 +1,10 @@
-function [] = ApplySuperpixelAnalysis(hsIm, targetName, isManual, pixelNum, pcNum)
-%%ApplySuperpixelAnalysis applies SuperPCA on an image
+function [] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
+%%SuperpixelAnalysis applies SuperPCA on an image
 %
 %   Usage:
-%   ApplySuperpixelAnalysis(hsi, targetName);
+%   SuperpixelAnalysisInternal(hsi, targetName);
 %
-%   ApplyScriptToEachImage(@ApplySuperpixelAnalysis);
+%   ApplyScriptToEachImage(@SuperpixelAnalysis);
 
 %% Apply superpixel analysis on HSI
 % prequisites: hsi, targetName
