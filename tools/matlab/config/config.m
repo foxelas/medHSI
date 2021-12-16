@@ -1,5 +1,19 @@
 classdef Config  
-    methods (Static)                  
+    methods (Static)       
+%% Contents 
+%
+%   Static:
+%         SetOpt()
+%         [curDir] = GetRunBaseDir()
+%         [curDir] = GetConfDir()
+%         [filepath] = DirMake(varargin)
+%         [fileConditions] = GetFileConditions(content, target, id)
+%         [sourceDir] = GetSource()
+%         [hasGpu] = HasGPU()
+%         [value] = GetSetting(parameter)
+%         SetSetting(parameter, value)
+%         NotifySetting(paramName, paramValue)
+
         function [] = SetOpt()
 %     SETOPT sets parameters for running from conf/Config.ini
 %
@@ -24,7 +38,6 @@ classdef Config
 
         end
 
-
         function [filepath] = DirMake(varargin)
         %% DirMake creates a new directory
         %
@@ -43,7 +56,6 @@ classdef Config
                 end
             end
         end
-
 
         function [fileConditions] = GetFileConditions(content, target, id)
         %% GETFILECONDITIONS returns the conditions necessary for finding the
@@ -69,8 +81,7 @@ classdef Config
             end
         end
         
-      
-        function sourceDir = GetSource()
+        function [sourceDir] = GetSource()
         %     GETSOURCE returns the source directory
         %
         %     Usage:
@@ -114,7 +125,6 @@ classdef Config
                 fprintf('Parameter %s does not exist in the configuration file.\n', parameter);
             end
         end
-
 
         function [] = SetSetting(parameter, value)
         %% SETSETTING sets a parameter according to a value or by default
