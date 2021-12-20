@@ -10,6 +10,7 @@ import numpy as np
 import os
 import os.path
 import sys
+import cv2
 
 
 ######################### Path #########################
@@ -26,7 +27,7 @@ def makedir(fpath):
         print('folder exists')
         
 def get_savedir():
-    return 'D:/elena/Google Drive/titech/research/experiments/output/hsi/python'
+    return 'D:/elena/mspi/output/python-test'
 
 def get_tripletdir():
     return 'D:/elena/mspi/matfiles/hsi/calibTriplets'
@@ -44,11 +45,13 @@ def not_supported(varname):
 import configparser
 
 def get_module_path():
-    module_path = os.path.abspath(os.path.join('..'))
-    if module_path not in sys.path:
-        sys.path.append(module_path+"\\tools")
+    #module_path = os.path.abspath(os.path.join('..'))
+    #if module_path not in sys.path:
+    #    sys.path.append(module_path+"\\tools")
     #print('Module path: ', module_path)
     #sys.path
+    module_path = "D:\\elena\\onedrive\\OneDrive - 東工大未来研情報イノベーションコア\\titech\\research\\experiments\\medHSI\\src\\"
+
     return module_path
 
 def get_config_path():
@@ -60,8 +63,9 @@ def parse_config():
     settings_file = get_config_path()
     config = configparser.ConfigParser()
     config.read(settings_file, encoding = 'utf-8')
-    print('Loading from settings .ini ', settings_file)
-    config.sections()
+    # print("Loading from settings conf/config.ini \n")
+    # print("Sections")
+    # print(config.sections())
     return config
 
 conf = parse_config()
@@ -108,10 +112,11 @@ def load_dataset(fpath, sampleType='pixel', ash5=0):
             val = f[keyz]
         else:
             val = f[keyz][:]
+        
         if val.shape[2] != 311:
             val = np.transpose(val, [1, 2, 0])
         hsiList.append(val)
-        
+    
     dataList = []
     if sampleType == 'pixel':
         dataList = flatten_hsis(hsiList)
@@ -123,8 +128,28 @@ def load_dataset(fpath, sampleType='pixel', ash5=0):
         not_supported('SampleType')
     return dataList             
 
+def load_images(fpath):
+    images = []
+    for filename in os.listdir(fpath):
+        img = cv2.imread(os.path.join(fpath,filename))
+        if img is not None:
+            images.append(img)
+    return images
+
 ######################### Process #########################
 
+def get_labels_from_mask(imgList):
+    labels = []
+    for img in imgList: 
+        grayIm = cv2.convertScaleAbs(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))  
+        #print("Min", np.min(np.min(grayIm)), "and Max ", np.max(np.max(grayIm)))     	
+        (thresh, blackAndWhiteImage) = cv2.threshold(grayIm, 170, 255, cv2.THRESH_BINARY)  	
+        labelImg = np.logical_not(blackAndWhiteImage)
+        #plt.imshow(labelImg, cmap='gray')
+        #plt.show()
+        labels.append(labelImg)
+    return labels
+    
 def center_crop_hsi(hsi, targetHeight=None, targetWidth=None):        
 
     width = hsi.shape[1]
@@ -142,8 +167,11 @@ def center_crop_hsi(hsi, targetHeight=None, targetWidth=None):
     top = int(np.ceil((height - targetHeight) / 2))
     bottom = height - int(np.floor((height - targetHeight) / 2))
 
-    croppedImg = hsi[top:bottom, left:right,:]
-
+    if np.ndim(hsi) > 2:
+        croppedImg = hsi[top:bottom, left:right,:]
+    else:
+        croppedImg = hsi[top:bottom, left:right]
+        
     return croppedImg
 
 def center_crop_list(dataList, targetHeight = 70, targetWidth = 70, showImage = False):
@@ -151,7 +179,7 @@ def center_crop_list(dataList, targetHeight = 70, targetWidth = 70, showImage = 
     for x in range(len(dataList)):
         val = center_crop_hsi(dataList[x], targetWidth, targetHeight)
         croppedData.append(val)
-        
+    
     if showImage:
         show_montage(croppedData)
             
@@ -207,9 +235,10 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
         [m,n,z] = hsi.shape
         
         filename = os.path.join(os.path.dirname(os.path.dirname(get_module_path())), conf['Directories']['paramDir'], 'displayParam_311.mat')
+
         xyz = load_from_mat(filename, 'xyz')
         illumination = load_from_mat(filename, 'illumination')
-        
+
         colImage = np.reshape( hsi, (m*n, z) )  
         normConst = np.amax(colImage)
         colImage = colImage / float(normConst)
@@ -261,8 +290,9 @@ def show_image(x, figTitle = None, hasGreyScale = False, fpath = ""):
     
 def show_montage(dataList, imgType = 'srgb', channel = 150):
     #Needs to have same number of dimensions for each image, type float single
-    hsiList = np.array([get_display_image(x, imgType, channel) for x in dataList], dtype=object)
-    m = skimage.util.montage(np.array(hsiList, dtype="float32"), multichannel=True)
+    hsiList = np.array([get_display_image(x, imgType, channel) for x in dataList], dtype="float64")
+    m = skimage.util.montage(hsiList, channel_axis = 3)
+    m = (m * 255).astype(np.uint8)
     filename = os.path.join(conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
     skimage.io.imsave(filename, m)
 
