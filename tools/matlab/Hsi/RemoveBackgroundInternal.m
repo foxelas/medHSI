@@ -80,7 +80,7 @@ filepath = DirMake(GetSetting('saveDir'), GetSetting('backgroundRemoval'), ...
     GetSetting('database'), strcat(GetSetting('fileName'), '.jpg'));
 SetSetting('plotName', filepath);
 
-Plots(1, @PlotOverlay, Irgb, fgMask);
+plots(1, @PlotOverlay, Irgb, fgMask);
 
 updI = I .* repmat(double(fgMask), [1, 1, z]);
 

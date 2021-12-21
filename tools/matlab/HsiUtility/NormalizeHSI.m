@@ -86,10 +86,10 @@ spectralData = hsIm.Value;
 % figure(4);imshow(squeeze(spectralData(:,:,100)));
 
 if saveFile
-    baseDir = Config.DirMake(Config.GetSetting('matDir'), ...
-        strcat(Config.GetSetting('database'), 'Normalized'), targetName);
+    baseDir = config.DirMake(config.GetSetting('matDir'), ...
+        strcat(config.GetSetting('database'), 'Normalized'), targetName);
 
-    targetFilename = strcat(baseDir, '_', Config.GetSetting('normalization'), '.mat');
+    targetFilename = strcat(baseDir, '_', config.GetSetting('normalization'), '.mat');
     save(targetFilename, 'spectralData', '-v7.3');
 end
 

@@ -1,4 +1,4 @@
-classdef Plots
+classdef plots
     methods (Static)
 
         %% Contents
@@ -68,8 +68,8 @@ classdef Plots
             %   criteria = struct('TargetDir', 'subfolders', ...
             %       'TargetName', strcat(target, '.jpg'), ...
             %       'TargetType', 'fix');
-            %   Plots.MontageFolderContents(1, [], criteria);
-            Plots.Apply(fig, @PlotMontageFolderContents, varargin{:});
+            %   plots.MontageFolderContents(1, [], criteria);
+            plots.Apply(fig, @PlotMontageFolderContents, varargin{:});
         end
 
         function [] = Superpixels(fig, varargin)
@@ -79,7 +79,7 @@ classdef Plots
             %   PlotSuperpixels(baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', [], 1);
             %   PlotSuperpixels(baseImage, labels, 'Superpixels of image 3', 'color', fgMask, 1);
 
-            Plots.Apply(fig, @PlotSuperpixels, varargin{:});
+            plots.Apply(fig, @PlotSuperpixels, varargin{:});
         end
 
         function [] = SubimageMontage(fig, varargin)
@@ -89,7 +89,7 @@ classdef Plots
             %   Usage:
             %   PlotSubimageMontage(hsi, figTitle, limit, fig);
 
-            Plots.Apply(fig, @PlotSubimageMontage, varargin{:});
+            plots.Apply(fig, @PlotSubimageMontage, varargin{:});
         end
 
         function [] = Spectra(fig, varargin)
@@ -99,7 +99,7 @@ classdef Plots
             %   PlotSpectra(spectra, wavelengths, names, figTitle, fig);
             %   PlotSpectra(spectra)
 
-            Plots.Apply(fig, @PlotSpectra, varargin{:});
+            plots.Apply(fig, @PlotSpectra, varargin{:});
         end
 
         function [] = Overlay(fig, varargin)
@@ -108,7 +108,7 @@ classdef Plots
             %   Usage:
             %   PlotOverlay(baseIm, topIm, figTitle, fig)
 
-            Plots.Apply(fig, @PlotOverlay, varargin{:});
+            plots.Apply(fig, @PlotOverlay, varargin{:});
         end
 
         function [] = Eigenvectors(fig, varargin)
@@ -117,11 +117,11 @@ classdef Plots
             %   Usage:
             %   PlotEigenvectors(coeff, xValues, pcNum, fig)
 
-            Plots.Apply(fig, @PlotEigenvectors, varargin{:});
+            plots.Apply(fig, @PlotEigenvectors, varargin{:});
         end
 
         function [] = DualMontage(fig, varargin)
-            Plots.Apply(fig, @PlotDualMontage, varargin{:});
+            plots.Apply(fig, @PlotDualMontage, varargin{:});
         end
 
         function [] = Dimred(method, dimredResult, w, redHsis)
@@ -153,7 +153,7 @@ classdef Plots
             %   [imCorr] = PlotBandStatistics(inVectors, 'correlation', fig)
             %   [imCorr] = PlotBandStatistics(inVectors, 'covariance', fig)
 
-            [imCorr] = Plots.Apply(fig, @PlotBandStatistics, varargin{:});
+            [imCorr] = plots.Apply(fig, @PlotBandStatistics, varargin{:});
         end
 
     end

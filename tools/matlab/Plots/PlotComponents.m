@@ -8,7 +8,7 @@ if nargin < 3
     figStart = 1;
 end
 
-plotName = Config.GetSetting('plotName');
+plotName = config.GetSetting('plotName');
 for i = 1:pcNum
     fig = figStart + i - 1;
     figure(fig);
@@ -17,8 +17,8 @@ for i = 1:pcNum
     h = imagesc(img, 'AlphaData', mask);
     title(strcat('PC', num2str(i)));
     colorbar;
-    Config.SetSetting('plotName', strcat(plotName, num2str(i)));
-    Plots.SavePlot(fig);
+    config.SetSetting('plotName', strcat(plotName, num2str(i)));
+    plots.SavePlot(fig);
 end
 
 end

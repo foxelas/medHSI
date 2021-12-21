@@ -15,14 +15,14 @@ end
 
 [m, n, z] = size(hsIm);
 if (z < 401)
-    v = HsiUtility.GetWavelengths(z, 'index');
+    v = hsiUtility.GetWavelengths(z, 'index');
     spectralImage2 = zeros(m, n, 401);
     spectralImage2(:, :, v) = hsIm;
     hsIm = spectralImage2;
     z = 401;
     clear 'spectralImage2';
 end
-if Config.HasGPU()
+if config.HasGPU()
     spectralImage_ = gpuArray(hsIm);
 else
     spectralImage_ = hsIm;
@@ -55,7 +55,7 @@ switch method
         error('Unsupported method for display image reconstruction');
 end
 
-if Config.HasGPU()
+if config.HasGPU()
     dispImage = gather(dispImage_);
 else
     dispImage = dispImage_;
@@ -64,9 +64,9 @@ end
 end
 
 function [xyz, illumination] = PrepareParams(z)
-filename = fullfile(Config.GetRunBaseDir(), Config.GetSetting('paramDir'), 'displayParam.mat');
+filename = fullfile(config.GetRunBaseDir(), config.GetSetting('paramDir'), 'displayParam.mat');
 if ~exist(filename, 'file')
-    lambdaIn = HsiUtility.GetWavelengths(z, 'raw');
+    lambdaIn = hsiUtility.GetWavelengths(z, 'raw');
     [lambdaMatch, xFcn, yFcn, zFcn] = colorMatchFcn('1964_FULL');
     xyz = interp1(lambdaMatch', [xFcn; yFcn; zFcn]', lambdaIn, 'pchip', 0);
     [solaxSpec, lambdaMatch] = GetSolaxSpectra();

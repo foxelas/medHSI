@@ -1,4 +1,4 @@
-classdef Apply
+classdef apply
     methods (Static)
 
         %% Contents
@@ -7,16 +7,16 @@ classdef Apply
         %         [varargout] = ScriptToEachImage(functionName, condition, target, varargin)
         %         [result] = RowFunc(funcName, varargin)
         %         [varargout] = OnQualityPixels(func, varargin)
-        %         [labels] = ApplyKmeans(hsIm, targetName, clusterNum)
-        %         [] = ApplySuperpixelAnalysis(hsIm, targetName, isManual, pixelNum, pcNum)
+        %         [labels] = Kmeans(hsIm, targetName, clusterNum)
+        %         [] = SuperpixelAnalysis(hsIm, targetName, isManual, pixelNum, pcNum)
 
         function [varargout] = ScriptToEachImage(varargin)
             %%ApplyScriptToEachImage applies a script on each of the data samples who
             %%fullfill the condition
             %
             %   Usage:
-            %   ApplyScriptToEachImage(@ApplyKmeans);
-            %   ApplyScriptToEachImage(@ApplyKmeans, {'tissue', true}, []);
+            %   ApplyScriptToEachImage(@apply.Kmeans);
+            %   ApplyScriptToEachImage(@apply.Kmeans, {'tissue', true}, []);
 
             varargout{:} = ApplyScriptToEachImage(varargin{:});
         end
@@ -32,7 +32,7 @@ classdef Apply
         end
 
         function [varargout] = OnQualityPixels(varargin)
-            % APPLYONQUALITYPIXELS Apply a function on only goog quality functions.
+            % APPLYONQUALITYPIXELS apply a function on only goog quality functions.
             %
             %   Usage:
             %   [coeff] = ApplyOnQualityPixels(@doPixelPCA, colMsi);
@@ -41,20 +41,18 @@ classdef Apply
         end
 
         function [labels] = Kmeans(hsIm, targetName, clusterNum)
-            %%ApplyKmeans performs Kmeans clustering on the HSI
+            %%Kmeans performs Kmeans clustering on the HSI
             %
             %   Usage:
-            %   labels = Apply.Kmeans(hsi, '158', 5);
+            %   labels = apply.Kmeans(hsi, '158', 5);
             [labels] = KmeansInternal(hsIm, targetName, clusterNum);
         end
 
         function [] = SuperpixelAnalysis(varargin)
-            %%ApplySuperpixelAnalysis applies SuperPCA on an image
+            %%SuperpixelAnalysis applies SuperPCA on an image
             %
             %   Usage:
-            %   Apply.SuperpixelAnalysis(hsi, targetName);
-            %
-            %   ApplyScriptToEachImage(@ApplySuperpixelAnalysis);
+            %   apply.SuperpixelAnalysis(hsi, targetName);
             SuperpixelAnalysisInternal(varargin{:});
         end
     end

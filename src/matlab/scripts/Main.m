@@ -1,38 +1,38 @@
 %%%%%%%%%%%%%%%%%%%%% Initialization %%%%%%%%%%%%%%%%%%%%%
-Config.SetOpt();
+config.SetOpt();
 StartLogger;
 
-Config.SetSetting('normalization', 'byPixel');
-% Config.SetSetting('dataDate', 20210706);
-% Config.SetSetting('integrationTime', 618);
-Config.SetSetting('saveDir', fullfile(Config.GetSetting('saveDir'), '001-DataTest'));
-Config.SetSetting('cropBorders', true);
+config.SetSetting('normalization', 'byPixel');
+% config.SetSetting('dataDate', 20210706);
+% config.SetSetting('integrationTime', 618);
+config.SetSetting('saveDir', fullfile(config.GetSetting('saveDir'), '001-DataTest'));
+config.SetSetting('cropBorders', true);
 
 %%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
-Config.SetSetting('isTest', true);
-Config.SetSetting('database', 'calib');
-HsiUtility.InitializeDataGroup('handsOnly', {'hand', false});
+config.SetSetting('isTest', true);
+config.SetSetting('database', 'calib');
+hsiUtility.InitializeDataGroup('handsOnly', {'hand', false});
 
 
 %%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
-Config.SetSetting('isTest', false);
-Config.SetSetting('database', 'psl');
-Config.SetSetting('normalization', 'byPixel');
+config.SetSetting('isTest', false);
+config.SetSetting('database', 'psl');
+config.SetSetting('normalization', 'byPixel');
 CheckPSLData();
 
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-HsiUtility.InitializeDataGroup('', {'tissue', true});
+hsiUtility.InitializeDataGroup('', {'tissue', true});
 
 %%%%%%%%%%%%%%%%%%%%% Export H5 %%%%%%%%%%%%%%%%%%%%%
-Config.SetSetting('normalization', 'raw');
-HsiUtility.ExportH5Dataset({'tissue', true});
+config.SetSetting('normalization', 'raw');
+hsiUtility.ExportH5Dataset({'tissue', true});
 
-Config.SetSetting('normalization', 'byPixel');
-HsiUtility.ExportH5Dataset({'tissue', true});
+config.SetSetting('normalization', 'byPixel');
+hsiUtility.ExportH5Dataset({'tissue', true});
 
-Config.SetSetting('normalization', 'byPixel');
+config.SetSetting('normalization', 'byPixel');
 fileNum = 150;
-Config.SetSetting('fileName', num2str(fileNum));
-hsi = HsiUtility.ReadStoredHSI(fileNum, Config.GetSetting('normalization'));
+config.SetSetting('fileName', num2str(fileNum));
+hsi = hsiUtility.ReadStoredHSI(fileNum, config.GetSetting('normalization'));

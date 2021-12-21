@@ -4,23 +4,23 @@ function [] = SavePlot(fig)
 %   Usage:
 %   SavePlot(2);
 
-saveImages = Config.GetSetting('saveImages');
+saveImages = config.GetSetting('saveImages');
 
 if (saveImages)
     figure(fig);
-    saveInHQ = Config.GetSetting('saveInHQ');
-    saveInBW = Config.GetSetting('saveInBW');
-    plotName = Config.GetSetting('plotName');
-    cropBorders = Config.GetSetting('cropBorders');
-    saveEps = Config.GetSetting('saveEps');
+    saveInHQ = config.GetSetting('saveInHQ');
+    saveInBW = config.GetSetting('saveInBW');
+    plotName = config.GetSetting('plotName');
+    cropBorders = config.GetSetting('cropBorders');
+    saveEps = config.GetSetting('saveEps');
 
     if (~isempty(plotName))
         filename = strrep(plotName, '.mat', '');
 
         [filepath, name, ~] = fileparts(filename);
         filepathBW = fullfile(filepath, 'bw');
-        Config.DirMake(filepath);
-        Config.DirMake(filepathBW);
+        config.DirMake(filepath);
+        config.DirMake(filepathBW);
 
         filename = fullfile(filepath, strcat(name, '.jpg'));
         %         filename = strrep(filename, ' ', '_');

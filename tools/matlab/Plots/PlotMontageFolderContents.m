@@ -7,10 +7,10 @@ function [] = PlotMontageFolderContents(path, criteria, figTitle, fig)
 %   criteria = struct('TargetDir', 'subfolders', ...
 %       'TargetName', strcat(target, '.jpg'), ...
 %       'TargetType', 'fix');
-%   Plots.MontageFolderContents(1, [], criteria);
+%  plots.MontageFolderContents(1, [], criteria);
 
 if isempty(path)
-    path = fullfile(Config.GetSetting('saveDir'), Config.GetSetting('experiment'));
+    path = fullfile(config.GetSetting('saveDir'), config.GetSetting('experiment'));
 end
 
 if nargin < 2
@@ -36,7 +36,7 @@ if ~isOneFolder
     hasTargetType = isfield(criteria, 'TargetType');
     imageList = cell(numel(fileList)-2, 1);
     if hasTargetType
-        [targetIDs, ~] = DB.GetTargetIndexes([], criteria.TargetType);
+        [targetIDs, ~] = databaseUtility.GetTargetIndexes([], criteria.TargetType);
         imageList = cell(numel(targetIDs), 1);
     end
     c = 1;
@@ -78,6 +78,6 @@ if ~isempty(figTitle)
 end
 
 %save in parent dir
-Config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
+config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
 SavePlot(fig);
 end

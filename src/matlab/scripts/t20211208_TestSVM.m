@@ -1,16 +1,16 @@
 %Date: 2021-12-08
 
-Config.SetOpt();
-Config.SetSetting('isTest', false);
-Config.SetSetting('database', 'psl');
-Config.SetSetting('normalization', 'byPixel');
-Config.SetSetting('experiment', 'T20211215-SVM');
+config.SetOpt();
+config.SetSetting('isTest', false);
+config.SetSetting('database', 'psl');
+config.SetSetting('normalization', 'byPixel');
+config.SetSetting('experiment', 'T20211215-SVM');
 
 %% Read h5 data
-[targetIDs, outRows] = DB.GetTargetIndexes({'tissue', true}, 'fix');
+[targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'fix');
 
-labeldir = Config.DirMake(Config.GetSetting('matDir'), strcat(Config.GetSetting('database'), 'Labels\'));
-imgadedir = Config.DirMake(Config.GetSetting('matDir'), strcat(Config.GetSetting('database'), 'Normalized\'));
+labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
+imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Normalized\'));
 
 % ApplyScriptToEacRhImage(@reshape, {'tissue', true},  'fix');
 
@@ -22,7 +22,7 @@ for i = 1:length(targetIDs)
     %% load HSI from .mat file
     targetName = num2str(id);
     I = Hsi;
-    I.Value = HsiUtility.ReadStoredHSI(targetName, Config.GetSetting('normalization'));
+    I.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
     [m, n, z] = I.Size();
 
     labelfile = fullfile(labeldir, strcat(num2str(id), '_label.mat'));
@@ -43,6 +43,6 @@ SVMModel = fitcsvm(X, y, 'KernelScale', 'auto', 'Standardize', false, 'Verbose',
 CVSVMModel = crossval(SVMModel);
 classLoss = kfoldLoss(CVSVMModel)
 
-savedir = Config.DirMake(Config.GetSetting('outputDir'), Config.GetSetting('experiment'), 'svm_model.mat');
+savedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'svm_model.mat');
 effectiveDate = date();
 save(savedir, 'SVMModel', 'classLoss', 'effectiveDate');

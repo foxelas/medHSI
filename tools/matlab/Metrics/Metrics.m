@@ -1,4 +1,4 @@
-classdef Metrics
+classdef metrics
     methods (Static)
 
         %% GoodnessOfFit returns the Goodness Of Fit criterion

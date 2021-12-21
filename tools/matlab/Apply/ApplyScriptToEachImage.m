@@ -13,7 +13,7 @@ if nargin < 2
 end
 
 %% Read h5 data
-[targetIDs, ~] = DB.GetTargetIndexes(condition, target);
+[targetIDs, ~] = databaseUtility.GetTargetIndexes(condition, target);
 
 for i = 1:length(targetIDs)
     id = targetIDs(i);
@@ -21,7 +21,7 @@ for i = 1:length(targetIDs)
     %% load HSI from .mat file
     targetName = num2str(id);
     hsIm = Hsi;
-    hsIm.Value = HsiUtility.ReadStoredHSI(targetName, Config.GetSetting('normalization'));
+    hsIm.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
 
     %% Change to Relevant Script
     if nargout(functionName) > 0

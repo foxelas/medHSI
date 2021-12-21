@@ -1,4 +1,4 @@
-classdef HsiUtility
+classdef hsiUtility
     methods (Static)
         % Contents
         %
@@ -34,7 +34,7 @@ classdef HsiUtility
 
             switch option
                 case 'raw'
-                    splitWavelength = Config.GetSetting('splitWavelength');
+                    splitWavelength = config.GetSetting('splitWavelength');
                     if m == 401
                         x = 380:780;
                     elseif m == 36
@@ -56,7 +56,7 @@ classdef HsiUtility
                     end
 
                 case 'index'
-                    x = HsiUtility.GetWavelengths(m, 'raw');
+                    x = hsiUtility.GetWavelengths(m, 'raw');
                     x = x - 380 + 1;
 
                 case 'babel'
@@ -87,22 +87,22 @@ classdef HsiUtility
             %% Setup
             disp('Initializing [InitializeDataGroup]...');
 
-            normalization = Config.GetSetting('normalization');
+            normalization = config.GetSetting('normalization');
             if strcmp(normalization, 'raw')
-                fileName = Config.DirMake(Config.GetSetting('outputDir'), Config.GetSetting('datasets'), strcat('hsi_raw_full', '.h5'));
+                fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_raw_full', '.h5'));
             else
-                fileName = Config.DirMake(Config.GetSetting('outputDir'), Config.GetSetting('datasets'), strcat('hsi_normalized_full', '.h5'));
+                fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_normalized_full', '.h5'));
             end
 
             %% Read h5 data
-            [~, targetIDs, ~] = DB.Query(condition);
+            [~, targetIDs, ~] = databaseUtility.Query(condition);
 
             for i = 1:length(targetIDs)
                 id = targetIDs(i);
 
                 %% load HSI from .mat file
                 targetName = num2str(id);
-                spectralData = HsiUtility.ReadStoredHSI(targetName, normalization);
+                spectralData = hsiUtility.ReadStoredHSI(targetName, normalization);
 
                 curName = strcat('/sample', targetName);
                 h5create(fileName, curName, size(spectralData));
@@ -124,68 +124,68 @@ classdef HsiUtility
             %% Setup
             disp('Initializing [InitializeDataGroup]...');
 
-            Config.SetSetting('experiment', experiment);
-            Config.SetSetting('cropBorders', true);
-            Config.SetSetting('saveFolder', fullfile(Config.GetSetting('snapshots'), experiment));
-            isTest = Config.GetSetting('isTest');
+            config.SetSetting('experiment', experiment);
+            config.SetSetting('cropBorders', true);
+            config.SetSetting('saveFolder', fullfile(config.GetSetting('snapshots'), experiment));
+            isTest = config.GetSetting('isTest');
             saveMatFile = true;
 
             %% Read h5 data
-            [filenames, targetIDs, outRows] = DB.Query(condition);
+            [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
 
             integrationTimes = [outRows.IntegrationTime];
             dates = [outRows.CaptureDate];
             if isTest
-                configurations = [outRows.Configuration];
+                configurations = [outRows.configuration];
             end
 
             for i = 19 %1:length(targetIDs)
                 id = targetIDs(i);
-                target = DataUtility.GetValueFromTable(outRows, 'Target', i);
-                content = DataUtility.GetValueFromTable(outRows, 'Content', i);
-                Config.SetSetting('integrationTime', integrationTimes(i));
-                Config.SetSetting('dataDate', num2str(dates(i)));
+                target = dataUtility.GetValueFromTable(outRows, 'Target', i);
+                content = dataUtility.GetValueFromTable(outRows, 'Content', i);
+                config.SetSetting('integrationTime', integrationTimes(i));
+                config.SetSetting('dataDate', num2str(dates(i)));
                 if isTest
-                    Config.SetSetting('configuration', configurations{i});
+                    config.SetSetting('configuration', configurations{i});
                 end
 
-                saveName = DataUtility.StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
+                saveName = dataUtility.StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
 
                 %% write HSI in .mat file
-                DataUtility.ReadHSIData(content, target, experiment);
+                dataUtility.ReadHSIData(content, target, experiment);
 
                 %% load HSI from .mat file to verify it is working and to prepare preview images
                 targetName = num2str(id);
                 spectralData = Hsi;
-                spectralData.Value = DataUtility.ReadStoredHSI(targetName);
+                spectralData.Value = dataUtility.ReadStoredHSI(targetName);
                 dispImage = spectralData.GetDisplayRescaledImage('rgb');
                 figure(1);
                 imshow(dispImage);
-                SetSetting('plotName', Config.DirMake(Config.GetSetting('saveDir'), Config.GetSetting('saveFolder'), 'rgb', saveName));
+                SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
                 SavePlot(1);
 
                 %% write normalized HSI in .mat file
-                spectralData = HsiUtility.NormalizeHSI(targetName, Config.GetSetting('normalization'), saveMatFile);
+                spectralData = hsiUtility.NormalizeHSI(targetName, config.GetSetting('normalization'), saveMatFile);
 
                 %% prepare preview from normalized HSI
                 dispImage = spectralData.GetDisplayRescaledImage('rgb');
                 figure(2);
                 imshow(dispImage);
-                SetSetting('plotName', Config.DirMake(Config.GetSetting('saveDir'), Config.GetSetting('saveFolder'), 'normalized', saveName));
+                SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
                 SavePlot(2);
             end
 
             %% preview of the entire dataset
 
-            path1 = fullfile(Config.GetSetting('saveDir'), Config.GetSetting('saveFolder'), 'normalized');
-            Plots(1, @MontageFolderContents, path1, '*.jpg', 'Normalized');
-            Plots(3, @MontageFolderContents, path1, '*raw.jpg', 'Normalized raw');
-            Plots(4, @MontageFolderContents, path1, '*fix.jpg', 'Normalized fix');
+            path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized');
+            plots(1, @MontageFolderContents, path1, '*.jpg', 'Normalized');
+            plots(3, @MontageFolderContents, path1, '*raw.jpg', 'Normalized raw');
+            plots(4, @MontageFolderContents, path1, '*fix.jpg', 'Normalized fix');
 
-            path2 = fullfile(Config.GetSetting('saveDir'), Config.GetSetting('saveFolder'), 'rgb');
-            Plots(2, @MontageFolderContents, path2, '*.jpg', 'sRGB');
-            Plots(5, @MontageFolderContents, path2, '*raw.jpg', 'sRGB raw');
-            Plots(6, @MontageFolderContents, path2, '*fix.jpg', 'sRGB fix');
+            path2 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb');
+            plots(2, @MontageFolderContents, path2, '*.jpg', 'sRGB');
+            plots(5, @MontageFolderContents, path2, '*raw.jpg', 'sRGB raw');
+            plots(6, @MontageFolderContents, path2, '*fix.jpg', 'sRGB fix');
 
             close all;
         end

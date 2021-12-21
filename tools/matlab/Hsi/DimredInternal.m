@@ -25,7 +25,7 @@ end
 [coeff, scores, latent, explained, objective] = Dimred(Xcol, method, q);
 
 if hasMask
-    scores = Hsiutility.RecoverReducedHsi(scores, size(X), mask);
+    scores = hsiutility.RecoverReducedHsi(scores, size(X), mask);
 else
     scores = reshape(scores, [size(X, 1), size(X, 2), q]);
 end

@@ -1,19 +1,19 @@
-Config.SetOpt();
-Config.SetSetting('isTest', false);
-Config.SetSetting('database', 'psl');
+config.SetOpt();
+config.SetSetting('isTest', false);
+config.SetSetting('database', 'psl');
 
 %% Read h5 data
-[targetIDs, outRows] = DB.GetTargetIndexes({'tissue', true}, 'fix');
+[targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'fix');
 
 %%
-dirpath = fullfile(Config.GetSetting('outputDir'), Config.GetSetting('labelsManual'));
+dirpath = fullfile(config.GetSetting('outputDir'), config.GetSetting('labelsManual'));
 dirList = dir(fullfile(dirpath, '*.jpg'));
 
 close all;
-savedir = Config.DirMake(Config.GetSetting('matDir'), strcat(Config.GetSetting('database'), 'Labels\'));
-maskdir = Config.DirMake(Config.GetSetting('outputDir'), Config.GetSetting('labels'), '\');
-applieddir = Config.DirMake(Config.GetSetting('outputDir'), Config.GetSetting('labelsApplied'), '\');
-basedir = Config.DirMake(Config.GetSetting('outputDir'), Config.GetSetting('snapshots'), 'normalized\');
+savedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
+maskdir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labels'), '\');
+applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsApplied'), '\');
+basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshots'), 'normalized\');
 
 for i = 1:numel(dirList)
     imBase = im2double(imread(fullfile(basedir, strrep(dirList(i).name, '_manual', ''))));
@@ -45,9 +45,9 @@ for i = 1:numel(dirList)
     savename = fullfile(savedir, strcat(num2str(id), '_label.mat'));
     save(savename, 'labelMask');
 
-    Config.SetSetting('plotName', fullfile(maskdir, dirList(i).name));
+    config.SetSetting('plotName', fullfile(maskdir, dirList(i).name));
     SavePlot(2);
 
-    Config.SetSetting('plotName', fullfile(applieddir, dirList(i).name));
+    config.SetSetting('plotName', fullfile(applieddir, dirList(i).name));
     SavePlot(3);
 end

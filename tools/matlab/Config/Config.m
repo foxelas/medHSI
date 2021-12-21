@@ -1,4 +1,4 @@
-classdef Config
+classdef config
     methods (Static)
 
         %% Contents
@@ -36,7 +36,7 @@ classdef Config
 
             %% GETCONFDIR returns the configuration dir for the current project
 
-            curDir = fullfile(Config.GetRunBaseDir(), 'conf');
+            curDir = fullfile(config.GetRunBaseDir(), 'conf');
 
         end
 
@@ -54,7 +54,7 @@ classdef Config
             fileDir = fileparts(filepath);
             if ~exist(fileDir, 'dir')
                 mkdir(fileDir);
-                if ~contains(fileDir, Config.GetSetting('saveDir'))
+                if ~contains(fileDir, config.GetSetting('saveDir'))
                     addpath(fileDir);
                 end
             end
@@ -84,10 +84,10 @@ classdef Config
                 %pcName = char(java.net.InetAddress.getLocalHost.getHostName);
                 %if stcmp(pcName, 'GPU-PC2') == 0
                 if length(ver('parallel')) == 1
-                    Config.SetSetting('pcHasGPU', true);
+                    config.SetSetting('pcHasGPU', true);
                 end
             end
-            hasGpu = Config.GetSetting('pcHasGPU');
+            hasGpu = config.GetSetting('pcHasGPU');
         end
 
         function [value] = GetSetting(parameter)
@@ -96,7 +96,7 @@ classdef Config
             %
             %     Usage:
             %     value = getSetting('saveDir')
-            settingsFile = fullfile(Config.GetConfDir(), 'Config.mat');
+            settingsFile = fullfile(config.GetConfDir(), 'Config.mat');
             variableInfo = who('-file', settingsFile);
             if ismember(parameter, variableInfo)
                 m = matfile(settingsFile);
@@ -113,7 +113,7 @@ classdef Config
             %     Usage:
             %     SetSetting('saveDir', 'out\out')
             %     SetSetting('saveDir')
-            settingsFile = fullfile(Config.GetConfDir(), 'Config.mat');
+            settingsFile = fullfile(config.GetConfDir(), 'Config.mat');
             m = matfile(settingsFile, 'Writable', true);
             if nargin < 2 %write default value
                 v = m.options;
@@ -122,7 +122,7 @@ classdef Config
             else
                 m.(parameter) = value;
             end
-            Config.NotifySetting(parameter, value);
+            config.NotifySetting(parameter, value);
         end
 
         function [] = NotifySetting(paramName, paramValue)

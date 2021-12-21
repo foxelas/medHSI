@@ -1,29 +1,29 @@
 
 %% Setup
-Config.SetOpt();
-Config.SetSetting('integrationTime', 200);
-Config.SetSetting('normalization', 'byPixel');
-Config.SetSetting('dataDate', 20201218);
-Config.SetSetting('experiment', 'handsOnly');
-Config.SetSetting('database', 'calib');
+config.SetOpt();
+config.SetSetting('integrationTime', 200);
+config.SetSetting('normalization', 'byPixel');
+config.SetSetting('dataDate', 20201218);
+config.SetSetting('experiment', 'handsOnly');
+config.SetSetting('database', 'calib');
 
-Config.SetSetting('saveFolder', fullfile('medHsi', Config.GetSetting('experiment')));
+config.SetSetting('saveFolder', fullfile('medHsi', config.GetSetting('experiment')));
 
 StartLogger;
 
 %% Read h5 data
-experiment = Config.GetSetting('experiment');
-[~, targetIDs, outRows] = DB.Query({'hand', false});
+experiment = config.GetSetting('experiment');
+[~, targetIDs, outRows] = databaseUtility.Query({'hand', false});
 integrationTimes = [outRows.IntegrationTime];
 dates = [outRows.CaptureDate];
-configurations = [outRows.Configuration];
+configurations = [outRows.configuration];
 for i = 1:length(targetIDs)
-    target = DataUtility.GetValueFromTable(outRows, 'Target', i);
-    content = DataUtility.GetValueFromTable(outRows, 'Content', i);
-    Config.SetSetting('integrationTime', integrationTimes(i));
-    Config.SetSetting('dataDate', num2str(dates(i)));
-    Config.SetSetting('configuration', configurations{i});
-    [spectralData] = HsiUtility.ReadHSIData(content, target, experiment);
+    target = dataUtility.GetValueFromTable(outRows, 'Target', i);
+    content = dataUtility.GetValueFromTable(outRows, 'Content', i);
+    config.SetSetting('integrationTime', integrationTimes(i));
+    config.SetSetting('dataDate', num2str(dates(i)));
+    config.SetSetting('configuration', configurations{i});
+    [spectralData] = hsiUtility.ReadHSIData(content, target, experiment);
 
 end
 

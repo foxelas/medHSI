@@ -1,4 +1,4 @@
-classdef Hsi
+classdef hsi
     properties
         Value{mustBeNumeric}
     end
@@ -196,7 +196,7 @@ classdef Hsi
 
             hsIm = obj.Value;
             hsIm = hsIm(:, :, [420:730]-380);
-            [updI, ~] = Hsi.RemoveBackground(hsIm);
+            [updI, ~] = hsi.RemoveBackground(hsIm);
             pHsi = updI;
 
         end

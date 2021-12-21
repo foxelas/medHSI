@@ -14,7 +14,7 @@ end
 
 switch method
     case 'real'
-        settingsDir = Config.GetSetting('importDir');
+        settingsDir = config.GetSetting('importDir');
         inTable = delimread(fullfile(settingsDir, 'LE-9ND55F.csv'), ',', 'num');
         wavelengths = inTable.num(:, 1);
         solaxSpec = inTable.num(:, 2);
@@ -25,7 +25,7 @@ switch method
         end
 
     case 'reconstructed'
-        saveDir = Config.GetSetting('saveDir');
+        saveDir = config.GetSetting('saveDir');
         [solaxSpec, wavelengths] = ReconstructSolaxIoIlluminationSpectrum(saveDir);
     otherwise
         error('Unsupported case for solax-io spectra reconstruction');
@@ -66,12 +66,12 @@ xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Relative Spectrum (%)', 'FontSize', 15)
 title('Using [smoothingspline] fitting', 'FontSize', 15)
 
-Config.SetSetting('cropBorders', true);
-Config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_lininterp.png'));
-Plots.SavePlot(fig1);
+config.SetSetting('cropBorders', true);
+config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_lininterp.png'));
+plots.SavePlot(fig1);
 
-Config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_spline.png'));
-Plots.SavePlot(fig2);
+config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_spline.png'));
+plots.SavePlot(fig2);
 
 wavelengths = [380:780]';
 solaxSpec = f2(wavelengths);
@@ -86,8 +86,8 @@ ylim([0, 100]);
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Relative Illumination Spectrum (%)', 'FontSize', 15);
 title('For Solax-iO light source', 'FontSize', 15);
-Config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
-Plots.SavePlot(fig3);
+config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
+plots.SavePlot(fig3);
 
 save('parameters/solax_reconstructed_spectrum.mat', 'solaxSpec', 'solaxLocalMaxWavelengths');
 
@@ -96,7 +96,7 @@ end
 
 function [] = PlotSolaxSpectra(wavelengths, solaxSpec, sunSpec)
 
-saveDir = Config.GetSetting('saveDir');
+saveDir = config.GetSetting('saveDir');
 
 fig4 = figure(4);
 x = wavelengths;
@@ -109,7 +109,7 @@ xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Relative Illumination Spectrum (%)', 'FontSize', 15);
 title('For Solax-iO light source', 'FontSize', 15);
 legend(h, 'Location', 'northeast', 'FontSize', 15);
-Config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
-Plots.SavePlot(fig4);
+config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
+plots.SavePlot(fig4);
 
 end

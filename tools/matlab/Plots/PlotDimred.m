@@ -41,9 +41,9 @@ if strcmp(method, 'pca')
     SavePlot(2);
 
     SetSetting('plotName', fullfile(saveto, 'eigenvectors3'));
-    Plots(3, @PlotEigenvectors, coeff, w, 3);
+    plots(3, @PlotEigenvectors, coeff, w, 3);
     SetSetting('plotName', fullfile(saveto, 'eigenvectors10'));
-    Plots(4, @PlotEigenvectors, coeff, w, 10);
+    plots(4, @PlotEigenvectors, coeff, w, 10);
 
     subimageName = 'Principal Component';
 end
@@ -62,9 +62,9 @@ if strcmp(method, 'rica')
     SavePlot(1);
 
     SetSetting('plotName', fullfile(saveto, 'transform_vectors3'));
-    Plots(3, @PlotEigenvectors, coeff, w, 3);
+    plots(3, @PlotEigenvectors, coeff, w, 3);
     SetSetting('plotName', fullfile(saveto, 'transform_vectors310'));
-    Plots(4, @PlotEigenvectors, coeff, w, 10);
+    plots(4, @PlotEigenvectors, coeff, w, 10);
 
     subimageName = 'Feature';
 end
@@ -76,7 +76,7 @@ for i = 1:numel(sizeProd)
     %% Plot components
     sampleName = strcat('Tissue', num2str(i));
     SetSetting('plotName', fullfile(saveto, strcat('img', num2str(i), '_pcs')));
-    Plots(4, @PlotSubimageMontage, redHsi, sampleName, 6);
+    plots(4, @PlotSubimageMontage, redHsi, sampleName, 6);
 
     name = strcat(subimageName, '1', '_', sampleName);
     figure(6);

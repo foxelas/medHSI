@@ -1,10 +1,10 @@
-classdef DB
+classdef databaseUtility
     methods (Static)
 
         %% Contents
         %
         %   Static:
-        %         [dataTable] = GetDB()
+        %         [dataTable] = GetdatabaseUtility()
         %         [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
         %         [targetIDs, outRows] = GetTargetIndexes(content, target)
         %         [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
@@ -12,14 +12,14 @@ classdef DB
         %         [setId] = SelectDatabaseSamples(dataTable, setId)
         %         [fileConditions] = GetFileConditions(content, target, id)
 
-        function [dataTable] = GetDB()
+        function [dataTable] = GetdatabaseUtility()
 
-            %% GetDB returns the db structure as a table
+            %% GetdatabaseUtility returns the db structure as a table
             %
             %   Usage:
-            %   dataTable = GetDB()
-            dataTable = readtable(fullfile(Config.GetSetting('importDir'), strcat(Config.GetSetting('database'), ...
-                Config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
+            %   dataTable = GetdatabaseUtility()
+            dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
+                config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
         end
 
         function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
@@ -37,7 +37,7 @@ classdef DB
             %   [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
 
             warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
-            dataTable = DB.GetDB();
+            dataTable = databaseUtility.GetdatabaseUtility();
 
             if nargin < 7
                 configuration = [];
@@ -72,7 +72,7 @@ classdef DB
             setId = true(numel(dataTable.ID), 1);
 
             if ~isempty(configuration)
-                setId = setId & ismember(dataTable.Configuration, configuration);
+                setId = setId & ismember(dataTable.configuration, configuration);
             end
 
             if ~isempty(content)
@@ -109,7 +109,7 @@ classdef DB
                 setId = setId & ismember(dataTable.SampleID, sampleId);
             end
 
-            setId = DB.SelectDatabaseSamples(dataTable, setId);
+            setId = databaseUtility.SelectDatabaseSamples(dataTable, setId);
 
             outRows = dataTable(setId, :);
             filenames = outRows.Filename;
@@ -122,7 +122,7 @@ classdef DB
         end
 
         function [targetIDs, outRows] = GetTargetIndexes(content, target)
-            %GetTargetIndexes returns target indexes and relevant rows from the DB in
+            %GetTargetIndexes returns target indexes and relevant rows from the databaseUtility in
             %order to access specific categories of *tissue* samples.
             %
             %   Usage:
@@ -139,7 +139,7 @@ classdef DB
             else
                 target = {target, false};
             end
-            [~, targetIDs, outRows] = DB.Query(content, [], [], [], [], target, []);
+            [~, targetIDs, outRows] = databaseUtility.Query(content, [], [], [], [], target, []);
 
         end
 
@@ -167,8 +167,8 @@ classdef DB
                 initialIntegrationTime = integrationTime;
             end
 
-            [~, ~, outRow] = DB.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
-            outRow = DB.CheckOutRow(outRow, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget);
+            [~, ~, outRow] = databaseUtility.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
+            outRow = databaseUtility.CheckOutRow(outRow, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget);
 
             filename = outRow.Filename{1};
             tableId = outRow.ID;
@@ -190,9 +190,9 @@ classdef DB
                 if strcmp(specialTarget, 'black')
                     configuration = 'noLight';
                 end
-                [~, ~, outR] = DB.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
+                [~, ~, outR] = databaseUtility.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
                 if isempty(outR.ID) && strcmp(specialTarget, 'black')
-                    [~, ~, outR] = DB.Query('capOn', sampleId, '20210107', id, integrationTime, target, configuration);
+                    [~, ~, outR] = databaseUtility.Query('capOn', sampleId, '20210107', id, integrationTime, target, configuration);
                 end
             end
 
@@ -208,7 +208,7 @@ classdef DB
             %
             %   Usage:
             %   [setId] = SelectDatabaseSamples(dataTable, setId)
-            if strcmpi(Config.GetSetting('database'), 'psl')
+            if strcmpi(config.GetSetting('database'), 'psl')
                 setId = setId & ~contains(lower(dataTable.SampleID), 'b');
             end
         end
@@ -228,12 +228,12 @@ classdef DB
                 id = [];
             end
 
-            if Config.GetSetting('isTest')
-                fileConditions = {content, [], Config.GetSetting('dataDate'), id, ...
-                    Config.GetSetting('integrationTime'), target, Config.GetSetting('configuration')};
+            if config.GetSetting('isTest')
+                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
+                    config.GetSetting('integrationTime'), target, config.GetSetting('configuration')};
             else
-                fileConditions = {content, [], Config.GetSetting('dataDate'), id, ...
-                    Config.GetSetting('integrationTime'), target, []};
+                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
+                    config.GetSetting('integrationTime'), target, []};
             end
         end
     end

@@ -14,12 +14,12 @@ if isnumeric(targetName)
 end
 
 if strcmp(normalization, 'raw')
-    baseDir = fullfile(Config.GetSetting('matDir'), ...
-        strcat(Config.GetSetting('database'), 'Triplets'), targetName);
+    baseDir = fullfile(config.GetSetting('matDir'), ...
+        strcat(config.GetSetting('database'), 'Triplets'), targetName);
     targetFilename = strcat(baseDir, '_target.mat');
 else
-    baseDir = fullfile(Config.GetSetting('matDir'), ...
-        strcat(Config.GetSetting('database'), 'Normalized'), targetName);
+    baseDir = fullfile(config.GetSetting('matDir'), ...
+        strcat(config.GetSetting('database'), 'Normalized'), targetName);
     targetFilename = strcat(baseDir, '_', normalization, '.mat');
 end
 

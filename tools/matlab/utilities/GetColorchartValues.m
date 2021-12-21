@@ -20,7 +20,7 @@ valueNames = [];
 additionalValues = [];
 switch name
     case 'colorchartSpectra'
-        filename = fullfile(Config.GetSetting('importDir'), 'ColorChecker_RGB_and_spectra.txt');
+        filename = fullfile(config.GetSetting('importDir'), 'ColorChecker_RGB_and_spectra.txt');
         outstruct = delimread(filename, '\t', {'text', 'num'});
         valueNames = outstruct.text;
         valueNames = valueNames(2:length(valueNames));
@@ -28,21 +28,21 @@ switch name
         values = outstruct.num(2:end, :);
 
     case 'colorchartRGB'
-        filename = fullfile(Config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_RGB_values.txt');
+        filename = fullfile(config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_RGB_values.txt');
         outstruct = delimread(filename, '\t', 'num');
         values = outstruct.num;
 
     case 'colorchartLab'
-        filename = fullfile(Config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_Lab_values.txt');
+        filename = fullfile(config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_Lab_values.txt');
         outstruct = delimread(filename, '\t', 'num');
         values = outstruct.num;
 
     case 'colorchartOrder'
-        colorPatchOrder = Config.GetSetting('colorPatchOrder');
+        colorPatchOrder = config.GetSetting('colorPatchOrder');
         if isempty(colorPatchOrder)
             colorPatchOrder = 'darkSkinBottom';
         end
-        outstruct = delimread(fullfile(Config.GetSetting('importDir'), strcat(colorPatchOrder, 'PatchOrder.txt')), '\t', 'text');
+        outstruct = delimread(fullfile(config.GetSetting('importDir'), strcat(colorPatchOrder, 'PatchOrder.txt')), '\t', 'text');
         values = outstruct.text;
 
     otherwise

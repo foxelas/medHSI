@@ -5,7 +5,7 @@ function [extCoeffEumelanin2, extCoeffHbO, extCoeffHbR] = PlotChromophoreAbsorpt
 %   Usage:
 %   [extCoeffEumelanin2, extCoeffHbO, extCoeffHbR] = PlotChromophoreAbsorptionSpectra();
 
-importDir = Config.GetSetting('importDir');
+importDir = config.GetSetting('importDir');
 eumelaninFilename = 'eumelanin_absroption.csv';
 hbFilename = 'hb_absorption_spectra_prahl.csv';
 eumelaninData = delimread(fullfile(importDir, eumelaninFilename), ',', 'num');
@@ -42,10 +42,10 @@ l.FontSize = 13;
 set(gca, 'yscale', 'log');
 %set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0, 1, 1]);
 
-% Config.SetSetting('saveEps', false);
-Config.SetSetting('plotName', fullfile(Config.GetSetting('outputDir'), Config.GetSetting('common'), 'skinChromophoreExtinctionCoeff'));
-Plots.SavePlot(fig);
+% config.SetSetting('saveEps', false);
+config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'skinChromophoreExtinctionCoeff'));
+plots.SavePlot(fig);
 
-save(fullfile(Config.GetSetting('paramDir'), 'extinctionCoefficients.mat'), 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
+save(fullfile(config.GetSetting('paramDir'), 'extinctionCoefficients.mat'), 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
 
 end
