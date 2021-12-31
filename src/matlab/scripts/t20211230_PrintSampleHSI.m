@@ -1,27 +1,32 @@
 
 sampleIds = [150, 163, 175, 181]; %157, 160,
 names = {'mucinous carcinoma', 'basal cell carcinoma', 'Bowen’s disease', 'basal cell carcinoma'};
-divBy = 0.0015;
+divBy = 1;
 
-figure(1);
+close all;
+figure(2);
+figure('units','normalized','outerposition',[0 0 1 1]);
+
 clf;
  for j = 1:4
      sampleId = sampleIds(j);
-     [spectrumCurves, rgb] = prepareData(sampleId);
-      x = hsiUtility.GetWavelengths(311);
-
+     [spectrumCurves, rgb] = GetAverageSpectraInROI(sampleId);
+      x = hsiUtility.GetWavelengths(size(spectrumCurves, 2));
+     
+     figure(2);
      subplot(4, 2, (j-1)*2 + 1);
      hold on
-     for i=1:10:size(spectrumCurves, 1)
+     for i=1:size(spectrumCurves, 1)
          plot(x, spectrumCurves(i,:) ./divBy, 'g');
      end
      avg = mean(spectrumCurves);
-     h = plot(x, avg ./divBy, 'b*', 'DisplayName', 'Mean', 'LineWidth', 3); 
+     h = plot(x, avg ./divBy, 'b*', 'DisplayName', 'Mean', 'LineWidth', 2); 
      hold off
      ylim([0,1]);
+     xlim([420, 750]);
      xlabel('Wavelength (nm)');
-     ylabel('Normalized Spectrum (a.u.)');
-     legend(h);
+     ylabel('Reflectance (a.u.)');
+     legend(h, 'Location', 'northwest');
 
      subplot(4, 2, j*2);
      imshow(rgb);
@@ -29,16 +34,6 @@ clf;
  end
  
  config.SetSetting('plotName', fullfile(config.DirMake(config.GetSetting('saveDir'), 'T20211230-review'), 'spectra-example.jpg'));
- plots.SavePlot(1);
- 
- function [spectrumCurves, rgb] = prepareData(sampleId)
- load(strcat('D:\elena\mspi\matfiles\hsi\pslNormalized\', num2str(sampleId),'_byPixel.mat'));
-  
- hsiIm = hsi;
- hsiIm.Value = spectralData;
- [rgb] = hsiIm.GetDisplayImage();
- [fgMask] = GetFgMask(hsiIm);
- [spectrumCurves] = GetPixelsFromMask(hsiIm, fgMask);
- end
+ plots.SavePlot(2);
  
  

@@ -7,7 +7,7 @@ function [mask, maskedPixels] = GetMaskFromFigureInternal(hsIm)
 
 [~, ~, w] = size(hsIm);
 if w > 3
-    Irgb = GetDisplayImage(hsIm);
+    Irgb = GetDisplayImageInternal(hsIm);
 else
     Irgb = hsIm;
 end
