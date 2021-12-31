@@ -103,7 +103,7 @@ classdef plots
 
             plots.Apply(fig, @PlotSpectra, varargin{:});
         end
-        
+
         function [] = SpectraAverage(fig, varargin)
             %%PlotSpectraAverage plots average spectra
             %
@@ -113,8 +113,8 @@ classdef plots
 
             plots.Apply(fig, @PlotSpectraAverage, varargin{:});
         end
-        
-        function []  =  NormalizationCheck(fig, varargin)
+
+        function [] = NormalizationCheck(fig, varargin)
             %%PlotNormalizationCheck plots the values recovered after normalization
             %   user needs to input a mask
             %

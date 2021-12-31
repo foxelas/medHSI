@@ -33,7 +33,7 @@ extCoeffHbR = hbData(:, 3);
 % absCoeffHbR = convertHbfun(extCoeffHbR);
 
 % (moles/liter) = M
- 
+
 fig = figure(1);
 clf;
 hold on;
