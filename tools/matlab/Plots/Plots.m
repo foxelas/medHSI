@@ -10,6 +10,8 @@ classdef plots
         %         Superpixels(fig, baseImage, labels, figTitle, plotType, fgMask)
         %         SubimageMontage(fig, hsi, figTitle, limit)
         %         Spectra(fig, spectra, wavelengths, names, figTitle)
+        %         SpectraAverage(fig, spectra, wavelengths, figTitle)
+        %         NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
         %         Overlay(fig, baseIm, topIm, figTitle)
         %         DualMontage(fig, left, right, figTitle)
         %         Dimred(method, dimredResult, w, redHsis)
@@ -100,6 +102,27 @@ classdef plots
             %   PlotSpectra(spectra)
 
             plots.Apply(fig, @PlotSpectra, varargin{:});
+        end
+        
+        function [] = SpectraAverage(fig, varargin)
+            %%PlotSpectraAverage plots average spectra
+            %
+            %   Usage:
+            %   PlotSpectraAverage(spectra, wavelengths, figTitle, fig);
+            %   PlotSpectraAverage(spectra)
+
+            plots.Apply(fig, @PlotSpectraAverage, varargin{:});
+        end
+        
+        function []  =  NormalizationCheck(fig, varargin)
+            %%PlotNormalizationCheck plots the values recovered after normalization
+            %   user needs to input a mask
+            %
+            %   Usage:
+            %   PlotsNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
+            %   plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
+
+            plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
         end
 
         function [] = Overlay(fig, varargin)
