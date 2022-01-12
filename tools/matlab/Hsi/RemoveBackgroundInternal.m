@@ -9,7 +9,7 @@ function [updI, fgMask] = RemoveBackgroundInternal(I, colorLevelsForKMeans, atte
 
 [m, n, z] = size(I);
 if z > 3
-    Irgb = GetDisplayImage(I, 'rgb');
+    Irgb = hsiUtility.GetDisplayImage(I, 'rgb');
 else
     Irgb = I;
 end
@@ -76,11 +76,11 @@ else
     % cluster1 = Irgb .* double(specimenMask);
 end
 
-filepath = DirMake(GetSetting('saveDir'), GetSetting('backgroundRemoval'), ...
-    GetSetting('database'), strcat(GetSetting('fileName'), '.jpg'));
-SetSetting('plotName', filepath);
+filepath = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('backgroundRemoval'), ...
+    config.GetSetting('database'), strcat(config.GetSetting('fileName'), '.jpg'));
+config.SetSetting('plotName', filepath);
 
-plots(1, @PlotOverlay, Irgb, fgMask);
+plots.PlotOverlay(1, Irgb, fgMask);
 
 updI = I .* repmat(double(fgMask), [1, 1, z]);
 

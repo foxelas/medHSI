@@ -8,17 +8,17 @@ function spectralData = NormalizeHSI(targetName, option, saveFile)
 %   spectralData = NormalizeHSI('sample2', 'raw')
 %   spectralData = NormalizeHSI('sample2', 'byPixel', true)
 
-SetSetting('fileName', targetName);
+config.SetSetting('fileName', targetName);
 
 if nargin < 2 || isempty(option)
-    option = GetSetting('normalization');
+    option = config.GetSetting('normalization');
 end
 
-baseDir = fullfile(GetSetting('matDir'), strcat(GetSetting('database'), 'Triplets'), targetName);
+baseDir = fullfile(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Triplets'), targetName);
 
 targetFilename = strcat(baseDir, '_target.mat');
 load(targetFilename, 'spectralData');
-hsIm = Hsi;
+hsIm = hsi;
 hsIm.Value = spectralData;
 [m, n, w] = hsIm.Size();
 
@@ -57,13 +57,14 @@ switch option
 end
 
 if useBlack
-    if ~isequal(hsIm.Size(), size(blackReflectance))
+    [m , n, w] = hsIm.Size();
+    if ~isequal([m , n, w], size(blackReflectance)) 
         error('Not implemented error');
         %cropMask = getCaptureROImask(m, n);
         blackReflectance = blackReflectance(any(cropMask, 2), any(cropMask, 1), :);
         warning('Crop the image value: black');
     end
-    if ~isequal(hsIm.Size(), size(whiteReflectance))
+    if ~isequal([m , n, w], size(whiteReflectance)) 
         error('Not implemented error');
         %cropMask = getCaptureROImask(m, n);
         whiteReflectance = whiteReflectance(any(cropMask, 2), any(cropMask, 1), :);

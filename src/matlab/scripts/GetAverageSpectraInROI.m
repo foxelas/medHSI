@@ -8,7 +8,7 @@ Iwhite = fullReflectanceByPixel;
 
 srgb = GetDisplayImageInternal(Iin);
 denom = Iwhite - Iblack;
-% denom(denom <= 0) = 0.000000001;
+denom(denom <= 0) = 0.000000001;
 Inorm = (Iin - Iblack) ./ denom;
 
 % close all;

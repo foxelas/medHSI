@@ -1,8 +1,8 @@
-function [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
-%%ReadHSIData returns the three images necessary for data analysis
+function [spectralData] = ReadHSIDataInternal(content, target, experiment, blackIsCapOn)
+%%ReadHSIDataInternal returns the three images necessary for data analysis
 %
 %   Usage:
-%   [raw] = ReadHSIData(content, target, experiment, blackIsCapOn)
+%   [raw] = ReadHSIDataInternal(content, target, experiment, blackIsCapOn)
 
 if nargin < 4
     blackIsCapOn = false;
@@ -44,7 +44,7 @@ if ~exist(strcat(saveName, '_target.mat'), 'file') ...
 
         %%UniSpectrum
         uniSpectrum = hsiUtility.GetSpectraFromMask(white);
-        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(GetSetting('integrationTime')))));
+        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(config.GetSetting('integrationTime')))));
         plots.Spectra(4, uniSpectrum, wavelengths, '99%-white', 'Reflectance Spectrum of White Balance Sheet');
 
         %%BandMax

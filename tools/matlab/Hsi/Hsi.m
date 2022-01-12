@@ -31,8 +31,13 @@ classdef hsi
         %         [labels] = Cubseg(obj, pixelNum)
         %         [scores] = SPCA(obj, pcNum, labels)
         %
-        function [m, n, w] = Size(obj)
-            [m, n, w] = size(obj.Value);
+        function [varargout] = Size(obj)
+            v{:} = size(obj.Value);
+            vals = v{1};
+            varargout = cell(numel(vals), 1);
+            for i = 1:numel(vals)
+                varargout{i} = vals(i);
+            end
         end
 
         function [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
@@ -195,8 +200,9 @@ classdef hsi
             %   YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS
 
             hsIm = obj.Value;
-            hsIm = hsIm(:, :, [420:730]-380);
-            [updI, ~] = hsi.RemoveBackground(hsIm);
+            hsIm = hsIm(:, :, hsiUtility.GetWavelengths(311, 'index'));
+            obj.Value = hsIm;
+            [updI, ~] = obj.RemoveBackground();
             pHsi = updI;
 
         end

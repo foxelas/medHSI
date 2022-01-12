@@ -21,7 +21,7 @@ for i = 1:length(targetIDs)
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    I = Hsi;
+    I = hsi;
     I.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
     [m, n, z] = I.Size();
 

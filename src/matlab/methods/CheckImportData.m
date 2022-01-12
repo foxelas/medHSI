@@ -1,7 +1,7 @@
-function [flag, fileS] = CheckPSLData()
-%CheckPSLData checks hsm data and prepares the data table structure
+function [flag, fileS] = CheckImportData()
+%CheckImportData checks hsm data and prepares the data table structure
 %
-%   Usage: [flag, fileS] = CheckPSLData()
+%   Usage: [flag, fileS] = CheckImportData()
 
 v = dir('D:\elena\mspi\3_skinHSI\skin samples\*.hsm');
 vname = {v.name};

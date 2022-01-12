@@ -152,17 +152,17 @@ classdef hsiUtility
                 saveName = dataUtility.StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
 
                 %% write HSI in .mat file
-                dataUtility.ReadHSIData(content, target, experiment);
+                hsiUtility.ReadHSIData(content, target, experiment);
 
                 %% load HSI from .mat file to verify it is working and to prepare preview images
                 targetName = num2str(id);
-                spectralData = Hsi;
-                spectralData.Value = dataUtility.ReadStoredHSI(targetName);
+                spectralData = hsi;
+                spectralData.Value = hsiUtility.ReadStoredHSI(targetName);
                 dispImage = spectralData.GetDisplayRescaledImage('rgb');
                 figure(1);
                 imshow(dispImage);
-                SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
-                SavePlot(1);
+                config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
+                plots.SavePlot(1);
 
                 %% write normalized HSI in .mat file
                 spectralData = hsiUtility.NormalizeHSI(targetName, config.GetSetting('normalization'), saveMatFile);
@@ -171,21 +171,21 @@ classdef hsiUtility
                 dispImage = spectralData.GetDisplayRescaledImage('rgb');
                 figure(2);
                 imshow(dispImage);
-                SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
-                SavePlot(2);
+                config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
+                plots.SavePlot(2);
             end
 
             %% preview of the entire dataset
 
             path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized');
-            plots(1, @MontageFolderContents, path1, '*.jpg', 'Normalized');
-            plots(3, @MontageFolderContents, path1, '*raw.jpg', 'Normalized raw');
-            plots(4, @MontageFolderContents, path1, '*fix.jpg', 'Normalized fix');
+            plots.MontageFolderContents(1, path1, '*.jpg', 'Normalized');
+            plots.MontageFolderContents(3, path1, '*raw.jpg', 'Normalized raw');
+            plots.MontageFolderContents(4, path1, '*fix.jpg', 'Normalized fix');
 
             path2 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb');
-            plots(2, @MontageFolderContents, path2, '*.jpg', 'sRGB');
-            plots(5, @MontageFolderContents, path2, '*raw.jpg', 'sRGB raw');
-            plots(6, @MontageFolderContents, path2, '*fix.jpg', 'sRGB fix');
+            plots.MontageFolderContents(2, path2, '*.jpg', 'sRGB');
+            plots.MontageFolderContents(5, path2, '*raw.jpg', 'sRGB raw');
+            plots.MontageFolderContents(6, path2, '*fix.jpg', 'sRGB fix');
 
             close all;
         end
@@ -229,7 +229,7 @@ classdef hsiUtility
             %   Usage:
             %   [raw] = ReadHSIData(target, experiment, blackIsCapOn)
 
-            [spectralData] = ReadHSIData(varargin{:});
+            [spectralData] = ReadHSIDataInternal(varargin{:});
         end
 
         function [spectralData] = ReadStoredHSI(varargin)

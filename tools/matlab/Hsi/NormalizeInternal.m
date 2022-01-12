@@ -21,6 +21,7 @@ switch method
 end
 
 if ~config.GetSetting('disableReflectranceExtremaPlots')
+    fig = 1;
     plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
 end
 
