@@ -139,7 +139,7 @@ classdef hsiUtility
                 configurations = [outRows.configuration];
             end
 
-            for i = 19 %1:length(targetIDs)
+            for i = 1:length(targetIDs)
                 id = targetIDs(i);
                 target = dataUtility.GetValueFromTable(outRows, 'Target', i);
                 content = dataUtility.GetValueFromTable(outRows, 'Content', i);
@@ -158,19 +158,20 @@ classdef hsiUtility
                 targetName = num2str(id);
                 spectralData = hsi;
                 spectralData.Value = hsiUtility.ReadStoredHSI(targetName);
-                dispImage = spectralData.GetDisplayRescaledImage('rgb');
-                figure(1);
-                imshow(dispImage);
-                config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
-                plots.SavePlot(1);
+                dispImageRaw = spectralData.GetDisplayRescaledImage('rgb');
 
                 %% write normalized HSI in .mat file
                 spectralData = hsiUtility.NormalizeHSI(targetName, config.GetSetting('normalization'), saveMatFile);
 
                 %% prepare preview from normalized HSI
-                dispImage = spectralData.GetDisplayRescaledImage('rgb');
+                dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
+                
+                figure(1);
+                imshow(dispImageRaw);
+                config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
+                plots.SavePlot(1);
                 figure(2);
-                imshow(dispImage);
+                imshow(dispImageRgb);
                 config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
                 plots.SavePlot(2);
             end
@@ -200,6 +201,19 @@ classdef hsiUtility
             %   spectralData = NormalizeHSI('sample2', 'raw')
             %   spectralData = NormalizeHSI('sample2', 'byPixel', true)
             spectralData = NormalizeHSI(varargin{:});
+        end
+        
+        function [spectralDataValue] = GetValueNormalizeHSI(varargin)
+            %GetValueNormalizeHSI returns normalized HSI image value
+            %
+            %   Usage:
+            %   spectralData = GetValueNormalizeHSI('sample2') returns a
+            %   cropped HSI with 'byPixel' normalization
+            %
+            %   spectralDataValue = GetValueNormalizeHSI('sample2', 'raw')
+            %   spectralDataValue = GetValueNormalizeHSI('sample2', 'byPixel', true)
+            spectralData = NormalizeHSI(varargin{:});
+            spectralDataValue = spectralData.Value;
         end
 
         function [dispImage] = GetDisplayImage(varargin)

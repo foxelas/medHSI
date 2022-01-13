@@ -1,12 +1,12 @@
-function spectralData = NormalizeHSI(targetName, option, saveFile)
+function hsIm = NormalizeHSI(targetName, option, saveFile)
 %NormalizeHSI returns spectral data from HSI image
 %
 %   Usage:
-%   spectralData = NormalizeHSI('sample2') returns a
+%   hsIm = NormalizeHSI('sample2') returns a
 %   cropped HSI with 'byPixel' normalization
 %
-%   spectralData = NormalizeHSI('sample2', 'raw')
-%   spectralData = NormalizeHSI('sample2', 'byPixel', true)
+%   hsIm = NormalizeHSI('sample2', 'raw')
+%   hsIm = NormalizeHSI('sample2', 'byPixel', true)
 
 config.SetSetting('fileName', targetName);
 

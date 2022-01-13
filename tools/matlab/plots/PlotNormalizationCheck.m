@@ -13,6 +13,7 @@ Iwhite_mask = GetPixelsFromMaskInternal(Iwhite, mask);
 Inorm_mask = GetPixelsFromMaskInternal(Inorm, mask);
 x = hsiUtility.GetWavelengths(size(Iin_mask, 2));
 
+close all;
 figure(fig);
 clf;
 hold on;
@@ -24,7 +25,7 @@ plot(x, min(reshape(Iwhite_mask, [size(Iwhite_mask, 1), size(Iwhite_mask, 2)])),
 plot(x, min(reshape(Iblack_mask, [size(Iblack_mask, 1), size(Iblack_mask, 2)])), 'DisplayName', 'Min Black', 'LineWidth', 2);
 plot(x, min(reshape(Iin_mask, [size(Iin_mask, 1), size(Iin_mask, 2)])), 'DisplayName', 'Min Tissue', 'LineWidth', 2);
 
-hold off; legend
+hold off; legend;
 min(Iwhite_mask(:)-Iblack_mask(:))
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Reflectance (a.u.)', 'FontSize', 15);
@@ -48,7 +49,17 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-% plots.SavePlot(fig);
-% plots.SavePlot(fig+1);
+fig3 = figure(fig+2);
+rgb = hsiUtility.GetDisplayImage(Iin);
+plots.Overlay(fig3, rgb, mask);
 
+baseFolder = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('normCheck'), config.GetSetting('fileName'));
+config.SetSetting('plotName', strcat(baseFolder, '_raw.jpg'));
+plots.SavePlot(fig);
+config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
+plots.SavePlot(fig+1);
+config.SetSetting('plotName', strcat(baseFolder, '_mask.jpg'));
+plots.SavePlot(fig3);
+
+close all;
 end

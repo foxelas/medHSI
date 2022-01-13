@@ -191,7 +191,7 @@ classdef hsi
             obj.Value = hsIm;
         end
 
-        function [pHsi] = Preprocessing(obj)
+        function [obj] = Preprocessing(obj)
             % Preprocessing prepares normalized data according to our specifications
             %
             %   Usage:
@@ -203,8 +203,7 @@ classdef hsi
             hsIm = hsIm(:, :, hsiUtility.GetWavelengths(311, 'index'));
             obj.Value = hsIm;
             [updI, ~] = obj.RemoveBackground();
-            pHsi = updI;
-
+            obj.Value = updI;
         end
 
         function [labels] = Cubseg(obj, varargin)

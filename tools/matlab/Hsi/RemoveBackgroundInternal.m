@@ -80,7 +80,7 @@ filepath = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('backg
     config.GetSetting('database'), strcat(config.GetSetting('fileName'), '.jpg'));
 config.SetSetting('plotName', filepath);
 
-plots.PlotOverlay(1, Irgb, fgMask);
+plots.Overlay(1, Irgb, fgMask);
 
 updI = I .* repmat(double(fgMask), [1, 1, z]);
 
