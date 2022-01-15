@@ -6,7 +6,7 @@ from . import pslNormalized
 
 class PslnormalizedTest(tfds.testing.DatasetBuilderTestCase):
   """Tests for pslNormalized dataset."""
-  # TODO(pslNormalized):
+  
   DATASET_CLASS = pslNormalized.Pslnormalized
   SPLITS = {
       'train': 3,  # Number of fake train example

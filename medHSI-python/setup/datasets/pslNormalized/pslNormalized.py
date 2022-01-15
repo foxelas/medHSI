@@ -3,13 +3,14 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
-# TODO(pslNormalized): Markdown description  that will appear on the catalog page.
 _DESCRIPTION = """
-Test dataset for current labels
+pslNormalized is a labeled dataset that contains hyper-spectral images of pigmented skin lesions, 
+captured during gross-pathology and before formalin fixing. 
 """
 
 # TODO(pslNormalized): BibTeX citation
 _CITATION =  """
+Hyper-spectral Images of ex-vivo gross pigmented skin lesions,
 foxelas, 2021
 """
 
@@ -31,7 +32,7 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
 
   def _info(self) -> tfds.core.DatasetInfo:
     """Returns the dataset metadata."""
-    # TODO(pslNormalized): Specifies the tfds.core.DatasetInfo object
+    # Specifies the tfds.core.DatasetInfo object
     return tfds.core.DatasetInfo(
         builder=self,
         description=_DESCRIPTION,
@@ -52,7 +53,7 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
 
   def _split_generators(self, dl_manager: tfds.download.DownloadManager):
     """Returns SplitGenerators."""
-    # # TODO(pslNormalized): Downloads the data and defines the splits
+    # TODO(pslNormalized): Downloads the data and defines the splits
     # path = dl_manager.download_and_extract('https://todo-data-url')
     
     # # data_path is a pathlib-like `Path('<manual_dir>/data.zip')`
@@ -60,7 +61,7 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
     # # Extract the manually downloaded `data.zip`
     # extracted_path = dl_manager.extract(archive_path)
 
-    # TODO(pslNormalized): Returns the Dict[split names, Iterator[Key, Example]]
+    # Returns the Dict[split names, Iterator[Key, Example]]
 
     path = "empty\\path"
     
@@ -71,7 +72,7 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
 
   def _generate_examples(self, startIdx, endIdx):
     """Yields examples."""
-    # TODO(pslNormalized): Yields (key, example) tuples from the dataset
+    # Yields (key, example) tuples from the dataset
     import sys
     module_path = "D:\\elena\\onedrive\\OneDrive - 東工大未来研情報イノベーションコア\\titech\\research\\experiments\\medHSI\\src\\python\\tools\\"
     if module_path not in sys.path:
