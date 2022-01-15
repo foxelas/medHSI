@@ -9,17 +9,18 @@ import sys
 import os
 
 import tensorflow_datasets as tfds 
+import tensorflow as tf
 
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
-    sys.path.append(module_path+"\\tools")
-import hsi_io as io
+    sys.path.append(os.path.join(module_path,"tools"))
+import hsi_io as hio
 # import hsi_decompositions as dc
 
 read_manually = False
 if read_manually:
-    conf = io.parse_config()
-    fpath = conf['Directories']['outputDir'] + "000-Datasets" + "\\hsi_normalized_full.h5"  
+    conf = hio.parse_config()
+    fpath = os.path.join(conf['Directories']['outputDir'], "000-Datasets", "hsi_normalized_full.h5")  
 
     # f = io.load_from_h5(fpath)
 
@@ -35,19 +36,19 @@ if read_manually:
      
     keepInd = [1, 5, 6, 7 ,9, 11]
 
-    dataList = io.load_dataset(fpath, 'image')
+    dataList = hio.load_dataset(fpath, 'image')
 
     if not keepInd is None: 
         dataList = [ dataList[i] for i in keepInd] 
 
     # Prepare input data 
-    croppedData = io.center_crop_list(dataList, 70, 70, True)
+    croppedData = hio.center_crop_list(dataList, 70, 70, True)
 
     # Prepare labels 
-    labelpath = conf['Directories']['outputDir'] +  conf['Folder Names']['labelsManual']
-    labelRgb = io.load_images(labelpath)
-    labelImages = io.get_labels_from_mask(labelRgb)
-    croppedLabels = io.center_crop_list(labelImages)
+    labelpath = os.path.join(conf['Directories']['outputDir'],  conf['Folder Names']['labelsManual'])
+    labelRgb = hio.load_images(labelpath)
+    labelImages = hio.get_labels_from_mask(labelRgb)
+    croppedLabels = hio.center_crop_list(labelImages)
 
     from sklearn.model_selection import train_test_split
 

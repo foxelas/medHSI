@@ -25,12 +25,6 @@ def makedir(fpath):
         os.mkdir(fpath)
     except OSError as error:
         print('folder exists')
-        
-def get_savedir():
-    return 'D:/elena/mspi/output/python-test'
-
-def get_tripletdir():
-    return 'D:/elena/mspi/matfiles/hsi/calibTriplets'
     
 ######################### Messages #########################        
 def not_implemented():
@@ -44,19 +38,17 @@ def not_supported(varname):
 ######################### Config #########################
 import configparser
 
-def get_module_path():
-    #module_path = os.path.abspath(os.path.join('..'))
-    #if module_path not in sys.path:
-    #    sys.path.append(module_path+"\\tools")
-    #print('Module path: ', module_path)
-    #sys.path
-    module_path = "D:\\elena\\onedrive\\OneDrive - 東工大未来研情報イノベーションコア\\titech\\research\\experiments\\medHSI\\src\\"
+dirSep = '\\'
 
+def get_base_dir():
+    return os.path.join("..", "..")
+
+def get_module_path():
+    module_path = os.path.join(get_base_dir(), "src")
     return module_path
 
 def get_config_path():
-    module_path = get_module_path()
-    settings_file = os.path.dirname(os.path.dirname(module_path)) + "\\conf" + "\\config.ini"
+    settings_file = os.path.join(get_base_dir(), "conf", "config.ini")
     return settings_file
 
 def parse_config():
@@ -69,6 +61,14 @@ def parse_config():
     return config
 
 conf = parse_config()
+
+def get_savedir():
+    dirName = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['pythonTest'])
+    return dirName
+
+def get_tripletdir():
+    dirName = os.path.join(conf['Directories']['matDir'], conf['Folder Names']['triplets'] )
+    return dirName
 
 ######################### Load #########################
     
