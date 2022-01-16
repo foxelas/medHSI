@@ -50,11 +50,11 @@ class DisplayablePath(object):
 
     @classmethod
     def _default_criteria(cls, path):
-        if ".git" in path.name: 
+        if '.git' in path.name: 
             return False
-        elif ".spyproject" in path.name:
+        elif '.spyproject' in path.name:
             return False
-        elif "__pycache__" in path.name:
+        elif '__pycache__' in path.name:
             return False
         return True
 
@@ -86,7 +86,7 @@ class DisplayablePath(object):
 
 paths = DisplayablePath.make_tree(Path("D:/elena/onedrive/OneDrive - 東工大未来研情報イノベーションコア/titech/research/experiments/medHSI"))
 
-fd = open("../../FILE_STRUCTURE.md","w", encoding="utf_8_sig")
+fd = open("../../FILE_STRUCTURE.md",'w', encoding='utf_8_sig')
 for path in paths:
     fd.write(path.displayable() + '\n')
 

@@ -44,13 +44,13 @@ def decompose(hsiList, method = 'pca', n_components=10):
     else: 
         stacked = hsiList
     
-    print('Total pixels for  fitting: ', stacked.shape[0], 'pixels')
+    print("Total pixels for  fitting: ", stacked.shape[0], 'pixels')
 
     if method == 'pca': 
         decom = PCA(n_components=n_components)
         decom.fit(stacked)
     
-    print('Finished dimension reduction.')
+    print("Finished dimension reduction.")
     return decom 
 
 def prep_decomp_figures(decom, hsiList, method = 'pca', savefolder='', rangeLimits = [420, 730]):
@@ -60,13 +60,13 @@ def prep_decomp_figures(decom, hsiList, method = 'pca', savefolder='', rangeLimi
     if method == 'pca':
         explained_vals = decom.explained_variance_ratio_
         singular_vals = decom.singular_values_
-        print('Explained variance:', explained_vals)
-        print('Singular values:', singular_vals)
+        print("Explained variance:", explained_vals)
+        print("Singular values:", singular_vals)
         
         plt.figure(0)
-        simple_plot(explained_vals, 'Explained variance', 'pc number', 'explained percentage', curSavedir)
+        simple_plot(explained_vals, "Explained variance", "pc number", "explained percentage", curSavedir)
         plt.figure(1)
-        simple_plot(singular_vals, 'Singular Values', 'pc number', 'value', curSavedir)
+        simple_plot(singular_vals, "Singular Values", "pc number", "value", curSavedir)
         
         w = np.arange(rangeLimits[0], rangeLimits[1]+1)
         plt.figure(2)
