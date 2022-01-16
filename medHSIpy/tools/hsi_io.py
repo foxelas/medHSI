@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import os.path
-import sys
 import cv2
 
 
@@ -248,7 +247,7 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
     if imgType == 'srgb':        
         [m,n,z] = hsi.shape
         
-        filename = os.path.join("..", "..", conf['Directories']['paramDir'], 'displayParam_311.mat')
+        filename = os.path.join(get_base_dir(), conf['Directories']['paramDir'], 'displayParam_311.mat')
 
         xyz = load_from_mat(filename, 'xyz')
         illumination = load_from_mat(filename, 'illumination')

@@ -4,6 +4,20 @@ from pyrsistent import v
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
+import os 
+def get_tools_dir():
+    cwd = os.getcwd()
+    parts = cwd.split("\\")
+    parts = parts[0: parts.index('medHSIpy')+1]
+    parts.insert(1, os.sep)
+    base_dir = os.path.join(*parts)
+    tools_dir = os.path.join(base_dir, 'tools')
+    return tools_dir
+
+import sys
+sys.path.append(get_tools_dir())
+import hsi_io
+
 _DESCRIPTION = """
 pslNormalized is a labeled dataset that contains hyper-spectral images of pigmented skin lesions, 
 captured during gross-pathology and before formalin fixing. 
@@ -41,7 +55,7 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
             # These are the features of your dataset like images, labels ...
             'id': tfds.features.Text(),
             'hsi': tfds.features.Tensor(shape=(70, 70, 311), dtype=tf.float64),
-            'tumor': tfds.features.Tensor(shape=(70, 70), dtype=tf.bool),
+            'tumor': tfds.features.Tensor(shape=(70, 70), dtype=tf.int8),
         }),
         # If there's a common (input, target) tuple from the
         # features, specify them here. They'll be used if
@@ -74,34 +88,28 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
   def _generate_examples(self, startIdx, endIdx):
     """Yields examples."""
     # Yields (key, example) tuples from the dataset
-    #     
-    import sys
-    import os 
-    module_path = os.path.join('..', '..', '..', 'tools')
-    if module_path not in sys.path:
-        sys.path.append(module_path)
-    import hsi_io as hio
+    #    
 
-    conf = hio.parse_config()
-    print(conf.sections())
-    fpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['datasets'], "hsi_normalized_full.h5")
+
+    conf = hsi_io.conf
+    fpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['datasets'], 'hsi_normalized_full.h5')
         
-    dataList = hio.load_dataset(fpath, 'image')
-    
+    dataList, keyList = hsi_io.load_dataset(fpath, 'image')
+
     ### Temporary
-    sampleIds = [153, 172, 166, 169, 178 , 184]
+    sampleIds = [153, 172, 166, 169, 178, 184]
     keepInd = [1, 7, 5, 6, 9, 11]
     if not keepInd is None: 
         dataList = [ dataList[i] for i in keepInd] 
 
     # Prepare input data 
-    croppedData = hio.center_crop_list(dataList, 70, 70, True)
+    croppedData = hsi_io.center_crop_list(dataList, 70, 70, True)
 
     # Prepare labels 
     labelpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['labelsManual'])
-    labelRgb = hio.load_label_images(labelpath)
-    labelImages = hio.get_labels_from_mask(labelRgb)
-    croppedLabels = hio.center_crop_list(labelImages)
+    labelRgb = hsi_io.load_label_images(labelpath)
+    labelImages = hsi_io.get_labels_from_mask(labelRgb)
+    croppedLabels = hsi_io.center_crop_list(labelImages)
     
     for (hsIm, labelIm, i) in zip(croppedData, croppedLabels, range(len(croppedData))):
         if i >= startIdx and i <= endIdx:

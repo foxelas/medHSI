@@ -93,24 +93,27 @@
 │           ├── PlotSolaxIllumination.m
 │           └── StartLogger.m
 ├── medHSIpy/
+│   ├── 5_test_3dconv.py
+│   ├── 6_segment_by_tensorflow.py
+│   ├── __init__.py
 │   ├── package/
+│   │   ├── __init__.py
 │   │   ├── LICENSE
 │   │   ├── README.md
 │   │   ├── requirements.txt
 │   │   ├── setup.cfg
 │   │   └── setup.py
 │   ├── setup/
-│   │   ├── datasets/
-│   │   │   └── pslNormalized/
-│   │   │       ├── __init__.py
-│   │   │       ├── __pycache__/
-│   │   │       │   └── pslNormalized.cpython-38.pyc
-│   │   │       ├── checksums.tsv
-│   │   │       ├── dummy_data/
-│   │   │       │   └── TODO-add_fake_data_in_this_directory.txt
-│   │   │       ├── pslNormalized.py
-│   │   │       └── pslNormalized_test.py
-│   │   └── README.md
+│   │   └── datasets/
+│   │       ├── __init__.py
+│   │       ├── pslNormalized/
+│   │       │   ├── __init__.py
+│   │       │   ├── checksums.tsv
+│   │       │   ├── dummy_data/
+│   │       │   │   └── TODO-add_fake_data_in_this_directory.txt
+│   │       │   ├── pslNormalized.py
+│   │       │   └── pslNormalized_test.py
+│   │       └── README.md
 │   ├── src/
 │   │   ├── __init__.py
 │   │   ├── classification.py
@@ -123,12 +126,9 @@
 │   │   ├── 2_test_pca.py
 │   │   ├── 3_test_hskl.ipynb
 │   │   ├── 4_test_lime.ipynb
-│   │   └── 5_test_3dconv.py
+│   │   └── __init__.py
 │   └── tools/
 │       ├── __init__.py
-│       ├── __pycache__/
-│       │   ├── hsi_decompositions.cpython-38.pyc
-│       │   └── hsi_io.cpython-38.pyc
 │       ├── create_file_structure.py
 │       ├── hsi_decompositions.py
 │       └── hsi_io.py
