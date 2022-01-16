@@ -4,7 +4,7 @@
 │   └── config.mat
 ├── FILE_STRUCTURE.md
 ├── LICENSE
-├── medHSI-matlab/
+├── medHSImat/
 │   ├── setup/
 │   │   ├── demos/
 │   │   │   ├── config.ini
@@ -67,10 +67,6 @@
 │       │   └── Dimred.m
 │       ├── metrics/
 │       │   └── metrics.m
-│       ├── parameters/
-│       │   ├── displayParam.mat
-│       │   ├── displayParam_311.mat
-│       │   └── extinctionCoefficients.mat
 │       ├── plots/
 │       │   ├── PlotBandStatistics.m
 │       │   ├── PlotComponents.m
@@ -96,7 +92,7 @@
 │           ├── PlotColorMatchingFunctions.m
 │           ├── PlotSolaxIllumination.m
 │           └── StartLogger.m
-├── medHSI-python/
+├── medHSIpy/
 │   ├── package/
 │   │   ├── LICENSE
 │   │   ├── README.md
@@ -136,4 +132,8 @@
 │       ├── create_file_structure.py
 │       ├── hsi_decompositions.py
 │       └── hsi_io.py
+├── parameters/
+│   ├── displayParam.mat
+│   ├── displayParam_311.mat
+│   └── extinctionCoefficients.mat
 └── README.md

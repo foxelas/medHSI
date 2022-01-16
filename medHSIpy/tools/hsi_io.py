@@ -5,6 +5,7 @@ Created on Tue Jun 15 18:00:32 2021
 @author: foxel
 """
 
+from cProfile import label
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -41,10 +42,15 @@ import configparser
 dirSep = '\\'
 
 def get_base_dir():
-    return os.path.join("..", "..")
+    cwd = os.getcwd()
+    parts = cwd.split("\\")
+    parts = parts[0: parts.index('medHSI')+1]
+    parts.insert(1, os.sep)
+    base_dir = os.path.join(*parts)
+    return base_dir
 
 def get_module_path():
-    module_path = os.path.join(get_base_dir(), "src")
+    module_path = os.path.join(get_base_dir(), 'medHSIpy', 'src')
     return module_path
 
 def get_config_path():
@@ -106,8 +112,9 @@ def load_black_mat(fname, varname):
 def load_dataset(fpath, sampleType='pixel', ash5=0):
     f = load_from_h5(fpath)
     hsiList = []
-    
-    for keyz in list(f.keys()):
+    keyList = list(f.keys())
+
+    for keyz in keyList:
         if ash5 == 1:
             val = f[keyz]
         else:
@@ -116,7 +123,7 @@ def load_dataset(fpath, sampleType='pixel', ash5=0):
         if val.shape[2] != 311:
             val = np.transpose(val, [1, 2, 0])
         hsiList.append(val)
-    
+
     dataList = []
     if sampleType == 'pixel':
         dataList = flatten_hsis(hsiList)
@@ -126,7 +133,7 @@ def load_dataset(fpath, sampleType='pixel', ash5=0):
         dataList = hsiList
     else:
         not_supported('SampleType')
-    return dataList             
+    return dataList, keyList          
 
 def load_images(fpath):
     images = []
@@ -135,6 +142,12 @@ def load_images(fpath):
         if img is not None:
             images.append(img)
     return images
+
+def load_label_images(fpath):
+    imgList = load_images(fpath)
+    rotImgList = [np.transpose(labelImg, [1, 0, 2]) for labelImg in imgList]
+    return rotImgList
+
 
 ######################### Process #########################
 
@@ -145,6 +158,7 @@ def get_labels_from_mask(imgList):
         #print("Min", np.min(np.min(grayIm)), "and Max ", np.max(np.max(grayIm)))     	
         (thresh, blackAndWhiteImage) = cv2.threshold(grayIm, 170, 255, cv2.THRESH_BINARY)  	
         labelImg = np.logical_not(blackAndWhiteImage)
+        labelImg = labelImg.astype(np.int8)
         #plt.imshow(labelImg, cmap='gray')
         #plt.show()
         labels.append(labelImg)
@@ -234,7 +248,7 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
     if imgType == 'srgb':        
         [m,n,z] = hsi.shape
         
-        filename = os.path.join(os.path.dirname(os.path.dirname(get_module_path())), conf['Directories']['paramDir'], 'displayParam_311.mat')
+        filename = os.path.join("..", "..", conf['Directories']['paramDir'], 'displayParam_311.mat')
 
         xyz = load_from_mat(filename, 'xyz')
         illumination = load_from_mat(filename, 'illumination')
@@ -275,6 +289,9 @@ def simple_plot(y, figTitle, xLabel, yLabel, fpath):
     print('Save figure at: ', pltFname) 
     plt.savefig(pltFname)
     plt.show()
+
+def show_display_image(hsiIm, imgType = 'srgb', channel = 150): 
+    show_image(get_display_image(hsiIm, imgType, channel))
 
 def show_image(x, figTitle = None, hasGreyScale = False, fpath = ""):
     if hasGreyScale:

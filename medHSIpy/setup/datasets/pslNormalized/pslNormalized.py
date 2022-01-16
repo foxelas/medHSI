@@ -1,5 +1,6 @@
 """pslNormalized dataset."""
 
+from pyrsistent import v
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
@@ -73,32 +74,34 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
   def _generate_examples(self, startIdx, endIdx):
     """Yields examples."""
     # Yields (key, example) tuples from the dataset
+    #     
     import sys
-    module_path = "D:\\elena\\onedrive\\OneDrive - 東工大未来研情報イノベーションコア\\titech\\research\\experiments\\medHSI\\src\\python\\tools\\"
+    import os 
+    module_path = os.path.join('..', '..', '..', 'tools')
     if module_path not in sys.path:
         sys.path.append(module_path)
-    import hsi_io as io
+    import hsi_io as hio
 
-    conf = io.parse_config()
-    fpath = conf['Directories']['outputDir'] + "000-Datasets" + "\\hsi_normalized_full.h5"   
+    conf = hio.parse_config()
+    print(conf.sections())
+    fpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['datasets'], "hsi_normalized_full.h5")
         
-    dataList = io.load_dataset(fpath, 'image')
+    dataList = hio.load_dataset(fpath, 'image')
     
     ### Temporary
     sampleIds = [153, 172, 166, 169, 178 , 184]
-    keepInd = [1, 5, 6, 7 ,9, 11]
+    keepInd = [1, 7, 5, 6, 9, 11]
     if not keepInd is None: 
         dataList = [ dataList[i] for i in keepInd] 
 
     # Prepare input data 
-    croppedData = io.center_crop_list(dataList, 70, 70, True)
+    croppedData = hio.center_crop_list(dataList, 70, 70, True)
 
     # Prepare labels 
-    labelpath = conf['Directories']['outputDir'] +  conf['Folder Names']['labelsManual']
-    labelRgb = io.load_images(labelpath)
-    labelImages = io.get_labels_from_mask(labelRgb)
-    croppedLabels = io.center_crop_list(labelImages)
-
+    labelpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['labelsManual'])
+    labelRgb = hio.load_label_images(labelpath)
+    labelImages = hio.get_labels_from_mask(labelRgb)
+    croppedLabels = hio.center_crop_list(labelImages)
     
     for (hsIm, labelIm, i) in zip(croppedData, croppedLabels, range(len(croppedData))):
         if i >= startIdx and i <= endIdx:
