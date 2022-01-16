@@ -28,8 +28,6 @@ model.compile(
 hio.save_model_summary(model)
 
 # fit model
-# if you use data generator use model.fit_generator(...) instead of model.fit(...)
-# more about `fit_generator` here: https://keras.io/models/sequential/#fit_generator
 history = model.fit(
    x=x_train,
    y=y_train,

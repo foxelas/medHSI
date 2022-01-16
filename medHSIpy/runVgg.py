@@ -4,13 +4,17 @@ from tools import hio, util
 import segmentation_models as sm
 import matplotlib.pyplot as plt
 
+from keras.layers import Input, Conv2D
+from keras.models import Model
+
 x_train_raw, x_test_raw, y_train, y_test = hio.get_train_test()
 
 sm.set_framework('tf.keras')
 sm.framework()
 
 NUMBER_OF_CLASSES = 1
-BACKBONE = 'inceptionresnetv2'
+NUMBER_OF_CHANNELS = 311
+BACKBONE = 'vgg19'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 
 # preprocess input
@@ -19,8 +23,15 @@ x_test = preprocess_input(x_test_raw)
 
 x_train_raw, x_test_raw, y_train, y_test = hio.get_train_test()
 
+
 # define model
-model = sm.Unet(BACKBONE, input_shape=(None, None, 311), encoder_weights=None, classes=NUMBER_OF_CLASSES)
+base_model = sm.Unet(backbone_name=BACKBONE, encoder_weights='imagenet')
+
+input = Input(shape=(None, None, NUMBER_OF_CHANNELS))
+l1 = Conv2D(3, (1, 1))(input) # map N channels data to 3 channels
+output = base_model(l1)
+
+model = Model(inputs=input, outputs=output, name=base_model.name)
 
 model.compile(
     'Adam',
