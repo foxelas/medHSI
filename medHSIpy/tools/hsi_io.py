@@ -187,7 +187,7 @@ def center_crop_hsi(hsi, targetHeight=None, targetWidth=None):
         
     return croppedImg
 
-def center_crop_list(dataList, targetHeight = 70, targetWidth = 70, showImage = False):
+def center_crop_list(dataList, targetHeight = 64, targetWidth = 64, showImage = False):
     croppedData = []
     for x in range(len(dataList)):
         val = center_crop_hsi(dataList[x], targetWidth, targetHeight)
