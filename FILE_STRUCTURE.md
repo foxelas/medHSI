@@ -93,7 +93,6 @@
 │           ├── PlotSolaxIllumination.m
 │           └── StartLogger.m
 ├── medHSIpy/
-│   ├── 5_test_3dconv.py
 │   ├── 6_segment_by_tensorflow.py
 │   ├── __init__.py
 │   ├── package/
@@ -103,6 +102,9 @@
 │   │   ├── requirements.txt
 │   │   ├── setup.cfg
 │   │   └── setup.py
+│   ├── runInception.py
+│   ├── runResnet.py
+│   ├── runVgg.py
 │   ├── setup/
 │   │   └── datasets/
 │   │       ├── __init__.py
@@ -131,7 +133,8 @@
 │       ├── __init__.py
 │       ├── create_file_structure.py
 │       ├── hsi_decompositions.py
-│       └── hsi_io.py
+│       ├── hsi_io.py
+│       └── hsi_utils.py
 ├── parameters/
 │   ├── displayParam.mat
 │   ├── displayParam_311.mat
