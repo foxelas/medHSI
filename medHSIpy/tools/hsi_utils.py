@@ -261,7 +261,10 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
 
     elif imgType =='channel':
         recon = hsi[:,:, channel]
-        
+
+    elif imgType =='grey':
+        recon = hsi
+
     else:
         not_supported(imgType)
     
@@ -296,12 +299,17 @@ def show_image(x, figTitle = None, hasGreyScale = False, fpath = ""):
         print("Save figure at:"+ pltFname)
     plt.show()
     
-def show_montage(dataList, imgType = 'srgb', channel = 150):
+def show_montage(dataList, filename = None, imgType = 'srgb', channel = 150):
     #Needs to have same number of dimensions for each image, type float single
     hsiList = np.array([get_display_image(x, imgType, channel) for x in dataList], dtype='float64')
-    m = skimage.util.montage(hsiList, channel_axis = 3)
-    m = (m * 255).astype(np.uint8)
-    filename = os.path.join(conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
+    if imgType != 'grey':
+        m = skimage.util.montage(hsiList, channel_axis = 3)
+        m = (m * 255).astype(np.uint8)
+    else:
+        m = skimage.util.montage(hsiList)
+
+    if filename == None: 
+        filename = os.path.join(conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
     skimage.io.imsave(filename, m)
 
 

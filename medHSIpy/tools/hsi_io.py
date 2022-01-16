@@ -82,3 +82,11 @@ def save_model_summary(model):
     with open(filename, 'w', encoding='utf-8') as f:
         with redirect_stdout(f):
             model.summary()
+
+
+def show_label_montage(): 
+    croppedData, croppedLabels = load_data()
+    filename = os.path.join(hsi_utils.conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
+    hsi_utils.show_montage(croppedData, filename, 'srgb')
+    filename = os.path.join(hsi_utils.conf['Directories']['outputDir'], 'T20211207-python', 'labels-montage.jpg')
+    hsi_utils.show_montage(croppedLabels, filename, 'grey')
