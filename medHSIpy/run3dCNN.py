@@ -3,7 +3,7 @@ from random import seed
 from tools import hio, util
 import matplotlib.pyplot as plt
 
-from keras import layers
+from keras import layers, backend
 from keras.models import Model
 
 x_train, x_test, y_train, y_test = hio.get_train_test()
@@ -69,7 +69,77 @@ def get_cnn2d_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
     model = Model(inputs, outputs)
     return model
 
-def get_cnn3d_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
+def get_cnn3d_unbalanced_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
+    num_classes = NUMBER_OF_CLASSES
+    inputs = layers.Input((width, height, depth, 1), name='cnn2d')
+
+    ### [First half of the network: downsampling inputs] ###
+
+    # Entry block
+    x = layers.Conv3D(32, 3, strides=2, padding="same")(inputs)
+    x = layers.BatchNormalization()(x)
+    x = layers.Activation("relu")(x)
+
+    previous_block_activation = x  # Set aside residual
+
+    # Blocks 1, 2, 3 are identical apart from the feature depth.
+    for filters in [64, 128, 256]:
+        x = layers.Activation("relu")(x)
+        x = layers.Conv3D(filters, 3, padding="same", groups=filters//2)(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same")(x)
+        x = layers.BatchNormalization()(x)
+
+        x = layers.Activation("relu")(x)
+        x = layers.Conv3D(filters, 3, padding="same", groups=filters//2)(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same")(x)
+        x = layers.BatchNormalization()(x)
+
+        x = layers.MaxPooling3D(3, strides=2, padding="same")(x)
+
+        # Project residual
+        residual = layers.Conv3D(filters, 1, strides=2, padding="same")(
+            previous_block_activation
+        )
+        x = layers.add([x, residual])  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+    x = layers.Lambda(lambda y: backend.mean(y, axis=3), 
+        #output_shape=(None, 4,4,256),
+        name='drop_thrid_dim')(x)
+
+    ### [Second half of the network: upsampling inputs] ###
+
+    for filters in [256, 128, 64, 32]:
+        x = layers.Activation("relu")(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same")(x)
+        x = layers.BatchNormalization()(x)
+
+        x = layers.Activation("relu")(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same")(x)
+        x = layers.BatchNormalization()(x)
+
+        x = layers.UpSampling2D(2)(x)
+
+        # Project residual
+        if filters == 256:
+            previous_block_activation = layers.Lambda(lambda y: backend.mean(y, axis=3), name='resid_drop_thrid_dim')(previous_block_activation)
+        #print(x)
+        #print(previous_block_activation)
+
+        residual = layers.UpSampling2D(2)(previous_block_activation)
+        residual = layers.Conv2D(filters, 1, padding="same")(residual)
+
+        x = layers.add([x, residual])  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+    # Add a per-pixel classification layer
+    outputs = layers.Conv2D(num_classes, 3, activation="softmax", padding="same")(x)
+
+    # Define the model
+    model = Model(inputs, outputs)
+    return model
+
+def get_cnn3d_balanced_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
     num_classes = NUMBER_OF_CLASSES
     inputs = layers.Input((width, height, depth, 1), name='cnn2d')
 
@@ -119,11 +189,17 @@ def get_cnn3d_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
         # Project residual
         residual = layers.UpSampling3D(2)(previous_block_activation)
         residual = layers.Conv3D(filters, 1, padding="same")(residual)
+
         x = layers.add([x, residual])  # Add back residual
         previous_block_activation = x  # Set aside next residual
 
+    # drop spectral dimension layer 
+    x = layers.Lambda(lambda y: backend.mean(y, axis=3), 
+        name='drop_thrid_dim')(x)
+
     # Add a per-pixel classification layer
-    outputs = layers.Conv3D(num_classes, 3, activation="softmax", padding="same")(x)
+    outputs = layers.Conv2D(num_classes, 3, activation="softmax", padding="same")(x)
+
 
     # Define the model
     model = Model(inputs, outputs)
@@ -160,13 +236,14 @@ def get_cnn3d_class_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
     model = Model(inputs, outputs, name="3dcnn")
     return model
 
-model = get_cnn3d_model()
+backend.clear_session()
+
+model = get_cnn3d_balanced_model()
+hio.save_model_info(model)
 
 model.compile(
     'Adam',
-    loss='sparse_categorical_crossentropy')
-
-hio.save_model_summary(model)
+    loss='categorical_crossentropy')
 
 # fit model
 history = model.fit(
@@ -202,6 +279,6 @@ def visualize(hsi, gt, pred):
 
 preds = model.predict(x_test)
 for (hsi, gt, pred) in zip(x_test, y_test, preds):
-    visualize(hsi, gt, pred)
+   visualize(hsi, gt, pred)
 
 

@@ -73,16 +73,33 @@ def get_train_test():
 from contextlib import redirect_stdout
 from datetime import date
 
-def save_model_summary(model):
+def get_model_filename(model, suffix='', extension='txt'):
     today = date.today()
+    model_name = str(today)
     savedir = os.path.join(hsi_utils.conf['Directories']['outputDir'],
         hsi_utils.conf['Folder Names']['pythonTest'])
-    filename = os.path.join(savedir, str(today) + '_modelsummary.txt')
-    print(filename)
+    filename = os.path.join(savedir, model_name + suffix + '.' + extension)
+    return filename
+
+def save_model_summary(model):
+    filename = get_model_filename(model, '_modelsummary', 'txt')
+    if __name__ != "__main__":
+        print("Saved at: ", filename)
     with open(filename, 'w', encoding='utf-8') as f:
         with redirect_stdout(f):
             model.summary()
 
+from keras.utils.vis_utils import plot_model
+
+def save_model_graph(model):
+    filename = get_model_filename(model, '_modelgraph', 'png')
+    if __name__ != "__main__":
+        print("Saved at: ", filename)
+    plot_model(model, to_file=filename, show_shapes=True, show_layer_names=True)
+
+def save_model_info(model):
+    save_model_summary(model)
+    save_model_graph(model)
 
 def show_label_montage(): 
     croppedData, croppedLabels = load_data()
