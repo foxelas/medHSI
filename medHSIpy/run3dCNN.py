@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 from keras import layers, backend
 from keras.models import Model
 
+#from tools import dc3d
+
+
 x_train, x_test, y_train, y_test = hio.get_train_test()
 
 NUMBER_OF_CLASSES = 1
@@ -157,11 +160,13 @@ def get_cnn3d_balanced_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
         x = layers.Activation("relu")(x)
         x = layers.Conv3D(filters, 3, padding="same", groups=filters//2)(x) #DepthwiseConv3D
         x = layers.Conv3D(filters, (1,1,1), padding="same")(x)
+        #x = dc3d.DepthwiseConv3D(3, 2)(x)
         x = layers.BatchNormalization()(x)
 
         x = layers.Activation("relu")(x)
         x = layers.Conv3D(filters, 3, padding="same", groups=filters//2)(x) #DepthwiseConv3D
         x = layers.Conv3D(filters, (1,1,1), padding="same")(x)
+        #x = dc3d.DepthwiseConv3D(3, 2)(x)
         x = layers.BatchNormalization()(x)
 
         x = layers.MaxPooling3D(3, strides=2, padding="same")(x)
