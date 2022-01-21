@@ -93,7 +93,6 @@
 │           ├── PlotSolaxIllumination.m
 │           └── StartLogger.m
 ├── medHSIpy/
-│   ├── 6_segment_by_tensorflow.py
 │   ├── __init__.py
 │   ├── package/
 │   │   ├── __init__.py
@@ -102,9 +101,8 @@
 │   │   ├── requirements.txt
 │   │   ├── setup.cfg
 │   │   └── setup.py
-│   ├── runInception.py
-│   ├── runResnet.py
-│   ├── runVgg.py
+│   ├── segment_from_scratch.py
+│   ├── segment_from_sm.py
 │   ├── setup/
 │   │   └── datasets/
 │   │       ├── __init__.py
@@ -118,17 +116,9 @@
 │   │       └── README.md
 │   ├── src/
 │   │   ├── __init__.py
-│   │   ├── classification.py
 │   │   └── main.py
 │   ├── tests/
-│   │   ├── .ipynb_checkpoints/
-│   │   │   └── 1_test_autoencoder_hsi-checkpoint.ipynb
-│   │   ├── 1_test_autoencoder.ipynb
-│   │   ├── 1_test_autoencoder_hsi.ipynb
-│   │   ├── 2_test_pca.py
-│   │   ├── 3_test_hskl.ipynb
-│   │   ├── 4_test_lime.ipynb
-│   │   └── __init__.py
+│   │   └── augment_segment.py
 │   └── tools/
 │       ├── __init__.py
 │       ├── create_file_structure.py
