@@ -56,6 +56,8 @@ class DisplayablePath(object):
             return False
         elif '__pycache__' in path.name:
             return False
+        elif '__init__' in path.name:
+            return False
         return True
 
     @property
