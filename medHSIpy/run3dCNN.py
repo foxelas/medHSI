@@ -243,7 +243,7 @@ def get_cnn3d_class_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
 
 backend.clear_session()
 
-model = get_cnn3d_balanced_model()
+model = get_cnn3d_unbalanced_model()
 hio.save_model_info(model)
 
 model.compile(
