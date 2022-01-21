@@ -8,6 +8,7 @@ classdef hsiUtility
         %         [] = InitializeDataGroup(experiment, condition)
         %         [spectralData] = NormalizeHSI(targetName, option, saveFile)
         %         [dispImage] = GetDisplayImage(varargin)
+        %         [updI, fgMask] = RemoveBackground(obj, varargin)
         %         [spectrumCurves] = GetSpectraFromMask(varargin)
         %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
         %         [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
@@ -220,6 +221,18 @@ classdef hsiUtility
             dispImage = GetDisplayImageInternal(varargin{:});
         end
 
+        function [updI, fgMask] = RemoveBackground(obj, varargin)
+            %     REMOVEBACKGROUND removes the background from the specimen image
+            %
+            %     Usage:
+            %     [updatedHSI, foregroundMask] = RemoveBackground(I)
+            %     [updatedHSI, foregroundMask] = RemoveBackground(I, colorLevelsForKMeans,
+            %         attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
+            %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
+
+            [updI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
+        end
+        
         function [spectrumCurves] = GetSpectraFromMask(varargin)
             %%GetSpectraFromMask returns the average spectrum of a specific ROI mask
             %
@@ -277,7 +290,7 @@ classdef hsiUtility
             %
             %   Usage:
             %   [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
-            [outHsi] = RecoverReducedHsi(redHsi, origSize, mask);
+            [outHsi] = RecoverReducedHsiInternal(redHsi, origSize, mask);
         end
     end
 end

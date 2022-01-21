@@ -1,9 +1,9 @@
-function [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
-% RecoverReducedHsi returns an image that matches the spatial dimensions
-%   of the original hsi
+function [outHsi] = RecoverReducedHsiInternal(redHsi, origSize, mask)
+% RecoverReducedHsiInternal returns an image that matches the spatial 
+%   dimensions of the original hsi
 %
 %   Usage:
-%   [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
+%   [outHsi] = RecoverReducedHsiInternal(redHsi, origSize, mask)
 
 m = origSize(1);
 n = origSize(2);

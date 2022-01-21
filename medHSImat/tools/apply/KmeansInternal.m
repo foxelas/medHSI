@@ -22,6 +22,6 @@ for i = 1:clusterNum
 end
 config.SetSetting('plotName', fullfile(savedir, 'kmeans-centroids'));
 plots.Spectra(2, C, hsiUtility.GetWavelengths(size(hsIm.Value, 3)), names, 'Kmeans centroids');
-ylim([0, 0.001]);
+ylim([0, 1]);
 plots.SavePlot(2);
 end
