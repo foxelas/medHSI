@@ -8,12 +8,10 @@ from keras.models import Model
 
 #from tools import dc3d
 
-
-x_train, x_test, y_train, y_test = hio.get_train_test()
-
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
 
+######### From scratch ###########
 def get_cnn2d_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
     num_classes = NUMBER_OF_CLASSES
     inputs = layers.Input((width, height, depth, 1), name='cnn2d')
@@ -243,6 +241,8 @@ def get_cnn3d_class_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
 
 backend.clear_session()
 
+x_train, x_test, y_train, y_test = hio.get_train_test()
+
 model = get_cnn3d_unbalanced_model()
 hio.save_model_info(model)
 
@@ -259,31 +259,10 @@ history = model.fit(
    validation_data=(x_test, y_test),
 )
 
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()
-
-def visualize(hsi, gt, pred):
-
-    plt.subplot(1,3,1)
-    plt.title("Original")
-    plt.imshow(util.get_display_image(hsi))
-
-    plt.subplot(1,3,2)
-    plt.title("Ground Truth")
-    plt.imshow(gt)
-
-    plt.subplot(1,3,3)
-    plt.title("Prediction")
-    plt.imshow(pred)
-    plt.show()
+hio.plot_history(history)
 
 preds = model.predict(x_test)
 for (hsi, gt, pred) in zip(x_test, y_test, preds):
-   visualize(hsi, gt, pred)
+   hio.visualize(hsi, gt, pred)
 
 

@@ -107,3 +107,27 @@ def show_label_montage():
     hsi_utils.show_montage(croppedData, filename, 'srgb')
     filename = os.path.join(hsi_utils.conf['Directories']['outputDir'], 'T20211207-python', 'labels-montage.jpg')
     hsi_utils.show_montage(croppedLabels, filename, 'grey')
+
+
+def plot_history(history):
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
+def visualize(hsi, gt, pred):
+    plt.subplot(1,3,1)
+    plt.title("Original")
+    plt.imshow(hsi_utils.get_display_image(hsi))
+
+    plt.subplot(1,3,2)
+    plt.title("Ground Truth")
+    plt.imshow(gt)
+
+    plt.subplot(1,3,3)
+    plt.title("Prediction")
+    plt.imshow(pred)
+    plt.show()
