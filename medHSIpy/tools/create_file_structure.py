@@ -90,6 +90,6 @@ paths = DisplayablePath.make_tree(Path("D:/elena/onedrive/OneDrive - 東工大�
 
 fd = open("../../FILE_STRUCTURE.md",'w', encoding='utf_8_sig')
 for path in paths:
-    fd.write(path.displayable() + '\n')
+    fd.write(path.displayable() + '  \n')
 
 fd.close()
