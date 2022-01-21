@@ -93,9 +93,7 @@
 │           ├── PlotSolaxIllumination.m
 │           └── StartLogger.m
 ├── medHSIpy/
-│   ├── __init__.py
 │   ├── package/
-│   │   ├── __init__.py
 │   │   ├── LICENSE
 │   │   ├── README.md
 │   │   ├── requirements.txt
@@ -105,9 +103,7 @@
 │   ├── segment_from_sm.py
 │   ├── setup/
 │   │   └── datasets/
-│   │       ├── __init__.py
 │   │       ├── pslNormalized/
-│   │       │   ├── __init__.py
 │   │       │   ├── checksums.tsv
 │   │       │   ├── dummy_data/
 │   │       │   │   └── TODO-add_fake_data_in_this_directory.txt
@@ -115,12 +111,10 @@
 │   │       │   └── pslNormalized_test.py
 │   │       └── README.md
 │   ├── src/
-│   │   ├── __init__.py
 │   │   └── main.py
 │   ├── tests/
 │   │   └── augment_segment.py
 │   └── tools/
-│       ├── __init__.py
 │       ├── create_file_structure.py
 │       ├── hsi_decompositions.py
 │       ├── hsi_io.py
