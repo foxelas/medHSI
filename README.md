@@ -20,3 +20,4 @@ Hyper-Spectral Image (HSI) Processing for medical images, specifically for macro
 - Preprocessing and classification are implemented separately in MATLAB and Python, respectively.
 - To setup MATLAB: Navigate to medHSI-matlab/setup/ and run dependencies_maltab.m. Check the demos.
 - To setup Python: Navigate to medHSI-python/setup/ and follow instructions regarding datasets and dependencies
+
