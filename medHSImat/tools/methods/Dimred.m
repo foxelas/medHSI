@@ -42,7 +42,8 @@ if strcmpi(method, 'rica')
     objective = Mdl.FitInfo.Objective;
 end
 
-if isempty(labels) && strcmpi(method, 'lda')
+%% Discriminant Analysis (LDA / QDA)
+if isempty(labels) && strcmpi(method, 'lda') && strcmpi(method, 'qda')
   error('A supervised method requires labels as argument');
 else
     if strcmp(method, 'lda')
@@ -56,4 +57,13 @@ else
     end
 end 
  
+%% SuperPCA
+if strcmpi(method, 'superpca')
+    pixelNum = 5;
+    %%super-pixels segmentation
+    superpixels = cubseg(X, pixelNum);
+
+    %%SupePCA based DR
+    scores = SuperPCA(X, q, superpixels);
+end
 end
