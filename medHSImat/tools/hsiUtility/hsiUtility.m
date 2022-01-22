@@ -9,6 +9,7 @@ classdef hsiUtility
         %         [spectralData] = NormalizeHSI(targetName, option, saveFile)
         %         [dispImage] = GetDisplayImage(varargin)
         %         [updI, fgMask] = RemoveBackground(obj, varargin)
+        %         [mask, maskedPixels] = GetMaskFromFigure(obj)
         %         [spectrumCurves] = GetSpectraFromMask(varargin)
         %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
         %         [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
@@ -231,6 +232,13 @@ classdef hsiUtility
             %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
 
             [updI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
+        end
+        
+        function [mask, maskedPixels] = GetMaskFromFigure(obj)
+
+            %% GetPixelsFromMask returns flattened pixels according to a 2D mask
+
+            [mask, maskedPixels] = GetMaskFromFigureInternal(obj.Value);
         end
         
         function [spectrumCurves] = GetSpectraFromMask(varargin)

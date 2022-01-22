@@ -1,4 +1,6 @@
 classdef metrics
+    %     [accuracy, sensitivity, specificity] = Evaluations(actual, predicted)
+    
     methods (Static)
 
         %% GoodnessOfFit returns the Goodness Of Fit criterion
@@ -27,6 +29,13 @@ classdef metrics
         function rmse = Rmse(reconstructed, measured)
             N = size(measured, 2);
             rmse = sqrt(((measured - reconstructed) * (measured - reconstructed)')/N);
+        end
+        
+        function [accuracy, sensitivity, specificity] = Evaluations(actual, predicted)
+            cmat = confusionmat(actual,predicted);
+            accuracy = (cmat(1,1) + cmat(2,2)) / length(actual);
+            sensitivity = cmat(2,2) / (cmat(2,1) + cmat(2,2));
+            specificity = cmat(1,1) / (cmat(1,1) + cmat(1,2));
         end
 
     end
