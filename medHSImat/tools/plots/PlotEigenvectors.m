@@ -7,10 +7,11 @@ if nargin < 3
     pcNum = 3;
 end
 
+symbol = {'-', ':', '-.', '--', 'o'};
 hold on;
 for i = 1:pcNum
     if i <= 5
-        plot(xValues, coeff(:, i), 'DisplayName', strcat('Trans Vector', num2str(i)), 'LineWidth', 2);
+        plot(xValues, coeff(:, i), symbol{i}, 'DisplayName', strcat('Trans Vector', num2str(i)), 'LineWidth', 2);
     else
         plot(xValues, coeff(:, i), '--', 'DisplayName', strcat('Trans Vector', num2str(i)), 'LineWidth', 2);
     end
