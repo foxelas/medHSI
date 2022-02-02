@@ -9,54 +9,54 @@ config.SetSetting('isTest', false);
 config.SetSetting('database', 'psl');
 config.SetSetting('normalization', 'byPixel');
 config.SetSetting('experiment', 'T20220122-Dimred');
-
-wavelengths = hsiUtility.GetWavelengths(311);
-labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
-imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Normalized\'));
-
-%%%%%%%%%%%%%%%%%%%%%% Fix %%%%%%%%%%%%%%%%%%%%%%%%%
-%% Read h5 data
-[targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'fix');
-
-X = [];
-y = [];
-for i = 1:numSamples %only 6 available labels else length(targetIDs)
-    
-    id = targetIDs(i);
-
-    %% load HSI from .mat file
-    targetName = num2str(id);
-    I = hsi;
-    I.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
-    [~, fgMask] = apply.DisableFigures(@hsiUtility.RemoveBackground, I);
-    [mask, maskedPixels] = apply.DisableFigures(@hsiUtility.GetMaskFromFigure, I);
-    fgMask = mask & fgMask;
-    
-    imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(num2str(id), '.png'));
-    config.SetSetting('plotName', imgFilename);
-    plots.Overlay(3, I.GetDisplayRescaledImage(), fgMask);
-    save(strrep(imgFilename, '.png', '.mat'), 'fgMask');
-    
-    [m, n, z] = I.Size();
-
-    labelfile = fullfile(labeldir, strcat(num2str(id), '_label.mat'));
-    if exist(labelfile, 'file')
-        load(labelfile, 'labelMask');
-
-        Xcol = I.GetPixelsFromMask(fgMask); 
-        ycol = GetPixelsFromMaskInternal(labelMask(1:m, 1:n), fgMask);
-        
-        if i ~= 5
-            X = [X; Xcol];
-            y = [y; ycol];
-        else
-            Xtest = [Xcol];
-            ytest = [ycol];
-        end
-    end
-end
-
-cvp = trainUtility.KfoldPartitions(y, 5); 
+% 
+% wavelengths = hsiUtility.GetWavelengths(311);
+% labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
+% imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Normalized\'));
+% 
+% %%%%%%%%%%%%%%%%%%%%%% Fix %%%%%%%%%%%%%%%%%%%%%%%%%
+% %% Read h5 data
+% [targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'fix');
+% 
+% X = [];
+% y = [];
+% for i = 1:numSamples %only 6 available labels else length(targetIDs)
+%     
+%     id = targetIDs(i);
+% 
+%     %% load HSI from .mat file
+%     targetName = num2str(id);
+%     I = hsi;
+%     I.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
+%     [~, fgMask] = apply.DisableFigures(@hsiUtility.RemoveBackground, I);
+%     [mask, maskedPixels] = apply.DisableFigures(@hsiUtility.GetMaskFromFigure, I);
+%     fgMask = mask & fgMask;
+%     
+%     imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(num2str(id), '.png'));
+%     config.SetSetting('plotName', imgFilename);
+%     plots.Overlay(3, I.GetDisplayRescaledImage(), fgMask);
+%     save(strrep(imgFilename, '.png', '.mat'), 'fgMask');
+%     
+%     [m, n, z] = I.Size();
+% 
+%     labelfile = fullfile(labeldir, strcat(num2str(id), '_label.mat'));
+%     if exist(labelfile, 'file')
+%         load(labelfile, 'labelMask');
+% 
+%         Xcol = I.GetPixelsFromMask(fgMask); 
+%         ycol = GetPixelsFromMaskInternal(labelMask(1:m, 1:n), fgMask);
+%         
+%         if i ~= 5
+%             X = [X; Xcol];
+%             y = [y; ycol];
+%         else
+%             Xtest = [Xcol];
+%             ytest = [ycol];
+%         end
+%     end
+% end
+% 
+% cvp = trainUtility.KfoldPartitions(y, 5); 
 
 %%%%%%%%%%%%%%%%%%%%% Recover Test Image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 i = 5;
@@ -108,23 +108,23 @@ for q = qs
 end
 
 fprintf('RFI: \n\n');
-tic;
-t = templateTree('NumVariablesToSample','all',...
-    'PredictorSelection','allsplits','Surrogate','off', 'Reproducible',true);
-RFMdl = fitrensemble(X, y,'Method','Bag','NumLearningCycles',200, ...
-    'Learners',t, 'NPrint', 50);
-yHat = oobPredict(RFMdl);
-R2 = corr(RFMdl.Y,yHat)^2;
-fprintf('Mdl explains %0.1f of the variability around the mean.\n', R2);
-impOOB = oobPermutedPredictorImportance(RFMdl);
-tt = toc;
-fprintf('Runtime %.5f \n\n', tt); 
-
-figure(1);
-bar(wavelengths, impOOB);
-title('Unbiased Predictor Importance Estimates');
-xlabel('Predictor variable');
-ylabel('Importance');
+% tic;
+% t = templateTree('NumVariablesToSample','all',...
+%     'PredictorSelection','allsplits','Surrogate','off', 'Reproducible',true);
+% RFMdl = fitrensemble(X, y,'Method','Bag','NumLearningCycles',200, ...
+%     'Learners',t, 'NPrint', 50);
+% yHat = oobPredict(RFMdl);
+% R2 = corr(RFMdl.Y,yHat)^2;
+% fprintf('Mdl explains %0.1f of the variability around the mean.\n', R2);
+% impOOB = oobPermutedPredictorImportance(RFMdl);
+% tt = toc;
+% fprintf('Runtime %.5f \n\n', tt); 
+% 
+% figure(1);
+% bar(wavelengths, impOOB);
+% title('Unbiased Predictor Importance Estimates');
+% xlabel('Predictor variable');
+% ylabel('Importance');
 [sortedW, idxOrder] = sort(impOOB, 'descend');
 for q = qs
     fprintf('RFI: %d \n\n', q);
