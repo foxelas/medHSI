@@ -11,6 +11,8 @@ classdef databaseUtility
         %         [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
         %         [setId] = SelectDatabaseSamples(dataTable, setId)
         %         [fileConditions] = GetFileConditions(content, target, id)
+        %         [dataTable] = GetDiseaseUtility()
+        %         [filenames, targetIDs, outRows, disease, stage] = GetDiseaseQuery(condition)
 
         function [dataTable] = GetdatabaseUtility()
 
@@ -234,6 +236,39 @@ classdef databaseUtility
             else
                 fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
                     config.GetSetting('integrationTime'), target, []};
+            end
+        end
+        
+        function [dataTable] = GetDiseaseTable()
+        %% GetDiseaseTable returns the db structure as a table
+        %
+        %   Usage:
+        %   dataTable = GetDiseaseTable()
+        dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
+            config.GetSetting('diseaseInfoTableName'))), 'Sheet', 'Sheet1');
+        end
+        
+        function [filenames, targetIDs, outRows, disease, stage] = GetDiseaseQuery(condition)
+        %% GetDiseaseQuery returns the same info as Query with additional 
+        %   information about disease and stage evaluation
+        %
+        %   Usage:
+        %   [filenames, targetIDs, outRows, disease, stage] =
+        %   GetDiseaseQuery({'tissue', true});
+        
+            [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
+            dataTable = databaseUtility.GetDiseaseTable();
+            disease = cell(length(filenames),1);
+            stage = cell(length(filenames),1);
+            for i = 1:length(filenames)
+                idx = find( strcmp(dataTable.SampleID, outRows{i, 'SampleID'}));
+                if ~isempty(idx) 
+                    disease{i} = dataTable{idx, 'Diagnosis'};
+                    stage{i} =  dataTable{idx, 'Type'};
+                else
+                    disease{i} = nan;
+                    stage{i} = nan;
+                end
             end
         end
     end

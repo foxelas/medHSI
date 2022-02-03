@@ -36,3 +36,5 @@ config.SetSetting('normalization', 'byPixel');
 fileNum = 150;
 config.SetSetting('fileName', num2str(fileNum));
 hsi = hsiUtility.ReadStoredHSI(fileNum, config.GetSetting('normalization'));
+
+[filenames, targetIDs, outRows, disease, stage] = databaseUtility.GetDiseaseQuery({'tissue', true});
