@@ -312,28 +312,35 @@ classdef hsiUtility
         end
         
         function [refLib] = PrepareReferenceLibrary(targetIDs, disease)
-            
+        %     PrepareReferenceLibrary prepares reference spectra for SAM
+        %     comparison 
+        %
+        %     Usage:
+        %     referenceIDs = {153, 166};
+        %     referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
+        %     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
+
             refLib = struct('ReferenceData', [], 'ReferenceLabel', [], 'ReferenceDisease', []);
             k = 0;
             for i = 1:length(targetIDs)
-                targetName = num2str(id);
+                targetName = num2str(targetIDs{i});
                 labelImg = hsiUtility.ReadLabelImage(targetName);
                 hsiIm = hsi;
                 hsiIm.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
                 [hsiIm.Value, fgMask] = hsiUtility.RemoveBackground(hsiIm);
-                malLabel = fgMask && labelImg;
+                malLabel = fgMask & labelImg;
                 malData = mean(hsiIm.GetPixelsFromMask(malLabel));
                 k = k + 1;
                 refLib(k).ReferenceData = malData;
                 refLib(k).ReferenceLabel = 1;
-                refLib(k).ReferenceDisease = disease(i);
+                refLib(k).ReferenceDisease = disease{i};
                 
-                benLabel = fgMask && ~labelImg;
+                benLabel = fgMask & ~labelImg;
                 benData = mean(hsiIm.GetPixelsFromMask(benLabel));
                 k = k + 1;
                 refLib(k).ReferenceData = benData;
                 refLib(k).ReferenceLabel = 0;
-                refLib(k).ReferenceDisease = disease(i);               
+                refLib(k).ReferenceDisease = disease{i};               
             end
            
            saveName = fullfile(config.GetSetting('matDir'), ...
@@ -345,7 +352,7 @@ classdef hsiUtility
         end      
         
         function [refLib] = GetReferenceLibrary()
-           saveName = fullfile(config.GetSetting('matDir'), ...
+           saveName = config.DirMake(config.GetSetting('matDir'), ...
                     strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ... 
                     strcat(config.GetSetting('referenceLibraryName'), '.mat'));
            
@@ -364,9 +371,9 @@ classdef hsiUtility
 
             baseDir = fullfile(config.GetSetting('matDir'), ...
                     strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
-            targetFilename = strcat(baseDir, '_target.mat');
+            targetFilename = strcat(baseDir, '_label.mat');
              
-            if exist(targetFilename,2)
+            if exist(targetFilename, 'file')
                 load(targetFilename, 'labelMask');
             else
                 labelMask = [];

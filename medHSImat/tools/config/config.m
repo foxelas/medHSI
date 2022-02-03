@@ -126,7 +126,7 @@ classdef config
                 m.(parameter) = value;
             end
             w = warning();
-            if ~strcmp(w.state, 'off')  
+            if  sum(strcmp({w.identifier}, 'all')) > 0 && strcmp(w(strcmp({w.identifier}, 'all')).state, 'off')  
                 config.NotifySetting(parameter, value);
             end
         end
