@@ -10,7 +10,7 @@ dirpath = fullfile(config.GetSetting('outputDir'), config.GetSetting('labelsManu
 dirList = dir(fullfile(dirpath, '*.jpg'));
 
 close all;
-savedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
+savedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('labelsName'), '\'));
 maskdir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labels'), '\');
 applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsApplied'), '\');
 basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshots'), 'normalized\');

@@ -9,8 +9,8 @@ config.SetSetting('experiment', 'T20211215-SVM');
 %% Read h5 data
 [targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'fix');
 
-labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
-imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Normalized\'));
+labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('labelsName'), '\'));
+imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('normalizedName'), '\'));
 
 % ApplyScriptToEacRhImage(@reshape, {'tissue', true},  'fix');
 

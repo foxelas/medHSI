@@ -6,6 +6,7 @@ classdef hsiUtility
         %         [x] = GetWavelengths(m, option)
         %         [] = ExportH5Dataset(condition)
         %         [] = InitializeDataGroup(experiment, condition)
+        %         [] = AugmentDataGroup(experiment, condition)
         %         [spectralData] = NormalizeHSI(targetName, option, saveFile)
         %         [dispImage] = GetDisplayImage(varargin)
         %         [updI, fgMask] = RemoveBackground(obj, varargin)
@@ -14,6 +15,7 @@ classdef hsiUtility
         %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
         %         [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
         %         [spectralData] = ReadStoredHSI(targetName, normalization)
+        %         [labelMask] = ReadLabelImage(targetName)
         %         [redHsis] = ReconstructDimred(scores, imgSizes, masks)
         %         [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
 
@@ -193,6 +195,136 @@ classdef hsiUtility
             close all;
         end
 
+        function [] = AugmentDataGroup(experiment, condition, augType)
+            % AugmentDataGroup reads a group of hsi data, prepares .mat files,
+            % prepared normalized files and returns montage previews of contents
+            %
+            %   Usage:
+            %   AugmentDataGroup('handsOnly',{'hand', false})
+            %   AugmentDataGroup('sample001-tissue', {'tissue', true}, 'set2');
+
+            %% Setup
+            disp('Initializing [AugmentDataGroup]...');
+
+            config.SetSetting('experiment', experiment);
+            config.SetSetting('cropBorders', true);
+            config.SetSetting('saveFolder', fullfile(config.GetSetting('snapshots'), experiment));
+            isTest = config.GetSetting('isTest');
+
+            %% Read h5 data
+            [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
+
+            integrationTimes = [outRows.IntegrationTime];
+            dates = [outRows.CaptureDate];
+            if isTest
+                configurations = [outRows.configuration];
+            end
+
+            seed = 42;
+            rng(seed);
+            for i = 1:length(targetIDs)
+               
+                id = targetIDs(i);
+                config.SetSetting('integrationTime', integrationTimes(i));
+                config.SetSetting('dataDate', num2str(dates(i)));
+                if isTest
+                    config.SetSetting('configuration', configurations{i});
+                end
+
+                %% load HSI from .mat file to verify it is working and to prepare preview images
+                targetName = num2str(id);
+                labelImg = ReadLabelImage(targetName);
+                
+                baseDir = fullfile(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('augmentationName'), '_', num2str(augType)), targetName);
+                
+                if ~isempty(labelImg) %% REMOVELATER
+                    spectralData = hsi;
+                    spectralData.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
+                    dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
+
+                    switch augType 
+                        case 'set0' % No augmentation
+                            data = spectralData.Value; 
+                            label = labelImg; 
+                            save(strcat(baseDir, '_target.mat'), 'data', 'label');
+                            
+                        case 'set1' % Vertical and horizontal flip 
+                            folds = 0;
+                            data = spectralData.Value; 
+                            label = labelImg; 
+                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
+                            
+                            folds = folds + 1;
+                            data = flip(spectralData.Value, 1); 
+                            label = flip(labelImg, 1); 
+                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
+                            
+                            folds = folds + 1;
+                            data = flip(spectralData.Value, 2); 
+                            label = flip(labelImg, 2); 
+                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');                            
+                            
+                            folds = folds + 1;
+                            data = flip(spectralData.Value, 2); 
+                            data = flip(data, 1); 
+                            label = flip(labelImg, 2); 
+                            label = flip(label, 1); 
+                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');      
+                         
+                        case 'set2' % 360 degree random rotation 
+                            for j = 0:1
+                                for k = 0:1
+                                    % use rnd generator 
+                                    img0 = spectralData.Value; 
+                                    img0 = imrotate3(img0, 180, [j, k, 0]);
+
+                                    %% rotate labels 
+                                    labelImg = imrotate(img, 180);
+
+                                end 
+                            end
+                        case 'set3' % Brightness x[0.9,1.1]
+                            
+                    end
+                end
+                      
+                
+%                 figure(2);
+%                 imshow(dispImageRgb);
+%                 config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
+%                 plots.SavePlot(2);
+            end
+
+%             %% preview of the entire dataset
+% 
+%             path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized');
+%             plots.MontageFolderContents(1, path1, '*.jpg', 'Normalized');
+%             plots.MontageFolderContents(3, path1, '*raw.jpg', 'Normalized raw');
+%             plots.MontageFolderContents(4, path1, '*fix.jpg', 'Normalized fix');
+%             close all;
+        end
+        
+        function [labelMask] = ReadLabelImage(targetName)
+            %ReadLabelImage returns the label image for each HSI
+            %
+            %   [labelMask] = ReadLabelImage(targetName);
+            
+            if isnumeric(targetName)
+                targetName = num2str(targetName);
+            end
+
+            baseDir = fullfile(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
+            targetFilename = strcat(baseDir, '_target.mat');
+             
+            if exist(targetFilename,2)
+                load(targetFilename, 'labelMask');
+            else
+                labelMask = [];
+            end
+        end 
+        
         function [spectralData] = NormalizeHSI(varargin)
             %NormalizeHSI returns spectral data from HSI image
             %

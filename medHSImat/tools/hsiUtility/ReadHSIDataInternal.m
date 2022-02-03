@@ -8,7 +8,7 @@ if nargin < 4
     blackIsCapOn = false;
 end
 
-baseDir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Triplets\'));
+baseDir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('tripletsName'), '\'));
 
 %% Target image
 fcTarget = databaseUtility.GetFileConditions(content, target);

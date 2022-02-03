@@ -64,7 +64,7 @@ def get_savedir():
     return dirName
 
 def get_tripletdir():
-    dirName = os.path.join(conf['Directories']['matDir'], conf['Folder Names']['triplets'] )
+    dirName = os.path.join(conf['Directories']['matDir'], str.join(conf['Data Settings']['database'], conf['Input Folder Names']['tripletsName'] ))
     return dirName
 
 ######################### Load #########################

@@ -4,8 +4,8 @@ clc; close all;
 config.SetSetting('experiment', 'T20220123-Dimred');
 
 wavelengths = hsiUtility.GetWavelengths(311);
-labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
-imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Normalized\'));
+labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('labelsName'), '\'));
+imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('normalizedName'), '\'));
 
 %%%%%%%%%%%%%%%%%%%%%%%% RAW %%%%%%%%%%%%%%%%%%%%%%
 

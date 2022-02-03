@@ -15,11 +15,11 @@ end
 
 if strcmp(normalization, 'raw')
     baseDir = fullfile(config.GetSetting('matDir'), ...
-        strcat(config.GetSetting('database'), 'Triplets'), targetName);
+        strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
     targetFilename = strcat(baseDir, '_target.mat');
 else
     baseDir = fullfile(config.GetSetting('matDir'), ...
-        strcat(config.GetSetting('database'), 'Normalized'), targetName);
+        strcat(config.GetSetting('database'), config.GetSetting('normalizedName')), targetName);
     targetFilename = strcat(baseDir, '_', normalization, '.mat');
 end
 

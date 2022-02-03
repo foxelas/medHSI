@@ -14,7 +14,7 @@ if nargin < 2 || isempty(option)
     option = config.GetSetting('normalization');
 end
 
-baseDir = fullfile(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Triplets'), targetName);
+baseDir = fullfile(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
 
 targetFilename = strcat(baseDir, '_target.mat');
 load(targetFilename, 'spectralData');
@@ -88,7 +88,7 @@ spectralData = hsIm.Value;
 
 if saveFile
     baseDir = config.DirMake(config.GetSetting('matDir'), ...
-        strcat(config.GetSetting('database'), 'Normalized'), targetName);
+        strcat(config.GetSetting('database'), config.GetSetting('normalizedName')), targetName);
 
     targetFilename = strcat(baseDir, '_', config.GetSetting('normalization'), '.mat');
     save(targetFilename, 'spectralData', '-v7.3');

@@ -11,8 +11,8 @@ config.SetSetting('normalization', 'byPixel');
 config.SetSetting('experiment', 'T20220122-Dimred');
 % 
 % wavelengths = hsiUtility.GetWavelengths(311);
-% labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Labels\'));
-% imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), 'Normalized\'));
+% labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('labelsName'), '\'));
+% imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('normalizedName'), '\'));
 % 
 % %%%%%%%%%%%%%%%%%%%%%% Fix %%%%%%%%%%%%%%%%%%%%%%%%%
 % %% Read h5 data

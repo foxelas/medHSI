@@ -1,4 +1,6 @@
 function [Inorm, srgb] = GetAverageSpectraInROI(sampleId)
+
+%% REMOVELATER
 load(strcat('D:\elena\mspi\matfiles\hsi\pslTriplets\', num2str(sampleId), '_target.mat'), 'spectralData');
 Iin = spectralData;
 load(strcat('D:\elena\mspi\matfiles\hsi\pslTriplets\', num2str(sampleId), '_black.mat'), 'blackReflectance');
