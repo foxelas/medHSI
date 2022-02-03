@@ -102,7 +102,10 @@ classdef config
                 m = matfile(settingsFile);
                 value = m.(parameter);
             else
-                fprintf('Parameter %s does not exist in the configuration file.\n', parameter);
+                w = warning();
+                if ~strcmp(w.state, 'off')  
+                    fprintf('Parameter %s does not exist in the configuration file.\n', parameter);
+                end
             end
         end
 
@@ -122,7 +125,10 @@ classdef config
             else
                 m.(parameter) = value;
             end
-            config.NotifySetting(parameter, value);
+            w = warning();
+            if ~strcmp(w.state, 'off')  
+                config.NotifySetting(parameter, value);
+            end
         end
 
         function [] = NotifySetting(paramName, paramValue)

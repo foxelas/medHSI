@@ -1,4 +1,4 @@
-function [] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
+function [scores] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
 %%SuperpixelAnalysis applies SuperPCA on an image
 %
 %   Usage:

@@ -1,3 +1,4 @@
+config.SetOpt();
 
 %% apply script of each of the data
 settingNum = 3;
