@@ -16,6 +16,8 @@ classdef hsiUtility
         %         [spectralData] = ReadHSIData(content, target, experiment, blackIsCapOn)
         %         [spectralData] = ReadStoredHSI(targetName, normalization)
         %         [labelMask] = ReadLabelImage(targetName)
+        %         [refLib] = PrepareReferenceLibrary(targetIDs, disease)
+        %         [refLib] = GetReferenceLibrary()
         %         [redHsis] = ReconstructDimred(scores, imgSizes, masks)
         %         [outHsi] = RecoverReducedHsi(redHsi, origSize, mask)
 
@@ -203,6 +205,10 @@ classdef hsiUtility
             %   AugmentDataGroup('handsOnly',{'hand', false})
             %   AugmentDataGroup('sample001-tissue', {'tissue', true}, 'set2');
 
+            if nargin < 3 
+                augType = 'set0';
+            end 
+            
             %% Setup
             disp('Initializing [AugmentDataGroup]...');
 
@@ -233,7 +239,7 @@ classdef hsiUtility
 
                 %% load HSI from .mat file to verify it is working and to prepare preview images
                 targetName = num2str(id);
-                labelImg = ReadLabelImage(targetName);
+                labelImg = hsiUtility.ReadLabelImage(targetName);
                 
                 baseDir = fullfile(config.GetSetting('matDir'), ...
                     strcat(config.GetSetting('database'), config.GetSetting('augmentationName'), '_', num2str(augType)), targetName);
@@ -303,6 +309,48 @@ classdef hsiUtility
 %             plots.MontageFolderContents(3, path1, '*raw.jpg', 'Normalized raw');
 %             plots.MontageFolderContents(4, path1, '*fix.jpg', 'Normalized fix');
 %             close all;
+        end
+        
+        function [refLib] = PrepareReferenceLibrary(targetIDs, disease)
+            
+            refLib = struct('ReferenceData', [], 'ReferenceLabel', [], 'ReferenceDisease', []);
+            k = 0;
+            for i = 1:length(targetIDs)
+                targetName = num2str(id);
+                labelImg = hsiUtility.ReadLabelImage(targetName);
+                hsiIm = hsi;
+                hsiIm.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
+                [hsiIm.Value, fgMask] = hsiUtility.RemoveBackground(hsiIm);
+                malLabel = fgMask && labelImg;
+                malData = mean(hsiIm.GetPixelsFromMask(malLabel));
+                k = k + 1;
+                refLib(k).ReferenceData = malData;
+                refLib(k).ReferenceLabel = 1;
+                refLib(k).ReferenceDisease = disease(i);
+                
+                benLabel = fgMask && ~labelImg;
+                benData = mean(hsiIm.GetPixelsFromMask(benLabel));
+                k = k + 1;
+                refLib(k).ReferenceData = benData;
+                refLib(k).ReferenceLabel = 0;
+                refLib(k).ReferenceDisease = disease(i);               
+            end
+           
+           saveName = fullfile(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ... 
+                    strcat(config.GetSetting('referenceLibraryName'), '.mat'));
+           
+           save(saveName, 'refLib');
+            
+        end      
+        
+        function [refLib] = GetReferenceLibrary()
+           saveName = fullfile(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ... 
+                    strcat(config.GetSetting('referenceLibraryName'), '.mat'));
+           
+           load(saveName, 'refLib');
+            
         end
         
         function [labelMask] = ReadLabelImage(targetName)
