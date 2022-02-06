@@ -1,8 +1,8 @@
-function [] = PlotSpectra(spectra, wavelengths, names, figTitle, fig)
+function [] = PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig)
 %%PLOTSPECTRA plots one or more spectra together
 %
 %   Usage:
-%   PlotSpectra(spectra, wavelengths, names, figTitle, fig);
+%   PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig);
 %   PlotSpectra(spectra)
 
 [~, n] = size(spectra);
@@ -25,9 +25,14 @@ end
 lineColorMap = plots.GetLineColorMap('custom', names);
 key = keys(lineColorMap);
 
+if isempty(markers)
+    markers = cellfun(@(x) "-", names); 
+end
+
 hold on
 for i = 1:length(names)
-    h(i) = plot(wavelengths, spectra(i, :), 'DisplayName', key{i}, 'Color', lineColorMap(key{i}), 'LineWidth', 3);
+    h(i) = plot(wavelengths, spectra(i, :), 'DisplayName', names{i}, ...
+        'Color', lineColorMap(names{i}), 'LineWidth', 3, 'LineStyle', markers{i});
 end
 hold off
 
@@ -36,8 +41,15 @@ xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Reflectance (a.u.)', 'FontSize', 15);
 title(figTitle)
 
-%%For hsi case only
-ylim([0, 5 * 10^(-3)]);
+% datamin = min(spectra(:));
+datamax = max(spectra(:));
+
+if datamax < 0.1
+    ylim([0, 5 * 10^(-3)]);
+else
+    ylim([0,1]);
+end
+    
 
 %%To disable showing exponent power on the corner
 ax = gca;

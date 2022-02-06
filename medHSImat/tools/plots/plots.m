@@ -98,7 +98,7 @@ classdef plots
             %%PLOTSPECTRA plots one or more spectra together
             %
             %   Usage:
-            %   PlotSpectra(spectra, wavelengths, names, figTitle, fig);
+            %   PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig);
             %   PlotSpectra(spectra)
 
             plots.Apply(fig, @PlotSpectra, varargin{:});
@@ -112,6 +112,23 @@ classdef plots
             %   PlotSpectraAverage(spectra)
 
             plots.Apply(fig, @PlotSpectraAverage, varargin{:});
+        end
+        
+        function [] = ReferenceLibrary(fig, refLib)
+            spectra = cell2mat({refLib.Data}');
+            [m, n] = size(spectra);
+            wavelengths = hsiUtility.GetWavelengths(n);
+            names = cellfun(@(x) x{1}, {refLib.Disease}', 'un', 0) ;
+            for i = 1:m
+                if refLib(i).Label == 0
+                    markers{i} = "-";
+                else
+                    markers{i} = ":";
+                end
+            end
+            figTitle = 'Reference Spectra';
+            config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png') );
+            plots.Apply(fig, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
         end
 
         function [] = NormalizationCheck(fig, varargin)

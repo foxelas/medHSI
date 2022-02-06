@@ -20,11 +20,13 @@ switch style
         value = jet(10);
     case 'custom'
         key = names;
-        value = jet(length(names));
+        key = unique(key);
+        value = jet(length(key));
     otherwise
         key = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '10'};
         value = jet(10);
 end
+
 
 if ~isvector(value)
     v = cell(size(value, 1), 1);

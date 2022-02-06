@@ -320,7 +320,7 @@ classdef hsiUtility
         %     referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
         %     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
 
-            refLib = struct('ReferenceData', [], 'ReferenceLabel', [], 'ReferenceDisease', []);
+            refLib = struct('Data', [], 'Label', [], 'Disease', []);
             k = 0;
             for i = 1:length(targetIDs)
                 targetName = num2str(targetIDs{i});
@@ -331,19 +331,19 @@ classdef hsiUtility
                 malLabel = fgMask & labelImg;
                 malData = mean(hsiIm.GetPixelsFromMask(malLabel));
                 k = k + 1;
-                refLib(k).ReferenceData = malData;
-                refLib(k).ReferenceLabel = 1;
-                refLib(k).ReferenceDisease = disease{i};
+                refLib(k).Data = malData;
+                refLib(k).Label = 1;
+                refLib(k).Disease = disease{i};
                 
                 benLabel = fgMask & ~labelImg;
                 benData = mean(hsiIm.GetPixelsFromMask(benLabel));
                 k = k + 1;
-                refLib(k).ReferenceData = benData;
-                refLib(k).ReferenceLabel = 0;
-                refLib(k).ReferenceDisease = disease{i};               
+                refLib(k).Data = benData;
+                refLib(k).Label = 0;
+                refLib(k).Disease = disease{i};               
             end
            
-           saveName = fullfile(config.GetSetting('matDir'), ...
+           saveName = config.DirMake(config.GetSetting('matDir'), ...
                     strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ... 
                     strcat(config.GetSetting('referenceLibraryName'), '.mat'));
            
