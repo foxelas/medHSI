@@ -118,11 +118,13 @@ classdef plots
             spectra = cell2mat({refLib.Data}');
             [m, n] = size(spectra);
             wavelengths = hsiUtility.GetWavelengths(n);
-            names = cellfun(@(x) x{1}, {refLib.Disease}', 'un', 0) ;
+            names = cellfun(@(x) x{1}, {refLib.Disease}','un', 0) ;
             for i = 1:m
                 if refLib(i).Label == 0
+                    names{i} = strcat(names{i}, ' Benign');
                     markers{i} = "-";
                 else
+                    names{i} = strcat(names{i}, ' Malignant');
                     markers{i} = ":";
                 end
             end
