@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*
-from random import seed
-from tools import hio, util
-import matplotlib.pyplot as plt
-
 from keras import layers, backend
 from keras.models import Model
 
@@ -239,30 +235,7 @@ def get_cnn3d_class_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
     model = Model(inputs, outputs, name="3dcnn")
     return model
 
-backend.clear_session()
+#backend.clear_session()
 
-x_train, x_test, y_train, y_test = hio.get_train_test()
-
-model = get_cnn3d_unbalanced_model()
-hio.save_model_info(model)
-
-model.compile(
-    'Adam',
-    loss='categorical_crossentropy')
-
-# fit model
-history = model.fit(
-   x=x_train,
-   y=y_train,
-   batch_size=64,
-   epochs=200,
-   validation_data=(x_test, y_test),
-)
-
-hio.plot_history(history)
-
-preds = model.predict(x_test)
-for (hsi, gt, pred) in zip(x_test, y_test, preds):
-   hio.visualize(hsi, gt, pred)
 
 

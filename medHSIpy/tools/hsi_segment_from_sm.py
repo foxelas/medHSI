@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*
-from random import seed
-from tools import hio
 
 ######### From Segment Models #########
 import segmentation_models as sm
@@ -17,9 +15,9 @@ def get_sm_preproc_data(x_train_raw, x_test_raw, backbone):
     preprocess_input = sm.get_preprocessing(backbone)
 
     # preprocess input
-    x_train = preprocess_input(x_train_raw)
-    x_test = preprocess_input(x_test_raw)
-    return x_train, x_test
+    xtrain = preprocess_input(x_train_raw)
+    xtest = preprocess_input(x_test_raw)
+    return xtrain, xtest
 
 def get_sm_model(backbone):
     # define model
@@ -52,41 +50,17 @@ def build_sm_model(backbone, x_train_raw, x_test_raw):
 
     return model, x_train_preproc, x_test_preproc
 
-def get_vgg(x_train_raw, y_test_raw):
+def get_vgg(x_train_raw, x_test_raw):
     backbone = 'vgg19'
-    model, x_train_preproc, x_test_preproc = build_sm_model(backbone, x_train_raw, y_test_raw)
+    model, x_train_preproc, x_test_preproc = build_sm_model(backbone, x_train_raw, x_test_raw)
     return model, x_train_preproc, x_test_preproc 
 
-def get_resnet(x_train_raw, y_test_raw):
+def get_resnet(x_train_raw, x_test_raw):
     backbone = 'resnet34'
-    model, x_train_preproc, x_test_preproc = build_sm_model(backbone, x_train_raw, y_test_raw)
+    model, x_train_preproc, x_test_preproc = build_sm_model(backbone, x_train_raw, x_test_raw)
     return model, x_train_preproc, x_test_preproc 
 
-def get_inception(x_train_raw, y_test_raw):
+def get_inception(x_train_raw, x_test_raw):
     backbone = 'inceptionresnetv2'
-    model, x_train_preproc, x_test_preproc = build_sm_model(backbone, x_train_raw, y_test_raw)
+    model, x_train_preproc, x_test_preproc = build_sm_model(backbone, x_train_raw, x_test_raw)
     return model, x_train_preproc, x_test_preproc 
-
-x_train, x_test, y_train, y_test = hio.get_train_test()
-model, x_train_preproc, x_test_preproc = get_vgg()
-# model, x_train_preproc, x_test_preproc = get_inception()
-# model, x_train_preproc, x_test_preproc = get_resnet()
-
-# x_train_raw, x_test_raw, y_train, y_test = hio.get_train_test()
-
-hio.save_model_info(model)
-
-# fit model
-history = model.fit(
-   x=x_train_preproc,
-   y=y_train,
-   batch_size=64,
-   epochs=200,
-   validation_data=(x_test_preproc, y_test),
-)
-
-hio.plot_history(history)
-
-preds = model.predict(x_test)
-for (hsi, gt, pred) in zip(x_test, y_test, preds):
-   hio.visualize(hsi, gt, pred)

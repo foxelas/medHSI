@@ -73,16 +73,28 @@ def get_train_test():
 from contextlib import redirect_stdout
 from datetime import date
 
-def get_model_filename(model, suffix='', extension='txt'):
-    today = date.today()
-    model_name = str(today)
+def get_model_filename(suffix='', extension='txt', folder = None):
+    model_name = ''
+
+    if folder is None:
+        today = date.today()
+        model_name = str(today) + '_'
+    
     savedir = os.path.join(hsi_utils.conf['Directories']['outputDir'],
         hsi_utils.conf['Folder Names']['pythonTest'])
+    if folder is not None:
+        savedir = os.path.join(savedir, folder)
+
+    try: 
+        os.mkdir(savedir) 
+    except OSError as error: 
+        pass
+
     filename = os.path.join(savedir, model_name + suffix + '.' + extension)
     return filename
 
-def save_model_summary(model):
-    filename = get_model_filename(model, '_modelsummary', 'txt')
+def save_model_summary(model, folder = None):
+    filename = get_model_filename('modelsummary', 'txt', folder)
     if __name__ != "__main__":
         print("Saved at: ", filename)
     with open(filename, 'w', encoding='utf-8') as f:
@@ -91,15 +103,15 @@ def save_model_summary(model):
 
 from keras.utils.vis_utils import plot_model
 
-def save_model_graph(model):
-    filename = get_model_filename(model, '_modelgraph', 'png')
+def save_model_graph(model, folder = None):
+    filename = get_model_filename('modelgraph', 'png', folder)
     if __name__ != "__main__":
         print("Saved at: ", filename)
     plot_model(model, to_file=filename, show_shapes=True, show_layer_names=True)
 
-def save_model_info(model):
-    save_model_summary(model)
-    save_model_graph(model)
+def save_model_info(model, folder = None):
+    save_model_summary(model, folder)
+    save_model_graph(model, folder)
 
 def show_label_montage(): 
     croppedData, croppedLabels = load_data()
@@ -109,16 +121,21 @@ def show_label_montage():
     hsi_utils.show_montage(croppedLabels, filename, 'grey')
 
 
-def plot_history(history):
+def plot_history(history, folder = None):
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
+
+    filename = get_model_filename('loss', 'png', folder)
+    plt.savefig(filename)
+
     plt.show()
 
-def visualize(hsi, gt, pred):
+
+def visualize(hsi, gt, pred, folder = None):
     plt.subplot(1,3,1)
     plt.title("Original")
     plt.imshow(hsi_utils.get_display_image(hsi))
@@ -130,4 +147,9 @@ def visualize(hsi, gt, pred):
     plt.subplot(1,3,3)
     plt.title("Prediction")
     plt.imshow(pred)
+
+    filename = get_model_filename('visualization', 'png', folder)
+    plt.savefig(filename)
+
     plt.show()
+
