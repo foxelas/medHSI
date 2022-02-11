@@ -5,7 +5,7 @@ function [labels] = KmeansInternal(hsIm, targetName, clusterNum)
 %   labels = KmeansInternal(hsi, '158', 5);
 
 srgb = hsIm.GetDisplayImage('rgb');
-fgMask = GetFgMaskInternal(srgb);
+fgMask = hsIm.FgMask;
 
 Xcol = hsIm.GetPixelsFromMask(fgMask);
 [labelsCol, C] = kmeans(Xcol, clusterNum);

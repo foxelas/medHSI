@@ -1,12 +1,18 @@
 classdef hsi
     properties
         Value{mustBeNumeric}
+        FgMask = [] 
     end
+    
     methods
 
         %% Contents
         %
+        %
+        %
         %   Non-Static:
+        %         obj = hsi(hsImVal)
+        %         obj = set.FgMask(obj,default)
         %         [setId] = SelectDatabaseSamples(dataTable, setId)
         %         [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, mask)
         %         [obj] = Normalize(obj, white, black, method)
@@ -31,6 +37,27 @@ classdef hsi
         %         [labels] = Cubseg(obj, pixelNum)
         %         [scores] = SPCA(obj, pcNum, labels)
         %
+        
+        %% Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function obj = hsi(hsImVal)
+            obj.Value = hsImVal;
+            obj.FgMask = GetFgMaskInternal(hsImVal); %% change to remove background
+        end
+      
+        function obj = set.FgMask(obj,inMask)
+            if nargin < 2
+                inMask = obj.GetFgMask();
+            end
+            obj.FgMask = inMask;
+        end
+        
+        function [obj] = Update(obj, ind, vals)
+            hsIm = obj.Value;
+            hsIm(ind) = vals;
+            obj.Value = hsIm;
+        end
+        
+        %% Common Properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [varargout] = Size(obj)
             v{:} = size(obj.Value);
             vals = v{1};
@@ -39,53 +66,15 @@ classdef hsi
                 varargout{i} = vals(i);
             end
         end
-
-        function [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
-            %Dimred reduces the dimensions of an image dataset
-            %
-            %   Input arguments
-            %   X: input data as a matrix with MxN observations and Z columns
-            %   methods: 'rica', 'pca'
-            %   q: number of components to be retained
-            %   mask: 2x2 logical array marking pixels to be used in PCA calculation
-            %
-            %   Usage:
-            %   [coeff, scores, latent, explained, objective] = Dimred(X, method, q, mask)
-            %   [coeff, scores, latent, explained, ~] = Dimred(X, 'pca', 10)
-            %   [coeff, scores, ~, ~, objective] = Dimred(X, 'rica', 40)
-            [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, varargin{:});
-        end
-
-        function [obj] = Normalize(obj, varargin)
-
-            %% Normalize a given array I with max and min arrays, white and black
-            %  according to methon 'method'
-            %
-            %   Usage:
-            %   normI = NormalizeImage(I, white, black, method)
-
-            obj.Value = NormalizeInternal(obj.Value, varargin{:});
-        end
-
-        function [dispImage] = GetDisplayImage(obj, varargin)
-            dispImage = GetDisplayImageInternal(obj.Value, varargin{:});
-        end
-
-        function [dispImage] = GetDisplayRescaledImage(obj, varargin)
-            dispImage = GetDisplayImageInternal(rescale(obj.Value), varargin{:});
-        end
-
+        
+        %% Masking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [maskedPixels] = GetPixelsFromMask(obj, varargin)
-
-            %% GetPixelsFromMask returns flattened pixels according to a 2D mask
-
+            %%GetPixelsFromMask returns flattened pixels according to a 2D mask
             maskedPixels = GetPixelsFromMaskInternal(obj.Value, varargin{:});
         end
 
         function [mask, maskedPixels] = GetMaskFromFigure(obj)
-
-            %% GetPixelsFromMask returns flattened pixels according to a 2D mask
-
+            %%GetPixelsFromMask returns flattened pixels according to a 2D mask
             [mask, maskedPixels] = GetMaskFromFigureInternal(obj.Value);
         end
 
@@ -114,7 +103,33 @@ classdef hsi
 
             [newI, idxs] = GetQualityPixelsInternal(obj.Value, varargin{:});
         end
+        
+        %% Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [obj] = Normalize(obj, varargin)
+            %%Normalize a given array I with max and min arrays, white and black
+            %  according to methon 'method'
+            %
+            %   Usage:
+            %   normI = NormalizeImage(I, white, black, method)
 
+            obj.Value = NormalizeInternal(obj.Value, varargin{:});
+        end
+        
+        function [obj] = Preprocessing(obj)
+            % Preprocessing prepares normalized data according to our specifications
+            %
+            %   Usage:
+            %   pHsi = Preprocessing(hsi);
+            %
+            %   YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS
+
+            hsIm = obj.Value;
+            hsIm = hsIm(:, :, hsiUtility.GetWavelengths(311, 'index'));
+            obj.Value = hsIm;
+            [updI, ~] = obj.RemoveBackground();
+            obj.Value = updI;
+        end
+        
         function [updI, fgMask] = RemoveBackground(obj, varargin)
             %     REMOVEBACKGROUND removes the background from the specimen image
             %
@@ -126,7 +141,51 @@ classdef hsi
 
             [updI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
         end
+        
+        %% Segmentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [labels] = Cubseg(obj, varargin)
+            %%super-pixels segmentation
+            labels = cubseg(obj.Value, varargin{:});
+        end
+        
+        %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        function [col] = ToColumn(obj)
+            image = obj.Value;
+            col = reshape(image, [size(image, 1) * size(image, 2), size(image, 3)]);
+        end
+        
+        function [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
+            %Dimred reduces the dimensions of an image dataset
+            %
+            %   Input arguments
+            %   X: input data as a matrix with MxN observations and Z columns
+            %   methods: 'rica', 'pca'
+            %   q: number of components to be retained
+            %   mask: 2x2 logical array marking pixels to be used in PCA calculation
+            %
+            %   Usage:
+            %   [coeff, scores, latent, explained, objective] = Dimred(X, method, q, mask)
+            %   [coeff, scores, latent, explained, ~] = Dimred(X, 'pca', 10)
+            %   [coeff, scores, ~, ~, objective] = Dimred(X, 'rica', 40)
+            [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, varargin{:});
+        end
 
+        function [scores] = SPCA(obj, varargin)
+            %%SupePCA based DR
+            scores = SuperPCA(obj.Value, varargin{:});
+        end
+        
+        %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [dispImage] = GetDisplayImage(obj, varargin)
+            dispImage = GetDisplayImageInternal(obj.Value, varargin{:});
+        end
+       
+        function [dispImage] = GetDisplayRescaledImage(obj, varargin)
+            dispImage = GetDisplayImageInternal(rescale(obj.Value), varargin{:});
+        end
+
+        %% Metrics %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [c] = GetBandCorrelation(obj, hasPixelSelection)
             %     GETBANDCORRELATION returns the array of band correlation for an msi I
             %
@@ -155,11 +214,7 @@ classdef hsi
             c = corr(tempI);
         end
 
-        function [col] = ToColumn(obj)
-            image = obj.Value;
-            col = reshape(image, [size(image, 1) * size(image, 2), size(image, 3)]);
-        end
-
+        %% Operators %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [obj] = Plus(obj, hsiIm)
             obj.Value = obj.Value + hsiIm;
         end
@@ -183,37 +238,6 @@ classdef hsi
         function [obj] = Index(obj, obj2)
             hsIm = obj.Value;
             obj.Value = hsIm(obj2.Value);
-        end
-
-        function [obj] = Update(obj, ind, vals)
-            hsIm = obj.Value;
-            hsIm(ind) = vals;
-            obj.Value = hsIm;
-        end
-
-        function [obj] = Preprocessing(obj)
-            % Preprocessing prepares normalized data according to our specifications
-            %
-            %   Usage:
-            %   pHsi = Preprocessing(hsi);
-            %
-            %   YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS
-
-            hsIm = obj.Value;
-            hsIm = hsIm(:, :, hsiUtility.GetWavelengths(311, 'index'));
-            obj.Value = hsIm;
-            [updI, ~] = obj.RemoveBackground();
-            obj.Value = updI;
-        end
-
-        function [labels] = Cubseg(obj, varargin)
-            %%super-pixels segmentation
-            labels = cubseg(obj.Value, varargin{:});
-        end
-
-        function [scores] = SPCA(obj, varargin)
-            %%SupePCA based DR
-            scores = SuperPCA(obj.Value, varargin{:});
         end
 
     end
