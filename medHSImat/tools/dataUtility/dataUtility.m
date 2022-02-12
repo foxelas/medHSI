@@ -10,7 +10,8 @@ classdef dataUtility
         %         [newSpectrum, newX] = SpectrumCut(oldSpectrum, x)
         %         [outSpectrum] = SpectrumPad(inSpectrum, options)
         %         [reorderedSpectra, labels] = ReorderSpectra(target, chartColorOrder, spectraColorOrder, wavelengths, spectralWavelengths)
-
+        %         [filename] = GetFilename(dataType, targetName);
+        
         function [outname] = StrrepAll(inname, isLegacy)
             %     StrrepAll fomats an inname to outname
             %
@@ -152,5 +153,72 @@ classdef dataUtility
             labels = spectraColorOrder;
         end
 
+        function [targetFilename] = GetFilename(dataType, targetName)
+        %GetFilename returns the directories for saved data 
+        %
+        %   Inputs
+        %   dataType: choose between 'preprocessed', 'target', 'white',
+        %   'black', 'raw', 'label', 'param', 'h5' or 'model'
+        %   targetName: the name of the target
+        %
+        %   Usage:
+        %   targetName = num2str(id); 
+        %   labelfile = dataUtility.GetFilename('label', targetName);  
+        
+        if nargin < 2
+            targetName = '';
+        end
+        
+        switch dataType
+            case 'preprocessed'
+                if strcmpi(config.GetSetting('normalization'), 'raw')
+                    targetFilename = dataUtility.GetFilename('target', targetName);                       
+                else
+                    baseDir = config.DirMake(config.GetSetting('matDir'), ...
+                        strcat(config.GetSetting('database'), config.GetSetting('normalizedName')), targetName);
+                    targetFilename = strcat(baseDir, '_', config.GetSetting('normalization'), '.mat');
+                end
+
+            case 'target'
+                baseDir = fullfile(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
+                targetFilename = strcat(baseDir, '_target.mat');
+
+            case 'raw'
+                 targetFilename = dataUtility.GetFilename('target', targetName);  
+
+            case 'white'
+                baseDir = fullfile(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
+                targetFilename = strcat(baseDir, '_white.mat');
+
+            case 'black'
+                baseDir = fullfile(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
+                targetFilename = strcat(baseDir, '_black.mat');
+
+            case 'label'
+                baseDir = config.DirMake(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
+                targetFilename = strcat(baseDir, '_label.mat');
+
+            case 'model'
+                baseDir = config.DirMake(config.GetSetting('outputDir'), ...
+                    config.GetSetting('experiment'), targetName);
+                targetFilename = strcat(baseDir, '.mat');
+
+            case 'param'
+                targetFilename = fullfile(config.GetRunBaseDir(),...
+                    config.GetSetting('paramDir'), strcat(targetName, '.mat'));
+            
+            case 'h5'
+                targetFilename = config.DirMake(config.GetSetting('matDir'), ...
+                    config.GetSetting('database'), strcat(targetName, '.mat'));
+            
+            otherwise 
+                error('Unsupported dataType.');
+        end
+                   
+        end
     end
 end

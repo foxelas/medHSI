@@ -1,31 +1,32 @@
-function [spectralData] = ReadHSIDataInternal(content, target, experiment, blackIsCapOn)
-%%ReadHSIDataInternal returns the three images necessary for data analysis
+function [spectralData] = ReadHSIInternal(content, target, experiment, blackIsCapOn)
+%%ReadHSIInternal returns the three images necessary for data analysis
 %
 %   Usage:
-%   [raw] = ReadHSIDataInternal(content, target, experiment, blackIsCapOn)
+%   [raw] = ReadHSIInternal(content, target, experiment, blackIsCapOn)
 
 if nargin < 4
     blackIsCapOn = false;
 end
 
-baseDir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('tripletsName'), '\'));
 
 %% Target image
 fcTarget = databaseUtility.GetFileConditions(content, target);
 [filename, tableId] = databaseUtility.GetFilename(fcTarget{:});
-saveName = fullfile(baseDir, num2str(tableId));
+targetName = num2str(tableId);
 [spectralData, ~, ~] = hsiUtility.LoadH5Data(filename);
 snapshotFolder = config.GetSetting('snapshots');
 plotBaseDir = fullfile(config.GetSetting('saveDir'), snapshotFolder, config.GetSetting('experiment'));
 
-if ~exist(strcat(saveName, '_target.mat'), 'file') ...
-        || ~exist(strcat(saveName, '_black.mat'), 'file') ...
-        || ~exist(strcat(saveName, '_white.mat'), 'file')
+if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
+        || ~exist(dataUtility.GetFilename('black', targetName), 'file') ...
+        || ~exist(dataUtility.GetFilename('white', targetName), 'file')
     figure(1);
     imshow(hsiUtility.GetDisplayImage(spectralData, 'rgb'));
     config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));
     plots.SavePlot(1);
-    save(strcat(saveName, '_target.mat'), 'spectralData', '-v7.3');
+    filename = dataUtility.GetFilename('target', targetName);
+    fprintf('Target data [spectralData] is saved at %s.\n', filename);
+    save(filename, 'spectralData', '-v7.3');
 
     if ~strcmp(config.GetSetting('normalization'), 'raw')
 
@@ -54,7 +55,9 @@ if ~exist(strcat(saveName, '_target.mat'), 'file') ...
         plots.Spectra(5, bandmaxSpectrum, wavelengths, 'Bandmax spectrum', 'Bandmax Spectrum for the current Image');
 
         fullReflectanceByPixel = white;
-        save(strcat(saveName, '_white.mat'), 'fullReflectanceByPixel', 'uniSpectrum', 'bandmaxSpectrum', '-v7.3');
+        filename = dataUtility.GetFilename('white', targetName);
+        fprintf('White data [fullReflectanceByPixel] is saved at %s.\n', filename);
+        save(filename, 'fullReflectanceByPixel', 'uniSpectrum', 'bandmaxSpectrum', '-v7.3');
 
         %% Black Image
         if config.GetSetting('isTest')
@@ -73,7 +76,9 @@ if ~exist(strcat(saveName, '_target.mat'), 'file') ...
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime')))));
         plots.SavePlot(3);
 
-        save(strcat(saveName, '_black.mat'), 'blackReflectance', '-v7.3');
+        filename = dataUtility.GetFilename('black', targetName);
+        fprintf('Black data [blackReflectance] is saved at %s.\n', filename);
+        save(filename, 'blackReflectance', '-v7.3');
     else
         disp('Read only capture data, ignore white and black images.');
     end

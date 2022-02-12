@@ -7,10 +7,11 @@ function PlotNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
 %   plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
 
 %Need to draw mask
-[mask, Iin_mask] = GetMaskFromFigureInternal(Iin);
-Iblack_mask = GetPixelsFromMaskInternal(Iblack, mask);
-Iwhite_mask = GetPixelsFromMaskInternal(Iwhite, mask);
-Inorm_mask = GetPixelsFromMaskInternal(Inorm, mask);
+mask = Iin.GetCustomMask();
+Iin_mask = Iin.GetMaskedPixels(mask);
+Iblack_mask = GetMaskedPixelsInternal(Iblack, mask);
+Iwhite_mask = GetMaskedPixelsInternal(Iwhite, mask);
+Inorm_mask = Inorm.GetMaskedPixels(mask);
 x = hsiUtility.GetWavelengths(size(Iin_mask, 2));
 
 close all;
@@ -25,8 +26,14 @@ plot(x, min(reshape(Iwhite_mask, [size(Iwhite_mask, 1), size(Iwhite_mask, 2)])),
 plot(x, min(reshape(Iblack_mask, [size(Iblack_mask, 1), size(Iblack_mask, 2)])), 'DisplayName', 'Min Black', 'LineWidth', 2);
 plot(x, min(reshape(Iin_mask, [size(Iin_mask, 1), size(Iin_mask, 2)])), 'DisplayName', 'Min Tissue', 'LineWidth', 2);
 
+minVal = min(Iwhite_mask(:)-Iblack_mask(:));
+fids = find( (Iwhite_mask(:)-Iblack_mask(:)) == minVal);
+[row,col] = ind2sub(size(Iwhite_mask),fids(1));
+ws = hsiUtility.GetWavelengths(401, 'raw');
+
 hold off; legend;
-min(Iwhite_mask(:)-Iblack_mask(:))
+fprintf( 'Min(I_w - I_b) is %.5f at row (pixel) %d and column %d (wavelength %d). \n', minVal, row, col, ws(col));
+fprintf( 'If minVal is negative and wavelenth is at the extreme, then it is discarded later as noise. \n');
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Reflectance (a.u.)', 'FontSize', 15);
 
@@ -50,7 +57,7 @@ ax = gca;
 ax.YAxis.Exponent = 0;
 
 fig3 = figure(fig+2);
-rgb = hsiUtility.GetDisplayImage(Iin);
+rgb = Iin.GetDisplayImage();
 plots.Overlay(fig3, rgb, mask);
 
 baseFolder = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('normCheck'), config.GetSetting('fileName'));

@@ -152,7 +152,9 @@ for i = 1:numSamples %only 6 available labels else length(targetIDs)
     
     [m, n, z] = I.Size();
 
-    labelfile = fullfile(labeldir, strcat(num2str(id), '_label.mat'));
+    targetName = num2str(id); 
+    labelfile = dataUtility.GetFilename('label', targetName);   
+    
     if exist(labelfile, 'file')
         load(labelfile, 'labelMask');
 

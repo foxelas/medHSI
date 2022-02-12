@@ -8,43 +8,69 @@ classdef hsi
 
         %% Contents
         %
-        %
-        %
         %   Non-Static:
-        %         obj = hsi(hsImVal)
-        %         obj = set.FgMask(obj,default)
-        %         [setId] = SelectDatabaseSamples(dataTable, setId)
-        %         [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, mask)
-        %         [obj] = Normalize(obj, white, black, method)
-        %         [dispImage] = GetDisplayImage(obj, method, channel)
-        %         [dispImage] = GetDisplayRescaledImage(obj, method, channel)
-        %         [maskedPixels] = GetPixelsFromMask(obj, mask)
-        %         [mask, maskedPixels] = GetMaskFromFigure(obj)
-        %         [fgMask] = GetFgMask(obj)
-        %         [spectrumCurves] = GetSpectraFromMask(obj, subMasks, targetMask)
-        %         [newI, idxs] = GetQualityPixels(obj, meanLimit, maxLimit)
-        %         [updI, fgMask] = RemoveBackground(obj, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
-        %         [c] = GetBandCorrelation(obj, hasPixelSelection)
-        %         [col] = ToColumn(obj)
-        %         [obj] = Plus(obj,hsiIm)
-        %         [obj] = Minus(obj,hsiIm)
-        %         [obj] = Max(obj, value)
-        %         [ind] = IsNan(obj)
-        %         [ind] = IsInf(obj)
-        %         [obj] = Index(obj, obj2)
-        %         [obj] = Update(obj, ind, vals)
-        %         [pHsi] = Preprocessing(obj)
-        %         [labels] = Cubseg(obj, pixelNum)
-        %         [scores] = SPCA(obj, pcNum, labels)
+        %   %% Set 
+        %   [obj] = hsi(hsImVal, calcMask)
+        %   [obj] = set.FgMask(obj,inMask)
+        %   [obj] = Update(obj, ind, vals)
         %
+        %   %% Common Properties 
+        %   [varargout] = Size(obj)
+        %
+        %   %% Masking
+        %   [maskedPixels] = GetMaskedPixels(obj, mask)
+        %   [fgMask] = GetCustomMask(obj)
+        %   [fgMask] = GetFgMask(obj, varargin)
+        %   [updatedHSI, fgMask] = RemoveBackground(obj, varargin)
+        %   [spectrumCurves] = GetSpectraFromMask(obj, varargin)
+        %   [newI, idxs] = GetQualityPixels(obj, varargin)
+        %
+        %   %% Processing
+        %   [obj] = Normalize(obj, varargin)
+        %   [obj] = Preprocessing(obj)
+        %
+        %   %% Segmentation 
+        %   [labels] = Cubseg(obj, varargin)
+        %
+        %   %% Dimension Reduction
+        %   [col] = ToColumn(obj)
+        %   [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
+        %   [scores] = SPCA(obj, varargin)
+        %   [dispImage] = GetDisplayImage(obj, varargin)
+        %   [dispImage] = GetDisplayRescaledImage(obj, varargin)
+        %
+        %   %% Metrics
+        %   [c] = GetBandCorrelation(obj, hasPixelSelection)
+        %
+        %   %% Operators 
+        %   [obj] = Plus(obj, hsiIm)
+        %   [obj] = Minus(obj, hsiIm)
+        %   [obj] = Max(obj, value)
+        %   [ind] = IsNan(obj)
+        %   [ind] = IsInf(obj)
+        %   [obj] = Index(obj, obj2)
+        %         
+        %   Static
+        %   %% Dimension Reduction
+        %   [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
+        %   
+        %   %% Is 
+        %   [flag] = IsHsi(obj)
         
         %% Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function obj = hsi(hsImVal)
+        function [obj] = hsi(hsImVal, calcMask)
+            if nargin < 2
+                calcMask = true;
+            end
+            
             obj.Value = hsImVal;
-            obj.FgMask = GetFgMaskInternal(hsImVal); %% change to remove background
+            if calcMask
+                [~, fgMask] = RemoveBackgroundInternal(hsImVal);
+                obj.FgMask = fgMask; 
+            end
         end
       
-        function obj = set.FgMask(obj,inMask)
+        function [obj] = set.FgMask(obj,inMask)
             if nargin < 2
                 inMask = obj.GetFgMask();
             end
@@ -68,25 +94,54 @@ classdef hsi
         end
         
         %% Masking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function [maskedPixels] = GetPixelsFromMask(obj, varargin)
-            %%GetPixelsFromMask returns flattened pixels according to a 2D mask
-            maskedPixels = GetPixelsFromMaskInternal(obj.Value, varargin{:});
-        end
+        function [maskedPixels] = GetMaskedPixels(obj, mask)
+            %%GetMaskedPixels returns flattened pixels according to a 2D mask
+            %   If the mask is missing, one is selected based on a manual 
+            %   polygon selection
+            
+            I = obj.Value;
+            [m, n, w] = size(I);
 
-        function [mask, maskedPixels] = GetMaskFromFigure(obj)
-            %%GetPixelsFromMask returns flattened pixels according to a 2D mask
-            [mask, maskedPixels] = GetMaskFromFigureInternal(obj.Value);
+            if nargin < 2 
+                mask = obj.GetCustomMask() && obj.FgMask;
+            end 
+            
+            [maskedPixels] = GetMaskedPixelsInternal(I, mask);
         end
-
-        function [fgMask] = GetFgMask(obj)
-            %%GetFgMask returns the foreground mask for an image where background
-            %%pixels are black
+       
+        function [fgMask] = GetCustomMask(obj)
+            %   GetCustomMask returns a manually drawn polygon mask 
             %
             %   Usage:
-            %   fgMask = GetFgMask(hsIm);
-            fgMask = GetFgMaskInternal(obj.Value);
+            %   [fgMask] = GetCustomMask(I);
+            
+            fgMask = GetCustomMaskInternal(obj.Value);
         end
+        
+        function [fgMask] = GetFgMask(obj, varargin)
+            %     REMOVEBACKGROUND removes the background from the specimen image
+            %
+            %     Usage:
+            %     [updatedHSI, foregroundMask] = RemoveBackground(I)
+            %     [updatedHSI, foregroundMask] = RemoveBackground(I, colorLevelsForKMeans,
+            %         attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
+            %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
 
+            [~, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
+        end        
+        
+        function [updatedHSI, fgMask] = RemoveBackground(obj, varargin)
+            %     REMOVEBACKGROUND removes the background from the specimen image
+            %
+            %     Usage:
+            %     [updatedHSI, foregroundMask] = RemoveBackground(I)
+            %     [updatedHSI, foregroundMask] = RemoveBackground(I, colorLevelsForKMeans,
+            %         attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
+            %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
+
+            [updatedHSI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
+        end   
+        
         function [spectrumCurves] = GetSpectraFromMask(obj, varargin)
             %%GetSpectraFromMask returns the average spectrum of a specific ROI mask
             %
@@ -112,7 +167,7 @@ classdef hsi
             %   Usage:
             %   normI = NormalizeImage(I, white, black, method)
 
-            obj.Value = NormalizeInternal(obj.Value, varargin{:});
+            obj = NormalizeInternal(obj, varargin{:});
         end
         
         function [obj] = Preprocessing(obj)
@@ -126,20 +181,9 @@ classdef hsi
             hsIm = obj.Value;
             hsIm = hsIm(:, :, hsiUtility.GetWavelengths(311, 'index'));
             obj.Value = hsIm;
-            [updI, ~] = obj.RemoveBackground();
+            [updI, fgMask] = obj.RemoveBackground();
             obj.Value = updI;
-        end
-        
-        function [updI, fgMask] = RemoveBackground(obj, varargin)
-            %     REMOVEBACKGROUND removes the background from the specimen image
-            %
-            %     Usage:
-            %     [updatedHSI, foregroundMask] = RemoveBackground(I)
-            %     [updatedHSI, foregroundMask] = RemoveBackground(I, colorLevelsForKMeans,
-            %         attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
-            %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
-
-            [updI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
+            obj.FgMask = fgMask; 
         end
         
         %% Segmentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -226,7 +270,7 @@ classdef hsi
         function [obj] = Max(obj, value)
             obj.Value = max(obj.Value, value);
         end
-
+        
         function [ind] = IsNan(obj)
             ind = isnan(obj.Value);
         end
@@ -242,4 +286,33 @@ classdef hsi
 
     end
 
+    methods (Static)
+        %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        function [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
+        % RecoverOriginalDimensionsInternal returns an image that matches the 
+        % spatial dimensions of the original hsi
+        %
+        %   Input arguments:
+        %   redIm: reduced dimension data (array or cell of arrays)
+        %   origSize: cell array with original sizes of input data (array or cell of arrays)
+        %   mask: cell array of masks per data sample (array or cell of arrays)
+        %
+        %   Returns:
+        %   Data with original spatial dimensions and reduced spectral dimensions
+        %
+        %   Usage:
+        %   [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
+        %   [redHsis] = RecoverOriginalDimensionsInternal(scores, imgSizes, masks)
+            [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask);           
+        end
+
+        %% Is %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [flag] = IsHsi(obj)
+        %   IsHsi checks if instance object belongs to hsi class
+        
+            flag = isequal(class(obj), 'hsi');
+        end
+        
+    end
 end

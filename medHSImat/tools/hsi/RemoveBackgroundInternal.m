@@ -9,7 +9,7 @@ function [updI, fgMask] = RemoveBackgroundInternal(I, colorLevelsForKMeans, atte
 
 [m, n, z] = size(I);
 if z > 3
-    Irgb = hsiUtility.GetDisplayImage(I, 'rgb');
+    Irgb = GetDisplayImageInternal(I, 'rgb');
 else
     Irgb = I;
 end

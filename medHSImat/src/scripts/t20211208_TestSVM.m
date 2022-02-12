@@ -9,8 +9,7 @@ config.SetSetting('experiment', 'T20211215-SVM');
 %% Read h5 data
 [targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'fix');
 
-labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('labelsName'), '\'));
-imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('normalizedName'), '\'));
+% imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('normalizedName'), '\'));
 
 % ApplyScriptToEacRhImage(@reshape, {'tissue', true},  'fix');
 
@@ -25,7 +24,8 @@ for i = 1:length(targetIDs)
     I.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
     [m, n, z] = I.Size();
 
-    labelfile = fullfile(labeldir, strcat(num2str(id), '_label.mat'));
+    targetName = num2str(id); 
+    labelfile = dataUtility.GetFilename('label', targetName);    
     if exist(labelfile, 'file')
         load(labelfile, 'labelMask');
 
@@ -43,6 +43,6 @@ SVMModel = fitcsvm(X, y, 'KernelScale', 'auto', 'Standardize', false, 'Verbose',
 CVSVMModel = crossval(SVMModel);
 classLoss = kfoldLoss(CVSVMModel)
 
-savedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'svm_model.mat');
+modelFilename = dataUtility.GetFilename('model', 'svm_model');
 effectiveDate = date();
-save(savedir, 'SVMModel', 'classLoss', 'effectiveDate');
+save(modelFilename, 'SVMModel', 'classLoss', 'effectiveDate');

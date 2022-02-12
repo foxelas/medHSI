@@ -10,10 +10,9 @@ dirpath = fullfile(config.GetSetting('outputDir'), config.GetSetting('labelsManu
 dirList = dir(fullfile(dirpath, '*.jpg'));
 
 close all;
-savedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('labelsName'), '\'));
-maskdir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labels'), '\');
-applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsApplied'), '\');
-basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshots'), 'normalized\');
+maskdir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labels'));
+applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsApplied'));
+basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshots'), 'normalized');
 
 for i = 1:numel(dirList)
     imBase = im2double(imread(fullfile(basedir, strrep(dirList(i).name, '_manual', ''))));
@@ -42,7 +41,8 @@ for i = 1:numel(dirList)
     parts = strsplit(dirList(i).name, '_');
     sampleId = parts{1};
     id = targetIDs(strcmp([outRows.SampleID], sampleId));
-    savename = fullfile(savedir, strcat(num2str(id), '_label.mat'));
+    targetName = num2str(id); 
+    savename = dataUtility.GetFilename('label', targetName);
     save(savename, 'labelMask');
 
     config.SetSetting('plotName', fullfile(maskdir, dirList(i).name));

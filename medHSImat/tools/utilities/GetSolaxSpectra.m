@@ -89,7 +89,8 @@ title('For Solax-iO light source', 'FontSize', 15);
 config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
 plots.SavePlot(fig3);
 
-save('parameters/solax_reconstructed_spectrum.mat', 'solaxSpec', 'solaxLocalMaxWavelengths');
+filename = dataUtility.GetFilename('param', 'solax_reconstructed_spectrum');
+save(filename, 'solaxSpec', 'solaxLocalMaxWavelengths');
 
 end
 

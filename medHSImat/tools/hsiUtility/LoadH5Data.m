@@ -5,9 +5,8 @@ function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %   [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %   returns spectralData, XYZ image and capture wavelengths
 
-database = config.GetSetting('database');
 filename = strrep(filename, '.hsm', '.h5');
-saveFilename = config.DirMake(config.GetSetting('matDir'), database, strcat(filename, '.mat'));
+saveFilename = dataUtility.GetFilename('h5', filename);   
 
 if ~exist(saveFilename, 'file')
     currentFile = AdjustFilename(filename);

@@ -64,7 +64,7 @@ end
 end
 
 function [xyz, illumination] = PrepareParams(z)
-filename = fullfile(config.GetRunBaseDir(), config.GetSetting('paramDir'), 'displayParam.mat');
+filename = dataUtility.GetFilename('param');
 if ~exist(filename, 'file')
     lambdaIn = hsiUtility.GetWavelengths(z, 'raw');
     [lambdaMatch, xFcn, yFcn, zFcn] = colorMatchFcn('1964_FULL');
