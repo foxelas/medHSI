@@ -288,7 +288,7 @@ classdef hsiUtility
 
             close all;
         end
-
+        %% PENDING
         function [] = AugmentDataGroup(experiment, condition, augType)
             % AugmentDataGroup reads a group of hsi data, prepares .mat files,
             % prepared normalized files and returns montage previews of contents
@@ -331,14 +331,14 @@ classdef hsiUtility
 
                 %% load HSI from .mat file to verify it is working and to prepare preview images
                 targetName = num2str(id);
-                labelImg = hsiUtility.ReadLabelImage(targetName);
+                labelImg = hsiUtility.ReadLabel(targetName);
                 
                 baseDir = fullfile(config.GetSetting('matDir'), ...
                     strcat(config.GetSetting('database'), config.GetSetting('augmentationName'), '_', num2str(augType)), targetName);
                 
                 if ~isempty(labelImg) %% REMOVELATER
                     spectralData = hsi;
-                    spectralData.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
+                    spectralData.Value = hsiUtility.LoadHSI(targetName, 'preprocessed');
                     dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 
                     switch augType 
@@ -426,40 +426,40 @@ classdef hsiUtility
             k = 0;
             for i = 1:length(targetIDs)
                 targetName = num2str(targetIDs{i});
-                labelImg = hsiUtility.ReadLabelImage(targetName);
-                hsiIm = hsi;
-                hsiIm.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
-                [hsiIm.Value, fgMask] = hsiUtility.RemoveBackground(hsiIm);
-                malLabel = fgMask & labelImg;
-                malData = mean(hsiIm.GetPixelsFromMask(malLabel));
+                labelImg = hsiUtility.ReadLabel(targetName);
+                hsiIm = hsiUtility.LoadHSI(targetName, 'preprocessed');
+                if ~hsi.IsHsi(hsiIm)
+                    error('Needs preprocessed input. Change [normalziation] in config.');
+                end
+                malLabel = hsiIm.FgMask & labelImg;
+                malData = mean(hsiIm.GetMaskedPixels(malLabel));
                 k = k + 1;
                 refLib(k).Data = malData;
                 refLib(k).Label = 1;
                 refLib(k).Disease = disease{i};
                 
-                benLabel = fgMask & ~labelImg;
-                benData = mean(hsiIm.GetPixelsFromMask(benLabel));
+                benLabel = hsiIm.FgMask & ~labelImg;
+                benData = mean(hsiIm.GetMaskedPixels(benLabel));
                 k = k + 1;
                 refLib(k).Data = benData;
                 refLib(k).Label = 0;
                 refLib(k).Disease = disease{i};               
             end
            
-           saveName = config.DirMake(config.GetSetting('matDir'), ...
-                    strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ... 
-                    strcat(config.GetSetting('referenceLibraryName'), '.mat'));
-           
+           saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));          
            save(saveName, 'refLib');
             
         end      
         
         function [refLib] = GetReferenceLibrary()
-           saveName = config.DirMake(config.GetSetting('matDir'), ...
-                    strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ... 
-                    strcat(config.GetSetting('referenceLibraryName'), '.mat'));
-           
-           load(saveName, 'refLib');
-            
+        %     GetReferenceLibrary returns reference spectra for SAM
+        %     comparison 
+        %
+        %     Usage:
+        %     refLib = hsiUtility.GetReferenceLibrary();
+
+            saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));          
+            load(saveName, 'refLib'); 
         end
         
     end

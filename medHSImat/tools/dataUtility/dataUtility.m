@@ -158,7 +158,7 @@ classdef dataUtility
         %
         %   Inputs
         %   dataType: choose between 'preprocessed', 'target', 'white',
-        %   'black', 'raw', 'label', 'param', 'h5' or 'model'
+        %   'black', 'raw', 'label', 'param', 'referenceLib', 'h5' or 'model'
         %   targetName: the name of the target
         %
         %   Usage:
@@ -211,6 +211,11 @@ classdef dataUtility
                 targetFilename = fullfile(config.GetRunBaseDir(),...
                     config.GetSetting('paramDir'), strcat(targetName, '.mat'));
             
+            case 'referenceLib'
+               targetFilename = config.DirMake(config.GetSetting('matDir'), ...
+                    strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ... 
+                    strcat(targetName, '.mat'));
+                
             case 'h5'
                 targetFilename = config.DirMake(config.GetSetting('matDir'), ...
                     config.GetSetting('database'), strcat(targetName, '.mat'));

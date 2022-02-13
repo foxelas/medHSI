@@ -3,7 +3,8 @@ function [flag, fileS] = CheckImportData()
 %
 %   Usage: [flag, fileS] = CheckImportData()
 
-v = dir('D:\elena\mspi\3_skinHSI\skin samples\*.hsm');
+datadir = fullfile(config.GetSetting('dataDir'), '*.h5');
+v = dir(datadir);
 vname = {v.name};
 k = cellfun(@(x) strrep(x, '.hsm', ''), vname, 'UniformOutput', false);
 fileS = struct('Filename', [], 'SampleID', [], 'Target', [], 'Content', [], ...
