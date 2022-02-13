@@ -14,12 +14,13 @@ fcTarget = databaseUtility.GetFileConditions(content, target);
 [filename, tableId] = databaseUtility.GetFilename(fcTarget{:});
 targetName = num2str(tableId);
 [spectralData, ~, ~] = hsiUtility.LoadH5Data(filename);
-snapshotFolder = config.GetSetting('snapshots');
-plotBaseDir = fullfile(config.GetSetting('saveDir'), snapshotFolder, config.GetSetting('experiment'));
 
 if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
         || ~exist(dataUtility.GetFilename('black', targetName), 'file') ...
         || ~exist(dataUtility.GetFilename('white', targetName), 'file')
+    
+    snapshotFolder = config.GetSetting('snapshots');
+    plotBaseDir = fullfile(config.GetSetting('saveDir'), snapshotFolder, config.GetSetting('experiment'));
     figure(1);
     imshow(hsiUtility.GetDisplayImage(spectralData, 'rgb'));
     config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));

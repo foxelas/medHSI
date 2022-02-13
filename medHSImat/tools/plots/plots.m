@@ -12,6 +12,7 @@ classdef plots
         %         Spectra(fig, spectra, wavelengths, names, figTitle)
         %         SpectraAverage(fig, spectra, wavelengths, figTitle)
         %         NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
+        %         AverageSpectrum(fig, Inorm)
         %         Overlay(fig, baseIm, topIm, figTitle)
         %         DualMontage(fig, left, right, figTitle)
         %         Dimred(method, dimredResult, w, redHsis)
@@ -142,6 +143,17 @@ classdef plots
             %   plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
 
             plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
+        end
+        
+        function [] = AverageSpectrum(fig, varargin)
+            %%PlotAverageSpectrum plots the values recovered after normalization
+            %   user needs to input a mask
+            %
+            %   Usage:
+            %   PlotsNormalizationCheck(Inorm, fig)
+            %   plots.NormalizationCheck(fig, Inorm)
+
+            plots.Apply(fig, @PlotAverageSpectrum, varargin{:});
         end
 
         function [] = Overlay(fig, varargin)

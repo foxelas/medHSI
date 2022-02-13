@@ -45,13 +45,13 @@ hsiUtility.ExportH5Dataset(dbSelection);
 config.SetSetting('normalization', 'raw');
 fileNum = 150;
 config.SetSetting('fileName', num2str(fileNum));
-hsi = hsiUtility.LoadHSI(fileNum);
+hsIm = hsiUtility.LoadHSI(fileNum);
 
 % Reads file with DB ID = 150 and preprocessed with 'byPixel'
 config.SetSetting('normalization', 'byPixel');
 fileNum = 150;
 config.SetSetting('fileName', num2str(fileNum));
-hsi = hsiUtility.LoadHSI(fileNum, 'preprocessed');
+hsIm = hsiUtility.LoadHSI(fileNum, 'preprocessed');
 
 %%%%%%%%%%%%%%%%%%%%% Get Disease Info %%%%%%%%%%%%%%%%%%%%%
 % Returns information from the disease DB saved in is saved in importDir 
@@ -64,3 +64,8 @@ hsi = hsiUtility.LoadHSI(fileNum, 'preprocessed');
 referenceIDs = {153, 166};
 referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
 refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
+
+%%%%%%%%%%%%%%%%%%%%% Plot Mean Spectra %%%%%%%%%%%%%%%%%%%%
+% Plot average spectra for an ROI on the sample 
+fig = 1;
+plots.AverageSpectrum(fig, hsIm);

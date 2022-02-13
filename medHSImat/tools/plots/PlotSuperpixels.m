@@ -6,16 +6,11 @@ function [] = PlotSuperpixels(baseImage, labels, figTitle, plotType, fgMask, fig
 %   PlotSuperpixels(baseImage, labels, 'Superpixels of image 3', 'color', fgMask, 1);
 
 if ~isempty(plotType) && strcmpi(plotType, 'color') % isColor = 'color'
-    if ~isempty(fgMask)
-        v = labels(fgMask);
-        a = unique(v);
-        counts = histc(v(:), a);
-        specimenSuperpixelIds = a(counts > 300)';
-    else
-        specimenSuperpixelIds = 1:length(unique(v));
-    end
-    B = labeloverlay(baseImage, labels, 'IncludedLabels', specimenSuperpixelIds);
+    labels = labels + 1; % To remove label 0, because labeloverlay ignores it 
+    labels(~fgMask) = 0;
+    B = labeloverlay(baseImage, labels);
     imshow(B);
+    
 else % isColor = 'boundary'
     BW = boundarymask(labels);
     imshow(imoverlay(baseImage, BW, 'cyan'), 'InitialMagnification', 67);

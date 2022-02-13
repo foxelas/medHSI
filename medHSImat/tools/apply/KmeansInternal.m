@@ -7,10 +7,10 @@ function [labels] = KmeansInternal(hsIm, targetName, clusterNum)
 srgb = hsIm.GetDisplayImage('rgb');
 fgMask = hsIm.FgMask;
 
-Xcol = hsIm.GetPixelsFromMask(fgMask);
+Xcol = hsIm.GetMaskedPixels(fgMask);
 [labelsCol, C] = kmeans(Xcol, clusterNum);
 
-labels = hsiUtility.RecoverReducedHsi(labelsCol, size(fgMask), fgMask);
+labels = hsi.RecoverSpatialDimensions(labelsCol, size(fgMask), fgMask);
 
 savedir = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('experiment'), targetName);
 config.SetSetting('plotName', fullfile(savedir, 'kmeans-clustering'));
