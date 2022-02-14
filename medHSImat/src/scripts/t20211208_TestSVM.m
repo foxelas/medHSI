@@ -20,19 +20,18 @@ for i = 1:length(targetIDs)
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    I = hsi;
-    I.Value = hsiUtility.ReadStoredHSI(targetName, config.GetSetting('normalization'));
-    [m, n, z] = I.Size();
+    I = hsiUtility.LoadHSI(targetName, 'preprocessed');
+    [m, n, z] = size(I.Value);
 
     targetName = num2str(id); 
     labelfile = dataUtility.GetFilename('label', targetName);    
     if exist(labelfile, 'file')
         load(labelfile, 'labelMask');
 
-        fgMask = I.GetFgMask();
-        Xcol = I.GetPixelsFromMask(fgMask);
+        fgMask = I.FgMask;
+        Xcol = I.GetMaskedPixels(fgMask);
         X = [X; Xcol];
-        ycol = GetPixelsFromMaskInternal(labelMask(1:m, 1:n), fgMask);
+        ycol = GetMaskedPixelsInternal(labelMask(1:m, 1:n), fgMask);
         y = [y; ycol];
     end
 end

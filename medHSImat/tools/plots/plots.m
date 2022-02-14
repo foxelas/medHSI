@@ -150,8 +150,8 @@ classdef plots
             %   user needs to input a mask
             %
             %   Usage:
-            %   PlotsNormalizationCheck(Inorm, fig)
-            %   plots.NormalizationCheck(fig, Inorm)
+            %   PlotsNormalizationCheck(Inorm, figName, fig)
+            %   plots.NormalizationCheck(fig, figName, Inorm)
 
             plots.Apply(fig, @PlotAverageSpectrum, varargin{:});
         end

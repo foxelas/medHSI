@@ -16,4 +16,4 @@ criteria = struct('TargetDir', 'subfolders', 'TargetName', 'kmeans-clustering', 
 plots.MontageFolderContents(4, fullfile(config.GetSetting('outputDir'), 'T20211104-Kmeans', '\'), criteria, 'kmeans-clustering (fix)');
 
 criteria = struct('TargetDir', 'subfolders', 'TargetName', 'kmeans-clustering', 'TargetType', 'fix');
-plots.MontageFolderContents(4, fullfile(config.GetSetting('outputDir'), 'T20211207-Kmeans', '\'), criteria, 'kmeans-clustering (fix)');
+plots.MontageFolderContents(4, fullfile(config.GetSetting('outputDir'), 'T20211104-Kmeans', '\'), criteria, 'kmeans-clustering (fix)');

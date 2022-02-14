@@ -1,19 +1,21 @@
-function PlotAverageSpectrum(Inorm, fig)
+function PlotAverageSpectrum(Inorm, figName, fig)
 %%PlotAverageSpectrum plots the values recovered after normalization
 %   user needs to input a mask
 %
 %   Usage:
-%   PlotsNormalizationCheck(Inorm, fig)
-%   plots.NormalizationCheck(fig, Inorm)
+%   PlotsNormalizationCheck(Inorm, figName, fig)
+%   plots.NormalizationCheck(fig, Inorm, figName)
 
 %Need to draw mask
 mask = Inorm.GetCustomMask();
 Inorm_mask = Inorm.GetMaskedPixels(mask);
 x = hsiUtility.GetWavelengths(size(Inorm_mask, 2));
+rgb = Inorm.GetDisplayImage();
 
 close all;
 figure(fig);
 
+subplot(1, 3, 1:2);
 hold on
 for i = 1:size(Inorm_mask, 1)
     plot(x, Inorm_mask(i, :), 'g');
@@ -31,11 +33,14 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
+subplot(1,3,3);
+imshow(rgb);
+title(figName);
+
 fig2 = figure(fig+1);
-rgb = Inorm.GetDisplayImage();
 plots.Overlay(fig2, rgb, mask);
 
-baseFolder = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('normCheck'), config.GetSetting('fileName'));
+baseFolder = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('spectraCheck'), config.GetSetting('fileName'));
 config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
 plots.SavePlot(fig);
 config.SetSetting('plotName', strcat(baseFolder, '_mask.jpg'));
