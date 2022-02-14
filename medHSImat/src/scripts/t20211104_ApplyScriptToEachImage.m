@@ -1,7 +1,7 @@
 config.SetOpt();
 
 %% apply script of each of the data
-settingNum = 1;
+settingNum = 2;
 RunSettings(settingNum);
 
 %% Change to Relevant Script
