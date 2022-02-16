@@ -29,7 +29,7 @@ if iscell(origSize)
             splitIndexes(i) = sizeProd(i-1) + sizeProd(i) + 1 * (i - 1);
         end
     else % case where only masked pixels are fed as input data
-        splitIndexes = cellfun(@(x) size(x, 1), masks);
+        splitIndexes = cellfun(@(x) sum(x, 'all'), masks);
     end
 
     redHsis = cell(numel(sizeProd), 1);
@@ -48,9 +48,9 @@ if iscell(origSize)
 
         % Uses recursion
         if hasMask
-            redHsi = RecoverOriginalDimensionsInternal(redHsi{i}, imgSizes{i}, masks{i});
+            redHsi = RecoverOriginalDimensionsInternal(redHsi, imgSizes{i}, masks{i});
         else
-            redHsi = RecoverOriginalDimensionsInternal(redHsi{i}, imgSizes{i});
+            redHsi = RecoverOriginalDimensionsInternal(redHsi, imgSizes{i});
         end
         redHsis{i} = redHsi;
     end

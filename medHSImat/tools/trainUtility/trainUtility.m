@@ -4,6 +4,7 @@ classdef trainUtility
     %     [accuracy, sensitivity, specificity, st] = RunSVM(scores, labels, testscores, testlabels)
     %     [acc, sens, spec, tdimred, st, model] = DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q)
     %     [cvp] = KfoldPartitions(labels, folds)
+    %     [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask, transformFun)
     
     methods (Static)
          
@@ -16,7 +17,7 @@ classdef trainUtility
             valTest = [accuracy, sensitivity, specificity, tdimred, tclassifier];            
         end
         
-        function [valTrain, valTest] = ValidateTest2(X, y, Xtest, ytest, srgb, fgMask, cvp, method, q)   
+        function [valTrain, valTest] = ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, method, q)   
             [accuracy, sensitivity, specificity, tdimred, tclassifier] = trainUtility.RunKfoldValidation(X, y, cvp, method, q);
             valTrain = [accuracy, sensitivity, specificity, tdimred, tclassifier];
             [accuracy, sensitivity, specificity, tdimred, tclassifier, Mdl, ~, testscores] = trainUtility.DimredAndTrain(X, y, Xtest, ytest, method, q);
@@ -25,10 +26,14 @@ classdef trainUtility
             valTest = [accuracy, sensitivity, specificity, tdimred, tclassifier];
             
             predlabels = predict(Mdl, testscores);
-            predLabel = RecoverReducedHsiInternal(predlabels, size(fgMask), fgMask);
-            imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat('pred_', method,'_', num2str(q), '.png'));
-            config.SetSetting('plotName', imgFilename);
-            plots.Overlay(4, srgb, predLabel, strcat(method, '-', num2str(q)));            
+            origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
+            predLabels = hsi.RecoverSpatialDimensions(predlabels, origSizes, fgMasks);
+            for i = 1:numel(sRGBs)
+                imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), ...
+                    strcat('pred_', num2str(i), '_', method,'_', num2str(q), '.png'));
+                config.SetSetting('plotName', imgFilename);
+                plots.Overlay(4, sRGBs{i}, predLabels{i}, strcat(method, '-', num2str(q))); 
+            end
         end
         
         
@@ -148,6 +153,103 @@ classdef trainUtility
                 folds = 10;
             end
             cvp = cvpartition(length(labels),'kfold',folds);
+        end
+        
+        function [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask, transformFun)
+        %% PrepareSpectralDataset rearranges pixels as a pixel (observation) by feature 2D array
+        % One pixel is one data sample 
+        %
+        %   Usage: 
+        %   folds = 5;
+        %   testingSamples = [5];
+        %   numSamples = 6;
+        %   content = {'tissue', true};
+        %   target = 'fix';
+        %   useCustomMask = true;
+        %   [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = trainUtility.PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask);
+        %
+        %   transformFun = @Dimred;
+        %   [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = trainUtility.PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask,transformFun);
+
+        useTransform = ~(nargin < 7);
+        
+            %% Read h5 data
+            [targetIDs, outRows] = databaseUtility.GetTargetIndexes(content, target);
+
+            X = [];
+            y = [];
+            Xtest = [];
+            ytest = [];
+            sRGBs = cell(length(testingSamples),1);
+            fgMasks = cell(length(testingSamples),1);
+            
+            k = 0;
+            for i = 1:numSamples %only 6 available labels else length(targetIDs)
+
+                id = targetIDs(i);
+
+                %% load HSI from .mat file
+                targetName = num2str(id);
+                I = hsiUtility.LoadHSI(targetName, 'preprocessed');
+                
+                imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
+                if useCustomMask
+                    fgMask = I.GetCustomMask();         
+                    config.SetSetting('plotName', imgFilename);
+                    plots.Overlay(3, I.GetDisplayRescaledImage(), fgMask);
+                    save(strrep(imgFilename, '.png', '.mat'), 'fgMask');
+                else
+                    load(strrep(imgFilename, '.png', '.mat'), 'fgMask');
+                    %fgMask = I.FgMask;
+                end
+                               
+                [m, n, z] = I.Size();
+
+                if useTransform
+                    scores = transformFun(I);
+                    Xcol = GetMaskedPixelsInternal(scores, fgMask); 
+                else
+                    Xcol = I.GetMaskedPixels(fgMask); 
+                end
+                    
+                labelfile = dataUtility.GetFilename('label', targetName);
+                if exist(labelfile, 'file')
+                    load(labelfile, 'labelMask');           
+                    ycol = GetMaskedPixelsInternal(labelMask(1:m, 1:n), fgMask);
+
+                    if isempty(find(testingSamples == i, 1))
+                        X = [X; Xcol];
+                        y = [y; ycol];
+                        
+                    else
+                        %% Prepare Test Set
+                        Xtest = [Xtest; Xcol];
+                        ytest = [ytest; ycol];
+                        %% Recover Test Image
+                        k = k + 1;
+                        sRGBs{k} = I.GetDisplayRescaledImage();
+                        fgMasks{k} = fgMask;
+                    end
+                else
+                    if isempty(find(testingSamples == i, 1))
+                        X = [X; Xcol];                        
+                    else
+                        %% Prepare Test Set
+                        Xtest = [Xtest; Xcol];
+                        
+                        %% Recover Test Image
+                        k = k + 1;
+                        sRGBs{k} = I.GetDisplayRescaledImage();
+                        fgMasks{k} = fgMask;
+                    end
+                end
+            end
+
+            if ~isempty(y)
+                cvp = trainUtility.KfoldPartitions(y, folds); 
+            else 
+                cvp = [];
+            end
         end
     end
 end

@@ -36,6 +36,7 @@ classdef hsi
         %   [col] = ToColumn(obj)
         %   [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
         %   [scores] = SPCA(obj, varargin)
+        %   [scores] = Transform(obj, method, varargin)
         %   [dispImage] = GetDisplayImage(obj, varargin)
         %   [dispImage] = GetDisplayRescaledImage(obj, varargin)
         %
@@ -100,10 +101,11 @@ classdef hsi
             %   polygon selection
             
             I = obj.Value;
-            [m, n, w] = size(I);
-
             if nargin < 2 
-                mask = obj.GetCustomMask() && obj.FgMask;
+                mask = obj.FgMask;
+            else
+                % the mask should be limited by the FgMask of the tissue specimen
+                mask = mask & obj.FgMask; 
             end 
             
             [maskedPixels] = GetMaskedPixelsInternal(I, mask);
@@ -116,6 +118,8 @@ classdef hsi
             %   [fgMask] = GetCustomMask(I);
             
             fgMask = GetCustomMaskInternal(obj.Value);
+            % the mask should be limited by the FgMask of the tissue specimen
+            fgMask = fgMask & obj.FgMask; 
         end
         
         function [fgMask] = GetFgMask(obj, varargin)
@@ -218,6 +222,12 @@ classdef hsi
         function [scores] = SPCA(obj, varargin)
             %%SupePCA based DR
             scores = SuperPCA(obj.Value, varargin{:});
+        end
+        
+        function [scores] = Transform(obj, method, varargin)
+            %Transform applies a transformation like dimension reduction on
+            %an hsi image
+            [~, scores, ~, ~, ~] = DimredInternal(obj.Value, method, varargin{:});
         end
         
         %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

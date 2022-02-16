@@ -13,7 +13,7 @@ x = hsiUtility.GetWavelengths(size(Inorm_mask, 2));
 rgb = Inorm.GetDisplayImage();
 
 close all;
-figure(fig);
+fig = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
 
 subplot(1, 3, 1:2);
 hold on

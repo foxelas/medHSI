@@ -12,7 +12,8 @@ function [mask] = GetCustomMaskInternal(I)
     else
         Irgb = I;
     end
-
+    
+    figure(1);
     mask = roipoly(Irgb);
     title('Draw polygon')
  

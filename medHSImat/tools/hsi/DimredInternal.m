@@ -13,21 +13,29 @@ function [coeff, scores, latent, explained, objective] = DimredInternal(X, metho
 %   [coeff, scores, ~, ~, objective] = Dimred(X, 'rica', 40)
 
 
-hasMask = nargin > 3;
+    hasMask = nargin > 3;
 
-if hasMask
-    Xcol = GetPixelsFromMaskInternal(X, mask);
-else
-    Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
-end
+    keepSpatialDim = strcmpi(method, 'SuperPCA');
+    
+    if keepSpatialDim
+        [coeff, scores, latent, explained, objective] = Dimred(X, method, q);
+        if hasMask
+            scores = GetMaskedPixelsInternal(scores, mask);
+        end
+        
+    else 
+        if hasMask
+            Xcol = GetMaskedPixelsInternal(X, mask);
+        else
+            Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
+        end
+        
+        [coeff, scores, latent, explained, objective] = Dimred(Xcol, method, q);
 
-
-[coeff, scores, latent, explained, objective] = Dimred(Xcol, method, q);
-
-if hasMask
-    scores = hsiUtility.RecoverReducedHsi(scores, size(X), mask);
-else
-    scores = reshape(scores, [size(X, 1), size(X, 2), q]);
-end
-
+        if hasMask
+            scores = hsi.RecoverSpatialDimensions(scores, size(X), mask);
+        else
+            scores = reshape(scores, [size(X, 1), size(X, 2), q]);
+        end
+    end
 end

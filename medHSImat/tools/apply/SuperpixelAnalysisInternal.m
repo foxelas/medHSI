@@ -1,4 +1,4 @@
-function [scores] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
+function [scores, labels, validLabels ] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
 %%SuperpixelAnalysis applies SuperPCA on an image
 %
 %   Usage:
@@ -60,44 +60,45 @@ plots.Superpixels(2, srgb, labels, '', 'color', fgMask);
 config.SetSetting('plotName', fullfile(savedir, 'pc'));
 plots.Components(scores, pcNum, 3);
 
-pause(0.5);
-
-%% Plot eigenvectors
-numComp = 3;
-
-Xcol = hsIm.GetMaskedPixels(fgMask);
-wavelengths = hsiUtility.GetWavelengths(size(Xcol, 2));
-basename = fullfile(savedir, 'eigenvectors');
-config.SetSetting('plotName', basename);
-coeff = Dimred(Xcol, 'pca', numComp);
-plots.Eigenvectors(6, coeff, wavelengths, numComp);
-for i = validLabels
-    superpixelMask = labels == i;
-    Xcol = hsIm.GetMaskedPixels(superpixelMask);
-    coeff = Dimred(Xcol, 'pca', numComp);
-    config.SetSetting('plotName', strcat(basename, num2str(i)));
-    plots.Eigenvectors(6, coeff, wavelengths, numComp);
-    title(strcat('Eigenvectors for Superpixel #', num2str(i)));
-    plots.SavePlot(6);
+if ~ config.GetSetting('saveImages')
     pause(0.5);
-end
 
-%% Plot statistics
-statistic = 'covariance';
-basename = fullfile(savedir, statistic);
-config.SetSetting('plotName', basename);
-plots.BandStatistics(7, Xcol, statistic);
+    %% Plot eigenvectors
+    numComp = 3;
 
-for i = validLabels
-    superpixelMask = labels == i;
-    Xcol = hsIm.GetMaskedPixels(superpixelMask);
-    config.SetSetting('plotName', strcat(basename, num2str(i)));
+    Xcol = hsIm.GetMaskedPixels(fgMask);
+    wavelengths = hsiUtility.GetWavelengths(size(Xcol, 2));
+    basename = fullfile(savedir, 'eigenvectors');
+    config.SetSetting('plotName', basename);
+    coeff = Dimred(Xcol, 'pca', numComp);
+    plots.Eigenvectors(6, coeff, wavelengths, numComp);
+    for i = validLabels
+        superpixelMask = labels == i;
+        Xcol = hsIm.GetMaskedPixels(superpixelMask);
+        coeff = Dimred(Xcol, 'pca', numComp);
+        config.SetSetting('plotName', strcat(basename, num2str(i)));
+        plots.Eigenvectors(6, coeff, wavelengths, numComp);
+        title(strcat('Eigenvectors for Superpixel #', num2str(i)));
+        plots.SavePlot(6);
+        pause(0.5);
+    end
+
+    %% Plot statistics
+    statistic = 'covariance';
+    basename = fullfile(savedir, statistic);
+    config.SetSetting('plotName', basename);
     plots.BandStatistics(7, Xcol, statistic);
-    title(strcat('Covariance for Superpixel #', num2str(i)));
-    plots.SavePlot(7);
-    pause(0.5);   
-end
 
+    for i = validLabels
+        superpixelMask = labels == i;
+        Xcol = hsIm.GetMaskedPixels(superpixelMask);
+        config.SetSetting('plotName', strcat(basename, num2str(i)));
+        plots.BandStatistics(7, Xcol, statistic);
+        title(strcat('Covariance for Superpixel #', num2str(i)));
+        plots.SavePlot(7);
+        pause(0.5);   
+    end
+end
 end
 
 function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
