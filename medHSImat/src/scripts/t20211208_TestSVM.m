@@ -23,8 +23,8 @@ for i = 1:length(targetIDs)
     I = hsiUtility.LoadHSI(targetName, 'preprocessed');
     [m, n, z] = size(I.Value);
 
-    targetName = num2str(id); 
-    labelfile = dataUtility.GetFilename('label', targetName);    
+    targetName = num2str(id);
+    labelfile = dataUtility.GetFilename('label', targetName);
     if exist(labelfile, 'file')
         load(labelfile, 'labelMask');
 

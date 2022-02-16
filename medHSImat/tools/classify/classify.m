@@ -5,6 +5,6 @@ classdef classify
         %
         %   Static:
 
-        
+
     end
 end

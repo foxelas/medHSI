@@ -10,20 +10,20 @@ if isnumeric(targetName)
 end
 
 if contains(refType, 'white')
-    targetFilename = dataUtility.GetFilename('white', targetName);        
+    targetFilename = dataUtility.GetFilename('white', targetName);
     if contains(refType, 'byPixel') || strcmpi(refType, 'white')
-            load(targetFilename, 'fullReflectanceByPixel');
-            spectralData = fullReflectanceByPixel;
+        load(targetFilename, 'fullReflectanceByPixel');
+        spectralData = fullReflectanceByPixel;
 
     elseif contains(refType, 'uniSpectrum')
-            load(targetFilename, 'uniSpectrum');
-            spectralData = uniSpectrum;
+        load(targetFilename, 'uniSpectrum');
+        spectralData = uniSpectrum;
 
     elseif contains(refType, 'bandmax')
-            load(targetFilename, 'bandmaxSpectrum');
-            spectralData = bandmaxSpectrum;
+        load(targetFilename, 'bandmaxSpectrum');
+        spectralData = bandmaxSpectrum;
 
-    else 
+    else
         error('Not supported.');
     end
 
@@ -31,7 +31,7 @@ elseif contains(refType, 'black')
     targetFilename = dataUtility.GetFilename('black', targetName);
     load(targetFilename, 'blackReflectance')
     spectralData = blackReflectance;
-else 
+else
     error('Not supported.');
 end
 

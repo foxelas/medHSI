@@ -19,7 +19,7 @@ if ~strcmp(option, 'raw')
     whiteReflectance = hsiUtility.LoadHSIReference(targetName, strcat('white_', option));
     blackReflectance = hsiUtility.LoadHSIReference(targetName, 'black');
     hsIm = hsIm.Normalize(whiteReflectance, blackReflectance);
-end 
+end
 
 %% Dependent on selected pre-processing
 if ~strcmp(option, 'raw')

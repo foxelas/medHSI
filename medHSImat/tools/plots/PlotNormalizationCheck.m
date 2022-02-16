@@ -27,13 +27,13 @@ plot(x, min(reshape(Iblack_mask, [size(Iblack_mask, 1), size(Iblack_mask, 2)])),
 plot(x, min(reshape(Iin_mask, [size(Iin_mask, 1), size(Iin_mask, 2)])), 'DisplayName', 'Min Tissue', 'LineWidth', 2);
 
 minVal = min(Iwhite_mask(:)-Iblack_mask(:));
-fids = find( (Iwhite_mask(:)-Iblack_mask(:)) == minVal);
-[row,col] = ind2sub(size(Iwhite_mask),fids(1));
+fids = find((Iwhite_mask(:) - Iblack_mask(:)) == minVal);
+[row, col] = ind2sub(size(Iwhite_mask), fids(1));
 ws = hsiUtility.GetWavelengths(401, 'raw');
 
 hold off; legend;
-fprintf( 'Min(I_w - I_b) is %.5f at row (pixel) %d and column %d (wavelength %d). \n', minVal, row, col, ws(col));
-fprintf( 'If minVal is negative and wavelenth is at the extreme, then it is discarded later as noise. \n');
+fprintf('Min(I_w - I_b) is %.5f at row (pixel) %d and column %d (wavelength %d). \n', minVal, row, col, ws(col));
+fprintf('If minVal is negative and wavelenth is at the extreme, then it is discarded later as noise. \n');
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Reflectance (a.u.)', 'FontSize', 15);
 

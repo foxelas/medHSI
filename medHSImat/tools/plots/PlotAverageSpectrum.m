@@ -33,7 +33,7 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-subplot(1,3,3);
+subplot(1, 3, 3);
 imshow(rgb);
 title(figName);
 

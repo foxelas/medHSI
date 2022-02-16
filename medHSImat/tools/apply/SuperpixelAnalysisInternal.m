@@ -1,4 +1,4 @@
-function [scores, labels, validLabels ] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
+function [scores, labels, validLabels] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
 %%SuperpixelAnalysis applies SuperPCA on an image
 %
 %   Usage:
@@ -36,7 +36,7 @@ if isManual
     % Use the 1st PCA component for superpixel calculation
     redImage = rescale(squeeze(scores(:, :, 1)));
     [labels, ~] = superpixels(redImage, pixelNum);
-    
+
     % Keep only pixels that belong to the tissue (Superpixel might assign
     % background pixels also). The last label is background label.
     [labels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
@@ -44,7 +44,7 @@ if isManual
 else
     %%super-pixels segmentation
     labels = hsIm.Cubseg(pixelNum);
-    
+
     % Keep only pixels that belong to the tissue (Superpixel might assign
     % background pixels also). The last label is background label.
     [labels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
@@ -60,7 +60,7 @@ plots.Superpixels(2, srgb, labels, '', 'color', fgMask);
 config.SetSetting('plotName', fullfile(savedir, 'pc'));
 plots.Components(scores, pcNum, 3);
 
-if ~ config.GetSetting('saveImages')
+if ~config.GetSetting('saveImages')
     pause(0.5);
 
     %% Plot eigenvectors
@@ -96,7 +96,7 @@ if ~ config.GetSetting('saveImages')
         plots.BandStatistics(7, Xcol, statistic);
         title(strcat('Covariance for Superpixel #', num2str(i)));
         plots.SavePlot(7);
-        pause(0.5);   
+        pause(0.5);
     end
 end
 end
@@ -105,7 +105,7 @@ function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
 % Keep only pixels that belong to the tissue (Superpixel might assign
 % background pixels also). The last label is background label.
 labels(~fgMask) = pixelNum;
-        
+
 pixelLim = 10;
 labelTags = unique(labels)';
 labelTags = labelTags(labelTags ~= pixelNum); % Remove last label (background pixels)

@@ -6,7 +6,7 @@ function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %   returns spectralData, XYZ image and capture wavelengths
 
 filename = strrep(filename, '.hsm', '.h5');
-saveFilename = dataUtility.GetFilename('h5', filename);   
+saveFilename = dataUtility.GetFilename('h5', filename);
 
 if ~exist(saveFilename, 'file')
     currentFile = AdjustFilename(filename);

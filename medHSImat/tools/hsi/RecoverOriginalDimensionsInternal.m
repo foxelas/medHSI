@@ -1,5 +1,5 @@
 function [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
-% RecoverOriginalDimensionsInternal returns an image that matches the 
+% RecoverOriginalDimensionsInternal returns an image that matches the
 % spatial dimensions of the original hsi
 %
 %   Input arguments:
@@ -18,7 +18,7 @@ if iscell(origSize)
     imgSizes = origSize;
     scores = redIm;
     masks = mask;
-    
+
     sizeProd = cellfun(@(x) x(1)*x(2), imgSizes);
     hasMask = size(scores, 1) ~= sum(sizeProd);
 
@@ -55,7 +55,7 @@ if iscell(origSize)
         redHsis{i} = redHsi;
     end
     recHsi = redHsis;
-    
+
 else
     m = origSize(1);
     n = origSize(2);
@@ -73,4 +73,4 @@ else
 
     recHsi = reshape(outHsiFlat, [m, n, q]);
 end
-end 
+end

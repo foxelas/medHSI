@@ -27,7 +27,7 @@ switch option
 
     case 'raw'
         method = 'raw';
-        
+
     otherwise
         error('Unsupported setting for normalization.');
 end
@@ -40,7 +40,7 @@ switch method
 
     case 'raw'
         Inorm = Iin;
-        
+
     otherwise
         error('Unsupported normalization method.');
 end

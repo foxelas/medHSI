@@ -8,7 +8,6 @@ if nargin < 4
     blackIsCapOn = false;
 end
 
-
 %% Target image
 fcTarget = databaseUtility.GetFileConditions(content, target);
 [filename, tableId] = databaseUtility.GetFilename(fcTarget{:});
@@ -18,7 +17,7 @@ targetName = num2str(tableId);
 if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
         || ~exist(dataUtility.GetFilename('black', targetName), 'file') ...
         || ~exist(dataUtility.GetFilename('white', targetName), 'file')
-    
+
     snapshotFolder = config.GetSetting('snapshots');
     plotBaseDir = fullfile(config.GetSetting('saveDir'), snapshotFolder, config.GetSetting('experiment'));
     figure(1);

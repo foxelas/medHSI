@@ -1,5 +1,7 @@
+
 %% Downloads and sets dependencies
-%% Run from nside setup folder 
+
+%% Run from nside setup folder
 
 dependenciesDir = fullfile('..', 'toolbox');
 if ~exist(dependenciesDir, 'dir')
@@ -11,14 +13,14 @@ addpath('downloads');
 
 disp('Setup started.')
 
-%% Download dependencies 
-fd = fopen('dependencies_matlab.md','r');
+%% Download dependencies
+fd = fopen('dependencies_matlab.md', 'r');
 formatSpec = ['- %s %s %s'];
-contents = textscan(fd, formatSpec,Inf, 'Delimiter',{'[details](','), [download](',')'});
-fclose(fd); 
+contents = textscan(fd, formatSpec, Inf, 'Delimiter', {'[details](', '), [download](', ')'});
+fclose(fd);
 
 if ~isempty(contents)
-    n = length(contents{1,1});
+    n = length(contents{1, 1});
 end
 
 disp('Download started...')
@@ -30,25 +32,24 @@ for i = 1:n
     websave(filepath, url);
     filenames = unzip(filepath, fullfile(dependenciesDir, name));
     for j = 1:numel(filenames)
-        folder = fileparts(filenames{j}); 
+        folder = fileparts(filenames{j});
         addpath(genpath(folder));
     end
-end 
+end
 disp('Download finished.')
 
-[status,msg,msgID] = rmdir('downloads', 's');
-
+[status, msg, msgID] = rmdir('downloads', 's');
 
 %% Add all new directories to the path
 cd('../')
 dirList = dir(pwd);
 
 for i = 1:numel(dirList)
-    if contains(dirList(i).name, 'tools') || contains(dirList(i).name, 'toolbox')  ...
-            || contains(dirList(i).name, 'src') 
+    if contains(dirList(i).name, 'tools') || contains(dirList(i).name, 'toolbox') ...
+            || contains(dirList(i).name, 'src')
         subdirList = dir(fullfile(dirList(i).folder, dirList(i).name));
         for j = 1:numel(subdirList)
-            if ~contains(dirList(i).name, '.') 
+            if ~contains(dirList(i).name, '.')
                 addpath(genpath(fullfile(subdirList(j).folder, subdirList(j).name)))
                 fullfile(subdirList(j).folder, subdirList(j).name)
             end

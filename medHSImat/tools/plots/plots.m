@@ -114,12 +114,12 @@ classdef plots
 
             plots.Apply(fig, @PlotSpectraAverage, varargin{:});
         end
-        
+
         function [] = ReferenceLibrary(fig, refLib)
             spectra = cell2mat({refLib.Data}');
             [m, n] = size(spectra);
             wavelengths = hsiUtility.GetWavelengths(n);
-            names = cellfun(@(x) x{1}, {refLib.Disease}','un', 0) ;
+            names = cellfun(@(x) x{1}, {refLib.Disease}', 'un', 0);
             for i = 1:m
                 if refLib(i).Label == 0
                     names{i} = strcat(names{i}, ' Benign');
@@ -130,7 +130,7 @@ classdef plots
                 end
             end
             figTitle = 'Reference Spectra';
-            config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png') );
+            config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png'));
             plots.Apply(fig, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
         end
 
@@ -144,7 +144,7 @@ classdef plots
 
             plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
         end
-        
+
         function [] = AverageSpectrum(fig, varargin)
             %%PlotAverageSpectrum plots the values recovered after normalization
             %   user needs to input a mask

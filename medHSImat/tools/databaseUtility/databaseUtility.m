@@ -238,33 +238,35 @@ classdef databaseUtility
                     config.GetSetting('integrationTime'), target, []};
             end
         end
-        
+
         function [dataTable] = GetDiseaseTable()
-        %% GetDiseaseTable returns the db structure as a table
-        %
-        %   Usage:
-        %   dataTable = GetDiseaseTable()
-        dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
-            config.GetSetting('diseaseInfoTableName'))), 'Sheet', 'Sheet1');
+
+            %% GetDiseaseTable returns the db structure as a table
+            %
+            %   Usage:
+            %   dataTable = GetDiseaseTable()
+            dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
+                config.GetSetting('diseaseInfoTableName'))), 'Sheet', 'Sheet1');
         end
-        
+
         function [filenames, targetIDs, outRows, disease, stage] = GetDiseaseQuery(condition)
-        %% GetDiseaseQuery returns the same info as Query with additional 
-        %   information about disease and stage evaluation
-        %
-        %   Usage:
-        %   [filenames, targetIDs, outRows, disease, stage] =
-        %   GetDiseaseQuery({'tissue', true});
-        
+
+            %% GetDiseaseQuery returns the same info as Query with additional
+            %   information about disease and stage evaluation
+            %
+            %   Usage:
+            %   [filenames, targetIDs, outRows, disease, stage] =
+            %   GetDiseaseQuery({'tissue', true});
+
             [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
             dataTable = databaseUtility.GetDiseaseTable();
-            disease = cell(length(filenames),1);
-            stage = cell(length(filenames),1);
+            disease = cell(length(filenames), 1);
+            stage = cell(length(filenames), 1);
             for i = 1:length(filenames)
-                idx = find( strcmp(dataTable.SampleID, outRows{i, 'SampleID'}));
-                if ~isempty(idx) 
+                idx = find(strcmp(dataTable.SampleID, outRows{i, 'SampleID'}));
+                if ~isempty(idx)
                     disease{i} = dataTable{idx, 'Diagnosis'};
-                    stage{i} =  dataTable{idx, 'Type'};
+                    stage{i} = dataTable{idx, 'Type'};
                 else
                     disease{i} = nan;
                     stage{i} = nan;

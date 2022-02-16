@@ -26,7 +26,7 @@ lineColorMap = plots.GetLineColorMap('custom', names);
 key = keys(lineColorMap);
 
 if isempty(markers)
-    markers = cellfun(@(x) "-", names); 
+    markers = cellfun(@(x) "-", names);
 end
 
 hold on
@@ -47,9 +47,9 @@ datamax = max(spectra(:));
 if datamax < 0.1
     ylim([0, 5 * 10^(-3)]);
 else
-    ylim([0,1]);
+    ylim([0, 1]);
 end
-    
+
 
 %%To disable showing exponent power on the corner
 ax = gca;

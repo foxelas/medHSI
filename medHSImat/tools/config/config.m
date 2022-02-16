@@ -103,7 +103,7 @@ classdef config
                 value = m.(parameter);
             else
                 w = warning();
-                if ~strcmp(w.state, 'off')  
+                if ~strcmp(w.state, 'off')
                     fprintf('Parameter %s does not exist in the configuration file.\n', parameter);
                 end
             end
@@ -126,8 +126,8 @@ classdef config
                 m.(parameter) = value;
             end
             w = warning();
-            if (length(w) == 1  && (sum(strcmp({w.identifier}, 'all')) == 1))  ... 
-                ||  (sum(strcmp({w.identifier}, 'all')) > 0 && strcmp(w(strcmp({w.identifier}, 'all')).state, 'off')) 
+            if (length(w) == 1 && (sum(strcmp({w.identifier}, 'all')) == 1)) ...
+                    || (sum(strcmp({w.identifier}, 'all')) > 0 && strcmp(w(strcmp({w.identifier}, 'all')).state, 'off'))
                 config.NotifySetting(parameter, value);
             end
         end

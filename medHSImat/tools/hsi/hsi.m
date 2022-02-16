@@ -1,20 +1,20 @@
 classdef hsi
     properties
         Value{mustBeNumeric}
-        FgMask = [] 
+        FgMask = []
     end
-    
+
     methods
 
         %% Contents
         %
         %   Non-Static:
-        %   %% Set 
+        %   %% Set
         %   [obj] = hsi(hsImVal, calcMask)
         %   [obj] = set.FgMask(obj,inMask)
         %   [obj] = Update(obj, ind, vals)
         %
-        %   %% Common Properties 
+        %   %% Common Properties
         %   [varargout] = Size(obj)
         %
         %   %% Masking
@@ -29,7 +29,7 @@ classdef hsi
         %   [obj] = Normalize(obj, varargin)
         %   [obj] = Preprocessing(obj)
         %
-        %   %% Segmentation 
+        %   %% Segmentation
         %   [labels] = Cubseg(obj, varargin)
         %
         %   %% Dimension Reduction
@@ -43,47 +43,47 @@ classdef hsi
         %   %% Metrics
         %   [c] = GetBandCorrelation(obj, hasPixelSelection)
         %
-        %   %% Operators 
+        %   %% Operators
         %   [obj] = Plus(obj, hsiIm)
         %   [obj] = Minus(obj, hsiIm)
         %   [obj] = Max(obj, value)
         %   [ind] = IsNan(obj)
         %   [ind] = IsInf(obj)
         %   [obj] = Index(obj, obj2)
-        %         
+        %
         %   Static
         %   %% Dimension Reduction
         %   [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
-        %   
-        %   %% Is 
+        %
+        %   %% Is
         %   [flag] = IsHsi(obj)
-        
+
         %% Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [obj] = hsi(hsImVal, calcMask)
             if nargin < 2
                 calcMask = true;
             end
-            
+
             obj.Value = hsImVal;
             if calcMask
                 [~, fgMask] = RemoveBackgroundInternal(hsImVal);
-                obj.FgMask = fgMask; 
+                obj.FgMask = fgMask;
             end
         end
-      
-        function [obj] = set.FgMask(obj,inMask)
+
+        function [obj] = set.FgMask(obj, inMask)
             if nargin < 2
                 inMask = obj.GetFgMask();
             end
             obj.FgMask = inMask;
         end
-        
+
         function [obj] = Update(obj, ind, vals)
             hsIm = obj.Value;
             hsIm(ind) = vals;
             obj.Value = hsIm;
         end
-        
+
         %% Common Properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [varargout] = Size(obj)
             v{:} = size(obj.Value);
@@ -93,35 +93,35 @@ classdef hsi
                 varargout{i} = vals(i);
             end
         end
-        
+
         %% Masking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [maskedPixels] = GetMaskedPixels(obj, mask)
             %%GetMaskedPixels returns flattened pixels according to a 2D mask
-            %   If the mask is missing, one is selected based on a manual 
+            %   If the mask is missing, one is selected based on a manual
             %   polygon selection
-            
+
             I = obj.Value;
-            if nargin < 2 
+            if nargin < 2
                 mask = obj.FgMask;
             else
                 % the mask should be limited by the FgMask of the tissue specimen
-                mask = mask & obj.FgMask; 
-            end 
-            
+                mask = mask & obj.FgMask;
+            end
+
             [maskedPixels] = GetMaskedPixelsInternal(I, mask);
         end
-       
+
         function [fgMask] = GetCustomMask(obj)
-            %   GetCustomMask returns a manually drawn polygon mask 
+            %   GetCustomMask returns a manually drawn polygon mask
             %
             %   Usage:
             %   [fgMask] = GetCustomMask(I);
-            
+
             fgMask = GetCustomMaskInternal(obj.Value);
             % the mask should be limited by the FgMask of the tissue specimen
-            fgMask = fgMask & obj.FgMask; 
+            fgMask = fgMask & obj.FgMask;
         end
-        
+
         function [fgMask] = GetFgMask(obj, varargin)
             %     REMOVEBACKGROUND removes the background from the specimen image
             %
@@ -132,8 +132,8 @@ classdef hsi
             %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
 
             [~, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
-        end        
-        
+        end
+
         function [updatedHSI, fgMask] = RemoveBackground(obj, varargin)
             %     REMOVEBACKGROUND removes the background from the specimen image
             %
@@ -144,8 +144,8 @@ classdef hsi
             %     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
 
             [updatedHSI, fgMask] = RemoveBackgroundInternal(obj.Value, varargin{:});
-        end   
-        
+        end
+
         function [spectrumCurves] = GetSpectraFromMask(obj, varargin)
             %%GetSpectraFromMask returns the average spectrum of a specific ROI mask
             %
@@ -162,7 +162,7 @@ classdef hsi
 
             [newI, idxs] = GetQualityPixelsInternal(obj.Value, varargin{:});
         end
-        
+
         %% Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [obj] = Normalize(obj, varargin)
             %%Normalize a given array I with max and min arrays, white and black
@@ -173,7 +173,7 @@ classdef hsi
 
             obj = NormalizeInternal(obj, varargin{:});
         end
-        
+
         function [obj] = Preprocessing(obj)
             % Preprocessing prepares normalized data according to our specifications
             %
@@ -187,22 +187,22 @@ classdef hsi
             obj.Value = hsIm;
             [updI, fgMask] = obj.RemoveBackground();
             obj.Value = updI;
-            obj.FgMask = fgMask; 
+            obj.FgMask = fgMask;
         end
-        
+
         %% Segmentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [labels] = Cubseg(obj, varargin)
             %%super-pixels segmentation
             labels = cubseg(obj.Value, varargin{:});
         end
-        
+
         %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         function [col] = ToColumn(obj)
             image = obj.Value;
             col = reshape(image, [size(image, 1) * size(image, 2), size(image, 3)]);
         end
-        
+
         function [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
             %Dimred reduces the dimensions of an image dataset
             %
@@ -223,18 +223,18 @@ classdef hsi
             %%SupePCA based DR
             scores = SuperPCA(obj.Value, varargin{:});
         end
-        
+
         function [scores] = Transform(obj, method, varargin)
             %Transform applies a transformation like dimension reduction on
             %an hsi image
             [~, scores, ~, ~, ~] = DimredInternal(obj.Value, method, varargin{:});
         end
-        
+
         %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [dispImage] = GetDisplayImage(obj, varargin)
             dispImage = GetDisplayImageInternal(obj.Value, varargin{:});
         end
-       
+
         function [dispImage] = GetDisplayRescaledImage(obj, varargin)
             dispImage = GetDisplayImageInternal(rescale(obj.Value), varargin{:});
         end
@@ -280,7 +280,7 @@ classdef hsi
         function [obj] = Max(obj, value)
             obj.Value = max(obj.Value, value);
         end
-        
+
         function [ind] = IsNan(obj)
             ind = isnan(obj.Value);
         end
@@ -297,32 +297,33 @@ classdef hsi
     end
 
     methods (Static)
+
         %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         function [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
-        % RecoverOriginalDimensionsInternal returns an image that matches the 
-        % spatial dimensions of the original hsi
-        %
-        %   Input arguments:
-        %   redIm: reduced dimension data (array or cell of arrays)
-        %   origSize: cell array with original sizes of input data (array or cell of arrays)
-        %   mask: cell array of masks per data sample (array or cell of arrays)
-        %
-        %   Returns:
-        %   Data with original spatial dimensions and reduced spectral dimensions
-        %
-        %   Usage:
-        %   [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
-        %   [redHsis] = RecoverOriginalDimensionsInternal(scores, imgSizes, masks)
-            [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask);           
+            % RecoverOriginalDimensionsInternal returns an image that matches the
+            % spatial dimensions of the original hsi
+            %
+            %   Input arguments:
+            %   redIm: reduced dimension data (array or cell of arrays)
+            %   origSize: cell array with original sizes of input data (array or cell of arrays)
+            %   mask: cell array of masks per data sample (array or cell of arrays)
+            %
+            %   Returns:
+            %   Data with original spatial dimensions and reduced spectral dimensions
+            %
+            %   Usage:
+            %   [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
+            %   [redHsis] = RecoverOriginalDimensionsInternal(scores, imgSizes, masks)
+            [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask);
         end
 
         %% Is %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [flag] = IsHsi(obj)
-        %   IsHsi checks if instance object belongs to hsi class
-        
+            %   IsHsi checks if instance object belongs to hsi class
+
             flag = isequal(class(obj), 'hsi');
         end
-        
+
     end
 end

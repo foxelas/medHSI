@@ -14,12 +14,12 @@ maskdir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labe
 applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsApplied'));
 
 for i = 1:numel(dirList)
-    
+
     parts = strsplit(dirList(i).name, '_');
     sampleId = parts{1};
     id = targetIDs(strcmp([outRows.SampleID], sampleId));
-    targetName = num2str(id); 
-    
+    targetName = num2str(id);
+
     hsIm = hsiUtility.LoadHSI(targetName, 'preprocessed');
 
     imBase = hsIm.GetDisplayImage();

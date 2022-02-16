@@ -58,6 +58,6 @@ config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.Ge
 plots.SavePlot(fig);
 
 filename = dataUtility.GetFilename('param', 'extinctionCoefficients');
-save( filename, 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
+save(filename, 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
 
 end

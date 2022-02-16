@@ -17,16 +17,16 @@ function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, 
 latent = [];
 explained = [];
 objective = [];
-Mdl = []; 
+Mdl = [];
 coeff = [];
 
 if nargin < 3
     q = 10;
 end
 
-if nargin < 4 
+if nargin < 4
     labels = [];
-end 
+end
 
 %% PCA
 if strcmpi(method, 'pca')
@@ -44,19 +44,19 @@ end
 
 %% Discriminant Analysis (LDA / QDA)
 if isempty(labels) && strcmpi(method, 'lda') && strcmpi(method, 'qda')
-  error('A supervised method requires labels as argument');
+    error('A supervised method requires labels as argument');
 else
     if strcmp(method, 'lda')
-        Mdl = fitcdiscr(X,labels);
+        Mdl = fitcdiscr(X, labels);
         scores = predict(Mdl, X);
     end
-    
+
     if strcmp(method, 'qda')
-        Mdl = fitcdiscr(X,labels,'DiscrimType','quadratic');
+        Mdl = fitcdiscr(X, labels, 'DiscrimType', 'quadratic');
         scores = predict(Mdl, X);
     end
-end 
- 
+end
+
 %% SuperPCA
 if strcmpi(method, 'superpca')
     pixelNum = 5;

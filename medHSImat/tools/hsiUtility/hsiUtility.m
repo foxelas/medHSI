@@ -3,22 +3,22 @@ classdef hsiUtility
         % Contents
         %
         %     Static:
-        %         %% System properties 
+        %         %% System properties
         %         [x] = GetWavelengths(m, option)
-        % 
+        %
         %         %% Input/Output
         %         [labelMask] = ReadLabel(targetName)
         %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
         %         [hsIm] = ReadHSI(content, target, experiment, blackIsCapOn)
         %         [hsIm] = LoadHSI(targetName, dataType)
-        %         [hsIm] = Preprocess(targetName, option, saveFile) 
+        %         [hsIm] = Preprocess(targetName, option, saveFile)
         %
         %         %% Dataset
         %         [] = ExportH5Dataset(condition)
         %         [] = InitializeDataGroup(experiment, condition)
         %         [] = AugmentDataGroup(experiment, condition, augType)
-        % 
-        %         %% References 
+        %
+        %         %% References
         %         [spectralData] = LoadHSIReference(targetName, refType)
         %         [refLib] = PrepareReferenceLibrary(targetIDs, disease)
         %         [refLib] = GetReferenceLibrary()
@@ -85,29 +85,29 @@ classdef hsiUtility
             end
 
         end
-        
-%% Input/Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        %% Input/Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         function [labelMask] = ReadLabel(targetName)
             %ReadLabelImage returns the label image for each HSI
             %
             %   [labelMask] = ReadLabelImage(targetName);
-            
+
             if isnumeric(targetName)
                 targetName = num2str(targetName);
             end
 
             baseDir = fullfile(config.GetSetting('matDir'), ...
-                    strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
+                strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
             targetFilename = strcat(baseDir, '_label.mat');
-             
+
             if exist(targetFilename, 'file')
                 load(targetFilename, 'labelMask');
             else
                 labelMask = [];
             end
-        end 
- 
+        end
+
         function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
             %LOADH5DATA loads info from h5 file
             %
@@ -130,7 +130,7 @@ classdef hsiUtility
             % LoadHSI reads a stored HSI from a _target mat file
             %
             %   Input
-            %   targetName: a string with the target id 
+            %   targetName: a string with the target id
             %   dataType: 'raw' or 'preprocessed'
             %
             %   Usage:
@@ -138,7 +138,7 @@ classdef hsiUtility
             %   [spectralData] = LoadHSI(targetName)
             [hsIm] = LoadHSIInternal(varargin{:});
         end
-        
+
         function [hsIm] = Preprocess(varargin)
             %LoadAndPreprocess returns spectral data from HSI image
             %
@@ -150,9 +150,10 @@ classdef hsiUtility
             %   spectralData = LoadAndPreprocess('sample2', 'byPixel', true)
             hsIm = LoadAndPreprocess(varargin{:});
         end
-        
-%% Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        %% Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [] = ExportH5Dataset(condition)
+
             %% EXPORTH5DATASET aggregates .mat files per sample to a large h5 dataset
             %
             %   Usage:
@@ -183,11 +184,11 @@ classdef hsiUtility
                     curName = strcat('/hsi/sample', targetName);
                     h5create(fileName, curName, size(dataValue));
                     h5write(fileName, curName, dataValue);
-                    
+
                     curName = strcat('/mask/sample', targetName);
                     h5create(fileName, curName, size(dataMask));
                     h5write(fileName, curName, dataMask);
-                    
+
                 else
                     dataValue = spectralData;
                     curName = strcat('/hsi/sample', targetName);
@@ -230,7 +231,7 @@ classdef hsiUtility
 
             for i = 1:length(targetIDs)
                 close all;
-                
+
                 id = targetIDs(i);
                 fprintf('Running for data %d. \n', id);
                 target = dataUtility.GetValueFromTable(outRows, 'Target', i);
@@ -243,7 +244,7 @@ classdef hsiUtility
 
                 saveName = dataUtility.StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
                 saveName = strcat(saveName, '.jpg');
-                
+
                 %% write HSI in .mat file
                 hsiUtility.ReadHSI(content, target, experiment);
 
@@ -254,14 +255,14 @@ classdef hsiUtility
                 hsIm = hsi(hsiUtility.LoadHSI(targetName, 'raw'));
                 dispImageRaw = hsIm.GetDisplayRescaledImage('rgb');
 
-                %% Preprocess HSI and save 
+                %% Preprocess HSI and save
                 hsIm = hsiUtility.Preprocess(targetName, config.GetSetting('normalization'), saveMatFile);
 
                 %% prepare preview from normalized HSI
                 dispImageRgb = hsIm.GetDisplayRescaledImage('rgb');
-                
+
                 close all;
-                
+
                 figure(1);
                 imshow(dispImageRaw);
                 config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
@@ -270,7 +271,7 @@ classdef hsiUtility
                 imshow(dispImageRgb);
                 config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
                 plots.SavePlot(2);
-                
+
                 pause(0.1);
             end
 
@@ -288,6 +289,7 @@ classdef hsiUtility
 
             close all;
         end
+
         %% PENDING
         function [] = AugmentDataGroup(experiment, condition, augType)
             % AugmentDataGroup reads a group of hsi data, prepares .mat files,
@@ -297,10 +299,10 @@ classdef hsiUtility
             %   AugmentDataGroup('handsOnly',{'hand', false})
             %   AugmentDataGroup('sample001-tissue', {'tissue', true}, 'set2');
 
-            if nargin < 3 
+            if nargin < 3
                 augType = 'set0';
-            end 
-            
+            end
+
             %% Setup
             disp('Initializing [AugmentDataGroup]...');
 
@@ -321,7 +323,7 @@ classdef hsiUtility
             seed = 42;
             rng(seed);
             for i = 1:length(targetIDs)
-               
+
                 id = targetIDs(i);
                 config.SetSetting('integrationTime', integrationTimes(i));
                 config.SetSetting('dataDate', num2str(dates(i)));
@@ -332,95 +334,95 @@ classdef hsiUtility
                 %% load HSI from .mat file to verify it is working and to prepare preview images
                 targetName = num2str(id);
                 labelImg = hsiUtility.ReadLabel(targetName);
-                
+
                 baseDir = fullfile(config.GetSetting('matDir'), ...
                     strcat(config.GetSetting('database'), config.GetSetting('augmentationName'), '_', num2str(augType)), targetName);
-                
+
                 if ~isempty(labelImg) %% REMOVELATER
                     spectralData = hsi;
                     spectralData.Value = hsiUtility.LoadHSI(targetName, 'preprocessed');
                     dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 
-                    switch augType 
+                    switch augType
                         case 'set0' % No augmentation
-                            data = spectralData.Value; 
-                            label = labelImg; 
+                            data = spectralData.Value;
+                            label = labelImg;
                             save(strcat(baseDir, '_target.mat'), 'data', 'label');
-                            
-                        case 'set1' % Vertical and horizontal flip 
+
+                        case 'set1' % Vertical and horizontal flip
                             folds = 0;
-                            data = spectralData.Value; 
-                            label = labelImg; 
+                            data = spectralData.Value;
+                            label = labelImg;
                             save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
-                            
+
                             folds = folds + 1;
-                            data = flip(spectralData.Value, 1); 
-                            label = flip(labelImg, 1); 
+                            data = flip(spectralData.Value, 1);
+                            label = flip(labelImg, 1);
                             save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
-                            
+
                             folds = folds + 1;
-                            data = flip(spectralData.Value, 2); 
-                            label = flip(labelImg, 2); 
-                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');                            
-                            
+                            data = flip(spectralData.Value, 2);
+                            label = flip(labelImg, 2);
+                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
+
                             folds = folds + 1;
-                            data = flip(spectralData.Value, 2); 
-                            data = flip(data, 1); 
-                            label = flip(labelImg, 2); 
-                            label = flip(label, 1); 
-                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');      
-                         
-                        case 'set2' % 360 degree random rotation 
+                            data = flip(spectralData.Value, 2);
+                            data = flip(data, 1);
+                            label = flip(labelImg, 2);
+                            label = flip(label, 1);
+                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
+
+                        case 'set2' % 360 degree random rotation
                             for j = 0:1
                                 for k = 0:1
-                                    % use rnd generator 
-                                    img0 = spectralData.Value; 
+                                    % use rnd generator
+                                    img0 = spectralData.Value;
                                     img0 = imrotate3(img0, 180, [j, k, 0]);
 
-                                    %% rotate labels 
+                                    %% rotate labels
                                     labelImg = imrotate(img, 180);
 
-                                end 
+                                end
                             end
                         case 'set3' % Brightness x[0.9,1.1]
-                            
+
                     end
                 end
-                      
-                
-%                 figure(2);
-%                 imshow(dispImageRgb);
-%                 config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
-%                 plots.SavePlot(2);
+
+
+                %                 figure(2);
+                %                 imshow(dispImageRgb);
+                %                 config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
+                %                 plots.SavePlot(2);
             end
 
-%             %% preview of the entire dataset
-% 
-%             path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized');
-%             plots.MontageFolderContents(1, path1, '*.jpg', 'Normalized');
-%             plots.MontageFolderContents(3, path1, '*raw.jpg', 'Normalized raw');
-%             plots.MontageFolderContents(4, path1, '*fix.jpg', 'Normalized fix');
-%             close all;
+            %             %% preview of the entire dataset
+            %
+            %             path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized');
+            %             plots.MontageFolderContents(1, path1, '*.jpg', 'Normalized');
+            %             plots.MontageFolderContents(3, path1, '*raw.jpg', 'Normalized raw');
+            %             plots.MontageFolderContents(4, path1, '*fix.jpg', 'Normalized fix');
+            %             close all;
         end
-        
-%% References %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
+
+        %% References %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [spectralData] = LoadHSIReference(targetName, refType)
-        % LoadHSIReferenceInternal reads a stored HSI reference according to refType
-        %
-        %   Usage:
-        %   [spectralData] = LoadHSIReferenceInternal(targetName, 'white')
-        %   [spectralData] = LoadHSIReferenceInternal(targetName, 'black')
+            % LoadHSIReferenceInternal reads a stored HSI reference according to refType
+            %
+            %   Usage:
+            %   [spectralData] = LoadHSIReferenceInternal(targetName, 'white')
+            %   [spectralData] = LoadHSIReferenceInternal(targetName, 'black')
             [spectralData] = LoadHSIReferenceInternal(targetName, refType);
         end
-        
+
         function [refLib] = PrepareReferenceLibrary(targetIDs, disease)
-        %     PrepareReferenceLibrary prepares reference spectra for SAM
-        %     comparison 
-        %
-        %     Usage:
-        %     referenceIDs = {153, 166};
-        %     referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
-        %     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
+            %     PrepareReferenceLibrary prepares reference spectra for SAM
+            %     comparison
+            %
+            %     Usage:
+            %     referenceIDs = {153, 166};
+            %     referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
+            %     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
 
             refLib = struct('Data', [], 'Label', [], 'Disease', []);
             k = 0;
@@ -437,30 +439,30 @@ classdef hsiUtility
                 refLib(k).Data = malData;
                 refLib(k).Label = 1;
                 refLib(k).Disease = disease{i};
-                
+
                 benLabel = hsiIm.FgMask & ~labelImg;
                 benData = mean(hsiIm.GetMaskedPixels(benLabel));
                 k = k + 1;
                 refLib(k).Data = benData;
                 refLib(k).Label = 0;
-                refLib(k).Disease = disease{i};               
+                refLib(k).Disease = disease{i};
             end
-           
-           saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));          
-           save(saveName, 'refLib');
-            
-        end      
-        
-        function [refLib] = GetReferenceLibrary()
-        %     GetReferenceLibrary returns reference spectra for SAM
-        %     comparison 
-        %
-        %     Usage:
-        %     refLib = hsiUtility.GetReferenceLibrary();
 
-            saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));          
-            load(saveName, 'refLib'); 
+            saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
+            save(saveName, 'refLib');
+
         end
-        
+
+        function [refLib] = GetReferenceLibrary()
+            %     GetReferenceLibrary returns reference spectra for SAM
+            %     comparison
+            %
+            %     Usage:
+            %     refLib = hsiUtility.GetReferenceLibrary();
+
+            saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
+            load(saveName, 'refLib');
+        end
+
     end
 end
