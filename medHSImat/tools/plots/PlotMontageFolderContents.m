@@ -1,13 +1,13 @@
-function [] = PlotMontageFolderContents(path, criteria, figTitle, fig)
+function [] = PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
 % PlotMontageFolderContents returns the images in a path as a montage
 %
 %   Usage:
-%   PlotMontageFolderContents(path, criteria, figTitle, fig)
+%   PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
 %
 %   criteria = struct('TargetDir', 'subfolders', ...
 %       'TargetName', strcat(target, '.jpg'), ...
 %       'TargetType', 'fix');
-%  plots.MontageFolderContents(1, [], criteria);
+%  plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
 
 if isempty(path)
     path = fullfile(config.GetSetting('saveDir'), config.GetSetting('experiment'));
@@ -25,6 +25,16 @@ if nargin < 3
     figTitle = [];
 end
 
+if nargin < 4 
+    standardDim = [200, 200];
+end
+
+if nargin < 5
+    imageLimit = 20;
+end 
+numrows = standardDim(1);
+numcols = standardDim(2);
+
 [pathstr, ~, ~] = fileparts(path);
 isOneFolder = ~(isstruct(criteria) && strcmpi(criteria.TargetDir, 'subfolders'));
 if ~isOneFolder
@@ -34,15 +44,21 @@ if ~isOneFolder
     dirFlags = [fileList.isdir];
     fileList = fileList(dirFlags);
     hasTargetType = isfield(criteria, 'TargetType');
-    imageList = cell(numel(fileList)-2, 1);
+    imageNum = numel(fileList) - 2;
+    if imageNum > imageLimit 
+        imageNum = imageLimit + 2;
+    end 
+    
+    imageList = cell(imageNum, 1);
     if hasTargetType
         [targetIDs, ~] = databaseUtility.GetTargetIndexes([], criteria.TargetType);
         imageList = cell(numel(targetIDs), 1);
     end
-    c = 1;
-    for i = 3:numel(fileList)
+    c = 1;   
+    for i = 3:imageNum
         if (hasTargetType & find(targetIDs == str2double(fileList(i).name))) | ~hasTargetType
-            imageList{c} = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
+            img = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
+            imageList{c} = imresize(img,[numrows numcols]);
             c = c + 1;
         end
     end
@@ -62,9 +78,15 @@ else
     pathCriteria = fullfile(path, target);
 
     fileList = dir(pathCriteria);
-    imageList = cell(numel(fileList), 1);
-    for i = 1:numel(fileList)
-        imageList{i} = imread(fullfile(fileList(i).folder, fileList(i).name));
+    imageNum = numel(fileList);
+    if imageNum > imageLimit 
+        imageNum = imageLimit;
+    end 
+    imageList = cell(numel(imageNum), 1);
+
+    for i = 1:imageNum
+        img = imread(fullfile(fileList(i).folder, fileList(i).name));
+        imageList{i} = imresize(img,[numrows numcols]);       
     end
     saveName = figTitle;
 end

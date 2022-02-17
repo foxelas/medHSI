@@ -319,9 +319,9 @@ classdef hsiUtility
             if isTest
                 configurations = [outRows.configuration];
             end
-
-            seed = 42;
-            rng(seed);
+            
+            seed = 42; 
+            rng(seed); %For reproducibility 
             for i = 1:length(targetIDs)
 
                 id = targetIDs(i);
@@ -333,45 +333,73 @@ classdef hsiUtility
 
                 %% load HSI from .mat file to verify it is working and to prepare preview images
                 targetName = num2str(id);
-                labelImg = hsiUtility.ReadLabel(targetName);
 
-                baseDir = fullfile(config.GetSetting('matDir'), ...
-                    strcat(config.GetSetting('database'), config.GetSetting('augmentationName'), '_', num2str(augType)), targetName);
-
-                if ~isempty(labelImg) %% REMOVELATER
-                    spectralData = hsi;
-                    spectralData.Value = hsiUtility.LoadHSI(targetName, 'preprocessed');
+                augTargetName = fullfile(num2str(augType), targetName);
+                labelfile = dataUtility.GetFilename('label', targetName);
+                    
+                if exist(labelfile, 'file') 
+                    spectralData = hsiUtility.LoadHSI(targetName, 'preprocessed');
                     dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
+                    labelImg = hsiUtility.ReadLabel(targetName);
 
                     switch augType
                         case 'set0' % No augmentation
-                            data = spectralData.Value;
+                            data = spectralData;
                             label = labelImg;
-                            save(strcat(baseDir, '_target.mat'), 'data', 'label');
+                            filename = dataUtility.GetFilename('augmentation', strcat(augTargetName, '_0'));
+                            save(filename, 'data', 'label');                          
+                            filename = dataUtility.GetFilename('augmentation',  ...
+                                fullfile(num2str(augType), config.GetSetting('snapshots'), strcat(targetName, '_0.jpg')));
+                            dispImageRgb = data.GetDisplayRescaledImage('rgb');
+                            imwrite(dispImageRgb, strrep(filename, '.mat', ''), 'jpg');
 
                         case 'set1' % Vertical and horizontal flip
                             folds = 0;
-                            data = spectralData.Value;
+                            data = spectralData;
                             label = labelImg;
-                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
-
+                            filename = dataUtility.GetFilename('augmentation', strcat(augTargetName, '_', num2str(folds)));
+                            save(filename, 'data', 'label');                           
+                            filename = dataUtility.GetFilename('augmentation',  ...
+                                fullfile(num2str(augType), config.GetSetting('snapshots'), strcat(targetName, '_', num2str(folds),'.jpg')));
+                            dispImageRgb = data.GetDisplayRescaledImage('rgb');
+                            imwrite(dispImageRgb, strrep(filename, '.mat', ''), 'jpg');
+                            
                             folds = folds + 1;
-                            data = flip(spectralData.Value, 1);
+                            data.Value = flip(spectralData.Value, 1);
+                            data.FgMask = flip(spectralData.FgMask, 1);
                             label = flip(labelImg, 1);
-                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
-
+                            filename = dataUtility.GetFilename('augmentation', strcat(augTargetName, '_', num2str(folds)));
+                            save(filename, 'data', 'label');
+                            filename = dataUtility.GetFilename('augmentation',  ...
+                                fullfile(num2str(augType), config.GetSetting('snapshots'), strcat(targetName, '_', num2str(folds),'.jpg')));
+                            dispImageRgb = data.GetDisplayRescaledImage('rgb');
+                            imwrite(dispImageRgb, strrep(filename, '.mat', ''), 'jpg');
+                            
                             folds = folds + 1;
-                            data = flip(spectralData.Value, 2);
+                            data.Value = flip(spectralData.Value, 2);
+                            data.FgMask = flip(spectralData.FgMask, 2);
                             label = flip(labelImg, 2);
-                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
-
+                            filename = dataUtility.GetFilename('augmentation', strcat(augTargetName, '_', num2str(folds)));
+                            save(filename, 'data', 'label');
+                            filename = dataUtility.GetFilename('augmentation',  ...
+                                fullfile(num2str(augType), config.GetSetting('snapshots'), strcat(targetName, '_', num2str(folds),'.jpg')));
+                            dispImageRgb = data.GetDisplayRescaledImage('rgb');
+                            imwrite(dispImageRgb, strrep(filename, '.mat', ''), 'jpg');
+                            
                             folds = folds + 1;
-                            data = flip(spectralData.Value, 2);
-                            data = flip(data, 1);
+                            data.Value = flip(spectralData.Value, 2);
+                            data.Value = flip(data.Value, 1);
+                            data.FgMask = flip(spectralData.FgMask, 2);
+                            data.FgMask = flip(data.FgMask, 1);
                             label = flip(labelImg, 2);
                             label = flip(label, 1);
-                            save(strcat(baseDir, '_', num2str(folds), '_target.mat'), 'data', 'label');
-
+                            filename = dataUtility.GetFilename('augmentation', strcat(augTargetName, '_', num2str(folds)));
+                            save(filename, 'data', 'label');
+                            filename = dataUtility.GetFilename('augmentation',  ...
+                                fullfile(num2str(augType), config.GetSetting('snapshots'), strcat(targetName, '_', num2str(folds),'.jpg')));
+                            dispImageRgb = data.GetDisplayRescaledImage('rgb');
+                            imwrite(dispImageRgb, strrep(filename, '.mat', ''), 'jpg');
+                            
                         case 'set2' % 360 degree random rotation
                             for j = 0:1
                                 for k = 0:1
@@ -396,13 +424,15 @@ classdef hsiUtility
                 %                 plots.SavePlot(2);
             end
 
-            %             %% preview of the entire dataset
-            %
-            %             path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized');
-            %             plots.MontageFolderContents(1, path1, '*.jpg', 'Normalized');
-            %             plots.MontageFolderContents(3, path1, '*raw.jpg', 'Normalized raw');
-            %             plots.MontageFolderContents(4, path1, '*fix.jpg', 'Normalized fix');
-            %             close all;
+            %% preview of the entire dataset
+
+            path1 = strrep(dataUtility.GetFilename('augmentation', fullfile(num2str(augType), ...
+                config.GetSetting('snapshots'))), '.mat', '');
+            plots.MontageFolderContents(1, path1, '*.jpg', 'Augmented Dataset');
+            close all;
+            
+            disp('Finished [AugmentDataGroup]...');
+
         end
 
         %% References %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

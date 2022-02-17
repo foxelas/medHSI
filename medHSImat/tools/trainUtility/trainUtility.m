@@ -175,7 +175,7 @@ classdef trainUtility
             useTransform = ~(nargin < 7);
 
             %% Read h5 data
-            [targetIDs, outRows] = databaseUtility.GetTargetIndexes(content, target);
+            [targetIDs, ~] = databaseUtility.GetTargetIndexes(content, target);
 
             X = [];
             y = [];
@@ -204,7 +204,7 @@ classdef trainUtility
                     %fgMask = I.FgMask;
                 end
 
-                [m, n, z] = I.Size();
+                [m, n, ~] = I.Size();
 
                 if useTransform
                     scores = transformFun(I);
@@ -214,7 +214,7 @@ classdef trainUtility
                 end
 
                 labelfile = dataUtility.GetFilename('label', targetName);
-                if exist(labelfile, 'file')
+                if exist(labelfile, 'file') 
                     load(labelfile, 'labelMask');
                     ycol = GetMaskedPixelsInternal(labelMask(1:m, 1:n), fgMask);
 

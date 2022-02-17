@@ -133,11 +133,9 @@ classdef dataUtility
             %    [reorderedSpectra, labels] = ReorderSpectra(target, chartColorOrder,
             %       spectraColorOrder, wavelengths, spectralWavelengths)
 
-            if size(target, 2) == 401
-                wavelengths = wavelengths;
-            elseif size(target, 2) == 161
+            if size(target, 2) ~= 401 && size(target, 2) == 161
                 wavelengths = [380:540]';
-            else
+            elseif size(target, 2) ~= 401 && size(target, 2) ~= 161
                 wavelengths = [541:780]';
             end
 
@@ -158,7 +156,8 @@ classdef dataUtility
             %
             %   Inputs
             %   dataType: choose between 'preprocessed', 'target', 'white',
-            %   'black', 'raw', 'label', 'param', 'referenceLib', 'h5' or 'model'
+            %   'black', 'raw', 'label', 'param', 'referenceLib', 
+            %   'augmentation', 'h5' or 'model'
             %   targetName: the name of the target
             %
             %   Usage:
@@ -215,7 +214,12 @@ classdef dataUtility
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
                         strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ...
                         strcat(targetName, '.mat'));
-
+                    
+                case 'augmentation'
+                    targetFilename = config.DirMake(config.GetSetting('matDir'), ...
+                        strcat(config.GetSetting('database'), config.GetSetting('augmentationName')), ...
+                        strcat(targetName, '.mat'));
+                    
                 case 'h5'
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
                         config.GetSetting('database'), strcat(targetName, '.mat'));

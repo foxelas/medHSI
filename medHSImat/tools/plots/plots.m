@@ -4,23 +4,35 @@ classdef plots
         %% Contents
         %
         %   Static:
+        %         %% Core
         %         Apply(fig, funcName, varargin)
         %         SavePlot(fig)
-        %         MontageFolderContents(fig, path, criteria, figTitle)
-        %         Superpixels(fig, baseImage, labels, figTitle, plotType, fgMask)
-        %         SubimageMontage(fig, hsi, figTitle, limit)
-        %         Spectra(fig, spectra, wavelengths, names, figTitle)
-        %         SpectraAverage(fig, spectra, wavelengths, figTitle)
-        %         NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
-        %         AverageSpectrum(fig, Inorm)
-        %         Overlay(fig, baseIm, topIm, figTitle)
-        %         DualMontage(fig, left, right, figTitle)
-        %         Dimred(method, dimredResult, w, redHsis)
-        %         Components(hsi, pcNum, figStart)
+        %
+        %         %% Graph Properties 
         %         [imCorr] = BandStatistics(inVectors, statistic, fig)
-        %         [lineColorMap] = GetLineColorMap(style, names)
+        %         [lineColorMap] = GetLineColorMap(style, names) 
+        %
+        %         %% Lines        
+        %         Spectra(fig, spectra, wavelengths, names, figTitle)
+        %         AverageSpectrum(fig, Inorm)
+        %         Components(hsi, pcNum, figStart) 
+        %         Eigenvectors(fig, varargin)
+        %
+        %         %% Images
+        %         Overlay(fig, baseIm, topIm, figTitle)
+        %         Dimred(method, dimredResult, w, redHsis)
+        %         Superpixels(fig, baseImage, labels, figTitle, plotType, fgMask)
+        %
+        %         %% Multi-image
+        %         MontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
+        %         SubimageMontage(fig, hsi, figTitle, limit)
+        %         DualMontage(fig, left, right, figTitle)
+        %
+        %         %% Checks
+        %         NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
+        %         ReferenceLibrary(fig, refLib)
 
-
+        %% Core %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [varargout] = Apply(fig, funcName, varargin)
             %PLOTS wraps plotting functions
             %
@@ -62,135 +74,7 @@ classdef plots
             SavePlot(fig);
         end
 
-        function [] = MontageFolderContents(fig, varargin)
-            % PlotMontageFolderContents returns the images in a path as a montage
-            %
-            %   Usage:
-            %   PlotMontageFolderContents(path, criteria, figTitle, fig)
-            %
-            %   criteria = struct('TargetDir', 'subfolders', ...
-            %       'TargetName', strcat(target, '.jpg'), ...
-            %       'TargetType', 'fix');
-            %   plots.MontageFolderContents(1, [], criteria);
-            plots.Apply(fig, @PlotMontageFolderContents, varargin{:});
-        end
-
-        function [] = Superpixels(fig, varargin)
-            % PlotSuperpixels plots the results of superpixel segmentation on the image
-            %
-            %   Usage:
-            %   PlotSuperpixels(baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', [], 1);
-            %   PlotSuperpixels(baseImage, labels, 'Superpixels of image 3', 'color', fgMask, 1);
-
-            plots.Apply(fig, @PlotSuperpixels, varargin{:});
-        end
-
-        function [] = SubimageMontage(fig, varargin)
-            % PlotSubimageMontage plots all or selected members of an hsi
-            % as a montage figure
-            %
-            %   Usage:
-            %   PlotSubimageMontage(hsi, figTitle, limit, fig);
-
-            plots.Apply(fig, @PlotSubimageMontage, varargin{:});
-        end
-
-        function [] = Spectra(fig, varargin)
-            %%PLOTSPECTRA plots one or more spectra together
-            %
-            %   Usage:
-            %   PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig);
-            %   PlotSpectra(spectra)
-
-            plots.Apply(fig, @PlotSpectra, varargin{:});
-        end
-
-        function [] = SpectraAverage(fig, varargin)
-            %%PlotSpectraAverage plots average spectra
-            %
-            %   Usage:
-            %   PlotSpectraAverage(spectra, wavelengths, figTitle, fig);
-            %   PlotSpectraAverage(spectra)
-
-            plots.Apply(fig, @PlotSpectraAverage, varargin{:});
-        end
-
-        function [] = ReferenceLibrary(fig, refLib)
-            spectra = cell2mat({refLib.Data}');
-            [m, n] = size(spectra);
-            wavelengths = hsiUtility.GetWavelengths(n);
-            names = cellfun(@(x) x{1}, {refLib.Disease}', 'un', 0);
-            for i = 1:m
-                if refLib(i).Label == 0
-                    names{i} = strcat(names{i}, ' Benign');
-                    markers{i} = "-";
-                else
-                    names{i} = strcat(names{i}, ' Malignant');
-                    markers{i} = ":";
-                end
-            end
-            figTitle = 'Reference Spectra';
-            config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png'));
-            plots.Apply(fig, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
-        end
-
-        function [] = NormalizationCheck(fig, varargin)
-            %%PlotNormalizationCheck plots the values recovered after normalization
-            %   user needs to input a mask
-            %
-            %   Usage:
-            %   PlotsNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
-            %   plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
-
-            plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
-        end
-
-        function [] = AverageSpectrum(fig, varargin)
-            %%PlotAverageSpectrum plots the values recovered after normalization
-            %   user needs to input a mask
-            %
-            %   Usage:
-            %   PlotsNormalizationCheck(Inorm, figName, fig)
-            %   plots.NormalizationCheck(fig, figName, Inorm)
-
-            plots.Apply(fig, @PlotAverageSpectrum, varargin{:});
-        end
-
-        function [] = Overlay(fig, varargin)
-            % PlotOverlay plots an image with an overlay mask
-            %
-            %   Usage:
-            %   PlotOverlay(baseIm, topIm, figTitle, fig)
-
-            plots.Apply(fig, @PlotOverlay, varargin{:});
-        end
-
-        function [] = Eigenvectors(fig, varargin)
-            % PlotEigenvectors plots eigenvectors of a deconmposition
-            %
-            %   Usage:
-            %   PlotEigenvectors(coeff, xValues, pcNum, fig)
-
-            plots.Apply(fig, @PlotEigenvectors, varargin{:});
-        end
-
-        function [] = DualMontage(fig, varargin)
-            plots.Apply(fig, @PlotDualMontage, varargin{:});
-        end
-
-        function [] = Dimred(method, dimredResult, w, redHsis)
-            PlotDimred(method, dimredResult, w, redHsis);
-        end
-
-        function [] = Components(varargin)
-            %PLOTCOMPONENTS plots a pcNum number of PCs, starting at figure figStart
-            %
-            %   Usage:
-            %   PlotComponents(hsi, 3, 4);
-
-            PlotComponents(varargin{:});
-        end
-
+        %% Graph Properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [lineColorMap] = GetLineColorMap(varargin)
             %     PLOTGETLINECOLORMAP returns a linecolor map based on the style
             %
@@ -209,6 +93,131 @@ classdef plots
 
             [imCorr] = plots.Apply(fig, @PlotBandStatistics, varargin{:});
         end
+        
+        %% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [] = Spectra(fig, varargin)
+            %%PLOTSPECTRA plots one or more spectra together
+            %
+            %   Usage:
+            %   PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig);
+            %   PlotSpectra(spectra)
 
+            plots.Apply(fig, @PlotSpectra, varargin{:});
+        end
+
+        function [] = AverageSpectrum(fig, varargin)
+            %%PlotAverageSpectrum plots the values recovered after normalization
+            %   user needs to input a mask
+            %
+            %   Usage:
+            %   PlotsNormalizationCheck(Inorm, figName, fig)
+            %   plots.NormalizationCheck(fig, figName, Inorm)
+
+            plots.Apply(fig, @PlotAverageSpectrum, varargin{:});
+        end
+        
+        function [] = Components(varargin)
+            %PLOTCOMPONENTS plots a pcNum number of PCs, starting at figure figStart
+            %
+            %   Usage:
+            %   PlotComponents(hsi, 3, 4);
+
+            PlotComponents(varargin{:});
+        end
+        
+        function [] = Eigenvectors(fig, varargin)
+            % PlotEigenvectors plots eigenvectors of a deconmposition
+            %
+            %   Usage:
+            %   PlotEigenvectors(coeff, xValues, pcNum, fig)
+
+            plots.Apply(fig, @PlotEigenvectors, varargin{:});
+        end
+         
+        %% Images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [] = Overlay(fig, varargin)
+            % PlotOverlay plots an image with an overlay mask
+            %
+            %   Usage:
+            %   PlotOverlay(baseIm, topIm, figTitle, fig)
+
+            plots.Apply(fig, @PlotOverlay, varargin{:});
+        end
+
+        function [] = Dimred(method, dimredResult, w, redHsis)
+            PlotDimred(method, dimredResult, w, redHsis);
+        end
+        
+        function [] = Superpixels(fig, varargin)
+            % PlotSuperpixels plots the results of superpixel segmentation on the image
+            %
+            %   Usage:
+            %   PlotSuperpixels(baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', [], 1);
+            %   PlotSuperpixels(baseImage, labels, 'Superpixels of image 3', 'color', fgMask, 1);
+
+            plots.Apply(fig, @PlotSuperpixels, varargin{:});
+        end
+  
+        %% Multi-image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        function [] = MontageFolderContents(fig, varargin)
+            % PlotMontageFolderContents returns the images in a path as a montage
+            %
+            %   Usage:
+            %   PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
+            %
+            %   criteria = struct('TargetDir', 'subfolders', ...
+            %       'TargetName', strcat(target, '.jpg'), ...
+            %       'TargetType', 'fix');
+            %   plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
+            plots.Apply(fig, @PlotMontageFolderContents, varargin{:});
+        end
+
+        function [] = SubimageMontage(fig, varargin)
+            % PlotSubimageMontage plots all or selected members of an hsi
+            % as a montage figure
+            %
+            %   Usage:
+            %   PlotSubimageMontage(hsi, figTitle, limit, fig);
+
+            plots.Apply(fig, @PlotSubimageMontage, varargin{:});
+        end
+
+        function [] = DualMontage(fig, varargin)
+            plots.Apply(fig, @PlotDualMontage, varargin{:});
+        end
+        
+        %% Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [] = NormalizationCheck(fig, varargin)
+            %%PlotNormalizationCheck plots the values recovered after normalization
+            %   user needs to input a mask
+            %
+            %   Usage:
+            %   PlotsNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
+            %   plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
+
+            plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
+        end
+        
+        function [] = ReferenceLibrary(fig, refLib)
+            spectra = cell2mat({refLib.Data}');
+            [m, n] = size(spectra);
+            wavelengths = hsiUtility.GetWavelengths(n);
+            names = cellfun(@(x) x{1}, {refLib.Disease}', 'un', 0);
+            markers = cell(numel(names), 1);
+            for i = 1:m
+                if refLib(i).Label == 0
+                    names{i} = strcat(names{i}, ' Benign');
+                    markers{i} = "-";
+                else
+                    names{i} = strcat(names{i}, ' Malignant');
+                    markers{i} = ":";
+                end
+            end
+            figTitle = 'Reference Spectra';
+            config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png'));
+            plots.Apply(fig, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
+        end
+       
     end
 end
