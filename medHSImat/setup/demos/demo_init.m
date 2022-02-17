@@ -69,3 +69,6 @@ refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
 % Plot average spectra for an ROI on the sample
 fig = 1;
 plots.AverageSpectrum(fig, hsIm);
+
+%%%%%%%%%%%%%%%%%%%%% Prepare an augmented dataset %%%%%%%%%%%%%%%%%%%%
+trainUtility.AugmentDataGroup('sample001-tissue', dbSelection, 'set1');

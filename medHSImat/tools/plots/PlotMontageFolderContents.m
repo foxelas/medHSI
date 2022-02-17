@@ -25,11 +25,11 @@ if nargin < 3
     figTitle = [];
 end
 
-if nargin < 4 
+if nargin < 4 || isempty(standardDim)
     standardDim = [200, 200];
 end
 
-if nargin < 5
+if nargin < 5 || isempty(imageLimit)
     imageLimit = 20;
 end 
 numrows = standardDim(1);
