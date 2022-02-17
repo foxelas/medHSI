@@ -25,8 +25,8 @@ config.SetSetting('normalization', 'byPixel');
 dbSelection = {'tissue', true};
 
 % Read all .h5 files according to info in the DB
-% Preprocessing is applied according to functions in hsi.Preprocessing
-hsiUtility.InitializeDataGroup('', dbSelection);
+% Consider modifying methods\Preprocessing.m first 
+hsiUtility.ReadDataset('', dbSelection);
 
 %%%%%%%%%%%%%%%%%%%%% Export H5 %%%%%%%%%%%%%%%%%%%%%
 % Export raw HSI images of tissue samples as a .h5 dataset with structure
@@ -51,7 +51,7 @@ hsIm = hsiUtility.LoadHSI(fileNum);
 config.SetSetting('normalization', 'byPixel');
 fileNum = 150;
 config.SetSetting('fileName', num2str(fileNum));
-hsIm = hsiUtility.LoadHSI(fileNum, 'preprocessed');
+hsIm = hsiUtility.LoadHSI(fileNum, 'dataset');
 
 %%%%%%%%%%%%%%%%%%%%% Get Disease Info %%%%%%%%%%%%%%%%%%%%%
 % Returns information from the disease DB saved in is saved in importDir
@@ -72,3 +72,16 @@ plots.AverageSpectrum(fig, hsIm);
 
 %%%%%%%%%%%%%%%%%%%%% Prepare an augmented dataset %%%%%%%%%%%%%%%%%%%%
 trainUtility.AugmentDataGroup('sample001-tissue', dbSelection, 'set1');
+
+
+%%%%%%%%%%%%%%%%%%%% Prepare train/test set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Read h5 data
+folds = 5;
+testingSamples = [5];
+numSamples = 6;
+content = {'tissue', true};
+target = 'fix';
+useCustomMask = true;
+[cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = trainUtility.PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask);
+filename = fullfile(config.GetSetting('output'), config.GetSetting('experiment'), 'cvpInfo.mat');
+save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');

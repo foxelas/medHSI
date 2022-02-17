@@ -20,7 +20,7 @@ for i = 1:numel(dirList)
     id = targetIDs(strcmp([outRows.SampleID], sampleId));
     targetName = num2str(id);
 
-    hsIm = hsiUtility.LoadHSI(targetName, 'preprocessed');
+    hsIm = hsiUtility.LoadHSI(targetName, 'dataset');
 
     imBase = hsIm.GetDisplayImage();
     imLab = imread(fullfile(dirList(i).folder, dirList(i).name));

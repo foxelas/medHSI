@@ -1,7 +1,8 @@
 classdef trainUtility
     %   Static:
     %       %% Core 
-    %       AugmentDataGroup(experiment, condition, augType)
+    %       Augment(dataset, augType)
+    %       [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
     %       [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask, transformFun)
     %       [cvp] = KfoldPartitions(labels, folds)
     %     
@@ -17,104 +18,44 @@ classdef trainUtility
     methods (Static)
 
         %% Core  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function [] = AugmentDataGroup(experiment, condition, augType)
-            % AugmentDataGroup reads a group of hsi data, prepares .mat files,
+        function [] = Augment(varargin)
+            % Augment reads a group of hsi data, prepares .mat files,
             % prepared normalized files and returns montage previews of contents
+            % Each sample contained in the original dataset is assumed unique
             %
             %   Usage:
-            %   AugmentDataGroup('handsOnly',{'hand', false})
-            %   AugmentDataGroup('sample001-tissue', {'tissue', true}, 'set2');
-
-            if nargin < 3
-                augType = 'set0';
-            end
-
-            %% Setup
-            disp('Initializing [AugmentDataGroup]...');
-
-            config.SetSetting('experiment', experiment);
-            config.SetSetting('cropBorders', true);
-            config.SetSetting('saveFolder', fullfile(config.GetSetting('snapshots'), experiment));
-            isTest = config.GetSetting('isTest');
-
-            %% Read h5 data
-            [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
-
-            integrationTimes = [outRows.IntegrationTime];
-            dates = [outRows.CaptureDate];
-            if isTest
-                configurations = [outRows.configuration];
-            end
-            
-            seed = 42; 
-            rng(seed); %For reproducibility 
-            for i = 1:length(targetIDs)
-
-                id = targetIDs(i);
-                config.SetSetting('integrationTime', integrationTimes(i));
-                config.SetSetting('dataDate', num2str(dates(i)));
-                if isTest
-                    config.SetSetting('configuration', configurations{i});
-                end
-
-                %% load HSI from .mat file to verify it is working and to prepare preview images
-                targetName = num2str(id);
-                labelfile = dataUtility.GetFilename('label', targetName);
-                    
-                if exist(labelfile, 'file') 
-                    spectralData = hsiUtility.LoadHSI(targetName, 'preprocessed');
-                    labelImg = hsiUtility.ReadLabel(targetName);
-
-                    switch augType
-                        case 'set0' % No augmentation
-                            folds = 0;
-                            AugmentAndSave([], spectralData, labelImg, folds, augType, targetName);
-
-                        case 'set1' % Vertical and horizontal flip
-                            folds = 0;
-                            AugmentAndSave([], spectralData, labelImg, folds, augType, targetName);
-                            
-                            folds = folds + 1;
-                            transFunc =  @(x) flip(x,1);
-                            AugmentAndSave(transFunc, spectralData, labelImg, folds, augType, targetName);
-                                          
-                            folds = folds + 1;
-                            transFunc =  @(x) flip(x,2);
-                            AugmentAndSave(transFunc, spectralData, labelImg, folds, augType, targetName);
-                                                                    
-                            folds = folds + 1;
-                            transFunc =  @(x) flip(flip(x,2),1);
-                            AugmentAndSave(transFunc, spectralData, labelImg, folds, augType, targetName);
-                            
-                        case 'set2' % 360 degree random rotation
-                            %% PENDING
-                            for j = 0:1
-                                for k = 0:1
-                                    % use rnd generator
-                                    img0 = spectralData.Value;
-                                    img0 = imrotate3(img0, 180, [j, k, 0]);
-
-                                    %% rotate labels
-                                    labelImg = imrotate(img, 180);
-
-                                end
-                            end
-                        case 'set3' % Brightness x[0.9,1.1]
-
-                    end
-                end
-            end
-
-            %% preview of the entire dataset
-
-            path1 = strrep(dataUtility.GetFilename('augmentation', fullfile(num2str(augType), ...
-                config.GetSetting('snapshots'))), '.mat', '');
-            plots.MontageFolderContents(1, path1, '*.jpg', 'Augmented Dataset');
-            close all;
-            
-            disp('Finished [AugmentDataGroup]...');
+            %   Augment(dataset)
+            %   Augment(dataset, 'set2');
+            AugmentInternal(varargin{:});
         end
         
+        function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTest(varargin)
+            %% SplitTrainTest rearranges pixels as a pixel (observation) by feature 2D array
+            % One pixel is one data sample
+            %
+            %   Arguments 
+            %   dataset: string, the folder name of dataset (must be in
+            %   matfiles\hsi\)
+            %   testTargets: array of str targetNames 
+            %   dataType: 'image' or 'pixel'
+            %   hasLabels: bool
+            %   folds: numeric 
+            %   transformFun: function handle
+            %
+            %   Usage:
+            %   dataset = 'pslBase';
+            %   testTargets = {'153'};
+            %   dataType = 'pixel';
+            %   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType);
+            %
+            %   hasLabels = true;
+            %   transformFun = @Dimred;
+            %   folds = 5;
+            %   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
+            
+            [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(varargin{:});
+        end
+       
         function [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask, transformFun)
             %% PrepareSpectralDataset rearranges pixels as a pixel (observation) by feature 2D array
             % One pixel is one data sample
@@ -150,7 +91,7 @@ classdef trainUtility
 
                 %% load HSI from .mat file
                 targetName = num2str(id);
-                I = hsiUtility.LoadHSI(targetName, 'preprocessed');
+                I = hsiUtility.LoadHSI(targetName, 'dataset');
 
                 imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
                 if useCustomMask
@@ -364,24 +305,4 @@ classdef trainUtility
         end
 
     end
-end
-
-function [] = AugmentAndSave(transFun, spectralData, labelImg, folds, augType, targetName)
-
-    augTargetName = fullfile(num2str(augType), targetName);
-    if ~isempty(transFun)
-        data = spectralData;
-        data.Value = transFun(spectralData.Value);
-        data.FgMask = transFun(spectralData.FgMask);
-        label = transFun(labelImg);
-    else
-        data = spectralData;
-        label = labelImg;
-    end
-    filename = dataUtility.GetFilename('augmentation', strcat(augTargetName, '_', num2str(folds)));
-    save(filename, 'data', 'label');                           
-    filename = dataUtility.GetFilename('augmentation',  ...
-        fullfile(num2str(augType), config.GetSetting('snapshots'), strcat(targetName, '_', num2str(folds),'.jpg')));
-    dispImageRgb = data.GetDisplayRescaledImage('rgb');
-    imwrite(dispImageRgb, strrep(filename, '.mat', ''), 'jpg');
 end

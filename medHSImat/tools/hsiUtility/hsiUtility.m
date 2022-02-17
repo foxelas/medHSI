@@ -11,11 +11,12 @@ classdef hsiUtility
         %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
         %         [hsIm] = ReadHSI(content, target, experiment, blackIsCapOn)
         %         [hsIm] = LoadHSI(targetName, dataType)
+        %         [hsIm, label] = LoadHSIAndLabel(targetName, dataType)
         %         [hsIm] = Preprocess(targetName, option, saveFile)
         %
         %         %% Dataset
         %         [] = ExportH5Dataset(condition)
-        %         [] = InitializeDataGroup(experiment, condition)
+        %         [] = ReadDataset(experiment, condition)
         %
         %         %% References
         %         [spectralData] = LoadHSIReference(targetName, refType)
@@ -126,16 +127,30 @@ classdef hsiUtility
         end
 
         function [hsIm] = LoadHSI(varargin)
-            % LoadHSI reads a stored HSI from a _target mat file
+            % LoadHSI reads a stored HSI from a .mat file
             %
             %   Input
             %   targetName: a string with the target id
-            %   dataType: 'raw' or 'preprocessed'
+            %   dataType: 'raw', 'dataset' or 'preprocessed'
             %
             %   Usage:
             %   [spectralData] = LoadHSI(targetName)
             %   [spectralData] = LoadHSI(targetName)
-            [hsIm] = LoadHSIInternal(varargin{:});
+            [hsIm, ~] = LoadHSIInternal(varargin{:});
+        end
+        
+        function [hsIm, label] = LoadHSIAndLabel(varargin)
+            % LoadHSIAndLabel reads a stored HSI and a label array from 
+            % a .mat file 
+            %
+            %   Input
+            %   targetName: a string with the target id
+            %   dataType: 'raw', 'dataset' or 'preprocessed'
+            %
+            %   Usage:
+            %   [spectralData, label] = LoadHSIAndLabel(targetName)
+            %   [spectralData, label] = LoadHSIAndLabel(targetName)
+            [hsIm, label] = LoadHSIInternal(varargin{:});
         end
 
         function [hsIm] = Preprocess(varargin)
@@ -176,7 +191,7 @@ classdef hsiUtility
 
                 %% load HSI from .mat file
                 targetName = num2str(id);
-                spectralData = hsiUtility.LoadHSI(targetName, 'preprocessed');
+                spectralData = hsiUtility.LoadHSI(targetName, 'dataset');
                 if (hsi.IsHsi(spectralData))
                     dataValue = spectralData.Value;
                     dataMask = uint8(spectralData.FgMask);
@@ -201,94 +216,21 @@ classdef hsiUtility
             fprintf('Saved dataset at %s.\n\n', fileName);
 
         end
-
-        function [] = InitializeDataGroup(experiment, condition)
-            % InitializeDataGroup reads a group of hsi data, prepares .mat files,
+        
+        function [] = ReadDataset(experiment, condition)
+            % ReadDataset reads a group of hsi data, prepares .mat files,
             % prepared normalized files and returns montage previews of contents
+            % It also prepare labels. Data samples are saved in .mat files
+            % so that each contains a 'spectralData' (class hsi) and a
+            % 'label' (class logical array) variable. 
             %
             %   Usage:
-            %   InitializeDataGroup('handsOnly',{'hand', false})
-            %   InitializeDataGroup('sample001-tissue', {'tissue', true});
+            %   ReadDataset('handsOnly',{'hand', false})
+            %   ReadDataset('sample001-tissue', {'tissue', true});
 
-            %% Setup
-            disp('Initializing [InitializeDataGroup]...');
-
-            config.SetSetting('experiment', experiment);
-            config.SetSetting('cropBorders', true);
-            config.SetSetting('saveFolder', fullfile(config.GetSetting('snapshots'), experiment));
-            isTest = config.GetSetting('isTest');
-            saveMatFile = true;
-
-            %% Read h5 data
-            [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
-
-            integrationTimes = [outRows.IntegrationTime];
-            dates = [outRows.CaptureDate];
-            if isTest
-                configurations = [outRows.configuration];
-            end
-
-            for i = 1:length(targetIDs)
-                close all;
-
-                id = targetIDs(i);
-                fprintf('Running for data %d. \n', id);
-                target = dataUtility.GetValueFromTable(outRows, 'Target', i);
-                content = dataUtility.GetValueFromTable(outRows, 'Content', i);
-                config.SetSetting('integrationTime', integrationTimes(i));
-                config.SetSetting('dataDate', num2str(dates(i)));
-                if isTest
-                    config.SetSetting('configuration', configurations{i});
-                end
-
-                saveName = dataUtility.StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
-                saveName = strcat(saveName, '.jpg');
-
-                %% write HSI in .mat file
-                hsiUtility.ReadHSI(content, target, experiment);
-
-                %% load HSI from .mat file to verify it is working and to prepare preview images
-                targetName = num2str(id);
-                config.SetSetting('fileName', targetName);
-
-                hsIm = hsi(hsiUtility.LoadHSI(targetName, 'raw'));
-                dispImageRaw = hsIm.GetDisplayRescaledImage('rgb');
-
-                %% Preprocess HSI and save
-                hsIm = hsiUtility.Preprocess(targetName, config.GetSetting('normalization'), saveMatFile);
-
-                %% prepare preview from normalized HSI
-                dispImageRgb = hsIm.GetDisplayRescaledImage('rgb');
-
-                close all;
-
-                figure(1);
-                imshow(dispImageRaw);
-                config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
-                plots.SavePlot(1);
-                figure(2);
-                imshow(dispImageRgb);
-                config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized', saveName));
-                plots.SavePlot(2);
-
-                pause(0.1);
-            end
-
-            %% preview of the entire dataset
-
-            path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'normalized');
-            plots.MontageFolderContents(1, path1, '*.jpg', 'Normalized');
-            plots.MontageFolderContents(3, path1, '*raw.jpg', 'Normalized raw');
-            plots.MontageFolderContents(4, path1, '*fix.jpg', 'Normalized fix');
-
-            path2 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb');
-            plots.MontageFolderContents(2, path2, '*.jpg', 'sRGB');
-            plots.MontageFolderContents(5, path2, '*raw.jpg', 'sRGB raw');
-            plots.MontageFolderContents(6, path2, '*fix.jpg', 'sRGB fix');
-
-            close all;
+            ReadDatasetInternal(experiment, condition);
         end
-
+        
         %% References %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [spectralData] = LoadHSIReference(targetName, refType)
             % LoadHSIReferenceInternal reads a stored HSI reference according to refType
@@ -313,9 +255,9 @@ classdef hsiUtility
             for i = 1:length(targetIDs)
                 targetName = num2str(targetIDs{i});
                 labelImg = hsiUtility.ReadLabel(targetName);
-                hsiIm = hsiUtility.LoadHSI(targetName, 'preprocessed');
+                hsiIm = hsiUtility.LoadHSI(targetName, 'dataset');
                 if ~hsi.IsHsi(hsiIm)
-                    error('Needs preprocessed input. Change [normalziation] in config.');
+                    error('Needs preprocessed input. Change [normalization] in config.');
                 end
                 malLabel = hsiIm.FgMask & labelImg;
                 malData = mean(hsiIm.GetMaskedPixels(malLabel));

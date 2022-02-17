@@ -27,7 +27,7 @@ X = [X; Xtest];
 i = 6;
 id = targetIDs(i);
 targetName = num2str(id);
-I = hsiUtility.LoadHSI(targetName, 'preprocessed');
+I = hsiUtility.LoadHSI(targetName, 'dataset');
 imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
 load(strrep(imgFilename, '.png', '.mat'), 'fgMask');
 
@@ -79,7 +79,7 @@ for i = targets
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    I = hsiUtility.LoadHSI(targetName, 'preprocessed');
+    I = hsiUtility.LoadHSI(targetName, 'dataset');
     imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
     load(strrep(imgFilename, '.png', '.mat'), 'fgMask');
     mask = fgMask;
@@ -145,7 +145,7 @@ for i = targets
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    I = hsiUtility.LoadHSI(targetName, 'preprocessed');
+    I = hsiUtility.LoadHSI(targetName, 'dataset');
     imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
     load(strrep(imgFilename, '.png', '.mat'), 'fgMask');
     mask = fgMask;

@@ -27,7 +27,7 @@ classdef hsi
         %
         %   %% Processing
         %   [obj] = Normalize(obj, varargin)
-        %   [obj] = Preprocessing(obj)
+        %   [obj] = Preprocess(obj, targetName)
         %
         %   %% Segmentation
         %   [labels] = Cubseg(obj, varargin)
@@ -174,20 +174,15 @@ classdef hsi
             obj = NormalizeInternal(obj, varargin{:});
         end
 
-        function [obj] = Preprocessing(obj)
+        function [obj] = Preprocess(obj, targetName)
             % Preprocessing prepares normalized data according to our specifications
             %
             %   Usage:
-            %   pHsi = Preprocessing(hsi);
+            %   pHsi = Preprocessing(hsi,targetName);
             %
             %   YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS
 
-            hsIm = obj.Value;
-            hsIm = hsIm(:, :, hsiUtility.GetWavelengths(311, 'index'));
-            obj.Value = hsIm;
-            [updI, fgMask] = obj.RemoveBackground();
-            obj.Value = updI;
-            obj.FgMask = fgMask;
+            obj = Preprocessing(obj, targetName);
         end
 
         %% Segmentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

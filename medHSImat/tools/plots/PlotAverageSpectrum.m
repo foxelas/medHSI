@@ -37,13 +37,12 @@ subplot(1, 3, 3);
 imshow(rgb);
 title(figName);
 
-fig2 = figure(fig+1);
-plots.Overlay(fig2, rgb, mask);
-
 baseFolder = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('spectraCheck'), config.GetSetting('fileName'));
 config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
 plots.SavePlot(fig);
+
+fig2 = figure;
 config.SetSetting('plotName', strcat(baseFolder, '_mask.jpg'));
-plots.SavePlot(fig2);
+plots.Overlay(fig2, rgb, mask);
 
 end

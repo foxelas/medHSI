@@ -11,6 +11,7 @@ classdef dataUtility
         %         [outSpectrum] = SpectrumPad(inSpectrum, options)
         %         [reorderedSpectra, labels] = ReorderSpectra(target, chartColorOrder, spectraColorOrder, wavelengths, spectralWavelengths)
         %         [filename] = GetFilename(dataType, targetName);
+        %         [datanames, targetIDs] = DatasetInfo()
 
         function [outname] = StrrepAll(inname, isLegacy)
             %     StrrepAll fomats an inname to outname
@@ -151,13 +152,13 @@ classdef dataUtility
             labels = spectraColorOrder;
         end
 
-        function [targetFilename] = GetFilename(dataType, targetName)
+        function [targetFilename] = GetFilename(dataType, targetName, extension)
             %GetFilename returns the directories for saved data
             %
             %   Inputs
             %   dataType: choose between 'preprocessed', 'target', 'white',
-            %   'black', 'raw', 'label', 'param', 'referenceLib', 
-            %   'augmentation', 'h5' or 'model'
+            %   'black', 'dataset', 'raw', 'label', 'param', 
+            %   'referenceLib', 'augmentation', 'h5' or 'model'
             %   targetName: the name of the target
             %
             %   Usage:
@@ -167,6 +168,10 @@ classdef dataUtility
             if nargin < 2
                 targetName = '';
             end
+            
+            if nargin < 3 
+                extension = 'mat';
+            end
 
             switch dataType
                 case 'preprocessed'
@@ -175,13 +180,17 @@ classdef dataUtility
                     else
                         baseDir = config.DirMake(config.GetSetting('matDir'), ...
                             strcat(config.GetSetting('database'), config.GetSetting('normalizedName')), targetName);
-                        targetFilename = strcat(baseDir, '_', config.GetSetting('normalization'), '.mat');
+                        targetFilename = strcat(baseDir, '_', config.GetSetting('normalization'));
                     end
+                    
+                case 'dataset'
+                    targetFilename = config.DirMake(config.GetSetting('matDir'), ...
+                            strcat(config.GetSetting('dataset')), targetName);
 
                 case 'target'
                     baseDir = fullfile(config.GetSetting('matDir'), ...
                         strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
-                    targetFilename = strcat(baseDir, '_target.mat');
+                    targetFilename = strcat(baseDir, '_target');
 
                 case 'raw'
                     targetFilename = dataUtility.GetFilename('target', targetName);
@@ -189,45 +198,57 @@ classdef dataUtility
                 case 'white'
                     baseDir = fullfile(config.GetSetting('matDir'), ...
                         strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
-                    targetFilename = strcat(baseDir, '_white.mat');
+                    targetFilename = strcat(baseDir, '_white');
 
                 case 'black'
                     baseDir = fullfile(config.GetSetting('matDir'), ...
                         strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
-                    targetFilename = strcat(baseDir, '_black.mat');
+                    targetFilename = strcat(baseDir, '_black');
 
                 case 'label'
                     baseDir = config.DirMake(config.GetSetting('matDir'), ...
                         strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
-                    targetFilename = strcat(baseDir, '_label.mat');
+                    targetFilename = strcat(baseDir, '_label');
 
                 case 'model'
-                    baseDir = config.DirMake(config.GetSetting('outputDir'), ...
+                    targetFilename = config.DirMake(config.GetSetting('outputDir'), ...
                         config.GetSetting('experiment'), targetName);
-                    targetFilename = strcat(baseDir, '.mat');
 
                 case 'param'
                     targetFilename = fullfile(config.GetRunBaseDir(), ...
-                        config.GetSetting('paramDir'), strcat(targetName, '.mat'));
+                        config.GetSetting('paramDir'), targetName);
 
                 case 'referenceLib'
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
                         strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ...
-                        strcat(targetName, '.mat'));
+                        targetName);
                     
                 case 'augmentation'
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('augmentationName')), ...
-                        strcat(targetName, '.mat'));
+                        config.GetSetting('augmentation'),targetName);
                     
                 case 'h5'
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
-                        config.GetSetting('database'), strcat(targetName, '.mat'));
+                        config.GetSetting('database'), targetName);
 
                 otherwise
                     error('Unsupported dataType.');
             end
-
+            
+            [~, ~, ext] = fileparts(targetFilename);
+            if isempty(ext)
+                targetFilename = strcat(targetFilename, '.', extension);
+            elseif ~strcmp(strrep(ext, '.', ''), extension)
+                targetFilename = strrep(targetFilename, ext, strcat('.', extension));
+            end
+        end
+        
+        function [datanames, targetIDs] = DatasetInfo()
+            fdir = dir(strrep(dataUtility.GetFilename('dataset'), '.mat', '\*.mat'));
+            datanames = {fdir.name};
+            unNames = cellfun(@(x) strsplit(x, {'_', '.'}), datanames', 'un', 0);
+            unNames = cellfun(@(x) x{1}, unNames, 'un', 0);
+            targetIDs = unique(unNames);
         end
     end
 end

@@ -9,7 +9,7 @@ clf;
 for j = 1:4
     targetName = num2str(sampleIds(j));
     config.SetSetting('fileName', targetName);
-    Inorm = hsiUtility.LoadHSI(targetName, 'preprocessed');
+    Inorm = hsiUtility.LoadHSI(targetName, 'dataset');
     plots.AverageSpectrum(1, Inorm, names{j});
 end
 

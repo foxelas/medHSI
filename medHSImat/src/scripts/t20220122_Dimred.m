@@ -22,7 +22,7 @@ content = {'tissue', true};
 target = 'fix';
 useCustomMask = true;
 [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = trainUtility.PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask);
-filename = fullfile(config.GetSetting('output'), config.GetSetting('experiment'), 'cvpInfo.mat');
+filename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'cvpInfo.mat');
 save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
 
 %%%%%%%%%%%%%%%%%%%%%% Train Validate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

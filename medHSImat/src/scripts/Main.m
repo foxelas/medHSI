@@ -11,7 +11,7 @@ config.SetSetting('cropBorders', true);
 %%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
 config.SetSetting('isTest', true);
 config.SetSetting('database', 'calib');
-hsiUtility.InitializeDataGroup('handsOnly', {'hand', false});
+hsiUtility.ReadDataset('handsOnly', {'hand', false});
 
 
 %%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,7 +26,7 @@ CheckImportData();
 dbSelection = {'tissue', true};
 
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-hsiUtility.InitializeDataGroup('', dbSelection);
+hsiUtility.ReadDataset('', dbSelection);
 
 %%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
 t20211104_ApplyScriptToEachImage;
