@@ -30,14 +30,14 @@ config.SetSetting('normalization', 'byPixel');
 
 % Read all .h5 files according to info in the DB
 % Normalization according to config.GetSetting('normalization') is applied
-% Consider modifying methods\Preprocessing.m first 
+% Consider modifying methods\Preprocessing.m first
 % The dataset name is set according to config (now 'demo')
 experiment = '';
 hsiUtility.ReadDataset(experiment, dbSelection);
 
-% Export normalized HSI images of tissue samples as a .h5 dataset with 
-% structure /hsi/samplexxx , /mask/samplexxx, /label/samplexxx. Each 
-% sample data is an instance of the hsi class with properties 'Value' (HSI 
+% Export normalized HSI images of tissue samples as a .h5 dataset with
+% structure /hsi/samplexxx , /mask/samplexxx, /label/samplexxx. Each
+% sample data is an instance of the hsi class with properties 'Value' (HSI
 % image) and 'FgMask' (foreground mask). Data is fetched from the dataset
 % mentioned in .config and the result is exported in output\000-Datasets.
 % Used for easy input to python or other environments.
@@ -78,6 +78,7 @@ baseDataset = 'demo';
 trainUtility.Augment(baseDataset, 'set1');
 
 %%%%%%%%%%%%%%%%%%%% Prepare train/test set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% Read h5 data
 folds = 5;
 testingSamples = [5];

@@ -31,7 +31,7 @@ end
 
 if nargin < 5 || isempty(imageLimit)
     imageLimit = 20;
-end 
+end
 numrows = standardDim(1);
 numcols = standardDim(2);
 
@@ -45,20 +45,20 @@ if ~isOneFolder
     fileList = fileList(dirFlags);
     hasTargetType = isfield(criteria, 'TargetType');
     imageNum = numel(fileList) - 2;
-    if imageNum > imageLimit 
+    if imageNum > imageLimit
         imageNum = imageLimit + 2;
-    end 
-    
+    end
+
     imageList = cell(imageNum, 1);
     if hasTargetType
         [targetIDs, ~] = databaseUtility.GetTargetIndexes([], criteria.TargetType);
         imageList = cell(numel(targetIDs), 1);
     end
-    c = 1;   
+    c = 1;
     for i = 3:imageNum
         if (hasTargetType & find(targetIDs == str2double(fileList(i).name))) | ~hasTargetType
             img = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
-            imageList{c} = imresize(img,[numrows numcols]);
+            imageList{c} = imresize(img, [numrows, numcols]);
             c = c + 1;
         end
     end
@@ -79,14 +79,14 @@ else
 
     fileList = dir(pathCriteria);
     imageNum = numel(fileList);
-    if imageNum > imageLimit 
+    if imageNum > imageLimit
         imageNum = imageLimit;
-    end 
+    end
     imageList = cell(numel(imageNum), 1);
 
     for i = 1:imageNum
         img = imread(fullfile(fileList(i).folder, fileList(i).name));
-        imageList{i} = imresize(img,[numrows numcols]);       
+        imageList{i} = imresize(img, [numrows, numcols]);
     end
     saveName = figTitle;
 end

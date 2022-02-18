@@ -8,14 +8,14 @@ classdef plots
         %         Apply(fig, funcName, varargin)
         %         SavePlot(fig)
         %
-        %         %% Graph Properties 
+        %         %% Graph Properties
         %         [imCorr] = BandStatistics(inVectors, statistic, fig)
-        %         [lineColorMap] = GetLineColorMap(style, names) 
+        %         [lineColorMap] = GetLineColorMap(style, names)
         %
-        %         %% Lines        
+        %         %% Lines
         %         Spectra(fig, spectra, wavelengths, names, figTitle)
         %         AverageSpectrum(fig, Inorm)
-        %         Components(hsi, pcNum, figStart) 
+        %         Components(hsi, pcNum, figStart)
         %         Eigenvectors(fig, varargin)
         %
         %         %% Images
@@ -93,7 +93,7 @@ classdef plots
 
             [imCorr] = plots.Apply(fig, @PlotBandStatistics, varargin{:});
         end
-        
+
         %% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [] = Spectra(fig, varargin)
             %%PLOTSPECTRA plots one or more spectra together
@@ -115,7 +115,7 @@ classdef plots
 
             plots.Apply(fig, @PlotAverageSpectrum, varargin{:});
         end
-        
+
         function [] = Components(varargin)
             %PLOTCOMPONENTS plots a pcNum number of PCs, starting at figure figStart
             %
@@ -124,7 +124,7 @@ classdef plots
 
             PlotComponents(varargin{:});
         end
-        
+
         function [] = Eigenvectors(fig, varargin)
             % PlotEigenvectors plots eigenvectors of a deconmposition
             %
@@ -133,7 +133,7 @@ classdef plots
 
             plots.Apply(fig, @PlotEigenvectors, varargin{:});
         end
-         
+
         %% Images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [] = Overlay(fig, varargin)
             % PlotOverlay plots an image with an overlay mask
@@ -147,7 +147,7 @@ classdef plots
         function [] = Dimred(method, dimredResult, w, redHsis)
             PlotDimred(method, dimredResult, w, redHsis);
         end
-        
+
         function [] = Superpixels(fig, varargin)
             % PlotSuperpixels plots the results of superpixel segmentation on the image
             %
@@ -157,7 +157,7 @@ classdef plots
 
             plots.Apply(fig, @PlotSuperpixels, varargin{:});
         end
-  
+
         %% Multi-image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         function [] = MontageFolderContents(fig, varargin)
@@ -186,7 +186,7 @@ classdef plots
         function [] = DualMontage(fig, varargin)
             plots.Apply(fig, @PlotDualMontage, varargin{:});
         end
-        
+
         %% Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [] = NormalizationCheck(fig, varargin)
             %%PlotNormalizationCheck plots the values recovered after normalization
@@ -198,7 +198,7 @@ classdef plots
 
             plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
         end
-        
+
         function [] = ReferenceLibrary(fig, refLib)
             spectra = cell2mat({refLib.Data}');
             [m, n] = size(spectra);
@@ -218,6 +218,6 @@ classdef plots
             config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png'));
             plots.Apply(fig, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
         end
-       
+
     end
 end

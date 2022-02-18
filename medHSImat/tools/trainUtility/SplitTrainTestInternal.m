@@ -1,68 +1,69 @@
 function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(dataset, testTargets, dataType, hasLabels, folds, transformFun)
-    %% SplitTrainTest rearranges pixels as a pixel (observation) by feature 2D array
-    % One pixel is one data sample
-    %
-    %   Arguments 
-    %   dataset: string, the folder name of dataset (must be in
-    %   matfiles\hsi\)
-    %   testTargets: array of str targetNames 
-    %   dataType: 'image' or 'pixel'
-    %   hasLabels: bool
-    %   folds: numeric 
-    %   transformFun: function handle
-    %
-    %   Usage:
-    %   dataset = 'pslBase';
-    %   testTargets = {'153'};
-    %   dataType = 'pixel';
-    %   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType);
-    %
-    %   hasLabels = true;
-    %   transformFun = @Dimred;
-    %   folds = 5;
-    %   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
 
-    hasTest = ~isempty(testTargets);
-    if nargin < 4 
-        hasLabels = true;
-    end
-    if nargin < 5 
-        folds = 5;
-    end 
+%% SplitTrainTest rearranges pixels as a pixel (observation) by feature 2D array
+% One pixel is one data sample
+%
+%   Arguments
+%   dataset: string, the folder name of dataset (must be in
+%   matfiles\hsi\)
+%   testTargets: array of str targetNames
+%   dataType: 'image' or 'pixel'
+%   hasLabels: bool
+%   folds: numeric
+%   transformFun: function handle
+%
+%   Usage:
+%   dataset = 'pslBase';
+%   testTargets = {'153'};
+%   dataType = 'pixel';
+%   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType);
+%
+%   hasLabels = true;
+%   transformFun = @Dimred;
+%   folds = 5;
+%   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
 
-    useTransform = ~(nargin < 6);
+hasTest = ~isempty(testTargets);
+if nargin < 4
+    hasLabels = true;
+end
+if nargin < 5
+    folds = 5;
+end
 
-    %% Read h5 data
-    config.SetSetting('dataset', dataset);
-    [datanames, targetIDs] = dataUtility.DatasetInfo();
+useTransform = ~(nargin < 6);
 
-    X = [];
-    y = [];
-    Xtest = [];
-    ytest = [];
-    sRGBs = cell(length(testTargets), 1);
-    fgMasks = cell(length(testTargets), 1);
+%% Read h5 data
+config.SetSetting('dataset', dataset);
+[datanames, targetIDs] = dataUtility.DatasetInfo();
 
-    k = 0;
-    for i = 1:length(targetIDs)
+X = [];
+y = [];
+Xtest = [];
+ytest = [];
+sRGBs = cell(length(testTargets), 1);
+fgMasks = cell(length(testTargets), 1);
 
-        baseTargetName = targetIDs{i};
-        targetNames = datanames(contains(datanames, baseTargetName));
+k = 0;
+for i = 1:length(targetIDs)
 
-        for j = 1:numel(targetNames)
-            targetName = targetNames{j};
+    baseTargetName = targetIDs{i};
+    targetNames = datanames(contains(datanames, baseTargetName));
 
-            %% load HSI from .mat file
-            [I, label] = hsiUtility.LoadHSIAndLabel(targetName, 'dataset');
-                
-            fgMask = I.FgMask;
-            if ~isempty(label) %% TOREMOVE
-            
+    for j = 1:numel(targetNames)
+        targetName = targetNames{j};
+
+        %% load HSI from .mat file
+        [I, label] = hsiUtility.LoadHSIAndLabel(targetName, 'dataset');
+
+        fgMask = I.FgMask;
+        if ~isempty(label) %% TOREMOVE
+
             if strcmp(dataType, 'image')
                 xdata = I.Value;
                 if hasLabels
                     ydata = label;
-                else 
+                else
                     ydata = [];
                 end
 
@@ -76,13 +77,13 @@ function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(data
                 xdata = Xcol;
                 if hasLabels
                     ydata = GetMaskedPixelsInternal(label, fgMask);
-                else 
+                else
                     ydata = [];
                 end
 
             else
                 error('Incorrect data type');
-            end 
+            end
 
             if isempty(find(contains(testTargets, targetName), 1))
                 if strcmp(dataType, 'image')
@@ -108,14 +109,14 @@ function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(data
                 sRGBs{k} = I.GetDisplayRescaledImage();
                 fgMasks{k} = fgMask;
             end
-            end
-
         end
-    end
 
-    if ~isempty(y)
-        cvp = trainUtility.KfoldPartitions(y, folds);
-    else
-        cvp = [];
     end
+end
+
+if ~isempty(y)
+    cvp = trainUtility.KfoldPartitions(y, folds);
+else
+    cvp = [];
+end
 end

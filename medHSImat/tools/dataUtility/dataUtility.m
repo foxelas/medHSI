@@ -157,7 +157,7 @@ classdef dataUtility
             %
             %   Inputs
             %   dataType: choose between 'preprocessed', 'target', 'white',
-            %   'black', 'dataset', 'raw', 'label', 'param', 
+            %   'black', 'dataset', 'raw', 'label', 'param',
             %   'referenceLib', 'augmentation', 'h5' or 'model'
             %   targetName: the name of the target
             %
@@ -168,8 +168,8 @@ classdef dataUtility
             if nargin < 2
                 targetName = '';
             end
-            
-            if nargin < 3 
+
+            if nargin < 3
                 extension = 'mat';
             end
 
@@ -182,10 +182,10 @@ classdef dataUtility
                             strcat(config.GetSetting('database'), config.GetSetting('normalizedName')), targetName);
                         targetFilename = strcat(baseDir, '_', config.GetSetting('normalization'));
                     end
-                    
+
                 case 'dataset'
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
-                            strcat(config.GetSetting('dataset')), targetName);
+                        strcat(config.GetSetting('dataset')), targetName);
 
                 case 'target'
                     baseDir = fullfile(config.GetSetting('matDir'), ...
@@ -222,11 +222,11 @@ classdef dataUtility
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
                         strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ...
                         targetName);
-                    
+
                 case 'augmentation'
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
-                        config.GetSetting('augmentation'),targetName);
-                    
+                        config.GetSetting('augmentation'), targetName);
+
                 case 'h5'
                     targetFilename = config.DirMake(config.GetSetting('matDir'), ...
                         config.GetSetting('database'), targetName);
@@ -234,7 +234,7 @@ classdef dataUtility
                 otherwise
                     error('Unsupported dataType.');
             end
-            
+
             [~, ~, ext] = fileparts(targetFilename);
             if isempty(ext)
                 targetFilename = strcat(targetFilename, '.', extension);
@@ -242,7 +242,7 @@ classdef dataUtility
                 targetFilename = strrep(targetFilename, ext, strcat('.', extension));
             end
         end
-        
+
         function [datanames, targetIDs] = DatasetInfo()
             fdir = dir(strrep(dataUtility.GetFilename('dataset'), '.mat', '\*.mat'));
             datanames = {fdir.name};

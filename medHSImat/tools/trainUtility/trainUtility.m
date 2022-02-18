@@ -1,11 +1,11 @@
 classdef trainUtility
     %   Static:
-    %       %% Core 
+    %       %% Core
     %       Augment(dataset, augType)
     %       [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
     %       [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask, transformFun)
     %       [cvp] = KfoldPartitions(labels, folds)
-    %     
+    %
     %       %% Train
     %       [acc, sens, spec, tdimred, st, model] = DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q)
     %       [accuracy, sensitivity, specificity, st] = RunSVM(scores, labels, testscores, testlabels)
@@ -28,18 +28,19 @@ classdef trainUtility
             %   Augment(dataset, 'set2');
             AugmentInternal(varargin{:});
         end
-        
+
         function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTest(varargin)
+
             %% SplitTrainTest rearranges pixels as a pixel (observation) by feature 2D array
             % One pixel is one data sample
             %
-            %   Arguments 
+            %   Arguments
             %   dataset: string, the folder name of dataset (must be in
             %   matfiles\hsi\)
-            %   testTargets: array of str targetNames 
+            %   testTargets: array of str targetNames
             %   dataType: 'image' or 'pixel'
             %   hasLabels: bool
-            %   folds: numeric 
+            %   folds: numeric
             %   transformFun: function handle
             %
             %   Usage:
@@ -52,11 +53,12 @@ classdef trainUtility
             %   transformFun = @Dimred;
             %   folds = 5;
             %   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
-            
+
             [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(varargin{:});
         end
-       
+
         function [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask, transformFun)
+
             %% PrepareSpectralDataset rearranges pixels as a pixel (observation) by feature 2D array
             % One pixel is one data sample
             %
@@ -114,7 +116,7 @@ classdef trainUtility
                 end
 
                 labelfile = dataUtility.GetFilename('label', targetName);
-                if exist(labelfile, 'file') 
+                if exist(labelfile, 'file')
                     load(labelfile, 'labelMask');
                     ycol = GetMaskedPixelsInternal(labelMask(1:m, 1:n), fgMask);
 
@@ -162,7 +164,7 @@ classdef trainUtility
             end
             cvp = cvpartition(length(labels), 'kfold', folds);
         end
-        
+
         %% Train  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [accuracy, sensitivity, specificity, st, SVMModel] = RunSVM(scores, labels, testscores, testlabels)
             % SVMModel = fitcsvm(X,Y,'Standardize',true,'KernelFunction','RBF',...
@@ -177,7 +179,7 @@ classdef trainUtility
 
             [accuracy, sensitivity, specificity] = metrics.Evaluations(testlabels, predlabels);
         end
-        
+
         function [acc, sens, spec, tdimred, st, Mdl, scores, testscores] = DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q)
             switch method
                 case 'pca'
