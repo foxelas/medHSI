@@ -15,7 +15,7 @@ classdef hsiUtility
         %         [hsIm] = Preprocess(targetName, option, saveFile)
         %
         %         %% Dataset
-        %         [] = ExportH5Dataset(condition)
+        %         [] = ExportH5Dataset()
         %         [] = ReadDataset(experiment, condition)
         %
         %         %% References
@@ -166,32 +166,27 @@ classdef hsiUtility
         end
 
         %% Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function [] = ExportH5Dataset(condition)
-
+        function [] = ExportH5Dataset()
             %% EXPORTH5DATASET aggregates .mat files per sample to a large h5 dataset
+            %   Reads from the 'dataset' value in config.ini
             %
             %   Usage:
-            %   ExportH5Dataset({'tissue', true});
+            %   ExportH5Dataset();
 
             %% Setup
-            disp('Initializing [InitializeDataGroup]...');
+            disp('Initializing [ExportH5Dataset]...');
 
-            normalization = config.GetSetting('normalization');
-            if strcmp(normalization, 'raw')
-                fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_raw_full', '.h5'));
-            else
-                fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_normalized_full', '.h5'));
-            end
-
-            %% Read h5 data
-            [~, targetIDs, ~] = databaseUtility.Query(condition);
-
+            fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_', config.GetSetting('dataset'), '_full', '.h5'));      
+            [~, targetIDs] = dataUtility.DatasetInfo();
+            
             for i = 1:length(targetIDs)
-                id = targetIDs(i);
-
                 %% load HSI from .mat file
-                targetName = num2str(id);
-                spectralData = hsiUtility.LoadHSI(targetName, 'dataset');
+                targetName = num2str(targetIDs{i});
+                [spectralData, label] = hsiUtility.LoadHSIAndLabel(targetName, 'dataset');
+                if isempty(label)
+                    label = nan;
+                end
+                
                 if (hsi.IsHsi(spectralData))
                     dataValue = spectralData.Value;
                     dataMask = uint8(spectralData.FgMask);
@@ -202,6 +197,10 @@ classdef hsiUtility
                     curName = strcat('/mask/sample', targetName);
                     h5create(fileName, curName, size(dataMask));
                     h5write(fileName, curName, dataMask);
+                    
+                    curName = strcat('/label/sample', targetName);
+                    h5create(fileName, curName, size(label));
+                    h5write(fileName, curName, uint8(label));
 
                 else
                     dataValue = spectralData;
@@ -213,7 +212,7 @@ classdef hsiUtility
             end
 
             h5disp(fileName);
-            fprintf('Saved dataset at %s.\n\n', fileName);
+            fprintf('Saved .h5 dataset at %s.\n\n', fileName);
 
         end
         

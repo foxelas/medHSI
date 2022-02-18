@@ -1,9 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 % Update config.ini to adjust directory names etc.
 config.SetOpt();
-config.SetSetting('isTest', false);
-config.SetSetting('database', 'demo');
-config.SetSetting('normalization', 'byPixel');
 
 %%%%%%%%%%%%%%%%%%%% Check Data %%%%%%%%%%%%%%%%%%%%%
 % Files are saved as .h5 files in directory config.GetSetting('dataDir')
@@ -23,22 +20,28 @@ config.SetSetting('normalization', 'byPixel');
 
 % Select entries from the db so that Content = 'tissue' (exact match)
 dbSelection = {'tissue', true};
+% Validate the details of each data sample
+[filenames, targetIDs, outRows] = databaseUtility.Query(dbSelection);
+
+%Set settings for database preparation
+config.SetSetting('isTest', false);
+config.SetSetting('database', 'demo');
+config.SetSetting('normalization', 'byPixel');
 
 % Read all .h5 files according to info in the DB
+% Normalization according to config.GetSetting('normalization') is applied
 % Consider modifying methods\Preprocessing.m first 
-hsiUtility.ReadDataset('', dbSelection);
+% The dataset name is set according to config (now 'demo')
+experiment = '';
+hsiUtility.ReadDataset(experiment, dbSelection);
 
-%%%%%%%%%%%%%%%%%%%%% Export H5 %%%%%%%%%%%%%%%%%%%%%
-% Export raw HSI images of tissue samples as a .h5 dataset with structure
-% /hsi/samplexxx . Each sample data is 3D array of raw measurements.
-config.SetSetting('normalization', 'raw');
-hsiUtility.ExportH5Dataset(dbSelection);
-
-% Export normalized HSI images of tissue samples as a .h5 dataset with structure
-% /hsi/samplexxx . Each sample data is an instance of the hsi class with
-% properties 'Value' (HSI image) and 'FgMask' (foreground mask).
-config.SetSetting('normalization', 'byPixel');
-hsiUtility.ExportH5Dataset(dbSelection);
+% Export normalized HSI images of tissue samples as a .h5 dataset with 
+% structure /hsi/samplexxx , /mask/samplexxx, /label/samplexxx. Each 
+% sample data is an instance of the hsi class with properties 'Value' (HSI 
+% image) and 'FgMask' (foreground mask). Data is fetched from the dataset
+% mentioned in .config and the result is exported in output\000-Datasets.
+% Used for easy input to python or other environments.
+hsiUtility.ExportH5Dataset();
 
 %%%%%%%%%%%%%%%%%%%%% Read Specific Data %%%%%%%%%%%%%%%%%%%%%
 % Reads file with DB ID = 150 and no preprocessing
@@ -71,8 +74,8 @@ fig = 1;
 plots.AverageSpectrum(fig, hsIm);
 
 %%%%%%%%%%%%%%%%%%%%% Prepare an augmented dataset %%%%%%%%%%%%%%%%%%%%
-trainUtility.AugmentDataGroup('sample001-tissue', dbSelection, 'set1');
-
+baseDataset = 'demo';
+trainUtility.Augment(baseDataset, 'set1');
 
 %%%%%%%%%%%%%%%%%%%% Prepare train/test set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Read h5 data

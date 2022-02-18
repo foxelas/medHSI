@@ -38,4 +38,5 @@ t20220121_Dimred
 t20220122_Dimred
 t210910_ReadHands
 
-trainUtility.AugmentDataGroup('sample001-tissue', dbSelection, 'set1');
+baseDataset = 'pslBase';
+trainUtility.Augment(baseDataset, 'set1');
