@@ -77,11 +77,9 @@ else
 end
 
 if config.GetSetting('showFigures')
-    if config.GetSetting('saveImages')
-        filepath = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('backgroundRemoval'), ...
-            config.GetSetting('database'), strcat(config.GetSetting('fileName'), '.jpg'));
-        config.SetSetting('plotName', filepath);
-    end
+    filepath = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('backgroundRemoval'), ...
+        config.GetSetting('database'), strcat(config.GetSetting('fileName'), '.jpg'));
+    config.SetSetting('plotName', filepath);
     plots.Overlay(1, Irgb, fgMask);
 end
 

@@ -1,55 +1,103 @@
 classdef hsiUtility
     methods (Static)
-        % Contents
-        %
-        %     Static:
-        %         %% System properties
-        %         [x] = GetWavelengths(m, option)
-        %
-        %         %% Input/Output
-        %         [labelMask] = ReadLabel(targetName)
-        %         [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
-        %         [hsIm] = ReadHSI(content, target, experiment, blackIsCapOn)
-        %         [hsIm] = LoadHSI(targetName, dataType)
-        %         [hsIm, label] = LoadHSIAndLabel(targetName, dataType)
-        %         [hsIm] = Preprocess(targetName, option, saveFile)
-        %
-        %         %% Dataset
-        %         [] = ExportH5Dataset()
-        %         [] = ReadDataset(experiment, condition)
-        %
-        %         %% References
-        %         [spectralData] = LoadHSIReference(targetName, refType)
-        %         [refLib] = PrepareReferenceLibrary(targetIDs, disease)
-        %         [refLib] = GetReferenceLibrary()
+%======================================================================
+%> @brief LoadHsiAndLabel loads both hsi and hsiInfo objects
+%>
+%> The hsi and hsiInfo objects should have been initialized beforehand with
+%> hsiUtility.PrepareDataset().
+%>
+%> @b Usage
+%> 
+%> @code
+%> [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel('150');
+%> @endcode
+%>
+%> @param targetId [char] | The unique ID of the target sample
+%>
+%> @retval spectralData [hsi] | The initialized hsi object
+%> @retval labelInfo [hsiInfo] | The initialized hsiInfo object
+%======================================================================
+        function [spectralData, labelInfo] = LoadHsiAndLabel(targetID)
+%> @brief LoadHsiAndLabel loads both hsi and hsiInfo objects
+%>
+%> The hsi and hsiInfo objects should have been initialized beforehand with
+%> hsiUtility.PrepareDataset().
+%>
+%> @b Usage
+%> 
+%> @code
+%> [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel('150');
+%> @endcode
+%>
+%> @param targetId [char] | The unique ID of the target sample
+%>
+%> @retval spectralData [hsi] | The initialized hsi object
+%> @retval labelInfo [hsiInfo] | The initialized hsiInfo object
+            targetFilename = dataUtility.GetFilename('dataset', targetID);
+            
+            if ~exist(targetFilename, 'file')
+                error('There are no data for the requested ID = %s.', targetID);
+            end
+            
+            variableInfo = who('-file', targetFilename);
+            if ismember('labelInfo', variableInfo) % returns true
+                load(targetFilename, 'spectralData', 'labelInfo');
+            else
+                load(targetFilename, 'spectralData');
+                labelInfo = hsiInfo.Empty();
+            end
+        end
 
-                function [hsIm, label] = LoadHSIAndLabel(varargin)
-            % LoadHSIAndLabel reads a stored HSI and a label array from
-            % a .mat file
-            %
-            %   Input
-            %   targetName: a string with the target id
-            %   dataType: 'raw', 'dataset' or 'preprocessed'
-            %
-            %   Usage:
-            %   [spectralData, label] = LoadHSIAndLabel(targetName)
-            %   [spectralData, label] = LoadHSIAndLabel(targetName)
-            [hsIm, label] = LoadHSIInternal(varargin{:});
-                end
-        
         %% System properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%======================================================================
+%> @brief GetWavelengths returns the wavelengths of the hyperspectral image
+%>
+%> Depending on the option, it either returns the wavelengths or the
+%> wavelength indexes of the spectral image.
+%>
+%> @b Usage
+%>   x = hsiUtility.GetWavelengths(m) returns wavelengths as a vector of wavelengths
+%>
+%>   x = hsiUtility.GetWavelengths(m, 'raw') returns wavelengths as a vector of wavelengths
+%>   
+%>   x = hsiUtility.GetWavelengths(m, 'index') returns indexes respective to selected wavelengths
+%>
+%>   x = hsiUtility.GetWavelengths(m, 'babel') returns indexes respective to selected wavelengths for babel standard spectra
+%> @code 
+%>
+%> @endcode
+%>
+%> @param m [int] | The total number of spectral channels
+%> @param option [char] | The option for return value. Can be 'raw',
+%> 'index', 'babel' or empty.
+%>
+%> @retval x [numeric array] | An array of wavelengths or wavelength
+%> indexes 
+%======================================================================
         function [x] = GetWavelengths(m, option)
-            %GETWAVELENGTHS returns the wavelengths
-            %
-            %   Usage:
-            %   x = GetWavelengths(m) returns wavelengths as a vector of wavelengths
-            %   x = GetWavelengths(m, 'raw') returns wavelengths as a vecrtor of
-            %   wavelengths
-            %   x = GetWavelengths(m, 'index') returns indexes respective to selected
-            %   wavelengths
-            %   x = GetWavelengths(m, 'babel') returns indexes respective to selected
-            %   wavelengths for babel standard spectra
-            %
+%> @brief GetWavelengths returns the wavelengths of the hyperspectral image
+%>
+%> Depending on the option, it either returns the wavelengths or the
+%> wavelength indexes of the spectral image.
+%>
+%> @b Usage
+%>   x = hsiUtility.GetWavelengths(m) returns wavelengths as a vector of wavelengths
+%>
+%>   x = hsiUtility.GetWavelengths(m, 'raw') returns wavelengths as a vector of wavelengths
+%>   
+%>   x = hsiUtility.GetWavelengths(m, 'index') returns indexes respective to selected wavelengths
+%>
+%>   x = hsiUtility.GetWavelengths(m, 'babel') returns indexes respective to selected wavelengths for babel standard spectra
+%> @code 
+%>
+%> @endcode
+%>
+%> @param m [int] | The total number of spectral channels
+%> @param option [char] | The option for return value. Can be 'raw',
+%> 'index', 'babel' or empty.
+%>
+%> @retval x [numeric array] | An array of wavelengths or wavelength
+%> indexes 
 
             if nargin < 2
                 option = 'raw';
@@ -100,36 +148,49 @@ classdef hsiUtility
 
         end
 
-        %% Input/Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-        function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
-            %LOADH5DATA loads info from h5 file
-            %
-            %   Usage:
-            %   [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
-            %   returns spectralData, XYZ image and capture wavelengths
+%% Input/Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%======================================================================
+%> @brief ReadH5 loads the hyperspectral image from an .h5 file.
+%>
+%> The .h5 data are assumed to be saved in config::[dataDir]\*.h5
+%> After reading, the image is saved in config::[matDir]\[database]\*.mat.
+%>
+%> @ Usage
+%> @code
+%> [spectralData, imageXYZ, wavelengths] = hsiUtility.ReadH5(filename);
+%> @endcode
+%>
+%> @param filename [char] | The filename of the file to read
+%>
+%> @retval spectralData [numeric array] | The hyperspectral image
+%> @retval imageXYZ [numeric array] | The XYZ image
+%> @retval wavelengths [numeric array] | The spectral wavelengths
+%======================================================================
+        function [spectralData, imageXYZ, wavelengths] = ReadH5(filename)
+%> @brief ReadH5 loads the hyperspectral image from an .h5 file.
+%>
+%> The .h5 data are assumed to be saved in config::[dataDir]\*.h5
+%> After reading, the image is saved in config::[matDir]\[database]\*.mat.
+%>
+%> @ Usage
+%> @code
+%> [spectralData, imageXYZ, wavelengths] = hsiUtility.ReadH5(filename);
+%> @endcode
+%>
+%> @param filename [char] | The filename of the file to read
+%>
+%> @retval spectralData [numeric array] | The hyperspectral image
+%> @retval imageXYZ [numeric array] | The XYZ image
+%> @retval wavelengths [numeric array] | The spectral wavelengths
             [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
         end
-        
-        function [hsIm] = ReadHSI(varargin)
-            %%ReadHSI returns the three images necessary for data analysis
-            %
-            %   Usage:
-            %   [raw] = ReadHSI(target, experiment, blackIsCapOn)
 
-            [hsIm] = ReadHSIInternal(varargin{:});
+        function [spectralData] = ReadTriplet(varargin)
+            [spectralData] = ReadTriplet(varargin{:});
         end
 
-        function [hsIm] = Preprocess(varargin)
-            %LoadAndPreprocess returns spectral data from HSI image
-            %
-            %   Usage:
-            %   spectralData = LoadAndPreprocess('sample2') returns a
-            %   cropped HSI with 'byPixel' normalization
-            %
-            %   spectralData = LoadAndPreprocess('sample2', 'raw')
-            %   spectralData = LoadAndPreprocess('sample2', 'byPixel', true)
-            hsIm = LoadAndPreprocess(varargin{:});
+        function [spectralData] = ReadRaw(targetID)
+            load(dataUtility.GetFilename('target', targetID), 'spectralData');
         end
 
         %% Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,18 +246,56 @@ classdef hsiUtility
 
         end
 
-        function [] = ReadDataset(experiment, condition)
-            % ReadDataset reads a group of hsi data, prepares .mat files,
-            % prepared normalized files and returns montage previews of contents
-            % It also prepare labels. Data samples are saved in .mat files
-            % so that each contains a 'spectralData' (class hsi) and a
-            % 'label' (class logical array) variable.
-            %
-            %   Usage:
-            %   ReadDataset('handsOnly',{'hand', false})
-            %   ReadDataset('sample001-tissue', {'tissue', true});
-
-            ReadDatasetInternal(experiment, condition);
+        %======================================================================
+        %> @brief ReadDataset reads the dataset.
+        %>
+        %> ReadDataset reads a group of hsi data according to condition, prepares
+        %> .mat files for the raw spectral data, applies preprocessing and returns
+        %> montage previews of the results. It also prepares labels, when
+        %> available.
+        %>
+        %>  Data samples are saved in .mat files so that one contains a
+        %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
+        %> hsiInfo) variable.
+        %> The save location is config::[matDir]\[dataset]\*.mat.
+        %> Snapshot images are saved in config::[outputDir]\[snapshots]\[dataset]\.
+        %>
+        %> @b Usage
+        %> @code
+        %> ReadDataset('handsDataset',{'hand', false});
+        %>
+        %> ReadDataset('pslData', {'tissue', true});
+        %> @endcode
+        %>
+        %> @param dataset [char] | The dataset
+        %> @param condition [cell array] | The conditions for reading files
+        %>
+        %======================================================================
+        function [] = PrepareDataset(dataset, condition)
+            %> @brief ReadDataset reads the dataset.
+            %>
+            %> ReadDataset reads a group of hsi data according to condition, prepares
+            %> .mat files for the raw spectral data, applies preprocessing and returns
+            %> montage previews of the results. It also prepares labels, when
+            %> available.
+            %>
+            %>  Data samples are saved in .mat files so that one contains a
+            %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
+            %> hsiInfo) variable.
+            %> The save location is config::[matDir]\[dataset]\*.mat.
+            %> Snapshot images are saved in config::[outputDir]\[snapshots]\[dataset]\.
+            %>
+            %> @b Usage
+            %> @code
+            %> ReadDataset('handsDataset',{'hand', false});
+            %>
+            %> ReadDataset('pslData', {'tissue', true});
+            %> @endcode
+            %>
+            %> @param dataset [char] | The dataset
+            %> @param condition [cell array] | The conditions for reading files
+            %>
+            ReadDataset(dataset, condition);
         end
 
         %% References %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

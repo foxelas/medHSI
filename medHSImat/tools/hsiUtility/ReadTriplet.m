@@ -1,10 +1,52 @@
-function [spectralData] = ReadHSIInternal(content, target, experiment, blackIsCapOn)
-%%ReadHSIInternal returns the three images necessary for data analysis
-%
-%   Usage:
-%   [raw] = ReadHSIInternal(content, target, experiment, blackIsCapOn)
+%======================================================================
+%> @brief ReadTriplet reads and saves the three hyperspectral images
+%>
+%> The hyperspectral data are saved in .h5 format. The raw, white and black
+%> (if exist) images are read one-by-one for the same target. Each HSI is
+%> saved in config::[matDir]\[database]\[tripletsName]\*_xxx.mat, where
+%> xxx is either '_target', '_white' or '_black'.
+%>
+%> @b Usage
+%>
+%> @code
+%> content = 'tissue';
+%> target = '001_raw';
+%> spectralData = ReadTriplet(content);
+%>
+%> spectralData = ReadTriplet(content, target, blackIsCapOn);
+%> @endcode
+%>
+%> @param content [cell array] | Contains the content to be imported
+%> @param target [char] | Contains the target to be imported
+%> @param blackIsCapOn [logical] | Flag about the use of blackCap for dark image
+%>
+%> @retval spectralData [numeric array] | The target (tissue) hyperspectral image
+%======================================================================
+function [spectralData] = ReadTriplet(content, target, blackIsCapOn)
+%> @brief ReadTriplet reads and saves the three hyperspectral images
+%>
+%> The hyperspectral data are saved in .h5 format. The raw, white and black
+%> (if exist) images are read one-by-one for the same target. Each HSI is
+%> saved in config::[matDir]\[database]\[tripletsName]\*_xxx.mat, where
+%> xxx is either '_target', '_white' or '_black'.
+%>
+%> @b Usage
+%>
+%> @code
+%> content = 'tissue';
+%> target = '001_raw';
+%> spectralData = ReadTriplet(content);
+%>
+%> spectralData = ReadTriplet(content, target, blackIsCapOn);
+%> @endcode
+%>
+%> @param content [cell array] | Contains the content to be imported
+%> @param target [char] | Contains the target to be imported
+%> @param blackIsCapOn [logical] | Flag about the use of blackCap for dark image
+%>
+%> @retval spectralData [numeric array] | The target (tissue) hyperspectral image
 
-if nargin < 4
+if nargin < 3
     blackIsCapOn = false;
 end
 
@@ -12,7 +54,7 @@ end
 fcTarget = databaseUtility.GetFileConditions(content, target);
 [filename, tableId] = databaseUtility.GetFilename(fcTarget{:});
 targetName = num2str(tableId);
-[spectralData, ~, ~] = hsiUtility.LoadH5Data(filename);
+[spectralData, ~, ~] = hsiUtility.ReadH5(filename);
 
 if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
         || ~exist(dataUtility.GetFilename('black', targetName), 'file') ...

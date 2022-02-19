@@ -19,6 +19,5 @@ if hasTitle
 end
 
 SavePlot(fig);
-warning('on');
 
 end

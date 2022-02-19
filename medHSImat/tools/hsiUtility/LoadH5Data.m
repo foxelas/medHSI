@@ -1,10 +1,36 @@
+%======================================================================
+%> @brief LoadH5Data loads the hyperspectral image from an .h5 file.
+%>
+%> The .h5 data are assumed to be saved in config::[dataDir]\*.h5
+%> After reading, the image is saved in config::[matDir]\[database]\*.mat.
+%>
+%> @ Usage
+%> @code
+%> [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
+%> @endcode
+%>
+%> @param filename [char] | The filename of the file to read
+%>
+%> @retval spectralData [numeric array] | The hyperspectral image
+%> @retval imageXYZ [numeric array] | The XYZ image
+%> @retval wavelengths [numeric array] | The spectral wavelengths
+%======================================================================
 function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
-%LOADH5DATA loads info from h5 file
-%
-%   Usage:
-%   [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
-%   returns spectralData, XYZ image and capture wavelengths
-
+%> @brief LoadH5Data loads the hyperspectral image from an .h5 file.
+%>
+%> The .h5 data are assumed to be saved in config::[dataDir]\*.h5
+%> After reading, the image is saved in config::[matDir]\[database]\*.mat.
+%>
+%> @ Usage
+%> @code
+%> [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
+%> @endcode
+%>
+%> @param filename [char] | The filename of the file to read
+%>
+%> @retval spectralData [numeric array] | The hyperspectral image
+%> @retval imageXYZ [numeric array] | The XYZ image
+%> @retval wavelengths [numeric array] | The spectral wavelengths
 filename = strrep(filename, '.hsm', '.h5');
 saveFilename = dataUtility.GetFilename('h5', filename);
 

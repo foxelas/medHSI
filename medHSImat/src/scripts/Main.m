@@ -26,7 +26,7 @@ CheckImportData();
 dbSelection = {'tissue', true};
 
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-hsiUtility.ReadDataset('', dbSelection);
+hsiUtility.PrepareDataset('', dbSelection);
 
 %%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
 t20211104_ApplyScriptToEachImage;

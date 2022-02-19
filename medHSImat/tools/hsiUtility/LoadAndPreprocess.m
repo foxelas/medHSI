@@ -5,18 +5,18 @@
 %> Requires data to be read in a .mat file before-hand.
 %>
 %> @b Usage:
-%> 
+%>
 %> @code
 %> % To read and preprocess a file with ID = 158
 %> hsIm = LoadAndPreprocess('158');
-%> 
+%>
 %> % To read, preprocess and save a file with ID = 158
 %> config.SetSetting('normalization', 'byPixel');
 %> hsIm = LoadAndPreprocess('158', true);
 %> % The preprocessed file is saved in
 %> % matfiles\hsi\pslNormalized\158_byPixel.mat
 %> @endcode
-%> 
+%>
 %> Preprocessed data file is saved with the same filename in a folder
 %> according to config -> 'normalization'.
 %>
@@ -32,12 +32,12 @@ function hsIm = LoadAndPreprocess(targetName, saveFile)
 %> Requires data to be read in a .mat file before-hand.
 %>
 %> @b Usage:
-%> 
+%>
 %> @code
 %> % To read and preprocess a file with ID = 158
 %>
 %> hsIm = LoadAndPreprocess('158');
-%> 
+%>
 %> % To read, preprocess and save a file with ID = 158
 %>
 %> config.SetSetting('normalization', 'byPixel');
@@ -46,7 +46,7 @@ function hsIm = LoadAndPreprocess(targetName, saveFile)
 %> % The preprocessed file is saved in
 %> % matfiles\hsi\pslNormalized\158_byPixel.mat
 %> @endcode
-%> 
+%>
 %> Preprocessed data file is saved with the same filename in a folder
 %> according to config -> 'normalization'.
 %>

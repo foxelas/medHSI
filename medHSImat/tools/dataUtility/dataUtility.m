@@ -205,11 +205,6 @@ classdef dataUtility
                         strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), targetName);
                     targetFilename = strcat(baseDir, '_black');
 
-                case 'label'
-                    baseDir = config.DirMake(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
-                    targetFilename = strcat(baseDir, '_label');
-
                 case 'model'
                     targetFilename = config.DirMake(config.GetSetting('outputDir'), ...
                         config.GetSetting('experiment'), targetName);
@@ -247,7 +242,7 @@ classdef dataUtility
             fdir = dir(strrep(dataUtility.GetFilename('dataset'), '.mat', '\*.mat'));
             if numel(fdir) < 1
                 error('You should first read the dataset. Use hsiUtility.ReadDataset().');
-                
+
             else
                 datanames = {fdir.name};
                 unNames = cellfun(@(x) strsplit(x, {'_', '.'}), datanames', 'un', 0);

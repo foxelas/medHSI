@@ -45,8 +45,8 @@ switch method
         error('Unsupported normalization method.');
 end
 
-hsInorm = hsi(Inorm, false);
-hsInorm.FgMask = hsIm.FgMask;
+hsInorm = hsIm;
+hsInorm.Value = Inorm;
 
 if ~config.GetSetting('disableReflectranceExtremaPlots')
     fig = 1;

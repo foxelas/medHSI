@@ -13,29 +13,30 @@ classdef hsi
         SampleID = ''
         %> A string that shows the tissue type
         TissueType = ''
-        %> The hyperspectral image 
-        Value {mustBeNumeric}
+        %> The hyperspectral image
+        Value{mustBeNumeric}
         %> The foreground mask i.e. the mask of tissue tensors
         FgMask = []
     end
 
     methods
+
         %% Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         function [obj] = hsi(hsImVal, calcMask, id, sampleId, tissueType)
             if nargin < 2
                 calcMask = true;
             end
-            
-            if nargin < 3 
+
+            if nargin >= 3
                 obj.ID = id;
-            end 
-            
-            if nargin < 4 
+            end
+
+            if nargin >= 4
                 obj.SampleID = sampleId;
             end
-            
-            if nargin < 5
+
+            if nargin >= 5
                 obj.TissueType = tissueType;
             end
 
@@ -44,7 +45,7 @@ classdef hsi
                 [~, fgMask] = RemoveBackgroundInternal(hsImVal);
                 obj.FgMask = fgMask;
             end
-            
+
         end
 
         function [obj] = set.FgMask(obj, inMask)
@@ -268,20 +269,16 @@ classdef hsi
     end
 
     methods (Static)
-        
-        function [obj] = Read(targetName)
-            hsIm = hsi(hsiUtility.LoadHSI(targetName, 'raw'));
-        end
-        
+
         %======================================================================
         %> @brief Load recovers the saved instance for the targetID
         %>
         %> In order to work properly it need the argument to be read and preprocessed first.
-        %> Use ... 
+        %> Use ...
         %>
         %> @b Usage
-        %> 
-        %> @code 
+        %>
+        %> @code
         %>  config.SetSetting('normalization', 'raw');
         %>  spectralData = LoadHSIInternal(targetName);
         %>
@@ -297,27 +294,27 @@ classdef hsi
         %> @retval obj [hsi] | The loaded hsi object
         %======================================================================
         function [obj] = Load(targetID, dataType)
-        %> @brief Load recovers the saved instance for the targetID
-        %>
-        %> In order to work properly it need the argument to be read and preprocessed first.
-        %> Use ... 
-        %>
-        %> @b Usage
-        %> 
-        %> @code 
-        %>  config.SetSetting('normalization', 'raw');
-        %>  spectralData = LoadHSIInternal(targetName);
-        %>
-        %>  spectralData = LoadHSIInternal(targetName, 'dataset');
-        %>
-        %>  config.SetSetting('normalization', 'byPixel');
-        %>  spectralData = LoadHSIInternal(targetName, 'preprocessed');
-        %> @endcode
-        %>
-        %> @param targetID [char] | The unique ID of the target sample
-        %> @param dataType [char] | Either 'dataset', 'preprocessed' or 'raw'
-        %>
-        %> @retval obj [hsi] | The loaded hsi object
+            %> @brief Load recovers the saved instance for the targetID
+            %>
+            %> In order to work properly it need the argument to be read and preprocessed first.
+            %> Use ...
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %>  config.SetSetting('normalization', 'raw');
+            %>  spectralData = LoadHSIInternal(targetName);
+            %>
+            %>  spectralData = LoadHSIInternal(targetName, 'dataset');
+            %>
+            %>  config.SetSetting('normalization', 'byPixel');
+            %>  spectralData = LoadHSIInternal(targetName, 'preprocessed');
+            %> @endcode
+            %>
+            %> @param targetID [char] | The unique ID of the target sample
+            %> @param dataType [char] | Either 'dataset', 'preprocessed' or 'raw'
+            %>
+            %> @retval obj [hsi] | The loaded hsi object
             if nargin < 2
                 dataType = 'raw';
             end
@@ -326,10 +323,10 @@ classdef hsi
                 targetID = num2str(targetID);
             end
             targetFilename = dataUtility.GetFilename(dataType, targetID);
-            
+
             load(targetFilename, 'spectralData');
             obj = spectralData;
-        end        
+        end
 
         function [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
             % RecoverOriginalDimensionsInternal returns an image that matches the
