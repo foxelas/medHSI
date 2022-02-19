@@ -1,5 +1,5 @@
 % ======================================================================
-%> @brief A class that holds tumor labels and diagnosis information.
+%> @brief hsiInfo is a class that holds tumor labels and diagnosis information.
 %
 %> It is used to contain the information about the labeled dataset.
 %> It works in tandem with the @b hsi class.
@@ -88,10 +88,7 @@ classdef hsiInfo
     %> @endcode
     %>
     %> @retval obj [hsiInfo] | The initialized hsiInfo object
-            obj.ID = '';
-            obj.SampleID = '';
-            obj.Labels = [];
-            obj.Diagnosis = '';
+            obj = hsiInfo('', '',  [], '');
         end
         
     % ======================================================================

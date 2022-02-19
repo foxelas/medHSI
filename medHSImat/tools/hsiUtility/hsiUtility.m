@@ -23,6 +23,20 @@ classdef hsiUtility
         %         [refLib] = PrepareReferenceLibrary(targetIDs, disease)
         %         [refLib] = GetReferenceLibrary()
 
+                function [hsIm, label] = LoadHSIAndLabel(varargin)
+            % LoadHSIAndLabel reads a stored HSI and a label array from
+            % a .mat file
+            %
+            %   Input
+            %   targetName: a string with the target id
+            %   dataType: 'raw', 'dataset' or 'preprocessed'
+            %
+            %   Usage:
+            %   [spectralData, label] = LoadHSIAndLabel(targetName)
+            %   [spectralData, label] = LoadHSIAndLabel(targetName)
+            [hsIm, label] = LoadHSIInternal(varargin{:});
+                end
+        
         %% System properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [x] = GetWavelengths(m, option)
             %GETWAVELENGTHS returns the wavelengths
@@ -96,7 +110,7 @@ classdef hsiUtility
             %   returns spectralData, XYZ image and capture wavelengths
             [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
         end
-
+        
         function [hsIm] = ReadHSI(varargin)
             %%ReadHSI returns the three images necessary for data analysis
             %
@@ -104,33 +118,6 @@ classdef hsiUtility
             %   [raw] = ReadHSI(target, experiment, blackIsCapOn)
 
             [hsIm] = ReadHSIInternal(varargin{:});
-        end
-
-        function [hsIm] = LoadHSI(varargin)
-            % LoadHSI reads a stored HSI from a .mat file
-            %
-            %   Input
-            %   targetName: a string with the target id
-            %   dataType: 'raw', 'dataset' or 'preprocessed'
-            %
-            %   Usage:
-            %   [spectralData] = LoadHSI(targetName)
-            %   [spectralData] = LoadHSI(targetName)
-            [hsIm, ~] = LoadHSIInternal(varargin{:});
-        end
-
-        function [hsIm, label] = LoadHSIAndLabel(varargin)
-            % LoadHSIAndLabel reads a stored HSI and a label array from
-            % a .mat file
-            %
-            %   Input
-            %   targetName: a string with the target id
-            %   dataType: 'raw', 'dataset' or 'preprocessed'
-            %
-            %   Usage:
-            %   [spectralData, label] = LoadHSIAndLabel(targetName)
-            %   [spectralData, label] = LoadHSIAndLabel(targetName)
-            [hsIm, label] = LoadHSIInternal(varargin{:});
         end
 
         function [hsIm] = Preprocess(varargin)

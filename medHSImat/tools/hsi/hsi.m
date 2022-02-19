@@ -1,67 +1,42 @@
+% ======================================================================
+%> @brief hsi is a class that holds the hyperspectral image.
+%
+%> It is used to contain both the hyperspectral image and additional information.
+%> For labels, use @b hsiInfo class.
+%>
+% ======================================================================
 classdef hsi
     properties
-        Value{mustBeNumeric}
+        %> A string that shows the target ID
+        ID = ''
+        %> A string that shows the sampleID
+        SampleID = ''
+        %> A string that shows the tissue type
+        TissueType = ''
+        %> The hyperspectral image 
+        Value {mustBeNumeric}
+        %> The foreground mask i.e. the mask of tissue tensors
         FgMask = []
     end
 
     methods
-
-        %% Contents
-        %
-        %   Non-Static:
-        %   %% Set
-        %   [obj] = hsi(hsImVal, calcMask)
-        %   [obj] = set.FgMask(obj,inMask)
-        %   [obj] = Update(obj, ind, vals)
-        %
-        %   %% Common Properties
-        %   [varargout] = Size(obj)
-        %
-        %   %% Masking
-        %   [maskedPixels] = GetMaskedPixels(obj, mask)
-        %   [fgMask] = GetCustomMask(obj)
-        %   [fgMask] = GetFgMask(obj, varargin)
-        %   [updatedHSI, fgMask] = RemoveBackground(obj, varargin)
-        %   [spectrumCurves] = GetSpectraFromMask(obj, varargin)
-        %   [newI, idxs] = GetQualityPixels(obj, varargin)
-        %
-        %   %% Processing
-        %   [obj] = Normalize(obj, varargin)
-        %   [obj] = Preprocess(obj, targetName)
-        %
-        %   %% Segmentation
-        %   [labels] = Cubseg(obj, varargin)
-        %
-        %   %% Dimension Reduction
-        %   [col] = ToColumn(obj)
-        %   [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
-        %   [scores] = SPCA(obj, varargin)
-        %   [scores] = Transform(obj, method, varargin)
-        %   [dispImage] = GetDisplayImage(obj, varargin)
-        %   [dispImage] = GetDisplayRescaledImage(obj, varargin)
-        %
-        %   %% Metrics
-        %   [c] = GetBandCorrelation(obj, hasPixelSelection)
-        %
-        %   %% Operators
-        %   [obj] = Plus(obj, hsiIm)
-        %   [obj] = Minus(obj, hsiIm)
-        %   [obj] = Max(obj, value)
-        %   [ind] = IsNan(obj)
-        %   [ind] = IsInf(obj)
-        %   [obj] = Index(obj, obj2)
-        %
-        %   Static
-        %   %% Dimension Reduction
-        %   [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
-        %
-        %   %% Is
-        %   [flag] = IsHsi(obj)
-
         %% Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function [obj] = hsi(hsImVal, calcMask)
+        
+        function [obj] = hsi(hsImVal, calcMask, id, sampleId, tissueType)
             if nargin < 2
                 calcMask = true;
+            end
+            
+            if nargin < 3 
+                obj.ID = id;
+            end 
+            
+            if nargin < 4 
+                obj.SampleID = sampleId;
+            end
+            
+            if nargin < 5
+                obj.TissueType = tissueType;
             end
 
             obj.Value = hsImVal;
@@ -69,6 +44,7 @@ classdef hsi
                 [~, fgMask] = RemoveBackgroundInternal(hsImVal);
                 obj.FgMask = fgMask;
             end
+            
         end
 
         function [obj] = set.FgMask(obj, inMask)
@@ -292,8 +268,68 @@ classdef hsi
     end
 
     methods (Static)
+        
+        function [obj] = Read(targetName)
+            hsIm = hsi(hsiUtility.LoadHSI(targetName, 'raw'));
+        end
+        
+        %======================================================================
+        %> @brief Load recovers the saved instance for the targetID
+        %>
+        %> In order to work properly it need the argument to be read and preprocessed first.
+        %> Use ... 
+        %>
+        %> @b Usage
+        %> 
+        %> @code 
+        %>  config.SetSetting('normalization', 'raw');
+        %>  spectralData = LoadHSIInternal(targetName);
+        %>
+        %>  spectralData = LoadHSIInternal(targetName, 'dataset');
+        %>
+        %>  config.SetSetting('normalization', 'byPixel');
+        %>  spectralData = LoadHSIInternal(targetName, 'preprocessed');
+        %> @endcode
+        %>
+        %> @param targetID [char] | The unique ID of the target sample
+        %> @param dataType [char] | Either 'dataset', 'preprocessed' or 'raw'
+        %>
+        %> @retval obj [hsi] | The loaded hsi object
+        %======================================================================
+        function [obj] = Load(targetID, dataType)
+        %> @brief Load recovers the saved instance for the targetID
+        %>
+        %> In order to work properly it need the argument to be read and preprocessed first.
+        %> Use ... 
+        %>
+        %> @b Usage
+        %> 
+        %> @code 
+        %>  config.SetSetting('normalization', 'raw');
+        %>  spectralData = LoadHSIInternal(targetName);
+        %>
+        %>  spectralData = LoadHSIInternal(targetName, 'dataset');
+        %>
+        %>  config.SetSetting('normalization', 'byPixel');
+        %>  spectralData = LoadHSIInternal(targetName, 'preprocessed');
+        %> @endcode
+        %>
+        %> @param targetID [char] | The unique ID of the target sample
+        %> @param dataType [char] | Either 'dataset', 'preprocessed' or 'raw'
+        %>
+        %> @retval obj [hsi] | The loaded hsi object
+            if nargin < 2
+                dataType = 'raw';
+            end
 
-        %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            if isnumeric(targetID)
+                targetID = num2str(targetID);
+            end
+            targetFilename = dataUtility.GetFilename(dataType, targetID);
+            
+            load(targetFilename, 'spectralData');
+            obj = spectralData;
+        end        
 
         function [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
             % RecoverOriginalDimensionsInternal returns an image that matches the
