@@ -245,10 +245,15 @@ classdef dataUtility
 
         function [datanames, targetIDs] = DatasetInfo()
             fdir = dir(strrep(dataUtility.GetFilename('dataset'), '.mat', '\*.mat'));
-            datanames = {fdir.name};
-            unNames = cellfun(@(x) strsplit(x, {'_', '.'}), datanames', 'un', 0);
-            unNames = cellfun(@(x) x{1}, unNames, 'un', 0);
-            targetIDs = unique(unNames);
+            if numel(fdir) < 1
+                error('You should first read the dataset. Use hsiUtility.ReadDataset().');
+                
+            else
+                datanames = {fdir.name};
+                unNames = cellfun(@(x) strsplit(x, {'_', '.'}), datanames', 'un', 0);
+                unNames = cellfun(@(x) x{1}, unNames, 'un', 0);
+                targetIDs = unique(unNames);
+            end
         end
     end
 end

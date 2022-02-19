@@ -88,26 +88,6 @@ classdef hsiUtility
 
         %% Input/Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        function [labelMask] = ReadLabel(targetName)
-            %ReadLabelImage returns the label image for each HSI
-            %
-            %   [labelMask] = ReadLabelImage(targetName);
-
-            if isnumeric(targetName)
-                targetName = num2str(targetName);
-            end
-
-            baseDir = fullfile(config.GetSetting('matDir'), ...
-                strcat(config.GetSetting('database'), config.GetSetting('labelsName')), targetName);
-            targetFilename = strcat(baseDir, '_label.mat');
-
-            if exist(targetFilename, 'file')
-                load(targetFilename, 'labelMask');
-            else
-                labelMask = [];
-            end
-        end
-
         function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
             %LOADH5DATA loads info from h5 file
             %

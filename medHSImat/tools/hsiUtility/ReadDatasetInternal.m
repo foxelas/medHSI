@@ -1,3 +1,23 @@
+%======================================================================
+%> @brief ReadDatasetInternal
+%>
+%> ReadDataset reads a group of hsi data, prepares .mat files,
+%> applies preprocessing and returns montage previews of the results.
+% > 
+%> It also prepare labels. Data samples are saved in .mat files
+%> so that each contains a 'spectralData' (class hsi) and a
+%> 'label' (class logical array) variable.
+%
+%   Usage:
+%   ReadDataset('handsOnly',{'hand', false})
+%   ReadDataset('sample001-tissue', {'tissue', true});
+%>
+%> @param arg1 First argument
+%> @param arg2 Second argument
+%>
+%> @retval out1 return value for the first output variable
+%> @retval out2 return value for the second output variable
+%======================================================================
 function [] = ReadDatasetInternal(experiment, condition)
 % ReadDataset reads a group of hsi data, prepares .mat files,
 % prepared normalized files and returns montage previews of contents

@@ -9,20 +9,33 @@
 classdef apply
     methods (Static)
     % ======================================================================
-    %> @brief ScriptToEachImage applies a script on each of the data samples who fullfill the condition
+    %> @brief ToEach applies a function on each of the data samples in the dataset.
+    %> The target function should have argumens in the format of (hsIm,
+    %> targetName, ...), where hsIm is an instance of class 'hsi' and
+    %> targetName is a string. 
     %>
-    %> @param functionName [Function Handle] | Handle of the target function to be applied. 
-    %> @param vargin [Cell array] | The arguments necessary for the target function. 
+    %> @b Usage
+    %> @code
+    %> apply.ToEach(@apply.Kmeans, [], [], 5);
+    %> @endcode
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied
+    %> @param vargin [Cell array] | The arguments necessary for the target function
     %
-    %> @retval varargout [Cell array] | The arguments returned from the target function.
+    %> @retval varargout [Cell array] | The arguments returned from the target function
     % ======================================================================
-        function [varargout] = ScriptToEachImage(functionName, varargin)
-    %> @brief ScriptToEachImage applies a script on each of the data samples who fullfill the condition
+        function [varargout] = ToEach(functionName, varargin)
+    %> @brief ScriptToEachImage applies a script on each of the data samples in the dataset.
     %>
-    %> @param functionName [Function Handle] | Handle of the target function to be applied. 
-    %> @param vargin [Cell array] | The arguments necessary for the target function. 
+    %> @b Usage
+    %> @code
+    %> apply.ScriptToEachImage(@apply.Kmeans, [], [], 5);
+    %> @endcode
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied
+    %> @param vargin [Cell array] | The arguments necessary for the target function
     %
-    %> @retval varargout [Cell array] | The arguments returned from the target function. 
+    %> @retval varargout [Cell array] | The arguments returned from the target function
             if nargin < 2
                 varargin = {};
             end
@@ -43,13 +56,31 @@ classdef apply
                 end
             end
         end
-        
+    % ======================================================================
+    %> @brief DisableFigures applies a script while suppressing figure production and saving.
+    %>
+    %> @b Usage
+    %> @code
+    %> apply.DisableFigures(@apply.SuperpixelAnalysis);
+    %> @endcode
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied
+    %> @param vargin [Cell array] | The arguments necessary for the target function
+    %
+    %> @retval varargout [Cell array] | The arguments returned from the target function
+    % ======================================================================
         function [varargout] = DisableFigures(functionName, varargin)
-            %%DisableFigures runs the function without showing any
-            %%figures
-            %   lallalslsla 
-            %   Usage:
-            %   DisableFigures(@apply.Kmeans);
+    %> @brief DisableFigures applies a script while suppressing figure production and saving.
+    %>
+    %> @b Usage
+    %> @code
+    %> apply.DisableFigures(@apply.SuperpixelAnalysis);
+    %> @endcode
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied
+    %> @param vargin [Cell array] | The arguments necessary for the target function
+    %
+    %> @retval varargout [Cell array] | The arguments returned from the target function
             warning('off', 'all');
             showFigures = config.GetSetting('showFigures');
             saveImages = config.GetSetting('saveImages');
@@ -70,13 +101,31 @@ classdef apply
             config.SetSetting('showFigures', showFigures);
             warning('on', 'all');
         end
-
+    % ======================================================================
+    %> @brief DisableSaveFigures applies a script while suppressing figure saving.
+    %>
+    %> @b Usage
+    %> @code
+    %> apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
+    %> @endcode
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied
+    %> @param vargin [Cell array] | The arguments necessary for the target function
+    %
+    %> @retval varargout [Cell array] | The arguments returned from the target function
+    % ======================================================================
         function [varargout] = DisableSaveFigures(functionName, varargin)
-            %%DisableSaveFigures runs the function without saving any
-            %%figures
-            %
-            %   Usage:
-            %   DisableSaveFigures(@apply.Kmeans);
+    %> @brief DisableSaveFigures applies a script while suppressing figure saving.
+    %>
+    %> @b Usage
+    %> @code
+    %> apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
+    %> @endcode
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied
+    %> @param vargin [Cell array] | The arguments necessary for the target function
+    %
+    %> @retval varargout [Cell array] | The arguments returned from the target function
             warning('off', 'all');
             saveImages = config.GetSetting('saveImages');
             config.SetSetting('saveImages', false);
