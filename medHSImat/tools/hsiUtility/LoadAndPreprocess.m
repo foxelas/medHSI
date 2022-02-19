@@ -1,12 +1,59 @@
+%> @file  LoadAndPreprocess.m
+%======================================================================
+%> @brief LoadAndPreprocess returns spectral data from HSI image
+%>
+%> Requires data to be read in a .mat file before-hand.
+%>
+%> @b Usage:
+%> 
+%> @code
+%> % To read and preprocess a file with ID = 158
+%> hsIm = LoadAndPreprocess('158');
+%> 
+%> % To read, preprocess and save a file with ID = 158
+%> config.SetSetting('normalization', 'byPixel');
+%> hsIm = LoadAndPreprocess('158', true);
+%> % The preprocessed file is saved in
+%> % matfiles\hsi\pslNormalized\158_byPixel.mat
+%> @endcode
+%> 
+%> Preprocessed data file is saved with the same filename in a folder
+%> according to config -> 'normalization'.
+%>
+%> @param targetName [str] | The filename of the target
+%> @param saveFile [bool] | Whether to save the preprocessed file or not
+%>
+%> @retval hsIm [hsi] | The preprocessed spectral image
+%>
+%======================================================================
 function hsIm = LoadAndPreprocess(targetName, saveFile)
-%LoadAndPreprocess returns spectral data from HSI image
-%
-%   Usage:
-%   hsIm = LoadAndPreprocess('sample2') returns a
-%   cropped HSI with 'byPixel' normalization
-%
-%   hsIm = LoadAndPreprocess('sample2')
-%   hsIm = LoadAndPreprocess('sample2', true)
+%> @brief LoadAndPreprocess returns spectral data from HSI image
+%>
+%> Requires data to be read in a .mat file before-hand.
+%>
+%> @b Usage:
+%> 
+%> @code
+%> % To read and preprocess a file with ID = 158
+%>
+%> hsIm = LoadAndPreprocess('158');
+%> 
+%> % To read, preprocess and save a file with ID = 158
+%>
+%> config.SetSetting('normalization', 'byPixel');
+%> hsIm = LoadAndPreprocess('158', true);
+%>
+%> % The preprocessed file is saved in
+%> % matfiles\hsi\pslNormalized\158_byPixel.mat
+%> @endcode
+%> 
+%> Preprocessed data file is saved with the same filename in a folder
+%> according to config -> 'normalization'.
+%>
+%> @param targetName [str] | The filename of the target
+%> @param saveFile [bool] | Whether to save the preprocessed file or not
+%>
+%> @retval hsIm [hsi] | The preprocessed spectral image
 
 config.SetSetting('fileName', targetName);
 

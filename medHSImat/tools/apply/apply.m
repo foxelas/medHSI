@@ -1,32 +1,53 @@
+% ======================================================================
+%> @brief A utility class for applying functions to different data samples
+%
+%> Functions using apply are applied on the currently selected dataset, 
+%> unless mentioned otherwise. The dataset name is recovered from
+%> config.GetSetting('dataset').
+%>
+% ======================================================================
 classdef apply
     methods (Static)
+    % ======================================================================
+    %> @brief ScriptToEachImage applies a script on each of the data samples who fullfill the condition
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied. 
+    %> @param vargin [Cell array] | The arguments necessary for the target function. 
+    %
+    %> @retval varargout [Cell array] | The arguments returned from the target function.
+    % ======================================================================
+        function [varargout] = ScriptToEachImage(functionName, varargin)
+    %> @brief ScriptToEachImage applies a script on each of the data samples who fullfill the condition
+    %>
+    %> @param functionName [Function Handle] | Handle of the target function to be applied. 
+    %> @param vargin [Cell array] | The arguments necessary for the target function. 
+    %
+    %> @retval varargout [Cell array] | The arguments returned from the target function. 
+            if nargin < 2
+                varargin = {};
+            end
+            
+            [~, targetIDs] = dataUtility.DatasetInfo();
+            
+            for i = 1:length(targetIDs)
+                %% load HSI from .mat file
+                targetName = targetIDs{i};
+                hsIm = hsiUtility.LoadHSI(targetName, 'dataset');
 
-        %% Contents
-        %
-        %   Static:
-        %         [varargout] = ScriptToEachImage(functionName, condition, target, varargin)
-        %         [result] = RowFunc(funcName, varargin)
-        %         [varargout] = OnQualityPixels(func, varargin)
-        %         [labels] = Kmeans(hsIm, targetName, clusterNum)
-        %         [] = SuperpixelAnalysis(hsIm, targetName, isManual, pixelNum, pcNum)
-        %         [varargout] = DisableFigures(functionName, varargin)
-        %         [varargout] = DisableSaveFigures(functionName, varargin)
-
-        function [varargout] = ScriptToEachImage(varargin)
-            %%ApplyScriptToEachImage applies a script on each of the data samples who
-            %%fullfill the condition
-            %
-            %   Usage:
-            %   ApplyScriptToEachImage(@apply.Kmeans);
-            %   ApplyScriptToEachImage(@apply.Kmeans, {'tissue', true}, []);
-
-            [varargout{1:nargout}] = ApplyScriptToEachImage(varargin{:});
+                %% Change to Relevant Script
+                if nargout(functionName) > 0
+                    varargout{:} = functionName(hsIm, targetName, varargin{:});
+                else
+                    functionName(hsIm, targetName, varargin{:});
+                    varargout{:} = {};
+                end
+            end
         end
-
+        
         function [varargout] = DisableFigures(functionName, varargin)
             %%DisableFigures runs the function without showing any
             %%figures
-            %
+            %   lallalslsla 
             %   Usage:
             %   DisableFigures(@apply.Kmeans);
             warning('off', 'all');
