@@ -99,9 +99,9 @@ classdef databaseUtility
                 end
             end
 
-%            if ~isempty(captureDate)
-%                setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
-%            end
+            %            if ~isempty(captureDate)
+            %                setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
+            %            end
 
             if ~isempty(id)
                 setId = setId & ismember(dataTable.ID, id);

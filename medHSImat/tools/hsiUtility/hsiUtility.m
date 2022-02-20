@@ -3,7 +3,7 @@
 %> that handle hsi objects.
 %
 %> It is used to import, export and process hsi information.
-%> It works in tandem with the @b hsi and @b hsiInfo classes.
+%> It works in tandem with the hsi and hsiInfo classes.
 %>
 % ======================================================================
 classdef hsiUtility
@@ -160,7 +160,7 @@ classdef hsiUtility
         %======================================================================
         %> @brief ReadH5 loads the hyperspectral image from an .h5 file.
         %>
-        %> The .h5 data are assumed to be saved in config::[dataDir]\\*.h5
+        %> The .h5 data are assumed to be saved in config::[dataDir]\\*.h5.
         %> After reading, the image is saved in config::[matDir]\\[database]\\*.mat.
         %>
         %> @b Usage
@@ -178,7 +178,8 @@ classdef hsiUtility
         function [spectralData, imageXYZ, wavelengths] = ReadH5(filename)
             % ReadH5 loads the hyperspectral image from an .h5 file.
             %
-            % The .h5 data are assumed to be saved in config::[dataDir]\*.h5
+            % The .h5 data are assumed to be saved in
+            % config::[dataDir]\*.h5.
             % After reading, the image is saved in config::[matDir]\[database]\*.mat.
             %
             % @b Usage
@@ -588,7 +589,7 @@ classdef hsiUtility
             saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
             if exist(saveName, 'file') > 0
                 load(saveName, 'refLib');
-            else 
+            else
                 refLib = [];
                 disp('The reference library is not created yet. Use hsiUtility.PrepareReferenceLibrary.');
             end
