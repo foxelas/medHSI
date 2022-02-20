@@ -390,9 +390,9 @@ classdef hsiUtility
         %> @b Usage
         %>
         %> @code
-        %> ReadDataset('handsDataset',{'hand', false});
+        %> hsiUtility.PrepareDataset('handsDataset',{'hand', false});
         %>
-        %> ReadDataset('pslData', {'tissue', true});
+        %> hsiUtility.PrepareDataset('pslData', {'tissue', true});
         %> @endcode
         %>
         %> @param dataset [char] | The dataset
@@ -416,9 +416,9 @@ classdef hsiUtility
             % @b Usage
             %
             % @code
-            % ReadDataset('handsDataset',{'hand', false});
+            % hsiUtility.PrepareDataset('handsDataset',{'hand', false});
             %
-            % ReadDataset('pslData', {'tissue', true});
+            % hsiUtility.PrepareDataset('pslData', {'tissue', true});
             % @endcode
             %
             % @param dataset [char] | The dataset
@@ -461,9 +461,9 @@ classdef hsiUtility
             % @b Usage
             %
             % @code
-            % [spectralData] = hsiUtility.LoadHSIReferenceInternal('150', 'white');
+            % [spectralData] = hsiUtility.LoadHSIReference('150', 'white');
             %
-            % [spectralData] = hsiUtility.LoadHSIReferenceInternal('150', 'black');
+            % [spectralData] = hsiUtility.LoadHSIReference('150', 'black');
             % @endcode
             %
             % @param targetId [char] | The unique ID of the target sample
@@ -488,67 +488,63 @@ classdef hsiUtility
         %>
         %> @code
         %>     referenceIDs = {153, 166};
-        %>     referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
-        %>     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
+        %>     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs);
         %> @endcode
         %>
         %> @param refIDs [cell array] | A cell array of strings that
         %> includes all target reference IDs for samples to be included in the library.
-        %> @param refDiseases [cell array] | A cell array off strings that
-        %> includes the respective disease diagnosis to the reference samples.
         %>
         %> @retval refLib [struct] | A struct that contains the reference
         %> library. The struct has fields 'Data', 'Label' (Malignant (1) or
         %> Benign (0)) and 'Disease'.
         %>
         %======================================================================
-        function [refLib] = PrepareReferenceLibrary(refIDs, refDiseases)
+        function [refLib] = PrepareReferenceLibrary(refIDs)
             % PrepareReferenceLibrary reads and prepares a library of spectral references.
             %
             % It can be used for various comparisons, including Spectral Angle
             % Mapper (SAM) calculation.
             % The result is saved in config::[matdir]\[database]\[referenceLibraryName]\[referenceLibraryName].mat.
-            %  After creating it can be loaded with @c hsiUtility.GetReferenceLibrary.
+            % After creating it can be loaded with @c hsiUtility.GetReferenceLibrary.
             %
             % @b Usage
             %
             % @code
             %     referenceIDs = {153, 166};
-            %     referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
-            %     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
+            %     refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs);
             % @endcode
             %
             % @param refIDs [cell array] | A cell array of strings that
             % includes all target reference IDs for samples to be included in the library.
-            % @param refDiseases [cell array] | A cell array off strings that
-            % includes the respective disease diagnosis to the reference samples.
             %
             % @retval refLib [struct] | A struct that contains the reference
             % library. The struct has fields 'Data', 'Label' (Malignant (1) or
-            % Benign (0)) and 'Disease'.
+            % Benign (0)) and 'Diagnosis'.
             %
-            refLib = struct('Data', [], 'Label', [], 'Disease', []);
+            refLib = struct('Data', [], 'Label', [], 'Diagnosis', []);
             k = 0;
             for i = 1:length(refIDs)
                 targetName = num2str(refIDs{i});
-                labelImg = hsiUtility.ReadLabel(targetName);
-                hsiIm = hsiUtility.LoadHSI(targetName, 'dataset');
+                [hsiIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
                 if ~hsi.IsHsi(hsiIm)
                     error('Needs preprocessed input. Change [normalization] in config.');
                 end
+                labelImg = labelInfo.Labels;
+                diagnosis = labelInfo.Diagnosis;
+
                 malLabel = hsiIm.FgMask & labelImg;
                 malData = mean(hsiIm.GetMaskedPixels(malLabel));
                 k = k + 1;
                 refLib(k).Data = malData;
                 refLib(k).Label = 1;
-                refLib(k).Disease = refDiseases{i};
+                refLib(k).Diagnosis = diagnosis;
 
                 benLabel = hsiIm.FgMask & ~labelImg;
                 benData = mean(hsiIm.GetMaskedPixels(benLabel));
                 k = k + 1;
                 refLib(k).Data = benData;
                 refLib(k).Label = 0;
-                refLib(k).Disease = refDiseases{i};
+                refLib(k).Diagnosis = diagnosis;
             end
 
             saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
@@ -590,7 +586,12 @@ classdef hsiUtility
             % Benign (0)) and 'Disease'.
             %
             saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
-            load(saveName, 'refLib');
+            if exist(saveName, 'file') > 0
+                load(saveName, 'refLib');
+            else 
+                refLib = [];
+                disp('The reference library is not created yet. Use hsiUtility.PrepareReferenceLibrary.');
+            end
         end
 
     end

@@ -99,9 +99,9 @@ classdef databaseUtility
                 end
             end
 
-            if ~isempty(captureDate)
-                setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
-            end
+%            if ~isempty(captureDate)
+%                setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
+%            end
 
             if ~isempty(id)
                 setId = setId & ismember(dataTable.ID, id);
@@ -245,8 +245,13 @@ classdef databaseUtility
             %
             %   Usage:
             %   dataTable = GetDiseaseTable()
-            dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
-                config.GetSetting('diseaseInfoTableName'))), 'Sheet', 'Sheet1');
+            filename = fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
+                config.GetSetting('diseaseInfoTableName')));
+            if exist(filename, 'file') > 0
+                dataTable = readtable(filename, 'Sheet', 'Sheet1');
+            else
+                error('File %s does not exist. Aborting.', filename);
+            end
         end
 
         function [filenames, targetIDs, outRows, disease, stage] = GetDiseaseQuery(condition)

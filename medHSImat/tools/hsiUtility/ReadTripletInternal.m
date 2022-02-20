@@ -124,6 +124,8 @@ if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
     else
         disp('Read only capture data, ignore white and black images.');
     end
+else
+    disp('Triple files already exist.');
 end
 
 end
