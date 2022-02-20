@@ -1,9 +1,42 @@
+% ======================================================================
+%> @brief GetDisplayImageInternal returns an RGB image from the hyperspectral data.
+%>
+%> @b Usage
+%>
+%> @code
+%> dispImage =  GetDisplayImageInternal(hsIm, superixelNumber);
+%>
+%> dispImage =  GetDisplayImageInternal(hsIm, 'rgb');
+%>
+%> dispImage =  GetDisplayImageInternal(hsIm, 'channel', 200);
+%> @endcode
+%>
+%> @param obj [hsi] | An instance of the hsi class
+%> @param method [string] | The method for display image creation
+%> ('rgb' or 'channel')
+%> @param channelNumber [int] | The target channel number
+%>
+%> @retval dispImage [numeric array] | The display image
+% ======================================================================
 function dispImage = GetDisplayImageInternal(hsIm, method, channel)
-%GetDisplayImage returns the display image from an HSI image
+% GetDisplayImageInternal returns an RGB image from the hyperspectral data.
 %
-%   Usage:
-%   dispImage = GetDisplayImage(hsIm, 'rgb')
-%   dispImage = GetDisplayImage(hsIm, 'channel', 200)
+% @b Usage
+%
+% @code
+% dispImage =  GetDisplayImageInternal(hsIm, superixelNumber);
+%
+% dispImage =  GetDisplayImageInternal(hsIm, 'rgb');
+%
+% dispImage =  GetDisplayImageInternal(hsIm, 'channel', 200);
+% @endcode
+%
+% @param obj [hsi] | An instance of the hsi class
+% @param method [string] | The method for display image creation
+% ('rgb' or 'channel')
+% @param channelNumber [int] | The target channel number
+%
+% @retval dispImage [numeric array] | The display image
 
 if nargin < 2
     method = 'rgb';

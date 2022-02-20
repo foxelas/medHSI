@@ -1,10 +1,42 @@
+% ======================================================================
+%> @brief NormalizeInternal a given hyperspectral image.
+%>
+%> The setting config::'normalization' needs to be set beforehand.
+%>
+%> @b Usage
+%>
+%> @code
+%> config.SetSetting('normalization', 'byPixel');
+%> [newI, idxs] = NormalizeInternal(I, Iwhite, Iblack, method);
+%> @endcode
+%>
+%> @param obj [hsi] | An instance of the hsi class
+%> @b Optional varargin
+%> @param white [numeric array] | The white reference image
+%> @param black [numeric array] | The black reference image
+%> @param method [string] | The normalization method ('scaling' or 'raw')
+%>
+%> @return instance of the hsi class
+% ======================================================================
 function hsInorm = NormalizeInternal(hsIm, Iwhite, Iblack, method)
-
-%% Normalize a given array I with max and min arrays, white and black
-%  according to method 'method'
+% NormalizeInternal a given hyperspectral image.
 %
-%   Usage:
-%   normI = NormalizeImage(I, white, black, method)
+% The setting config::'normalization' needs to be set beforehand.
+%
+% @b Usage
+%
+% @code
+% config.SetSetting('normalization', 'byPixel');
+% [newI, idxs] = NormalizeInternal(I, Iwhite, Iblack, method);
+% @endcode
+%
+% @param obj [hsi] | An instance of the hsi class
+% @b Optional varargin
+% @param white [numeric array] | The white reference image
+% @param black [numeric array] | The black reference image
+% @param method [string] | The normalization method ('scaling' or 'raw')
+%
+% @return instance of the hsi class
 
 eps = 0.000000001;
 if nargin < 4

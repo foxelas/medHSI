@@ -1,10 +1,11 @@
 %======================================================================
 %> @brief LoadH5Data loads the hyperspectral image from an .h5 file.
 %>
-%> The .h5 data are assumed to be saved in config::[dataDir]\*.h5
-%> After reading, the image is saved in config::[matDir]\[database]\*.mat.
+%> The .h5 data are assumed to be saved in config::[dataDir]\\*.h5
+%> After reading, the image is saved in config::[matDir]\\[database]\\*.mat.
 %>
 %> @ Usage
+%>
 %> @code
 %> [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
 %> @endcode

@@ -1,19 +1,42 @@
+%======================================================================
+%> @brief RecoverOriginalDimensionsInternal recovers the original spatial dimension
+%> from masked pixels.
+%>
+%> Data with original spatial dimensions and reduced spectral dimensions
+%>
+%> @b Usage
+%>
+%> @code
+%> [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask);
+%>
+%> [recHsi] = RecoverOriginalDimensionsInternal(scores, imgSizes, masks);
+%> @endcode
+%>
+%> @param obj [hsi] | An hsi instance
+%> @param origSize [cell array] | cell array with original sizes of input data (array or cell of arrays)
+%> @param mask [cell array] | cell array of masks per data sample (array or cell of arrays)
+%>
+%> @retval obj [hsi] | The reconstructed hsi instance
+%======================================================================
 function [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
-% RecoverOriginalDimensionsInternal returns an image that matches the
-% spatial dimensions of the original hsi
+% RecoverOriginalDimensionsInternal recovers the original spatial dimension
+% from masked pixels.
 %
-%   Input arguments:
-%   redIm: reduced dimension data (array or cell of arrays)
-%   origSize: cell array with original sizes of input data (array or cell of arrays)
-%   mask: cell array of masks per data sample (array or cell of arrays)
+% Data with original spatial dimensions and reduced spectral dimensions
 %
-%   Returns:
-%   Data with original spatial dimensions and reduced spectral dimensions
+% @b Usage
 %
-%   Usage:
-%   [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
-%   [recHsis] = RecoverOriginalDimensionsInternal(scores, imgSizes, masks)
-
+% @code
+% [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask);
+%
+% [recHsi] = RecoverOriginalDimensionsInternal(scores, imgSizes, masks);
+% @endcode
+%
+% @param obj [hsi] | An hsi instance
+% @param origSize [cell array] | cell array with original sizes of input data (array or cell of arrays)
+% @param mask [cell array] | cell array of masks per data sample (array or cell of arrays)
+%
+% @retval obj [hsi] | The reconstructed hsi instance
 if iscell(origSize)
     imgSizes = origSize;
     scores = redIm;

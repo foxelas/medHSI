@@ -1,18 +1,73 @@
-function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, q, labels)
-%Dimred reduces the dimensions of a dataset
-%
-%   Input arguments
-%   X: input data as a matrix with M observations and N columns
-%   methods: 'rica', 'pca'
-%   q: number of components to be retained
-%   labels: needed for the case of supervised dimension reduction
-%
-%   Usage:
-%   [coeff, scores, latent, explained, objective] = Dimred(X, method, q)
-%   [coeff, scores, latent, explained, ~] = Dimred(X, 'pca', 10)
-%   [coeff, scores, ~, ~, objective] = Dimred(X, 'rica', 40)
-%   [~, scores, ~, ~, ~, Mdl] = Dimred(X, 'lda')
+% ======================================================================
+%> @brief Dimred reduces the dimensions of the hyperspectral image.
+%>
+%> Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+%> details check @c function Dimred.
+%>
+%> @b Usage
+%>
+%> @code
+%> q = 10;
+%> [coeff, scores, latent, explained, objective] = Dimred(X,
+%> method, q, mask);
+%>
+%> [coeff, scores, latent, explained, ~] = Dimred(X, 'pca', 10);
+%>
+%> [coeff, scores, ~, ~, objective] = Dimred(X, 'rica', 40);
+%>
+%> [~, scores, ~, ~, ~, Mdl] = Dimred(X, 'lda')
+%> @endcode
+%>
+%> @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
+%> @b Optional varargin
+%> @param method [string] | The method for dimension reduction
+%> @param q [int] | The number of components to be retained
+%> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+%>
+%> @retval coeff [numeric array] | The transformation coefficients
+%> @retval scores [numeric array] | The transformed values
+%> @retval latent [numeric array] | The latent values
+%> @retval explained [numeric array] | The percentage of explained
+%> variance
+%> @retval objective [numeric array] | The objective function
+%> values
+%> @retval Mdl [model] | The dimension reduction model
+% ======================================================================
 
+function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, q, mask)
+% Dimred reduces the dimensions of the hyperspectral image.
+%
+% Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+% details check @c function Dimred.
+%
+% @b Usage
+%
+% @code
+% q = 10;
+% [coeff, scores, latent, explained, objective] = Dimred(X,
+% method, q, mask);
+%
+% [coeff, scores, latent, explained, ~] = Dimred(X, 'pca', 10);
+%
+% [coeff, scores, ~, ~, objective] = Dimred(X, 'rica', 40);
+%
+% [~, scores, ~, ~, ~, Mdl] = Dimred(X, 'lda')
+% @endcode
+%
+% @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
+% @b Optional varargin
+% @param method [string] | The method for dimension reduction
+% @param q [int] | The number of components to be retained
+% @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+%
+% @retval coeff [numeric array] | The transformation coefficients
+% @retval scores [numeric array] | The transformed values
+% @retval latent [numeric array] | The latent values
+% @retval explained [numeric array] | The percentage of explained
+% variance
+% @retval objective [numeric array] | The objective function
+% values
+% @retval Mdl [model] | The dimension reduction model
 
 latent = [];
 explained = [];
@@ -25,7 +80,7 @@ if nargin < 3
 end
 
 if nargin < 4
-    labels = [];
+    mask = [];
 end
 
 %% PCA
@@ -43,16 +98,16 @@ if strcmpi(method, 'rica')
 end
 
 %% Discriminant Analysis (LDA / QDA)
-if isempty(labels) && strcmpi(method, 'lda') && strcmpi(method, 'qda')
+if isempty(mask) && strcmpi(method, 'lda') && strcmpi(method, 'qda')
     error('A supervised method requires labels as argument');
 else
     if strcmp(method, 'lda')
-        Mdl = fitcdiscr(X, labels);
+        Mdl = fitcdiscr(X, mask);
         scores = predict(Mdl, X);
     end
 
     if strcmp(method, 'qda')
-        Mdl = fitcdiscr(X, labels, 'DiscrimType', 'quadratic');
+        Mdl = fitcdiscr(X, mask, 'DiscrimType', 'quadratic');
         scores = predict(Mdl, X);
     end
 end

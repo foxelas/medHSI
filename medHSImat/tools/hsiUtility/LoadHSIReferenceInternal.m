@@ -2,7 +2,7 @@
 %> @brief LoadHSIReferenceInternal reads the reference hyperspectral image (white or black).
 %>
 %> It is valid for hyperspectral data already saved as .mat files
-%> in config::[matdir]\[tripletsName]\*_white.mat or *_black.mat.
+%> in config::[matdir]\\[tripletsName]\\*_white.mat or *_black.mat.
 %> The returned reference image is a 3D array, not an hsi instance.
 %>
 %> @b Usage

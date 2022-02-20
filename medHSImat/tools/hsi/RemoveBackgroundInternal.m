@@ -1,12 +1,54 @@
-function [updI, fgMask] = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
-%     REMOVEBACKGROUND removes the background from the specimen image
+% ======================================================================
+%> @brief RemoveBackgroundInternal returns the foreground mask for a sample.
+%>
+%> The foreground mask corresponds to the tensors that belong to
+%> the tissue.
+%> See also
+%> https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html.
+%>
+%> @b Usage
+%>
+%> @code
+%> hsIm = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, layerSelectionThreshold, bigHoleCoefficient, closingCoefficient, openingCoefficient);
+%> @endcode
+%>
+%> @param obj [hsi] | An instance of the hsi class
+%> @b Optional varargin
+%> @param colorLevelsForKMeans [int] | Color levels for Kmeans. Default is 6.
+%> @param attemptsForKMeans [int] | Attempts for Kmeans. Default is 3.
+%> @param layerSelectionThreshold [double] | Threshold for layer
+%> selection. Default is 0.1.
+%> @param bigHoleCoefficient [double] | Coefficient for closing big holes. Default is 1000
+%> @param closingCoefficient [double] | Coefficient for closing operation. Default is 2.
+%> @param openingCoefficient [double] | Coefficient for opening operation. Default is 5.
+%>
+%> @retval fgMask [numeric array] | A foreground mask
+% ======================================================================
+function [updI, fgMask] = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, layerSelectionThreshold, bigHoleCoefficient, closingCoefficient, openingCoefficient)
+% RemoveBackgroundInternal returns the foreground mask for a sample.
 %
-%     Usage:
-%     [updatedHSI, foregroundMask] = RemoveBackground(I)
-%     [updatedHSI, foregroundMask] = RemoveBackground(I, colorLevelsForKMeans,
-%         attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
-%     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
-
+% The foreground mask corresponds to the tensors that belong to
+% the tissue.
+% See also
+% https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html.
+%
+% @b Usage
+%
+% @code
+% hsIm = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, layerSelectionThreshold, bigHoleCoefficient, closingCoefficient, openingCoefficient);
+% @endcode
+%
+% @param obj [hsi] | An instance of the hsi class
+% @b Optional varargin
+% @param colorLevelsForKMeans [int] | Color levels for Kmeans. Default is 6.
+% @param attemptsForKMeans [int] | Attempts for Kmeans. Default is 3.
+% @param layerSelectionThreshold [double] | Threshold for layer
+% selection. Default is 0.1.
+% @param bigHoleCoefficient [double] | Coefficient for closing big holes. Default is 1000
+% @param closingCoefficient [double] | Coefficient for closing operation. Default is 2.
+% @param openingCoefficient [double] | Coefficient for opening operation. Default is 5.
+%
+% @retval fgMask [numeric array] | A foreground mask
 [m, n, z] = size(I);
 if z > 3
     Irgb = GetDisplayImageInternal(I, 'rgb');

@@ -1,8 +1,48 @@
+% ======================================================================
+%> @brief GetQualityPixelsInternal returns the values and indexes for good quality pixels only.
+%>
+%> Quality is determined according to spectral brightness.
+%>
+%> @b Usage
+%>
+%> @code
+%> [newI, idxs] = GetQualityPixelsInternal(spectralData, meanLimit, maxLimit);
+%> @endcode
+%>
+%> @param obj [hsi] | An instance of the hsi class
+%> @b Optional varargin
+%> @param meanLimit [double] | The mean brightness limit. Default
+%> is 0.2.
+%> @param maxLimit [double] | The max brightness limit. Default is
+%> 0.99.
+%>
+%> @retval newI [numeric array] | The stacked spectra of good
+%> quality pixels
+%> @retval newI [numeric array] | The indexes of good quality
+%> pixels
+% ======================================================================
 function [newI, idxs] = GetQualityPixelsInternal(I, meanLimit, maxLimit)
-%     GETQUALITYPIXELS removes over-saturated and under-exposed pixels from base image
+% GetQualityPixelsInternal returns the values and indexes for good quality pixels only.
 %
-%     Usage:
-%     [newI, idxs] = GetQualityPixels(I, meanLimit, maxLimit)
+% Quality is determined according to spectral brightness.
+%
+% @b Usage
+%
+% @code
+% [newI, idxs] = GetQualityPixelsInternal(spectralData, meanLimit, maxLimit);
+% @endcode
+%
+% @param obj [hsi] | An instance of the hsi class
+% @b Optional varargin
+% @param meanLimit [double] | The mean brightness limit. Default
+% is 0.2.
+% @param maxLimit [double] | The max brightness limit. Default is
+% 0.99.
+%
+% @retval newI [numeric array] | The stacked spectra of good
+% quality pixels
+% @retval newI [numeric array] | The indexes of good quality
+% pixels
 
 if nargin < 2
     meanLimit = 0.2;

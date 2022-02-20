@@ -9,10 +9,11 @@
 %>  Data samples are saved in .mat files so that one contains a
 %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 %> hsiInfo) variable.
-%> The save location is config::[matDir]\[dataset]\*.mat.
-%> Snapshot images are saved in config::[outputDir]\[snapshots]\[dataset]\.
+%> The save location is config::[matDir]\\[dataset]\\*.mat.
+%> Snapshot images are saved in config::[outputDir]\\[snapshots]\\[dataset]\\.
 %>
 %> @b Usage
+%>
 %> @code
 %> ReadDataset('handsDataset',{'hand', false});
 %>
