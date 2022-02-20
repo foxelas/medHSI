@@ -36,29 +36,11 @@ classdef hsiInfo
         %> @param diagnosis [char] | The diagnosis (disease name) of the target
         %> sample
         %
-        %> @retval obj [hsiInfo] | The initialized hsiInfo object
+        %> @return instance of the hsiInfo class
         % ======================================================================
         function [obj] = hsiInfo(targetId, sampleID, labels, diagnosis)
-            %> @brief hsiInfo prepares an instance of class hsiInfo.
-            %>
-            %> If the values are missing, an empty instance is returned.
-            %> In order to work properly, the HSI images should be read with the
-            %> hsi class beforehand for the config::[database].
-            %>
-            %> @b Usage
-            %> @code
-            %> labelInfo = hsiInfo('158', '001', labels, 'Carcinoma');
-            %> @endcode
-            %>
-            %> @param targetId [char] | The unique ID of the target sample
-            %> @param sampleID [char] | The sampleID of the target sample
-            %> @param labels [numeric array] | The labels of the target sample
-            %> @param diagnosis [char] | The diagnosis (disease name) of the target
-            %> sample
-            %
-            %> @retval obj [hsiInfo] | The initialized hsiInfo object
             if nargin < 1
-                obj = hsiInfo.Empty();
+                obj = hsiInfo('', '', [], '');
             else
                 obj.ID = targetId;
                 obj.SampleID = sampleID;
@@ -66,30 +48,10 @@ classdef hsiInfo
                 obj.Diagnosis = diagnosis;
             end
         end
+
     end
 
     methods (Static)
-        % ======================================================================
-        %> @brief Empty returns an empty instance of class hsiInfo.
-        %>
-        %> @b Usage
-        %> @code
-        %> labelInfo = hsiInfo.Empty();
-        %> @endcode
-        %>
-        %> @retval obj [hsiInfo] | The initialized hsiInfo object
-        % ======================================================================
-        function [obj] = Empty()
-            %> @brief Empty returns an empty instance of class hsiInfo.
-            %>
-            %> @b Usage
-            %> @code
-            %> labelInfo = hsiInfo.Empty();
-            %> @endcode
-            %>
-            %> @retval obj [hsiInfo] | The initialized hsiInfo object
-            obj = hsiInfo('', '', [], '');
-        end
 
         % ======================================================================
         %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
@@ -108,26 +70,9 @@ classdef hsiInfo
         %> @param targetId [char] | The unique ID of the target sample
         %> @param sampleID [char] | The sampleID of the target sample
         %
-        %> @retval obj [hsiInfo] | The initialized hsiInfo object
+        %> @return instance of the hsiInfo class
         % ======================================================================
         function [obj] = ReadHsiInfo(targetId, sampleId)
-            %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
-            %>
-            %> The input data should be saved in folder with config::[outputDir]\[labelDir]\.
-            %> The data should be saved in folders according to tissue type, e.g.
-            %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
-            %>
-            %> Diagnostic data should be saved in config::[importDir]\[database]\[diseaseInfoTableName]
-            %>
-            %> @b Usage
-            %> @code
-            %> labelInfo = hsiInfo.ReadHsiInfo('158', '001', labels, 'Carcinoma');
-            %> @endcode
-            %>
-            %> @param targetId [char] | The unique ID of the target sample
-            %> @param sampleID [char] | The sampleID of the target sample
-            %
-            %> @retval obj [hsiInfo] | The initialized hsiInfo objects
             labels = hsiInfo.ReadLabel(targetId);
             diagnosis = hsiInfo.ReadDiagnosis(sampleId);
             obj = hsiInfo(targetId, sampleId, labels, diagnosis);
@@ -149,25 +94,9 @@ classdef hsiInfo
         %>
         %> @param hsIm [hsi] | An object of hsi class
         %
-        %> @retval obj [hsiInfo] | The initialized hsiInfo object
+        %> @return instance of the hsiInfo class
         % ======================================================================
         function [obj] = ReadHsiInfoFromHsi(hsIm)
-            %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
-            %>
-            %> The input data should be saved in folder with config::[outputDir]\[labelDir]\.
-            %> The data should be saved in folders according to tissue type, e.g.
-            %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
-            %>
-            %> Diagnostic data should be saved in config::[importDir]\[database]\[diseaseInfoTableName]
-            %>
-            %> @b Usage
-            %> @code
-            %> labelInfo = hsiInfo.ReadHsiInfoFromHsi(hsIm);
-            %> @endcode
-            %>
-            %> @param hsIm [hsi] | An object of hsi class
-            %
-            %> @retval obj [hsiInfo] | The initialized hsiInfo object
             targetId = hsIm.ID;
             sampleId = hsIm.SampleID;
             labels = hsiInfo.ReadLabelFromHsi(hsIm);
@@ -192,21 +121,6 @@ classdef hsiInfo
         %> @retval labelMask [numeric array] | The label mask
         % ======================================================================
         function [labelMask] = ReadLabel(targetID)
-            %> @brief ReadLabel reads label information from a label image.
-            %>
-            %> The input data should be saved in folder with config::[outputDir]\[labelDir]\.
-            %> The data should be saved in folders according to tissue type, e.g.
-            %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
-            %>
-            %> @b Usage
-            %> @code
-            %> labelInfo = hsiInfo.ReadLabel('158');
-            %> @endcode
-            %>
-            %> @param targetId [char] | The unique ID of the target sample
-            %
-            %> @retval labelMask [numeric array] | The label mask
-
             if isnumeric(targetID)
                 targetID = num2str(targetID);
             end
@@ -234,21 +148,6 @@ classdef hsiInfo
         %> @retval labelMask [numeric array] | The label mask
         % ======================================================================
         function [labelMask] = ReadLabelFromHsi(hsIm)
-            %> @brief ReadLabelFromHsi reads label information from a label image.
-            %>
-            %> The input data should be saved in folder with config::[outputDir]\[labelDir]\.
-            %> The data should be saved in folders according to tissue type, e.g.
-            %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
-            %>
-            %> @b Usage
-            %> @code
-            %> labelInfo = hsiInfo.ReadLabelFromHsi(hsIm);
-            %> @endcode
-            %>
-            %> @param hsIm [hsi] | An object of hsi class
-            %
-            %> @retval labelMask [numeric array] | The label mask
-
             close all;
 
             targetID = hsIm.ID;
@@ -268,7 +167,7 @@ classdef hsiInfo
                 imLab = imread(fullfile(maskdir, dirList(idx).name));
 
                 fgMask = hsIm.FgMask;
-                labelMask = im2gray(imLab)> 127;
+                labelMask = im2gray(imLab) > 127;
                 labelMask = imfill(labelMask, 'holes');
                 %     se = strel('disk',3);
                 %     labelMask = imclose(labelMask, se);
@@ -315,19 +214,6 @@ classdef hsiInfo
         %> @retval diagnosis [char] | The diagnosis string
         % ======================================================================
         function [diagnosis] = ReadDiagnosis(sampleId)
-            %> @brief ReadDiagnosis reads diagnosis information from an excel file.
-            %>
-            %> Diagnostic data should be saved in config::[importDir]\[database]\[diseaseInfoTableName]
-            %>
-            %> @b Usage
-            %> @code
-            %> labelInfo = hsiInfo.ReadDiagnosis('001');
-            %> @endcode
-            %>
-            %> @param sampleID [char] | The sampleID of the target sample
-            %
-            %> @retval diagnosis [char] | The diagnosis string
-
             dataTable = databaseUtility.GetDiseaseTable();
             id = find(strcmp(dataTable.SampleID, sampleId), 1);
             if ~isempty(id)

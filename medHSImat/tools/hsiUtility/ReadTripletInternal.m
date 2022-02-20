@@ -1,9 +1,9 @@
 %======================================================================
-%> @brief ReadTriplet reads and saves the three hyperspectral images
+%> @brief ReadTripletInternal reads and saves the three hyperspectral images
 %>
 %> The hyperspectral data are saved in .h5 format. The raw, white and black
 %> (if exist) images are read one-by-one for the same target. Each HSI is
-%> saved in config::[matDir]\[database]\[tripletsName]\*_xxx.mat, where
+%> saved in config::[matDir]\\[database]\\[tripletsName]\\*_xxx.mat, where
 %> xxx is either '_target', '_white' or '_black'.
 %>
 %> @b Usage
@@ -11,9 +11,9 @@
 %> @code
 %> content = 'tissue';
 %> target = '001_raw';
-%> spectralData = ReadTriplet(content);
+%> spectralData = ReadTripletInternal(content, target);
 %>
-%> spectralData = ReadTriplet(content, target, blackIsCapOn);
+%> spectralData = ReadTripletInternal(content, target, blackIsCapOn);
 %> @endcode
 %>
 %> @param content [cell array] | Contains the content to be imported
@@ -22,29 +22,29 @@
 %>
 %> @retval spectralData [numeric array] | The target (tissue) hyperspectral image
 %======================================================================
-function [spectralData] = ReadTriplet(content, target, blackIsCapOn)
-%> @brief ReadTriplet reads and saves the three hyperspectral images
-%>
-%> The hyperspectral data are saved in .h5 format. The raw, white and black
-%> (if exist) images are read one-by-one for the same target. Each HSI is
-%> saved in config::[matDir]\[database]\[tripletsName]\*_xxx.mat, where
-%> xxx is either '_target', '_white' or '_black'.
-%>
-%> @b Usage
-%>
-%> @code
-%> content = 'tissue';
-%> target = '001_raw';
-%> spectralData = ReadTriplet(content);
-%>
-%> spectralData = ReadTriplet(content, target, blackIsCapOn);
-%> @endcode
-%>
-%> @param content [cell array] | Contains the content to be imported
-%> @param target [char] | Contains the target to be imported
-%> @param blackIsCapOn [logical] | Flag about the use of blackCap for dark image
-%>
-%> @retval spectralData [numeric array] | The target (tissue) hyperspectral image
+function [spectralData] = ReadTripletInternal(content, target, blackIsCapOn)
+% ReadTripletInternal reads and saves the three hyperspectral images
+%
+% The hyperspectral data are saved in .h5 format. The raw, white and black
+% (if exist) images are read one-by-one for the same target. Each HSI is
+% saved in config::[matDir]\[database]\[tripletsName]\*_xxx.mat, where
+% xxx is either '_target', '_white' or '_black'.
+%
+% @b Usage
+%
+% @code
+% content = 'tissue';
+% target = '001_raw';
+% spectralData = ReadTripletInternal(content, target);
+%
+% spectralData = ReadTripletInternal(content, target, blackIsCapOn);
+% @endcode
+%
+% @param content [cell array] | Contains the content to be imported
+% @param target [char] | Contains the target to be imported
+% @param blackIsCapOn [logical] | Flag about the use of blackCap for dark image
+%
+% @retval spectralData [numeric array] | The target (tissue) hyperspectral image
 
 if nargin < 3
     blackIsCapOn = false;

@@ -14,7 +14,7 @@ classdef hsi
         %> A string that shows the tissue type
         TissueType = ''
         %> The hyperspectral image
-        Value{mustBeNumeric}
+        Value = []
         %> The foreground mask i.e. the mask of tissue tensors
         FgMask = []
     end
