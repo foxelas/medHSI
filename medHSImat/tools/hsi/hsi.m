@@ -162,8 +162,7 @@ classdef hsi
         %> @brief GetMaskedPixels gets all spectral values included in a mask.
         %>
         %> Pixels are picked up by @c function GetMaskedPixelsInternal.
-        %> If the mask is missing, a manually selected mask is assigned by
-        %> a polygon selection prompt.
+        %> If the mask is missing, the foreground mask is used.
         %>
         %> @b Usage
         %>
@@ -181,8 +180,7 @@ classdef hsi
             % GetMaskedPixels gets all spectral values included in a mask.
             %
             % Pixels are picked up by @c function GetMaskedPixelsInternal.
-            % If the mask is missing, a manually selected mask is assigned by
-            % a polygon selection prompt.
+            % If the mask is missing, the foreground mask is used.
             %
             % @b Usage
             %
@@ -347,54 +345,6 @@ classdef hsi
             % for each mask. Each row is the average corresponding to a
             % submask.
             averages = GetAverageSpectraInternal(obj.Value, varargin{:});
-        end
-
-        % ======================================================================
-        %> @brief GetQualityPixels returns the values and indexes for good quality pixels only.
-        %>
-        %> Quality is determined according to spectral brightness. For more details check @c function GetQualityPixelsInternal.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [newI, idxs] = hsIm.GetQualityPixels(meanLimit, maxLimit);
-        %> @endcode
-        %>
-        %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
-        %> @param meanLimit [double] | The mean brightness limit. Default
-        %> is 0.2.
-        %> @param maxLimit [double] | The max brightness limit. Default is
-        %> 0.99.
-        %>
-        %> @retval newI [numeric array] | The stacked spectra of good
-        %> quality pixels
-        %> @retval newI [numeric array] | The indexes of good quality
-        %> pixels
-        % ======================================================================
-        function [newI, idxs] = GetQualityPixels(obj, varargin)
-            % GetQualityPixels returns the values and indexes for good quality pixels only.
-            %
-            % Quality is determined according to spectral brightness. For more details check @c function GetQualityPixelsInternal.
-            %
-            % @b Usage
-            %
-            % @code
-            % [newI, idxs] = hsIm.GetQualityPixels(meanLimit, maxLimit);
-            % @endcode
-            %
-            % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
-            % @param meanLimit [double] | The mean brightness limit. Default
-            % is 0.2.
-            % @param maxLimit [double] | The max brightness limit. Default is
-            % 0.99.
-            %
-            % @retval newI [numeric array] | The stacked spectra of good
-            % quality pixels
-            % @retval newI [numeric array] | The indexes of good quality
-            % pixels
-            [newI, idxs] = GetQualityPixelsInternal(obj.Value, varargin{:});
         end
 
         %% Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1016,12 +966,12 @@ classdef hsi
         %>
         %> @code
         %>  config.SetSetting('normalization', 'raw');
-        %>  spectralData = LoadHSIInternal(targetName);
+        %>  spectralData = hsi.Load(targetName);
         %>
-        %>  spectralData = LoadHSIInternal(targetName, 'dataset');
+        %>  spectralData = hsi.Load(targetName, 'dataset');
         %>
         %>  config.SetSetting('normalization', 'byPixel');
-        %>  spectralData = LoadHSIInternal(targetName, 'preprocessed');
+        %>  spectralData = hsi.Load(targetName, 'preprocessed');
         %> @endcode
         %>
         %> @param targetID [char] | The unique ID of the target sample
@@ -1039,12 +989,12 @@ classdef hsi
             %
             % @code
             %  config.SetSetting('normalization', 'raw');
-            %  spectralData = LoadHSIInternal(targetName);
+            %  spectralData = hsi.Load(targetName);
             %
-            %  spectralData = LoadHSIInternal(targetName, 'dataset');
+            %  spectralData = hsi.Load(targetName, 'dataset');
             %
             %  config.SetSetting('normalization', 'byPixel');
-            %  spectralData = LoadHSIInternal(targetName, 'preprocessed');
+            %  spectralData = hsi.Load(targetName, 'preprocessed');
             % @endcode
             %
             % @param targetID [char] | The unique ID of the target sample
@@ -1060,6 +1010,12 @@ classdef hsi
             end
             targetFilename = dataUtility.GetFilename(dataType, targetID);
 
+            if strcmp(dataType, 'raw')
+                fprintf('Loads raw HSI.\n');
+            else
+                fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('dataset'), config.GetSetting('normalization'));
+            end
+            fprintf('Filename: %s.\n', targetFilename);
             load(targetFilename, 'spectralData');
             obj = spectralData;
         end

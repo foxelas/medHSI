@@ -10,32 +10,39 @@ classdef apply
     methods (Static)
         % ======================================================================
         %> @brief ToEach applies a function on each of the data samples in the dataset.
-        %> The target function should have argumens in the format of (hsIm,
-        %> targetName, ...), where hsIm is an instance of class 'hsi' and
-        %> targetName is a string.
+        %>
+        %> The target function should have arguments in the format of (hsIm,
+        %> , ...), where hsIm is an instance of class 'hsi'. The targetID
+        %> is saved for figure saving purposes in config::'fileName'.
         %>
         %> @b Usage
+        %>
         %> @code
-        %> apply.ToEach(@apply.Kmeans, [], [], 5);
+        %> apply.ToEach(@CustomKmeans, 5);
         %> @endcode
         %>
         %> @param functionName [Function Handle] | Handle of the target function to be applied
-        %> @param vargin [Cell array] | The arguments necessary for the target function
-        %
-        %> @retval varargout [Cell array] | The arguments returned from the target function
+        %> @param varargin [Cell array] | The arguments necessary for the target function
+        %>
+        %> @retval varargout [Cell array] | The return values of the target function
         % ======================================================================
         function [varargout] = ToEach(functionName, varargin)
-            %> @brief ScriptToEachImage applies a script on each of the data samples in the dataset.
-            %>
-            %> @b Usage
-            %> @code
-            %> apply.ScriptToEachImage(@apply.Kmeans, [], [], 5);
-            %> @endcode
-            %>
-            %> @param functionName [Function Handle] | Handle of the target function to be applied
-            %> @param vargin [Cell array] | The arguments necessary for the target function
+            % ScriptToEachImage applies a script on each of the data samples in the dataset.
             %
-            %> @retval varargout [Cell array] | The arguments returned from the target function
+            % The target function should have arguments in the format of (hsIm,
+            % , ...), where hsIm is an instance of class 'hsi'. The targetID
+            % is saved for figure saving purposes in config::'fileName'.
+            %
+            % @b Usage
+            %
+            % @code
+            % apply.ToEach(@CustomKmeans, 5);
+            % @endcode
+            %
+            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param varargin [Cell array] | The arguments necessary for the target function
+            %
+            % @retval varargout [Cell array] | The return values of the target function
             if nargin < 2
                 varargin = {};
             end
@@ -45,14 +52,16 @@ classdef apply
             for i = 1:length(targetIDs)
 
                 %% load HSI from .mat file
-                targetName = targetIDs{i};
-                hsIm = hsiUtility.LoadHSI(targetName, 'dataset');
+                targetID = targetIDs{i};
+                hsIm = hsi.Load(targetID, 'dataset');
+
+                config.SetSetting('fileName', targetID);
 
                 %% Change to Relevant Script
                 if nargout(functionName) > 0
-                    varargout{:} = functionName(hsIm, targetName, varargin{:});
+                    varargout{:} = functionName(hsIm, varargin{:});
                 else
-                    functionName(hsIm, targetName, varargin{:});
+                    functionName(hsIm, varargin{:});
                     varargout{:} = {};
                 end
             end
@@ -61,27 +70,29 @@ classdef apply
         %> @brief DisableFigures applies a script while suppressing figure production and saving.
         %>
         %> @b Usage
+        %>
         %> @code
         %> apply.DisableFigures(@apply.SuperpixelAnalysis);
         %> @endcode
         %>
         %> @param functionName [Function Handle] | Handle of the target function to be applied
-        %> @param vargin [Cell array] | The arguments necessary for the target function
-        %
-        %> @retval varargout [Cell array] | The arguments returned from the target function
+        %> @param varargin [Cell array] | The arguments necessary for the target function
+        %>
+        %> @retval varargout [Cell array] | The return values of the target function
         % ======================================================================
         function [varargout] = DisableFigures(functionName, varargin)
-            %> @brief DisableFigures applies a script while suppressing figure production and saving.
-            %>
-            %> @b Usage
-            %> @code
-            %> apply.DisableFigures(@apply.SuperpixelAnalysis);
-            %> @endcode
-            %>
-            %> @param functionName [Function Handle] | Handle of the target function to be applied
-            %> @param vargin [Cell array] | The arguments necessary for the target function
+            % DisableFigures applies a script while suppressing figure production and saving.
             %
-            %> @retval varargout [Cell array] | The arguments returned from the target function
+            % @b Usage
+            %
+            % @code
+            % apply.DisableFigures(@apply.SuperpixelAnalysis);
+            % @endcode
+            %
+            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param varargin [Cell array] | The arguments necessary for the target function
+            %
+            % @retval varargout [Cell array] | The return values of the target function
             warning('off', 'all');
             showFigures = config.GetSetting('showFigures');
             saveImages = config.GetSetting('saveImages');
@@ -91,7 +102,7 @@ classdef apply
             warning('on', 'all');
 
             if nargout(functionName) > 0
-                [varargout{1:nargout}] = functionName(varargin{:});
+                varargout{:} = functionName(varargin{:});
             else
                 functionName(varargin{:});
                 varargout{:} = {};
@@ -106,33 +117,35 @@ classdef apply
         %> @brief DisableSaveFigures applies a script while suppressing figure saving.
         %>
         %> @b Usage
+        %>
         %> @code
         %> apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
         %> @endcode
         %>
         %> @param functionName [Function Handle] | Handle of the target function to be applied
-        %> @param vargin [Cell array] | The arguments necessary for the target function
-        %
-        %> @retval varargout [Cell array] | The arguments returned from the target function
+        %> @param varargin [Cell array] | The arguments necessary for the target function
+        %>
+        %> @retval varargout [Cell array] | The return values of the target function
         % ======================================================================
         function [varargout] = DisableSaveFigures(functionName, varargin)
-            %> @brief DisableSaveFigures applies a script while suppressing figure saving.
-            %>
-            %> @b Usage
-            %> @code
-            %> apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
-            %> @endcode
-            %>
-            %> @param functionName [Function Handle] | Handle of the target function to be applied
-            %> @param vargin [Cell array] | The arguments necessary for the target function
+            % DisableSaveFigures applies a script while suppressing figure saving.
             %
-            %> @retval varargout [Cell array] | The arguments returned from the target function
+            % @b Usage
+            %
+            % @code
+            % apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
+            % @endcode
+            %
+            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param varargin [Cell array] | The arguments necessary for the target function
+            %
+            % @retval varargout [Cell array] | The return values of the target function
             warning('off', 'all');
             saveImages = config.GetSetting('saveImages');
             config.SetSetting('saveImages', false);
             warning('on', 'all');
             if nargout(functionName) > 0
-                [varargout{1:nargout}] = functionName(varargin{:});
+                varargout{:} = functionName(varargin{:});
             else
                 functionName(varargin{:});
                 varargout{:} = {};
@@ -142,40 +155,75 @@ classdef apply
             config.SetSetting('saveImages', saveImages);
             warning('on', 'all');
         end
+        % ======================================================================
+        %> @brief RowFunc applies a function on each row of the input.
+        %>
+        %> Is the input data is an hsi instance, then the pixels that
+        %> belong to the foreground mask are considered.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> meanVals = apply.RowFunc(@mean, X);
+        %>
+        %> meanVals = apply.RowFunc(@mean, hsIm);
+        %> @endcode
+        %>
+        %> @param functionName [Function Handle] | Handle of the target function to be applied
+        %> @param X [numeric array] | The input data as an array, where each
+        %> row is a feature vector.
+        %> @param varargin [Cell array] | The arguments necessary for the target function
+        %>
+        %> @retval result [Cell array] | The return values of the target function
+        % ======================================================================
+        function [result] = RowFunc(functionName, X, varargin)
+            % RowFunc applies a function on each row of the input.
+            %
+            % Is the input data is an hsi instance, then the pixels that
+            % belong to the foreground mask are considered.
+            %
+            % @b Usage
+            %
+            % @code
+            % meanVals = apply.RowFunc(@mean, X);
+            %
+            % meanVals = apply.RowFunc(@mean, hsIm);
+            % @endcode
+            %
+            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param X [numeric array] | The input data as an array, where each
+            % row is a feature vector.
+            % @param varargin [Cell array] | The arguments necessary for the target function
+            %
+            % @retval result [Cell array] | The return values of the target function
 
-        function [result] = RowFunc(varargin)
-            %APPLYROWFUNC applies a function on each row
-            %
-            %   Usage:
-            %   result = ApplyRowFunc(func, varargin) applies function func with
-            %   arguments varargin on each row of varargin
-            %
-            [result] = ApplyRowFunc(varargin{:});
-        end
+            if hsi.IsHsi(X)
+                X = X.GetMaskedPixels();
+            end
 
-        function [varargout] = OnQualityPixels(varargin)
-            % APPLYONQUALITYPIXELS apply a function on only goog quality functions.
-            %
-            %   Usage:
-            %   [coeff] = ApplyOnQualityPixels(@doPixelPCA, colMsi);
-            %   applies function 'doPixelPCA' on good quality pixels of array colMsi
-            [varargout{1:nargout}] = ApplyOnQualityPixels(varargin{:});
-        end
+            rows = size(X, 1);
+            result = cell(rows, 1);
+            for i = 1:rows
+                if nargout(functionName) > 0
+                    if nargin(functionName) > 1
+                        varargout{:} = functionName(X(rows, :), varargin{:});
+                    else
+                        varargout{:} = functionName(X(rows, :));
+                    end
+                else
+                    if nargin(functionName) > 1
+                        functionName(X(rows, :), varargin{:});
+                    else
+                        functionName(X(rows, :));
+                    end
+                    varargout{:} = {};
+                end
+                result{i} = varargout;
+            end
 
-        function [labels] = Kmeans(hsIm, targetName, clusterNum)
-            %%Kmeans performs Kmeans clustering on the HSI
-            %
-            %   Usage:
-            %   labels = apply.Kmeans(hsi, '158', 5);
-            [labels] = KmeansInternal(hsIm, targetName, clusterNum);
-        end
-
-        function [] = SuperpixelAnalysis(varargin)
-            %%SuperpixelAnalysis applies SuperPCA on an image
-            %
-            %   Usage:
-            %   apply.SuperpixelAnalysis(hsi, targetName);
-            SuperpixelAnalysisInternal(varargin{:});
+            if isnumeric(result{1})
+                result = cell2mat(result);
+            end
         end
     end
 end

@@ -93,7 +93,7 @@ classdef trainUtility
 
                 %% load HSI from .mat file
                 targetName = num2str(id);
-                I = hsiUtility.LoadHSI(targetName, 'dataset');
+                I = hsi.Load(targetName, 'dataset');
 
                 imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
                 if useCustomMask

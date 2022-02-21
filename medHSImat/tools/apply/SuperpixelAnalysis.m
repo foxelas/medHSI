@@ -1,26 +1,63 @@
-function [scores, labels, validLabels] = SuperpixelAnalysisInternal(hsIm, targetName, isManual, pixelNum, pcNum)
-%%SuperpixelAnalysis applies SuperPCA on an image
+% ======================================================================
+%> @brief SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
+%> the result.
+%>
+%> @b Usage
+%>
+%> @code
+%> SuperpixelAnalysis(hsIm);
+%>
+%> apply.ToEach(@SuperpixelAnalysis, true, 20, 3);
+%> @endcode
+%>
+%> @param hsIm [hsi] | An instance of the hsi class
+%> @b Optional
+%> @param isManual [boolean] | A  flag to show whether is manual (local)
+%> implementation or by SuperPCA package. Default: false.
+%> @param pixelNum [int] | The number of superpixels. Default: 20.
+%> @param pcNum [int] | The number of PCA components. Default: 3.
+%>
+%> @retval scores [numeric array] | The PCA scores
+%> @retval labels [numeric array] | The labels of the superpixels
+%> @retval validLabels [numeric array] | The superpixel labels that refer
+%> to tissue pixels
+% ======================================================================
+function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, isManual, pixelNum, pcNum)
+% SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
+% the result.
 %
-%   Usage:
-%   SuperpixelAnalysisInternal(hsi, targetName);
+% @b Usage
 %
-%   ApplyScriptToEachImage(@SuperpixelAnalysis);
+% @code
+% SuperpixelAnalysis(hsIm);
+%
+% apply.ToEach(@SuperpixelAnalysis, true, 20, 3);
+% @endcode
+%
+% @param hsIm [hsi] | An instance of the hsi class
+% @b Optional
+% @param isManual [boolean] | A  flag to show whether is manual (local)
+% implementation or by SuperPCA package. Default: false.
+% @param pixelNum [int] | The number of superpixels. Default: 20.
+% @param pcNum [int] | The number of PCA components. Default: 3.
+%
+% @retval scores [numeric array] | The PCA scores
+% @retval labels [numeric array] | The labels of the superpixels
+% @retval validLabels [numeric array] | The superpixel labels that refer
+% to tissue pixels
 
-%% Apply superpixel analysis on HSI
-% prequisites: hsi, targetName
-
-if nargin < 3
+if nargin < 2
     isManual = false;
 end
 
-if nargin < 4
+if nargin < 3
     pixelNum = 20;
 end
 
-if nargin < 5
+if nargin < 4
     pcNum = 3;
 end
-savedir = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('experiment'), targetName);
+savedir = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('experiment'), config.GetSetting('fileName'));
 
 %% Preparation
 srgb = hsIm.GetDisplayImage('rgb');
@@ -101,9 +138,46 @@ if ~config.GetSetting('saveImages')
 end
 end
 
+% ======================================================================
+%> @brief CleanLabels returns superpixel labels that contain tissue pixels.
+%>
+%> Keep only pixels that belong to the tissue (Superpixel might assign
+%> background pixels also). The last label is background label.
+%>
+%> @b Usage
+%>
+%> @code
+%> [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
+%> @endcode
+%>
+%> @param labels [numeric array] | The labels of the superpixels
+%> @param fgMask [numeric array] | The foreground mask
+%> @param pixelNum [int] | The number of superpixels.
+%>
+%> @retval cleanLabels [numeric array] | The labels of the superpixels
+%> @retval validLabels [numeric array] | The superpixel labels that refer
+%> to tissue pixels
+% ======================================================================
 function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
+% CleanLabels returns superpixel labels that contain tissue pixels.
+%
 % Keep only pixels that belong to the tissue (Superpixel might assign
 % background pixels also). The last label is background label.
+%
+% @b Usage
+%
+% @code
+% [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
+% @endcode
+%
+% @param labels [numeric array] | The labels of the superpixels
+% @param fgMask [numeric array] | The foreground mask
+% @param pixelNum [int] | The number of superpixels.
+%
+% @retval cleanLabels [numeric array] | The labels of the superpixels
+% @retval validLabels [numeric array] | The superpixel labels that refer
+% to tissue pixels
+
 labels(~fgMask) = pixelNum;
 
 pixelLim = 10;

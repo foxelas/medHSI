@@ -48,6 +48,8 @@ classdef hsiUtility
             end
 
             variableInfo = who('-file', targetFilename);
+            fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('dataset'), config.GetSetting('normalization'));
+            fprintf('Filename: %s.\n', targetFilename);
             if ismember('labelInfo', variableInfo) % returns true
                 load(targetFilename, 'spectralData', 'labelInfo');
             else
