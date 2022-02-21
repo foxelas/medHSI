@@ -1,10 +1,36 @@
+% ======================================================================
+%> @brief ByLeon2020 implements segmentation according to Leon (2020).
+%>
+%> For details check Leon, R., Martinez-Vega, B., Fabelo, H., Ortega, S., Melian, V., Castaño, I., Carretero, G., Almeida, P., Garcia, A., Quevedo, E., Hernandez, J. A., Clavo, B., & M. Callico, G. (2020). Non-Invasive Skin Cancer Diagnosis Using Hyperspectral Imaging for In-Situ Clinical Support. Journal of Clinical Medicine, 9(6), 1662. https://doi.org/10.3390/jcm9061662
+%>
+%> @b Usage
+%>
+%> @code
+%> segopt = segopt.GetOptions('Leon2020');
+%> labels = segment.Apply(hsIm, segopt);
+%> @endcode
+%>
+%> @param hsIm [hsi] | An instance of the hsi class
+%> @param segopt [struct] | The segmentation options
+%>
+%> @retval labels [numeric array] | The segmented labels
+% ======================================================================    
 function [labels] = ByLeon2020(hsIm, segopt)
+% ByLeon2020 implements segmentation according to Leon (2020).
 %
-%   Usage:
-%   segopt = segment.GetOptions('Leon2020');
-%   labels = segment.Apply(hsIm, targetName, segopt);
+% For details check Leon, R., Martinez-Vega, B., Fabelo, H., Ortega, S., Melian, V., Castaño, I., Carretero, G., Almeida, P., Garcia, A., Quevedo, E., Hernandez, J. A., Clavo, B., & M. Callico, G. (2020). Non-Invasive Skin Cancer Diagnosis Using Hyperspectral Imaging for In-Situ Clinical Support. Journal of Clinical Medicine, 9(6), 1662. https://doi.org/10.3390/jcm9061662
 %
-%   labels = ByLeon2020(hsIm, segopt);
+% @b Usage
+%
+% @code
+% segopt = segopt.GetOptions('Leon2020');
+% labels = segment.Apply(hsIm, segopt);
+% @endcode
+%
+% @param hsIm [hsi] | An instance of the hsi class
+% @param segopt [struct] | The segmentation options
+%
+% @retval labels [numeric array] | The segmented labels
 
 k = segopt.MainClasses;
 voting = segopt.VotingScheme;
@@ -15,7 +41,7 @@ n = numel(refLibrary);
 
 if options.HasInitialSegmentation
     kin = segopt.InitialClasses;
-    initSegFun = segopt.segment.Kmeans;
+    initSegFun = segopt.InitialSegmentation;
     [labelsInit, centroids] = initSegFun(hsIm, kin);
 
     %% Segmenet first class as background with label -1
