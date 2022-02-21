@@ -14,7 +14,7 @@
 %> @param segopt [struct] | The segmentation options
 %>
 %> @retval labels [numeric array] | The segmented labels
-% ======================================================================    
+% ======================================================================
 function [labels] = ByLeon2020(hsIm, segopt)
 % ByLeon2020 implements segmentation according to Leon (2020).
 %

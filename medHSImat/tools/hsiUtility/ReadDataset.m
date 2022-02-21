@@ -145,27 +145,27 @@ disp('Finish [ReadLabeledDataset].');
 end
 
 function [outname] = StrrepAll(inname, isLegacy)
-    %     StrrepAll formats an inname to outname
-    %
-    %     Usage:
-    %     [outname] = StrrepAll(inname)
+%     StrrepAll formats an inname to outname
+%
+%     Usage:
+%     [outname] = StrrepAll(inname)
 
-    if nargin < 2
-        isLegacy = false;
-    end
+if nargin < 2
+    isLegacy = false;
+end
 
-    [~, outname] = fileparts(inname);
+[~, outname] = fileparts(inname);
 
-    str = '_';
-    if isLegacy
-        str = ' ';
-    end
+str = '_';
+if isLegacy
+    str = ' ';
+end
 
-    outname = strrep(outname, '\', str);
-    outname = strrep(outname, '_', str);
-    outname = strrep(outname, ' ', str);
+outname = strrep(outname, '\', str);
+outname = strrep(outname, '_', str);
+outname = strrep(outname, ' ', str);
 
-    outname = strrep(outname, '.csv', '');
-    outname = strrep(outname, '.mat', '');
+outname = strrep(outname, '.csv', '');
+outname = strrep(outname, '.mat', '');
 
 end

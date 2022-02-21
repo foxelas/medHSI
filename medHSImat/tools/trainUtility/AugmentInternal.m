@@ -1,11 +1,44 @@
+% ======================================================================
+%> @brief AugmentInternal applies augmentation on the dataset
+%>
+%> The base dataset should be already saved before running augmentation.
+%>
+%> 'set1': applies vertical and horizontal flipping.
+%> 'set2': applies random rotation.
+%>
+%> @b Usage
+%>
+%> @code
+%> dataset = 'pslData';
+%> hsiUtility.PrepareDataset(dataset, {'tissue', true});
+%> augType = 'set1';
+%> AugmentInternal(dataset, augType);
+%> @endcode
+%>
+%> @param dataset [char] | The dataset
+%> @param augType [char] | The augmentation type ('set1' or 'set2')
+%>
+% ======================================================================
 function [] = AugmentInternal(dataset, augType)
-% Augment reads a group of hsi data, prepares .mat files,
-% prepared normalized files and returns montage previews of contents
-% Each sample contained in the original dataset is assumed unique
+% AugmentInternal applies augmentation on the dataset
 %
-%   Usage:
-%   Augment(dataset)
-%   Augment(dataset, 'set2');
+% The base dataset should be already saved before running augmentation.
+%
+% 'set1': applies vertical and horizontal flipping.
+% 'set2': applies random rotation.
+%
+% @b Usage
+%
+% @code
+% dataset = 'pslData';
+% hsiUtility.PrepareDataset(dataset, {'tissue', true});
+% augType = 'set1';
+% AugmentInternal(dataset, augType);
+% @endcode
+%
+% @param dataset [char] | The dataset
+% @param augType [char] | The augmentation type ('set1' or 'set2')
+%
 
 config.SetSetting('dataset', dataset);
 if nargin < 2

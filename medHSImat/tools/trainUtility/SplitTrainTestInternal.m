@@ -1,28 +1,76 @@
+% ======================================================================
+%> @brief SplitTrainTestInternal splits the dataset to train and test.
+%>
+%> For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
+%> For more details check @c function SplitTrainTestInternal .
+%> The base dataset should be already saved before running augmentation.
+%>
+%> @b Usage
+%>
+%> @code
+%>   dataset = 'pslBase';
+%>   testTargets = {'153'};
+%>   dataType = 'pixel';
+%>   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(dataset, testTargets, dataType);
+%>
+%>   hasLabels = true;
+%>   transformFun = @Dimred;
+%>   folds = 5;
+%>   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(dataset, testTargets, dataType, hasLabels, folds, transformFun);
+%> @endcode
+%>
+%> @param dataset [char] | The dataset
+%> @param testTargets [string array] | The targetIDs of test targets
+%> @param dataType [char] | The data type, either 'image' or 'pixel'
+%> @param hasLabels [boolean] | A flag to return labels
+%> @param folds [int] | The number of folds
+%> @param transformFun [function handle] | The function handle for the function to be applied
+%>
+%> @retval X [numeric array] | The train data
+%> @retval y [numeric array] | The train values
+%> @retval Xtest [numeric array] | The test data
+%> @retval ytest [numeric array] | The test values
+%> @retval cvp [cell array] | The cross validation index splits
+%> @retval sRGBs [cell array] | The array of sRGBs for test hsi data
+%> @retval fgMasks [cell array] | The foreground masks of sRGBs for test hsi data
+%>
+% ======================================================================
 function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(dataset, testTargets, dataType, hasLabels, folds, transformFun)
-
-%% SplitTrainTest rearranges pixels as a pixel (observation) by feature 2D array
-% One pixel is one data sample
+% SplitTrainTestInternal splits the dataset to train and test.
 %
-%   Arguments
-%   dataset: string, the folder name of dataset (must be in
-%   matfiles\hsi\)
-%   testTargets: array of str targetNames
-%   dataType: 'image' or 'pixel'
-%   hasLabels: bool
-%   folds: numeric
-%   transformFun: function handle
+% For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
+% For more details check @c function SplitTrainTestInternal .
+% The base dataset should be already saved before running augmentation.
 %
-%   Usage:
+% @b Usage
+%
+% @code
 %   dataset = 'pslBase';
 %   testTargets = {'153'};
 %   dataType = 'pixel';
-%   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType);
+%   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(dataset, testTargets, dataType);
 %
 %   hasLabels = true;
 %   transformFun = @Dimred;
 %   folds = 5;
-%   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
-
+%   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(dataset, testTargets, dataType, hasLabels, folds, transformFun);
+% @endcode
+%
+% @param dataset [char] | The dataset
+% @param testTargets [string array] | The targetIDs of test targets
+% @param dataType [char] | The data type, either 'image' or 'pixel'
+% @param hasLabels [boolean] | A flag to return labels
+% @param folds [int] | The number of folds
+% @param transformFun [function handle] | The function handle for the function to be applied
+%
+% @retval X [numeric array] | The train data
+% @retval y [numeric array] | The train values
+% @retval Xtest [numeric array] | The test data
+% @retval ytest [numeric array] | The test values
+% @retval cvp [cell array] | The cross validation index splits
+% @retval sRGBs [cell array] | The array of sRGBs for test hsi data
+% @retval fgMasks [cell array] | The foreground masks of sRGBs for test hsi data
+%
 hasTest = ~isempty(testTargets);
 if nargin < 4
     hasLabels = true;
@@ -41,10 +89,16 @@ X = [];
 y = [];
 Xtest = [];
 ytest = [];
-sRGBs = cell(length(testTargets), 1);
-fgMasks = cell(length(testTargets), 1);
+if hasTest
+    sRGBs = cell(length(testTargets), 1);
+    fgMasks = cell(length(testTargets), 1);
+else
+    sRGBs = {};
+    fgMasks = {};
+end
 
 k = 0;
+numData = 0;
 for i = 1:length(targetIDs)
 
     baseTargetName = targetIDs{i};
@@ -58,6 +112,7 @@ for i = 1:length(targetIDs)
 
         fgMask = I.FgMask;
         if ~isempty(label) %% TOREMOVE
+            numData = numData + 1;
 
             if strcmp(dataType, 'image')
                 xdata = I.Value;
@@ -114,9 +169,8 @@ for i = 1:length(targetIDs)
     end
 end
 
-if ~isempty(y)
-    cvp = trainUtility.KfoldPartitions(y, folds);
-else
-    cvp = [];
+if numData >= folds
+    cvp = trainUtility.KfoldPartitions(numData, folds);
 end
+
 end
