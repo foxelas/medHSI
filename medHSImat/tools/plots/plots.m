@@ -1,45 +1,43 @@
+% ======================================================================
+%> @brief plots is a class that holds all functions for figure plotting.
+%>
+% ======================================================================
 classdef plots
     methods (Static)
-
-        %% Contents
+        
+        %======================================================================
+        %> @brief Apply runs a plotting function.
+        %>
+        %> The function should take the figure handle as last argument.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [varargout] = plots.Apply(1, @PlotSpectra, spectra);
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %> @param functionName [Function Handle] | Handle of the target function to be applied
+        %> @param varargin [Cell array] | The arguments necessary for the target function
+        %>
+        %> @retval varargout [Cell array] | The return values of the target function
+        %======================================================================
+        function [varargout] = Apply(fig, functionName, varargin)
+        % Apply runs a plotting function.
         %
-        %   Static:
-        %         %% Core
-        %         Apply(fig, funcName, varargin)
-        %         SavePlot(fig)
+        % The function should take the figure handle as last argument.
         %
-        %         %% Graph Properties
-        %         [imCorr] = BandStatistics(inVectors, statistic, fig)
-        %         [lineColorMap] = GetLineColorMap(style, names)
+        % @b Usage
         %
-        %         %% Lines
-        %         Spectra(fig, spectra, wavelengths, names, figTitle)
-        %         AverageSpectrum(fig, Inorm)
-        %         Components(hsi, pcNum, figStart)
-        %         Eigenvectors(fig, varargin)
+        % @code
+        % [varargout] = plots.Apply(1, @PlotSpectra, spectra);
+        % @endcode
         %
-        %         %% Images
-        %         Overlay(fig, baseIm, topIm, figTitle)
-        %         Dimred(method, dimredResult, w, redHsis)
-        %         Superpixels(fig, baseImage, labels, figTitle, plotType, fgMask)
+        % @param fig [int] | The figure handle
+        % @param functionName [Function Handle] | Handle of the target function to be applied
+        % @param varargin [Cell array] | The arguments necessary for the target function
         %
-        %         %% Multi-image
-        %         MontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
-        %         SubimageMontage(fig, hsi, figTitle, limit)
-        %         DualMontage(fig, left, right, figTitle)
-        %
-        %         %% Checks
-        %         NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
-        %         ReferenceLibrary(fig, refLib)
-
-        %% Core %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function [varargout] = Apply(fig, funcName, varargin)
-            %PLOTS wraps plotting functions
-            %
-            %   Usage:
-            %   Plots(fig, funcName, varargin) plots function with funcName and
-            %   arguments varargin in figure fig
-            %   Plots(1, @PlotSpectra, spectra)
+        % @retval varargout [Cell array] | The return values of the target function
 
             if isnumeric(fig) && ~isempty(fig)
                 %disp('Check if no overlaps appear and correct fig is saved.')
@@ -50,57 +48,211 @@ classdef plots
             end
 
             newVarargin = varargin;
-            expectedArgs = nargin(funcName);
+            expectedArgs = nargin(functionName);
             for i = (length(newVarargin) + 1):(expectedArgs - 1)
                 newVarargin{i} = [];
             end
             newVarargin{length(newVarargin)+1} = fig;
 
-            if nargout(funcName) > 0
-                varargout{:} = funcName(newVarargin{:});
+            if nargout(functionName) > 0
+                varargout{:} = functionName(newVarargin{:});
             else
-                funcName(newVarargin{:});
+                functionName(newVarargin{:});
                 varargout{:} = {};
             end
 
+            plots.SavePlot(fig);
         end
-
+        %======================================================================
+        %> @brief SavePlot saves a figure plot.
+        %>
+        %> The plot name should be set beforehand in config::[plotName].
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> plots.SavePlot(1);
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %======================================================================
         function [] = SavePlot(fig)
-            %SAVEPLOT saves the plot shown in figure fig
-            %
-            %   Usage:
-            %   SavePlot(2);
-
+        % SavePlot saves a figure plot.
+        %
+        % The plot name should be set beforehand in config::[plotName].
+        %
+        % @b Usage
+        %
+        % @code
+        % plots.SavePlot(1);
+        % @endcode
+        %
+        % @param fig [int] | The figure handle
             SavePlot(fig);
         end
 
-        %% Graph Properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %======================================================================
+        %> @brief GetLineColorMap returns a linecolor map based on the style.
+        %>
+        %> Available keys are:
+        %> 'class': {'Benign', 'Atypical', 'Malignant'}
+        %> 'type': {'Unfixed', 'Fixed', 'Sectioned'}
+        %> 'sample': {'0037', '0045', '0053', '0059', '0067', '9913', '9933', '9940', '9949', '9956'}
+        %> 'custom': user-defined
+        %> default: {'1', '2', '3', '4', '5', '6', '7', '8', '9', '10'}
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> lineColorMap = plots.GetLineColorMap('class');
+        %> @endcode
+        %>
+        %> @param style [char] | The line group style. Default: 'class'.
+        %> @b Optional
+        %> @param names [cell array] | The line group names
+        %>
+        %> @retval lineColorMap [map] | The line color map
+        %======================================================================
         function [lineColorMap] = GetLineColorMap(varargin)
-            %     PLOTGETLINECOLORMAP returns a linecolor map based on the style
-            %
-            %     Usage:
-            %     [lineColorMap] = PlotGetLineColorMap('class')
+        % GetLineColorMap returns a linecolor map based on the style.
+        %
+        % Available keys are:
+        % 'class': {'Benign', 'Atypical', 'Malignant'}
+        % 'type': {'Unfixed', 'Fixed', 'Sectioned'}
+        % 'sample': {'0037', '0045', '0053', '0059', '0067', '9913', '9933', '9940', '9949', '9956'}
+        % 'custom': user-defined
+        % default: {'1', '2', '3', '4', '5', '6', '7', '8', '9', '10'}
+        %
+        % @b Usage
+        %
+        % @code
+        % lineColorMap = plots.GetLineColorMap('class');
+        % @endcode
+        %
+        % @param style [char] | The line group style. Default: 'class'.
+        % @b Optional
+        % @param names [cell array] | The line group names
+        %
+        % @retval lineColorMap [map] | The line color map
 
-            [lineColorMap] = PlotGetLineColorMap(varargin{:});
+            if (nargin < 1)
+                style = 'class';
+            end
+
+            switch style
+                case 'class'
+                    key = {'Benign', 'Atypical', 'Malignant'};
+                    value = {'g', 'm', 'r'};
+                case 'type'
+                    key = {'Unfixed', 'Fixed', 'Sectioned'};
+                    value = {'g', 'm', 'r'};
+                case 'sample'
+                    key = {'0037', '0045', '0053', '0059', '0067', '9913', '9933', '9940', '9949', '9956'};
+                    value = jet(10);
+                case 'custom'
+                    key = names;
+                    key = unique(key);
+                    value = jet(length(key));
+                otherwise
+                    key = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '10'};
+                    value = jet(10);
+            end
+
+
+            if ~isvector(value)
+                v = cell(size(value, 1), 1);
+                for i = 1:size(value, 1)
+                    v{i} = value(i, :);
+                end
+                value = v;
+            end
+
+            if size(value, 1) == 1
+                value = {value};
+            end
+lineColorMap = containers.Map(key, value);
         end
 
+        %======================================================================
+        %> @brief BandStatistics plots statistics among spectral bands.
+        %>       
+        %> For more details check @c function PlotBandStatistics . 
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [imCorr] = plots.BandStatistics(fig, inVectors, 'correlation');
+        %>
+        %> [imCorr] = plots.BandStatistics(fig, inVectors, 'covariance');
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %> @param inVectors [numeric array] | The input vectors
+        %> @param statistic [char] | The statistic name
+        %>
+        %> @retval imCorr [numeric array] | The statistics values
+        %======================================================================
         function [imCorr] = BandStatistics(fig, varargin)
-            % PlotBandStatistics plots the correlation among spectral bands
-            %
-            %   Usage:
-            %   [imCorr] = PlotBandStatistics(inVectors, 'correlation', fig)
-            %   [imCorr] = PlotBandStatistics(inVectors, 'covariance', fig)
+        % BandStatistics plots statistics among spectral bands.
+        %       
+        % For more details check @c function PlotBandStatistics . 
+        %
+        % @b Usage
+        %
+        % @code
+        % [imCorr] = plots.BandStatistics(fig, inVectors, 'correlation');
+        %
+        % [imCorr] = plots.BandStatistics(fig, inVectors, 'covariance');
+        % @endcode
+        %
+        % @param fig [int] | The figure handle
+        % @param inVectors [numeric array] | The input vectors
+        % @param statistic [char] | The statistic name
+        %
+        % @retval imCorr [numeric array] | The statistics values
 
             [imCorr] = plots.Apply(fig, @PlotBandStatistics, varargin{:});
         end
 
-        %% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %======================================================================
+        %> @brief Spectra plots multiple spectra together.
+        %>       
+        %> For more details check @c function PlotSpectra . 
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> plots.Spectra(fig, spectra, wavelengths, names, figTitle, markers);
+        %>
+        %> plots.Spectra(fig, spectra);
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %> @param spectra [numeric array] | The input vectors
+        %> @param wavelengths [numeric array] | The wavlength values
+        %> @param names [cell array] | The curve names
+        %> @param figTitle [char] | The figure title
+        %> @param markers [cell array] | The curve markers
+        %======================================================================
         function [] = Spectra(fig, varargin)
-            %%PLOTSPECTRA plots one or more spectra together
-            %
-            %   Usage:
-            %   PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig);
-            %   PlotSpectra(spectra)
+        % Spectra plots multiple spectra together.
+        %       
+        % For more details check @c function PlotSpectra . 
+        %
+        % @b Usage
+        %
+        % @code
+        % plots.Spectra(fig, spectra, wavelengths, names, figTitle, markers);
+        %
+        % plots.Spectra(fig, spectra);
+        % @endcode
+        %
+        % @param fig [int] | The figure handle
+        % @param spectra [numeric array] | The input vectors
+        % @param wavelengths [numeric array] | The wavlength values
+        % @param names [cell array] | The curve names
+        % @param figTitle [char] | The figure title
+        % @param markers [cell array] | The curve markers
 
             plots.Apply(fig, @PlotSpectra, varargin{:});
         end
