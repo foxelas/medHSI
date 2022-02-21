@@ -16,7 +16,7 @@ plot(lambdaIn, xyz(:, 2), 'DisplayName', 'y');
 plot(lambdaIn, xyz(:, 3), 'DisplayName', 'z');
 hold off
 legend();
-config.SetSetting('plotName', fullfile(config.GetSetting('saveDir'), '1_Common', 'interpColorMatchingFunctions'));
+config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'interpColorMatchingFunctions'));
 title('Interpolated Color Matching Functions');
 xlabel('Wavelength (nm)');
 ylabel('Weight (a.u.)');

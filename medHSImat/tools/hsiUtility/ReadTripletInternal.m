@@ -60,8 +60,7 @@ if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
         || ~exist(dataUtility.GetFilename('black', targetName), 'file') ...
         || ~exist(dataUtility.GetFilename('white', targetName), 'file')
 
-    snapshotFolder = config.GetSetting('snapshots');
-    plotBaseDir = fullfile(config.GetSetting('saveDir'), snapshotFolder, config.GetSetting('experiment'));
+    plotBaseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('snapshots'), config.GetSetting('experiment'));
     figure(1);
     imshow(hsiUtility.GetDisplayImage(spectralData, 'rgb'));
     config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));

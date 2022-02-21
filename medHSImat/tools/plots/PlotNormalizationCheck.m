@@ -60,7 +60,7 @@ fig3 = figure(fig+2);
 rgb = Iin.GetDisplayImage();
 plots.Overlay(fig3, rgb, mask);
 
-baseFolder = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('normCheck'), config.GetSetting('fileName'));
+baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('normCheck'), config.GetSetting('fileName'));
 config.SetSetting('plotName', strcat(baseFolder, '_raw.jpg'));
 plots.SavePlot(fig);
 config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));

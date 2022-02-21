@@ -5,7 +5,7 @@ StartLogger;
 config.SetSetting('normalization', 'byPixel');
 % config.SetSetting('dataDate', 20210706);
 % config.SetSetting('integrationTime', 618);
-config.SetSetting('saveDir', fullfile(config.GetSetting('saveDir'), '001-DataTest'));
+config.SetSetting('outputDir', fullfile(config.GetSetting('outputDir'), '001-DataTest'));
 config.SetSetting('cropBorders', true);
 
 %%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%

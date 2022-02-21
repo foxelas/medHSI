@@ -25,7 +25,7 @@ switch method
         end
 
     case 'reconstructed'
-        saveDir = config.GetSetting('saveDir');
+        saveDir = config.GetSetting('outputDir');
         [solaxSpec, wavelengths] = ReconstructSolaxIoIlluminationSpectrum(saveDir);
     otherwise
         error('Unsupported case for solax-io spectra reconstruction');
@@ -97,7 +97,7 @@ end
 
 function [] = PlotSolaxSpectra(wavelengths, solaxSpec, sunSpec)
 
-saveDir = config.GetSetting('saveDir');
+saveDir = config.GetSetting('outputDir');
 
 fig4 = figure(4);
 x = wavelengths;

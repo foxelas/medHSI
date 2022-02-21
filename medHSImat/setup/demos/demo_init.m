@@ -56,17 +56,17 @@ fileNum = 150;
 config.SetSetting('fileName', num2str(fileNum));
 hsIm = hsiUtility.LoadHSI(fileNum, 'dataset');
 
-%%%%%%%%%%%%%%%%%%%%% Get Disease Info %%%%%%%%%%%%%%%%%%%%%
-% Returns information from the disease DB saved in is saved in importDir
+%%%%%%%%%%%%%%%%%%%%% Get Diagnosis Info %%%%%%%%%%%%%%%%%%%%%
+% Returns information from the Diagnosis DB saved in is saved in importDir
 % (input\xxxDBDiagnosisInfoTable.xlsx)
-[filenames, targetIDs, outRows, disease, stage] = databaseUtility.GetDiseaseQuery(dbSelection);
+[filenames, targetIDs, outRows, diagnosis, stage] = databaseUtility.GetDiagnosisQuery(dbSelection);
 
 %%%%%%%%%%%%%%%%%%%%% Get SAM library %%%%%%%%%%%%%%%%%%%%
 % Select samples with ID 153 and 166 to be used as references for the
 % library for SAM calculation
 referenceIDs = {153, 166};
-referenceDisease = cellfun(@(x) disease{targetIDs == x}, referenceIDs, 'UniformOutput', false);
-refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDisease);
+referenceDiagnosis = cellfun(@(x) diagnosis{targetIDs == x}, referenceIDs, 'UniformOutput', false);
+refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs, referenceDiagnosis);
 
 %%%%%%%%%%%%%%%%%%%%% Plot Mean Spectra %%%%%%%%%%%%%%%%%%%%
 % Plot average spectra for an ROI on the sample

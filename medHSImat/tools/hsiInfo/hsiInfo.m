@@ -81,7 +81,7 @@ classdef hsiInfo
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
-        %> Diagnostic data should be saved in config::[importDir]\\[database]+[diseaseInfoTableName]
+        %> Diagnostic data should be saved in config::[importDir]\\[database]+[diagnosisInfoTableName]
         %>
         %> @b Usage
         %>
@@ -321,7 +321,7 @@ classdef hsiInfo
             %
             % @retval diagnosis [char] | The diagnosis string
 
-            dataTable = databaseUtility.GetDiseaseTable();
+            dataTable = databaseUtility.GetDiagnosisTable();
             id = find(strcmp(dataTable.SampleID, sampleId), 1);
             if ~isempty(id)
                 diagnosis = dataTable{id, 'Diagnosis'}{1, 1};

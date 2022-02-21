@@ -117,12 +117,12 @@ for i = 1:length(targetIDs)
 
     figure(1);
     imshow(dispImageRaw);
-    config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
+    config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
     plots.SavePlot(1);
 
     figure(2);
     imshow(dispImageRgb);
-    config.SetSetting('plotName', config.DirMake(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'preprocessed', saveName));
+    config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'preprocessed', saveName));
     plots.SavePlot(2);
 
     pause(0.1);
@@ -130,12 +130,12 @@ end
 
 %% preview of the entire dataset
 
-path1 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'preprocessed');
+path1 = fullfile(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'preprocessed');
 plots.MontageFolderContents(1, path1, '*.jpg', 'Dataset');
 plots.MontageFolderContents(3, path1, '*raw.jpg', 'Dataset raw');
 plots.MontageFolderContents(4, path1, '*fix.jpg', 'Dataset fix');
 
-path2 = fullfile(config.GetSetting('saveDir'), config.GetSetting('saveFolder'), 'rgb');
+path2 = fullfile(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'rgb');
 plots.MontageFolderContents(2, path2, '*.jpg', 'sRGB');
 plots.MontageFolderContents(5, path2, '*raw.jpg', 'sRGB raw');
 plots.MontageFolderContents(6, path2, '*fix.jpg', 'sRGB fix');

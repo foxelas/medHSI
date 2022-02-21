@@ -14,7 +14,7 @@ function [] = PlotDimred(method, dimredResult, w, redHsis)
 %
 
 close all;
-saveto = GetSetting('saveDir');
+saveto = GetSetting('outputDir');
 
 coeff = dimredResult{1};
 scores = dimredResult{2};

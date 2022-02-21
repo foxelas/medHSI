@@ -1,8 +1,28 @@
+% ======================================================================
+%> @brief SetOpt sets parameters for running from Config.ini
+%>
+%> The values are recovered from MedHSIMat\\conf\\Config.ini.
+%> Values are saved in an .ini format.
+%>
+%> @b Usage
+%>
+%> @code
+%> SetOpt();
+%> @endcode
+%>
+% ======================================================================
 function [] = SetOpt()
-%     SETOPT sets parameters for running from conf/Config.ini
+% SetOpt sets parameters for running from Config.ini
 %
-%     Usage:
-%     SetOpt()
+% The values are recovered from MedHSIMat\\conf\\Config.ini.
+% Values are saved in an .ini format.
+%
+% @b Usage
+%
+% @code
+% SetOpt();
+% @endcode
+%
 
 disp('Reading configuration file [Config.ini] ...');
 inputSettingsFile = fullfile(config.GetConfDir(), 'Config.ini');
@@ -33,8 +53,6 @@ for i = 1:length(tmp.raw)
                     varValue = parentDataDir;
                 case 'matDir'
                     varValue = fullfile(parentDataDir, 'matfiles', 'hsi\');
-                case 'saveDir'
-                    varValue = outputDir;
                 case 'inDir'
                     varValue = parentDataDir;
             end

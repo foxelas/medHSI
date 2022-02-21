@@ -57,7 +57,7 @@ end
 if nargin < 4
     pcNum = 3;
 end
-savedir = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('experiment'), config.GetSetting('fileName'));
+savedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), config.GetSetting('fileName'));
 
 %% Preparation
 srgb = hsIm.GetDisplayImage('rgb');

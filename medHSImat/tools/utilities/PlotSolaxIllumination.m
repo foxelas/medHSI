@@ -11,7 +11,7 @@ load(filename, 'illumination');
 %% Plots Solax-iO illumination spectrum
 figure(1);
 plot(lambdaIn, illumination, 'DisplayName', 'Solax-iO');
-config.SetSetting('plotName', fullfile(config.GetSetting('saveDir'), '1_Common', 'illumination'));
+config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'illumination'));
 title('Illumination');
 xlabel('Wavelength (nm)');
 ylabel('Radiant Intensity (a.u.)');

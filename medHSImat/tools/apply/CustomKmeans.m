@@ -40,7 +40,7 @@ Xcol = hsIm.GetMaskedPixels(fgMask);
 
 labels = hsi.RecoverSpatialDimensions(labelsCol, size(fgMask), fgMask);
 
-savedir = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('experiment'), config.GetSetting('fileName'));
+savedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), config.GetSetting('fileName'));
 config.SetSetting('plotName', fullfile(savedir, 'kmeans-clustering'));
 plots.Superpixels(1, srgb, labels, '', 'color', fgMask);
 
