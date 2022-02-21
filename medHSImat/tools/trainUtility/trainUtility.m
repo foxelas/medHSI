@@ -177,7 +177,7 @@ classdef trainUtility
             st = toc;
             predlabels = predict(SVMModel, testscores);
 
-            [accuracy, sensitivity, specificity] = metrics.Evaluations(testlabels, predlabels);
+            [accuracy, sensitivity, specificity] = commonUtility.Evaluations(testlabels, predlabels);
         end
 
         function [acc, sens, spec, tdimred, st, Mdl, scores, testscores] = DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q)
@@ -216,7 +216,7 @@ classdef trainUtility
                     ypred1 = predict(LMdl, Xvalid);
                     scores = Xtrain;
                     testscores = Xvalid;
-                    [acc, sens, spec] = metrics.Evaluations(yvalid, ypred1);
+                    [acc, sens, spec] = commonUtility.Evaluations(yvalid, ypred1);
                     Mdl = LMdl;
 
                 case 'qda'
@@ -226,7 +226,7 @@ classdef trainUtility
                     ypred1 = predict(LMdl, Xvalid);
                     scores = Xtrain;
                     testscores = Xvalid;
-                    [acc, sens, spec] = metrics.Evaluations(yvalid, ypred1);
+                    [acc, sens, spec] = commonUtility.Evaluations(yvalid, ypred1);
                     Mdl = LMdl;
 
                 case 'rfi'
