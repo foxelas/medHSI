@@ -35,7 +35,7 @@ useTransform = ~(nargin < 6);
 
 %% Read h5 data
 config.SetSetting('dataset', dataset);
-[datanames, targetIDs] = dataUtility.DatasetInfo();
+[datanames, targetIDs] = commonUtility.DatasetInfo();
 
 X = [];
 y = [];

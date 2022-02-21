@@ -47,7 +47,7 @@ if isnumeric(targetName)
 end
 
 if contains(refType, 'white')
-    targetFilename = dataUtility.GetFilename('white', targetName);
+    targetFilename = commonUtility.GetFilename('white', targetName);
     if contains(refType, 'byPixel') || strcmpi(refType, 'white')
         load(targetFilename, 'fullReflectanceByPixel');
         spectralData = fullReflectanceByPixel;
@@ -65,7 +65,7 @@ if contains(refType, 'white')
     end
 
 elseif contains(refType, 'black')
-    targetFilename = dataUtility.GetFilename('black', targetName);
+    targetFilename = commonUtility.GetFilename('black', targetName);
     load(targetFilename, 'blackReflectance')
     spectralData = blackReflectance;
 else

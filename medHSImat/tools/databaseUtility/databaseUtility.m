@@ -41,6 +41,33 @@ classdef databaseUtility
         end
 
         % ======================================================================
+        %> @brief GetValueFromTable gets a value from the database table
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> dataTable = databaseUtility.GetValueFromTable(tab, field, id);
+        %>
+        %> sampleID = databaseUtility.GetValueFromTable(outRows, 'SampleID', i);
+        %> @endcode
+        %>
+        % ======================================================================        
+        function [value] = GetValueFromTable(tab, field, id)
+        % GetValueFromTable gets a value from the database table
+        %
+        % @b Usage
+        %
+        % @code
+        % dataTable = databaseUtility.GetValueFromTable(tab, field, id);
+        %
+        % sampleID = databaseUtility.GetValueFromTable(outRows, 'SampleID', i);
+        % @endcode
+        %
+            column = tab.(field);
+            value = column{id};
+        end
+        
+        % ======================================================================
         %> @brief Query returns a query result from the database.
         %>
         %> The table is recovered from

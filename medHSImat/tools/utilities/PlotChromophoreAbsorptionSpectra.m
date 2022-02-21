@@ -57,7 +57,7 @@ set(gca, 'yscale', 'log');
 config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'skinChromophoreExtinctionCoeff'));
 plots.SavePlot(fig);
 
-filename = dataUtility.GetFilename('param', 'extinctionCoefficients');
+filename = commonUtility.GetFilename('param', 'extinctionCoefficients');
 save(filename, 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
 
 end

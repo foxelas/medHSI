@@ -41,7 +41,7 @@ classdef hsiUtility
             %
             % @retval spectralData [hsi] | The initialized hsi object
             % @retval labelInfo [hsiInfo] | The initialized hsiInfo object
-            targetFilename = dataUtility.GetFilename('dataset', targetID);
+            targetFilename = commonUtility.GetFilename('dataset', targetID);
 
             if ~exist(targetFilename, 'file')
                 error('There are no data for the requested ID = %s.', targetID);
@@ -278,7 +278,7 @@ classdef hsiUtility
             %
             % @retval spectralData [numeric array] | A 3D array of the
             % hyperspectral image reference
-            load(dataUtility.GetFilename('target', targetID), 'spectralData');
+            load(commonUtility.GetFilename('target', targetID), 'spectralData');
         end
 
         %% Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,7 +324,7 @@ classdef hsiUtility
                 delete(fileName);
             end
 
-            [~, targetIDs] = dataUtility.DatasetInfo();
+            [~, targetIDs] = commonUtility.DatasetInfo();
 
             for i = 1:length(targetIDs)
                 targetName = num2str(targetIDs{i});
@@ -550,7 +550,7 @@ classdef hsiUtility
                 refLib(k).Diagnosis = diagnosis;
             end
 
-            saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
+            saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
             save(saveName, 'refLib');
 
         end
@@ -588,7 +588,7 @@ classdef hsiUtility
             % library. The struct has fields 'Data', 'Label' (Malignant (1) or
             % Benign (0)) and 'Disease'.
             %
-            saveName = dataUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
+            saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
             if exist(saveName, 'file') > 0
                 load(saveName, 'refLib');
             else

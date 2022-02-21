@@ -1008,7 +1008,7 @@ classdef hsi
             if isnumeric(targetID)
                 targetID = num2str(targetID);
             end
-            targetFilename = dataUtility.GetFilename(dataType, targetID);
+            targetFilename = commonUtility.GetFilename(dataType, targetID);
 
             if strcmp(dataType, 'raw')
                 fprintf('Loads raw HSI.\n');

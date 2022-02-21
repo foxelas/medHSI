@@ -73,15 +73,15 @@ for i = 1:length(targetIDs)
 
     id = targetIDs(i);
     fprintf('Running for data %d. \n', id);
-    target = dataUtility.GetValueFromTable(outRows, 'Target', i);
-    content = dataUtility.GetValueFromTable(outRows, 'Content', i);
+    target = databaseUtility.GetValueFromTable(outRows, 'Target', i);
+    content = databaseUtility.GetValueFromTable(outRows, 'Content', i);
     config.SetSetting('integrationTime', integrationTimes(i));
     config.SetSetting('dataDate', num2str(dates(i)));
     if isTest
         config.SetSetting('configuration', configurations{i});
     end
 
-    saveName = dataUtility.StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
+    saveName = StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
     saveName = strcat(saveName, '.jpg');
 
     %% write triplet HSI in .mat file
@@ -89,8 +89,8 @@ for i = 1:length(targetIDs)
 
     %% load HSI from .mat file to verify it is working and to prepare preview images
     targetID = num2str(id);
-    sampleID = dataUtility.GetValueFromTable(outRows, 'SampleID', i);
-    isUnfixed = dataUtility.GetValueFromTable(outRows, 'IsUnfixed', i);
+    sampleID = databaseUtility.GetValueFromTable(outRows, 'SampleID', i);
+    isUnfixed = databaseUtility.GetValueFromTable(outRows, 'IsUnfixed', i);
     if strcmp(isUnfixed, '1')
         tissueType = 'Unfixed';
     else
@@ -109,7 +109,7 @@ for i = 1:length(targetIDs)
     labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
 
     %% Save data info in a file
-    filename = dataUtility.GetFilename('dataset', targetID);
+    filename = commonUtility.GetFilename('dataset', targetID);
     save(filename, 'spectralData', 'labelInfo', '-v7.3');
 
     %% Plot images
@@ -142,4 +142,30 @@ plots.MontageFolderContents(6, path2, '*fix.jpg', 'sRGB fix');
 
 close all;
 disp('Finish [ReadLabeledDataset].');
+end
+
+function [outname] = StrrepAll(inname, isLegacy)
+    %     StrrepAll formats an inname to outname
+    %
+    %     Usage:
+    %     [outname] = StrrepAll(inname)
+
+    if nargin < 2
+        isLegacy = false;
+    end
+
+    [~, outname] = fileparts(inname);
+
+    str = '_';
+    if isLegacy
+        str = ' ';
+    end
+
+    outname = strrep(outname, '\', str);
+    outname = strrep(outname, '_', str);
+    outname = strrep(outname, ' ', str);
+
+    outname = strrep(outname, '.csv', '');
+    outname = strrep(outname, '.mat', '');
+
 end

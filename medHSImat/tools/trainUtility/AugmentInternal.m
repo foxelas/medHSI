@@ -17,7 +17,7 @@ config.SetSetting('augmentation', strcat(dataset, '-', augType));
 fprintf('Starting augmentation for dataset: %s ...\n', dataset);
 
 %% Read h5 data
-[datanames, targetNames] = dataUtility.DatasetInfo();
+[datanames, targetNames] = commonUtility.DatasetInfo();
 
 if length(datanames) ~= length(targetNames)
     disp('Is the target dataset already augmented? You may want to check it.');
@@ -75,12 +75,12 @@ end
 
 %% preview of the entire dataset
 
-path1 = strrep(dataUtility.GetFilename('augmentation', ...
+path1 = strrep(commonUtility.GetFilename('augmentation', ...
     config.GetSetting('snapshots')), '.mat', '');
 plots.MontageFolderContents(1, path1, '*.jpg', 'Augmented Dataset');
 close all;
 
-fprintf('The augmented dataset is saved in folder %s \n', dataUtility.GetFilename('augmentation', '*'));
+fprintf('The augmented dataset is saved in folder %s \n', commonUtility.GetFilename('augmentation', '*'));
 disp('Finished augmenting.');
 end
 
@@ -96,9 +96,9 @@ else
     data = spectralData;
     label = labelImg;
 end
-filename = dataUtility.GetFilename('augmentation', strcat(targetName, '_', num2str(folds)));
+filename = commonUtility.GetFilename('augmentation', strcat(targetName, '_', num2str(folds)));
 save(filename, 'data', 'label');
-filename = dataUtility.GetFilename('augmentation', ...
+filename = commonUtility.GetFilename('augmentation', ...
     fullfile(config.GetSetting('snapshots'), strcat(targetName, '_', num2str(folds))), 'jpg');
 dispImageRgb = data.GetDisplayRescaledImage('rgb');
 imwrite(dispImageRgb, filename, 'jpg');

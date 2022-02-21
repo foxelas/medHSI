@@ -56,16 +56,16 @@ fcTarget = databaseUtility.GetFileConditions(content, target);
 targetName = num2str(tableId);
 [spectralData, ~, ~] = hsiUtility.ReadH5(filename);
 
-if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
-        || ~exist(dataUtility.GetFilename('black', targetName), 'file') ...
-        || ~exist(dataUtility.GetFilename('white', targetName), 'file')
+if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
+        || ~exist(commonUtility.GetFilename('black', targetName), 'file') ...
+        || ~exist(commonUtility.GetFilename('white', targetName), 'file')
 
     plotBaseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('snapshots'), config.GetSetting('experiment'));
     figure(1);
     imshow(hsiUtility.GetDisplayImage(spectralData, 'rgb'));
     config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));
     plots.SavePlot(1);
-    filename = dataUtility.GetFilename('target', targetName);
+    filename = commonUtility.GetFilename('target', targetName);
     fprintf('Target data [spectralData] is saved at %s.\n', filename);
     save(filename, 'spectralData', '-v7.3');
 
@@ -96,7 +96,7 @@ if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
         plots.Spectra(5, bandmaxSpectrum, wavelengths, 'Bandmax spectrum', 'Bandmax Spectrum for the current Image');
 
         fullReflectanceByPixel = white;
-        filename = dataUtility.GetFilename('white', targetName);
+        filename = commonUtility.GetFilename('white', targetName);
         fprintf('White data [fullReflectanceByPixel] is saved at %s.\n', filename);
         save(filename, 'fullReflectanceByPixel', 'uniSpectrum', 'bandmaxSpectrum', '-v7.3');
 
@@ -117,7 +117,7 @@ if ~exist(dataUtility.GetFilename('target', targetName), 'file') ...
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime')))));
         plots.SavePlot(3);
 
-        filename = dataUtility.GetFilename('black', targetName);
+        filename = commonUtility.GetFilename('black', targetName);
         fprintf('Black data [blackReflectance] is saved at %s.\n', filename);
         save(filename, 'blackReflectance', '-v7.3');
     else

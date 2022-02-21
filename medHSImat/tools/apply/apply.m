@@ -47,7 +47,7 @@ classdef apply
                 varargin = {};
             end
 
-            [~, targetIDs] = dataUtility.DatasetInfo();
+            [~, targetIDs] = commonUtility.DatasetInfo();
 
             for i = 1:length(targetIDs)
 

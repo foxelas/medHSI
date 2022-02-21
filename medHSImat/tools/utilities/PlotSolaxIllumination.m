@@ -2,7 +2,7 @@
 %% Plots Color Matching Functions
 close all;
 
-filename = dataUtility.GetFilename('param', 'displayParam');
+filename = commonUtility.GetFilename('param', 'displayParam');
 
 z = 401;
 lambdaIn = hsiUtility.GetWavelengths(z, 'raw');

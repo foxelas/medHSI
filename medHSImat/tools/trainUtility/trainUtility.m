@@ -115,7 +115,7 @@ classdef trainUtility
                     Xcol = I.GetMaskedPixels(fgMask);
                 end
 
-                labelfile = dataUtility.GetFilename('label', targetName);
+                labelfile = commonUtility.GetFilename('label', targetName);
                 if exist(labelfile, 'file')
                     load(labelfile, 'labelMask');
                     ycol = GetMaskedPixelsInternal(labelMask(1:m, 1:n), fgMask);

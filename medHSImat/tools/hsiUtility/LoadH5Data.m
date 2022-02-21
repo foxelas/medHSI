@@ -33,7 +33,7 @@ function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %> @retval imageXYZ [numeric array] | The XYZ image
 %> @retval wavelengths [numeric array] | The spectral wavelengths
 filename = strrep(filename, '.hsm', '.h5');
-saveFilename = dataUtility.GetFilename('h5', filename);
+saveFilename = commonUtility.GetFilename('h5', filename);
 
 if ~exist(saveFilename, 'file')
     currentFile = AdjustFilename(filename);
