@@ -50,9 +50,14 @@ if ~strcmp(option, 'raw')
     value = value(:, :, hsiUtility.GetWavelengths(311, 'index'));
 
     %%Remove background
-    hsIm.Value = value;
-    [updI, fgMask] = hsIm.RemoveBackground();
-    hsIm.Value = updI;
-    hsIm.FgMask = fgMask;
+    if ~isempty(hsIm.FgMask)
+        hsIm.Value = value;
+        col = hsIm.GetMaskedPixels(ones(size(hsIm.FgMask)), false);
+        colMask = reshape(hsIm.FgMask, [size(hsIm.FgMask,1) * size(hsIm.FgMask,2), 1]);
+        col(~colMask) = 0; 
+        value = hsi.RecoverSpatialDimensions(col, size(hsIm.FgMask));
+        hsIm.Value = value;
+    end
 end
+
 end

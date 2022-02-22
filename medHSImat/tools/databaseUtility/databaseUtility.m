@@ -64,7 +64,11 @@ classdef databaseUtility
             % @endcode
             %
             column = tab.(field);
-            value = column{id};
+            if iscell(column)
+                value = column{id};
+            else
+                value = column(id);
+            end 
         end
 
         % ======================================================================
@@ -152,7 +156,7 @@ classdef databaseUtility
             setId = true(numel(dataTable.ID), 1);
 
             if ~isempty(configuration)
-                setId = setId & ismember(dataTable.configuration, configuration);
+                setId = setId & ismember(dataTable.Configuration, configuration);
             end
 
             if ~isempty(content)
@@ -382,7 +386,8 @@ classdef databaseUtility
             if exist(filename, 'file') > 0
                 dataTable = readtable(filename, 'Sheet', 'Sheet1');
             else
-                error('File %s does not exist. Aborting.', filename);
+                fprintf('File %s does not exist. Proceeding without it.\n', filename);
+                dataTable = [];
             end
         end
 

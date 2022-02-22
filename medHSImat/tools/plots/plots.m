@@ -111,7 +111,7 @@ classdef plots
         %>
         %> @retval lineColorMap [map] | The line color map
         %======================================================================
-        function [lineColorMap] = GetLineColorMap(varargin)
+        function [lineColorMap] = GetLineColorMap(style, names)
             % GetLineColorMap returns a linecolor map based on the style.
             %
             % Available keys are:

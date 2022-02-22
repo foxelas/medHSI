@@ -1,6 +1,8 @@
 % ======================================================================
 %> @brief GetDisplayImageInternal returns an RGB image from the hyperspectral data.
 %>
+%> Parameters are saved in config::[paramDir]\[parametersFileName]
+%>
 %> @b Usage
 %>
 %> @code
@@ -20,6 +22,8 @@
 % ======================================================================
 function dispImage = GetDisplayImageInternal(hsIm, method, channel)
 % GetDisplayImageInternal returns an RGB image from the hyperspectral data.
+%
+% Parameters are saved in config::[paramDir]\[parametersFileName]
 %
 % @b Usage
 %
@@ -97,7 +101,7 @@ end
 end
 
 function [xyz, illumination] = PrepareParams(z)
-filename = commonUtility.GetFilename('param', 'displayParam');
+filename = commonUtility.GetFilename('param', config.GetSetting('parametersFileName'));
 if ~exist(filename, 'file')
     lambdaIn = hsiUtility.GetWavelengths(z, 'raw');
     [lambdaMatch, xFcn, yFcn, zFcn] = colorMatchFcn('1964_FULL');

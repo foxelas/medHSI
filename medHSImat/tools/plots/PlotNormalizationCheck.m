@@ -80,17 +80,15 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-fig3 = figure(fig+2);
-rgb = Iin.GetDisplayImage();
-plots.Overlay(fig3, rgb, mask);
+baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('normCheckFolderName'), config.GetSetting('fileName'));
 
-baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('normCheck'), config.GetSetting('fileName'));
 config.SetSetting('plotName', strcat(baseFolder, '_raw.jpg'));
 plots.SavePlot(fig);
 config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
 plots.SavePlot(fig+1);
+fig3 = figure(fig+2);
+rgb = Iin.GetDisplayImage();
 config.SetSetting('plotName', strcat(baseFolder, '_mask.jpg'));
-plots.SavePlot(fig3);
+plots.Overlay(fig3, rgb, mask);
 
-close all;
 end

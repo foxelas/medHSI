@@ -243,7 +243,7 @@ classdef hsiInfo
             close all;
 
             targetID = hsIm.ID;
-            maskdir = fullfile(config.GetSetting('labelDir'), hsIm.TissueType);
+            maskdir = fullfile(config.GetSetting('dataDir'), config.GetSetting('labelsFolderName'), hsIm.TissueType);
             dirList = dir(fullfile(maskdir, '*.jpg'));
             if ~isempty(dirList)
                 labelFilenames = cellfun(@(x) strsplit(x, '_'), {dirList.name}', 'un', 0);
@@ -320,13 +320,14 @@ classdef hsiInfo
             % @param sampleID [char] | The sampleID of the target sample
             %
             % @retval diagnosis [char] | The diagnosis string
-
+            
+            diagnosis = '';
             dataTable = databaseUtility.GetDiagnosisTable();
-            id = find(strcmp(dataTable.SampleID, sampleId), 1);
-            if ~isempty(id)
-                diagnosis = dataTable{id, 'Diagnosis'}{1, 1};
-            else
-                diagnosis = '';
+            if ~isempty(dataTable)
+                id = find(strcmp(dataTable.SampleID, sampleId), 1);
+                if ~isempty(id)
+                    diagnosis = dataTable{id, 'Diagnosis'}{1, 1};                
+                end
             end
         end
     end

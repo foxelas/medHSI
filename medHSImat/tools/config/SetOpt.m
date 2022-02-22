@@ -43,18 +43,12 @@ for i = 1:length(tmp.raw)
         if isempty(rawValue)
             varValue = [];
             switch varName
-                case 'inputDir'
-                    varValue = fullfile(parentDir, 'input\');
                 case 'importDir'
-                    varValue = fullfile(inputDir, 'import\');
-                case 'outputDir'
-                    varValue = fullfile(parentDir, 'output\');
-                case 'dataDir'
-                    varValue = parentDataDir;
+                    varValue = fullfile(dataDir, 'import\');
                 case 'matDir'
-                    varValue = fullfile(parentDataDir, 'matfiles', 'hsi\');
-                case 'inDir'
-                    varValue = parentDataDir;
+                    varValue = fullfile(outputDir, 'matfiles', 'hsi\');   
+                case 'paramDir'
+                    varValue = fullfile(dataDir, 'parameters\');
             end
 
         elseif strcmpi(rawValue, 'true') || strcmpi(rawValue, 'false') % logical type
@@ -70,12 +64,15 @@ for i = 1:length(tmp.raw)
 end
 
 fprintf('Data directory is set to %s.\n', dataDir);
-fprintf('Save directory is set to %s.\n', saveDir);
+fprintf('Import directory is set to %s.\n', importDir);
+fprintf('Output directory is set to %s.\n', outputDir);
+fprintf('Parameter directory is set to %s.\n', paramDir);
+fprintf('Matfile directory is set to %s.\n', matDir);
 
 clear parts row varName rawValue varValue i tmp;
 settingsFile = strrep(inputSettingsFile, '.ini', '.mat');
 save(settingsFile);
-fprintf('Settings loaded from %s and saved in %s.\n', inputSettingsFile, settingsFile);
+fprintf('\nSettings loaded from %s \n and saved in %s.\n\n', inputSettingsFile, settingsFile);
 
 end
 

@@ -40,7 +40,8 @@ else
 end
 
 figure(1);
+title('Draw a polygon on the figure');
 mask = roipoly(Irgb);
-title('Draw polygon')
+title('Draw a polygon on the figure');
 
 end

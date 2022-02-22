@@ -78,7 +78,7 @@ end
 hsInorm = hsIm;
 hsInorm.Value = Inorm;
 
-if ~config.GetSetting('disableReflectranceExtremaPlots')
+if ~config.GetSetting('disableNormalizationCheck')
     fig = 1;
     plots.NormalizationCheck(fig, hsIm, Iblack, Iwhite, hsInorm);
 end

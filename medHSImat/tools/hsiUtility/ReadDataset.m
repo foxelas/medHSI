@@ -10,7 +10,7 @@
 %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 %> hsiInfo) variable.
 %> The save location is config::[matDir]\\[dataset]\\*.mat.
-%> Snapshot images are saved in config::[outputDir]\\[snapshots]\\[dataset]\\.
+%> Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\.
 %>
 %> @b Usage
 %>
@@ -22,41 +22,48 @@
 %>
 %> @param dataset [char] | The dataset
 %> @param condition [cell array] | The conditions for reading files
+%> @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
 %>
 %======================================================================
-function [] = ReadDataset(dataset, condition)
-%> @brief ReadDataset reads the dataset.
-%>
-%> ReadDataset reads a group of hsi data according to condition, prepares
-%> .mat files for the raw spectral data, applies preprocessing and returns
-%> montage previews of the results. It also prepares labels, when
-%> available.
-%>
-%>  Data samples are saved in .mat files so that one contains a
-%> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
-%> hsiInfo) variable.
-%> The save location is config::[matDir]\[dataset]\*.mat.
-%> Snapshot images are saved in config::[outputDir]\[snapshots]\[dataset]\.
-%>
-%> @b Usage
-%> @code
-%> ReadDataset('handsDataset',{'hand', false});
-%>
-%> ReadDataset('pslData', {'tissue', true});
-%> @endcode
-%>
-%> @param dataset [char] | The dataset
-%> @param condition [cell array] | The conditions for reading files
-%>
+function [] = ReadDataset(dataset, condition, readForeground)
+% @brief ReadDataset reads the dataset.
+%
+% ReadDataset reads a group of hsi data according to condition, prepares
+% .mat files for the raw spectral data, applies preprocessing and returns
+% montage previews of the results. It also prepares labels, when
+% available.
+%
+%  Data samples are saved in .mat files so that one contains a
+% 'spectralData' (class hsi) and another contains a 'labelInfo' (class
+% hsiInfo) variable.
+% The save location is config::[matDir]\[dataset]\*.mat.
+% Snapshot images are saved in config::[outputDir]\[snapshotsFolderName]\[dataset]\.
+%
+% @b Usage
+% @code
+% ReadDataset('handsDataset',{'hand', false});
+%
+% ReadDataset('pslData', {'tissue', true});
+% @endcode
+%
+% @param dataset [char] | The dataset
+% @param condition [cell array] | The conditions for reading files
+%@param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
+%
+
+if nargin < 3 
+    readForeground = true;
+end 
 
 %% Setup
+disp('');
 disp('Initializing [ReadLabeledDataset]...');
 
 config.SetSetting('dataset', dataset);
 experiment = dataset;
 config.SetSetting('experiment', experiment);
 config.SetSetting('cropBorders', true);
-config.SetSetting('saveFolder', fullfile(config.GetSetting('snapshots'), experiment));
+config.SetSetting('saveFolder', fullfile(config.GetSetting('snapshotsFolderName'), experiment));
 isTest = config.GetSetting('isTest');
 
 %% Read h5 data
@@ -65,7 +72,7 @@ isTest = config.GetSetting('isTest');
 integrationTimes = [outRows.IntegrationTime];
 dates = [outRows.CaptureDate];
 if isTest
-    configurations = [outRows.configuration];
+    configurations = [outRows.Configuration];
 end
 
 for i = 1:length(targetIDs)
@@ -80,14 +87,6 @@ for i = 1:length(targetIDs)
     if isTest
         config.SetSetting('configuration', configurations{i});
     end
-
-    saveName = StrrepAll(strcat(outRows{i, 'SampleID'}, '_', num2str(((str2double(outRows{i, 'IsUnfixed'}) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
-    saveName = strcat(saveName, '.jpg');
-
-    %% write triplet HSI in .mat file
-    rawImg = hsiUtility.ReadTriplet(content, target, experiment);
-
-    %% load HSI from .mat file to verify it is working and to prepare preview images
     targetID = num2str(id);
     sampleID = databaseUtility.GetValueFromTable(outRows, 'SampleID', i);
     isUnfixed = databaseUtility.GetValueFromTable(outRows, 'IsUnfixed', i);
@@ -96,9 +95,20 @@ for i = 1:length(targetIDs)
     else
         tissueType = 'Fixed';
     end
+    
+    if isTest
+        saveName = StrrepAll(filenames{i});
+    else
+        saveName = StrrepAll(strcat(sampleID, '_', num2str(((str2double(isUnfixed) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
+    end
+    saveName = strcat(saveName, '.jpg');
 
+    %% write triplet HSI in .mat file
+    rawImg = hsiUtility.ReadTriplet(content, target);
+
+    %% load HSI from .mat file to verify it is working and to prepare preview images
     config.SetSetting('fileName', targetID);
-    rawIm = hsi(rawImg, true, targetID, sampleID, tissueType);
+    rawIm = hsi(rawImg, readForeground, targetID, sampleID, tissueType);
     dispImageRaw = rawIm.GetDisplayRescaledImage('rgb');
 
     %% Preprocess HSI and save

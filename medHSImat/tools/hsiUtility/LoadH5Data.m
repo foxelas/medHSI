@@ -56,7 +56,7 @@ end
 end
 
 function currentFile = AdjustFilename(filename)
-inDir = config.GetSetting('dataDir');
+inDir = fullfile(config.GetSetting('dataDir'), config.GetSetting('dataFolderName'));
 
 % filenameParts = strsplit(filename, '_');
 % dataDate = filenameParts{1};

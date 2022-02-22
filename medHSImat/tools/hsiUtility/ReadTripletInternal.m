@@ -52,7 +52,10 @@ end
 
 %% Target image
 fcTarget = databaseUtility.GetFileConditions(content, target);
-[filename, tableId] = databaseUtility.GetFilename(fcTarget{:});
+[filename, tableId, ~] = databaseUtility.Query(fcTarget{:});
+if iscell(filename)
+    filename = filename{1};
+end
 targetName = num2str(tableId);
 [spectralData, ~, ~] = hsiUtility.ReadH5(filename);
 
@@ -60,12 +63,12 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         || ~exist(commonUtility.GetFilename('black', targetName), 'file') ...
         || ~exist(commonUtility.GetFilename('white', targetName), 'file')
 
-    plotBaseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('snapshots'), config.GetSetting('experiment'));
+    plotBaseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('snapshotsFolderName'), config.GetSetting('experiment'), 'ReadDataset');
     figure(1);
-    imshow(hsiUtility.GetDisplayImage(spectralData, 'rgb'));
+    imshow(GetDisplayImageInternal(spectralData, 'rgb'));
     config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));
     plots.SavePlot(1);
-    filename = commonUtility.GetFilename('target', targetName);
+    filename = config.DirMake(commonUtility.GetFilename('target', targetName));
     fprintf('Target data [spectralData] is saved at %s.\n', filename);
     save(filename, 'spectralData', '-v7.3');
 
@@ -77,15 +80,19 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         else
             fcWhite = databaseUtility.GetFileConditions('white', target);
         end
-        filename = databaseUtility.GetFilename(fcWhite{:});
-        [white, ~, wavelengths] = hsiUtility.LoadH5Data(filename);
+        [filename, ~, ~] = databaseUtility.Query(fcWhite{:});
+        if iscell(filename)
+            filename = filename{1};
+        end
+        [white, ~, wavelengths] = hsiUtility.ReadH5(filename);
         figure(2);
-        imshow(hsiUtility.GetDisplayImage(white, 'rgb'));
+        imshow(GetDisplayImageInternal(white, 'rgb'));
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_', num2str(config.GetSetting('integrationTime')))));
         SavePlot(2);
 
         %%UniSpectrum
-        uniSpectrum = hsiUtility.GetSpectraFromMask(white);
+        uniMask = GetCustomMaskInternal(white);
+        uniSpectrum = GetMaskedPixelsInternal(white, uniMask);
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(config.GetSetting('integrationTime')))));
         plots.Spectra(4, uniSpectrum, wavelengths, '99%-white', 'Reflectance Spectrum of White Balance Sheet');
 
@@ -110,10 +117,13 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         else
             fcBlack = databaseUtility.GetFileConditions('black', target);
         end
-        filename = databaseUtility.GetFilename(fcBlack{:});
-        [blackReflectance, ~, ~] = hsiUtility.LoadH5Data(filename);
+        [filename, ~, ~] = databaseUtility.Query(fcBlack{:});
+        if iscell(filename)
+            filename = filename{1};
+        end
+        [blackReflectance, ~, ~] = hsiUtility.ReadH5(filename);
         figure(3);
-        imshow(hsiUtility.GetDisplayImage(blackReflectance, 'rgb'));
+        imshow(GetDisplayImageInternal(blackReflectance, 'rgb'));
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime')))));
         plots.SavePlot(3);
 

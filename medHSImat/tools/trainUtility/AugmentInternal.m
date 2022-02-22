@@ -109,7 +109,7 @@ end
 %% preview of the entire dataset
 
 path1 = strrep(commonUtility.GetFilename('augmentation', ...
-    config.GetSetting('snapshots')), '.mat', '');
+    config.GetSetting('snapshotsFolderName')), '.mat', '');
 plots.MontageFolderContents(1, path1, '*.jpg', 'Augmented Dataset');
 close all;
 
@@ -132,7 +132,7 @@ end
 filename = commonUtility.GetFilename('augmentation', strcat(targetName, '_', num2str(folds)));
 save(filename, 'data', 'label');
 filename = commonUtility.GetFilename('augmentation', ...
-    fullfile(config.GetSetting('snapshots'), strcat(targetName, '_', num2str(folds))), 'jpg');
+    fullfile(config.GetSetting('snapshotsFolderName'), strcat(targetName, '_', num2str(folds))), 'jpg');
 dispImageRgb = data.GetDisplayRescaledImage('rgb');
 imwrite(dispImageRgb, filename, 'jpg');
 end

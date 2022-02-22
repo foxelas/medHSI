@@ -13,8 +13,8 @@
 %> @endcode
 %>
 %> @param obj [hsi] | An hsi instance
-%> @param origSize [cell array] | cell array with original sizes of input data (array or cell of arrays)
-%> @param mask [cell array] | cell array of masks per data sample (array or cell of arrays)
+%> @param origSize [cell array] | Original sizes of input data (array or cell of arrays)
+%> @param mask [cell array] | Optional: Masks per data sample (array or cell of arrays)
 %>
 %> @retval obj [hsi] | The reconstructed hsi instance
 %======================================================================
@@ -33,8 +33,8 @@ function [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
 % @endcode
 %
 % @param obj [hsi] | An hsi instance
-% @param origSize [cell array] | cell array with original sizes of input data (array or cell of arrays)
-% @param mask [cell array] | cell array of masks per data sample (array or cell of arrays)
+% @param origSize [cell array] | Original sizes of input data (array or cell of arrays)
+% @param mask [cell array] | Optional: Masks per data sample (array or cell of arrays)
 %
 % @retval obj [hsi] | The reconstructed hsi instance
 if iscell(origSize)

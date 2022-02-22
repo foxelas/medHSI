@@ -317,7 +317,7 @@ classdef hsiUtility
             %% Setup
             disp('Initializing [ExportH5Dataset]...');
 
-            fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_', config.GetSetting('dataset'), '_full', '.h5'));
+            fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_', config.GetSetting('datasetsFolderName'), '_full', '.h5'));
 
             if exist(fileName, 'file') > 0
                 disp('Deleting previously exported .h5 dataset.');
@@ -388,7 +388,7 @@ classdef hsiUtility
         %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
         %> hsiInfo) variable.
         %> The save location is config::[matDir]\\[dataset]\\*.mat.
-        %> Snapshot images are saved in config::[outputDir]\\[snapshots]\\[dataset]\\*.jpg.
+        %> Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\*.jpg.
         %>
         %> @b Usage
         %>
@@ -400,9 +400,9 @@ classdef hsiUtility
         %>
         %> @param dataset [char] | The dataset
         %> @param condition [cell array] | The conditions for reading files
-        %>
+        %> @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
         %======================================================================
-        function [] = PrepareDataset(dataset, condition)
+        function [] = PrepareDataset(varargin)
             % ReadDataset reads the dataset.
             %
             % ReadDataset reads a group of hsi data according to condition, prepares
@@ -414,7 +414,7 @@ classdef hsiUtility
             % 'spectralData' (class hsi) and another contains a 'labelInfo' (class
             % hsiInfo) variable.
             % The save location is config::[matDir]\[dataset]\*.mat.
-            % Snapshot images are saved in config::[outputDir]\[snapshots]\[dataset]\.
+            % Snapshot images are saved in config::[outputDir]\[snapshotsFolderName]\[dataset]\.
             %
             % @b Usage
             %
@@ -426,8 +426,9 @@ classdef hsiUtility
             %
             % @param dataset [char] | The dataset
             % @param condition [cell array] | The conditions for reading files
+            % @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
             %
-            ReadDataset(dataset, condition);
+            ReadDataset(varargin{:});
         end
 
         %% References %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -3,7 +3,7 @@ function [flag, fileS] = CheckImportData()
 %
 %   Usage: [flag, fileS] = CheckImportData()
 
-datadir = fullfile(config.GetSetting('dataDir'), '*.h5');
+datadir = fullfile(config.GetSetting('dataDir'), config.GetSetting('dataFolderName'), '*.h5');
 v = dir(datadir);
 vname = {v.name};
 k = cellfun(@(x) strrep(x, '.hsm', ''), vname, 'UniformOutput', false);
@@ -89,7 +89,7 @@ if ~flag
     disp('Check failed');
 else
     disp('Check passed');
-    filename = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), 'last_import.xlsx');
+    filename = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasetsFolderName'), 'last_import.xlsx');
     writetable(struct2table(fileS), filename);
     fprintf('File written in %s. \n', filename);
 end

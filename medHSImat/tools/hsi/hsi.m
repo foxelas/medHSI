@@ -71,6 +71,8 @@ classdef hsi
             % @return instance of the hsi class
             if nargin < 2
                 calcMask = true;
+            else
+                obj.FgMask = [];
             end
 
             if nargin >= 3
@@ -171,12 +173,13 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @param inMask [numeric array] | A target mask
+        %> @param inMask [numeric array] | Optional: A target mask. Default: The foreground mask
+        %> @param isForegroundOnly [boolean] | Optional: Flag to show if foreground mask is applied. Default: true 
         %>
         %> @retval maskedPixels [numeric array] | A 2D array of pixel
         %> spectra aligned vertically. One row is one pixel's spectrum
         % ======================================================================
-        function [maskedPixels] = GetMaskedPixels(obj, inMask)
+        function [maskedPixels] = GetMaskedPixels(obj, inMask, isForegroundOnly)
             % GetMaskedPixels gets all spectral values included in a mask.
             %
             % Pixels are picked up by @c function GetMaskedPixelsInternal.
@@ -189,17 +192,27 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @param inMask [numeric array] | A target mask
+            % @param inMask [numeric array] | Optional: A target mask. Default: The foreground mask
+            % @param isForegroundOnly [boolean] | Optional: Flag to show if foreground mask is applied. Default: true 
+            % 
+            % foreground mask is applied. Default: true 
+            % 
             %
             % @retval maskedPixels [numeric array] | A 2D array of pixel
             % spectra aligned vertically. One row is one pixel's spectrum
 
+            if nargin < 3
+                isForegroundOnly = true; 
+            end 
+            
             I = obj.Value;
             if nargin < 2
                 inMask = obj.FgMask;
             else
                 % the mask should be limited by the FgMask of the tissue specimen
-                inMask = inMask & obj.FgMask;
+                if ~isempty(obj.FgMask) && isForegroundOnly
+                    inMask = inMask & obj.FgMask;
+                end
             end
 
             [maskedPixels] = GetMaskedPixelsInternal(I, inMask);
@@ -240,8 +253,6 @@ classdef hsi
             % @retval customMask [numeric array] | A custom mask
 
             customMask = GetCustomMaskInternal(obj.Value);
-            % the mask should be limited by the FgMask of the tissue specimen
-            customMask = customMask & obj.FgMask;
         end
 
         % ======================================================================
@@ -1065,12 +1076,12 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An hsi instance
-        %> @param origSize [cell array] | cell array with original sizes of input data (array or cell of arrays)
-        %> @param mask [cell array] | cell array of masks per data sample (array or cell of arrays)
+        %> @param origSize [cell array] | Original sizes of input data (array or cell of arrays)
+        %> @param mask [cell array] | Optional: Masks per data sample (array or cell of arrays)
         %>
         %> @retval obj [hsi] | The reconstructed hsi instance
         %======================================================================
-        function [recHsi] = RecoverSpatialDimensions(redIm, origSize, mask)
+        function [recHsi] = RecoverSpatialDimensions(varargin)
             % RecoverSpatialDimensions recovers the original spatial dimension
             % from masked pixels.
             %
@@ -1086,11 +1097,11 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An hsi instance
-            % @param origSize [cell array] | cell array with original sizes of input data (array or cell of arrays)
-            % @param mask [cell array] | cell array of masks per data sample (array or cell of arrays)
+            % @param origSize [cell array] | Original sizes of input data (array or cell of arrays)
+            % @param mask [cell array] | Optional: Masks per data sample (array or cell of arrays)
             %
             % @retval obj [hsi] | The reconstructed hsi instance
-            [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask);
+            [recHsi] = RecoverOriginalDimensionsInternal(varargin{:});
         end
 
         %======================================================================

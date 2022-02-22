@@ -81,7 +81,7 @@ classdef commonUtility
                         fullPath = commonUtility.GetFilename('target', filename);
                     else
                         baseDir = config.DirMake(config.GetSetting('matDir'), ...
-                            strcat(config.GetSetting('database'), config.GetSetting('normalizedName')), filename);
+                            strcat(config.GetSetting('database'), config.GetSetting('normalizedFolderName')), filename);
                         fullPath = strcat(baseDir, '_', config.GetSetting('normalization'));
                     end
 
@@ -91,7 +91,7 @@ classdef commonUtility
 
                 case 'target'
                     baseDir = fullfile(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), filename);
+                        strcat(config.GetSetting('database'), config.GetSetting('tripletsFolderName')), filename);
                     fullPath = strcat(baseDir, '_target');
 
                 case 'raw'
@@ -99,12 +99,12 @@ classdef commonUtility
 
                 case 'white'
                     baseDir = fullfile(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), filename);
+                        strcat(config.GetSetting('database'), config.GetSetting('tripletsFolderName')), filename);
                     fullPath = strcat(baseDir, '_white');
 
                 case 'black'
                     baseDir = fullfile(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('tripletsName')), filename);
+                        strcat(config.GetSetting('database'), config.GetSetting('tripletsFolderName')), filename);
                     fullPath = strcat(baseDir, '_black');
 
                 case 'model'
@@ -112,8 +112,7 @@ classdef commonUtility
                         config.GetSetting('experiment'), filename);
 
                 case 'param'
-                    fullPath = fullfile(config.GetRunBaseDir(), ...
-                        config.GetSetting('paramDir'), filename);
+                    fullPath = fullfile(config.GetSetting('paramDir'), filename);
 
                 case 'referenceLib'
                     fullPath = config.DirMake(config.GetSetting('matDir'), ...
@@ -122,7 +121,7 @@ classdef commonUtility
 
                 case 'augmentation'
                     fullPath = config.DirMake(config.GetSetting('matDir'), ...
-                        config.GetSetting('augmentation'), filename);
+                        config.GetSetting('augmentationFolderName'), filename);
 
                 case 'h5'
                     fullPath = config.DirMake(config.GetSetting('matDir'), ...

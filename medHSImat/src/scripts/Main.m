@@ -1,18 +1,22 @@
-%%%%%%%%%%%%%%%%%%%%% Initialization %%%%%%%%%%%%%%%%%%%%%
-config.SetOpt();
-StartLogger;
+clc; 
 
-config.SetSetting('normalization', 'byPixel');
-% config.SetSetting('dataDate', 20210706);
-% config.SetSetting('integrationTime', 618);
-config.SetSetting('outputDir', fullfile(config.GetSetting('outputDir'), '001-DataTest'));
-config.SetSetting('cropBorders', true);
-
-%%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
-config.SetSetting('isTest', true);
-config.SetSetting('database', 'calib');
-hsiUtility.ReadDataset('handsOnly', {'hand', false});
-
+% %%%%%%%%%%%%%%%%%%%%% Initialization %%%%%%%%%%%%%%%%%%%%%
+% config.SetOpt();
+% 
+% config.SetSetting('normalization', 'byPixel');
+% % config.SetSetting('dataDate', 20210706);
+% % config.SetSetting('integrationTime', 618);
+% config.SetSetting('cropBorders', true);
+%
+% % Pending fix db
+% %%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
+% config.SetSetting('isTest', true);
+% config.SetSetting('database', 'calib');
+% config.SetSetting('dataDir', 'D:\elena\mspi\2_saitamaHSI\calib\');
+% config.SetSetting('outputDir', fullfile(config.GetSetting('outputDir'), '001-DataTest'));
+% 
+% readForeground = false;
+% hsiUtility.PrepareDataset('handsOnly', {'hand', false}, readForeground);
 
 %%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -24,19 +28,5 @@ config.SetSetting('normalization', 'byPixel');
 CheckImportData();
 
 dbSelection = {'tissue', true};
-
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-hsiUtility.PrepareDataset('', dbSelection);
-
-%%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
-t20211104_ApplyScriptToEachImage;
-t20211207_PrepareLabels;
-t20211207_PrepareSummaryFigures
-t20211208_TestSVM
-t20211230_PrintSampleHSI
-t20220121_Dimred
-t20220122_Dimred
-t210910_ReadHands
-
-baseDataset = 'pslBase';
-trainUtility.Augment(baseDataset, 'set1');
+hsiUtility.PrepareDataset('pslCore', dbSelection);
