@@ -1,6 +1,6 @@
 %======================================================================
 %> @brief PlotBandStatistics plots statistics among spectral bands.
-%>       
+%>
 %> @b Usage
 %>
 %> @code
@@ -17,7 +17,7 @@
 %======================================================================
 function [imCorr] = PlotBandStatistics(inVectors, statistic, fig)
 % PlotBandStatistics plots statistics among spectral bands.
-%       
+%
 % @b Usage
 %
 % @code
@@ -48,4 +48,7 @@ set(gca, 'XTick', 1:50:311, 'XTickLabel', [1:50:311]+420-1)
 set(gca, 'YTick', 1:50:311, 'YTickLabel', [1:50:311]+420-1)
 title(figTitle);
 c = colorbar;
+
+plots.SavePlot(fig);
+
 end

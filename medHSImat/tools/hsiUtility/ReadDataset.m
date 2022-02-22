@@ -125,6 +125,8 @@ for i = 1:length(targetIDs)
     config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'preprocessed', saveName));
     plots.SavePlot(2);
 
+    config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'preprocessed_channels', saveName));
+    spectralData.SubimageMontage(3);
     pause(0.1);
 end
 

@@ -1,16 +1,34 @@
-function PlotAverageSpectrum(Inorm, figName, fig)
-%%PlotAverageSpectrum plots the values recovered after normalization
-%   user needs to input a mask
+%======================================================================
+%> @brief PlotAverageSpectrum plots average spectra using a promt for custom mask selection.
+%>
+%> @b Usage
+%>
+%> @code
+%> plots.AverageSpectrum(fig, hsIm, figTitle);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param hsIm [hsi] | An instance of the hsi class
+%> @param figTitle [char] | The figure title
+%======================================================================
+function PlotAverageSpectrum(hsIm, figTitle, fig)
+% PlotAverageSpectrum plots average spectra using a promt for custom mask selection.
 %
-%   Usage:
-%   PlotsNormalizationCheck(Inorm, figName, fig)
-%   plots.NormalizationCheck(fig, Inorm, figName)
+% @b Usage
+%
+% @code
+% plots.AverageSpectrum(fig, hsIm, figTitle);
+% @endcode
+%
+% @param fig [int] | The figure handle
+% @param hsIm [hsi] | An instance of the hsi class
+% @param figTitle [char] | The figure title
 
-%Need to draw mask
-mask = Inorm.GetCustomMask();
-Inorm_mask = Inorm.GetMaskedPixels(mask);
+% Draw mask
+mask = hsIm.GetCustomMask();
+Inorm_mask = hsIm.GetMaskedPixels(mask);
 x = hsiUtility.GetWavelengths(size(Inorm_mask, 2));
-rgb = Inorm.GetDisplayImage();
+rgb = hsIm.GetDisplayImage();
 
 close all;
 fig = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
@@ -35,7 +53,7 @@ ax.YAxis.Exponent = 0;
 
 subplot(1, 3, 3);
 imshow(rgb);
-title(figName);
+title(figTitle);
 
 baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('spectraCheck'), config.GetSetting('fileName'));
 config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));

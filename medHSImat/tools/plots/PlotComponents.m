@@ -1,8 +1,28 @@
-function [] = PlotComponents(hsi, pcNum, figStart)
-%PLOTCOMPONENTS plots a pcNum number of PCs, starting at figure figStart
+%======================================================================
+%> @brief PlotComponents plots the components of a hyperspectral image.
+%>
+%> @b Usage
+%>
+%> @code
+%> plots.Components(fig, hsIm, pcNum);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param hsIm [hsi] | An instance of the hsi class
+%> @param pcNum [int] | The number of components
+%======================================================================
+function [] = PlotComponents(hsIm, pcNum, figStart)
+% PlotComponents plots the components of a hyperspectral image.
 %
-%   Usage:
-%   PlotComponents(hsi, 3, 4);
+% @b Usage
+%
+% @code
+% plots.Components(fig, hsIm, pcNum);
+% @endcode
+%
+% @param fig [int] | The figure handle
+% @param hsIm [hsi] | An instance of the hsi class
+% @param pcNum [int] | The number of components
 
 if nargin < 3
     figStart = 1;
@@ -12,7 +32,7 @@ plotName = config.GetSetting('plotName');
 for i = 1:pcNum
     fig = figStart + i - 1;
     figure(fig);
-    img = squeeze(hsi(:, :, i));
+    img = squeeze(hsIm(:, :, i));
     mask = (img ~= 0);
     h = imagesc(img, 'AlphaData', mask);
     title(strcat('PC', num2str(i)));

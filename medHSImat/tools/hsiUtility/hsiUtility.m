@@ -560,11 +560,13 @@ classdef hsiUtility
         %>
         %> It loads a library created previously by @c function hsiUtility.PrepareReferenceLibrary .
         %> The result is loaded from config::[matdir]\\[database]\\[referenceLibraryName]\\[referenceLibraryName].mat.
+        %> Plot with @c function plots.ReferenceLibrary .
         %>
         %> @b Usage
         %>
         %> @code
         %>     refLib = hsiUtility.GetReferenceLibrary();
+        %>     plots.ReferenceLibrary(1, refLib);
         %> @endcode
         %>
         %> @retval refLib [struct] | A struct that contains the reference
@@ -577,11 +579,13 @@ classdef hsiUtility
             %
             % It loads a library created previously by @c function hsiUtility.PrepareReferenceLibrary .
             % The result is loaded from config::[matdir]\[database]\[referenceLibraryName]\[referenceLibraryName].mat.
+            % Plot with @c function plots.ReferenceLibrary .
             %
             % @b Usage
             %
             % @code
             %     refLib = hsiUtility.GetReferenceLibrary();
+            %     plots.ReferenceLibrary(1, refLib);
             % @endcode
             %
             % @retval refLib [struct] | A struct that contains the reference

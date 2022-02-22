@@ -1,13 +1,40 @@
+%======================================================================
+%> @brief PlotMontageFolderContents plots contents of a folder as a montage.
+%>
+%> @b Usage
+%>
+%> @code
+%>   criteria = struct('TargetDir', 'subfolders', ...
+%>       'TargetName', strcat(target, '.jpg'), ...
+%>       'TargetType', 'fix');
+%> plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param path [char] | The path to image folder
+%> @param criteria [struct] | The montage options
+%> @param figTitle [char] | The figure title
+%> @param standardDim [int vector] | The dimensions for subimage resizing
+%> @param imageLimit [int] | The maximum number of subimages to be montaged
+%======================================================================
 function [] = PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
-% PlotMontageFolderContents returns the images in a path as a montage
+% PlotMontageFolderContents plots contents of a folder as a montage.
 %
-%   Usage:
-%   PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
+% @b Usage
 %
+% @code
 %   criteria = struct('TargetDir', 'subfolders', ...
 %       'TargetName', strcat(target, '.jpg'), ...
 %       'TargetType', 'fix');
-%  plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
+% plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
+% @endcode
+%
+% @param fig [int] | The figure handle
+% @param path [char] | The path to image folder
+% @param criteria [struct] | The montage options
+% @param figTitle [char] | The figure title
+% @param standardDim [int vector] | The dimensions for subimage resizing
+% @param imageLimit [int] | The maximum number of subimages to be montaged
 
 if isempty(path)
     path = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'));
@@ -101,5 +128,5 @@ end
 
 %save in parent dir
 config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
-SavePlot(fig);
+plots.SavePlot(fig);
 end

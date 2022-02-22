@@ -1,6 +1,6 @@
 %======================================================================
 %> @brief PlotSpectra plots multiple spectra together.
-%>   
+%>
 %> @b Usage
 %>
 %> @code
@@ -18,7 +18,7 @@
 %======================================================================
 function [] = PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig)
 % PlotSpectra plots multiple spectra together.
-%   
+%
 % @b Usage
 %
 % @code

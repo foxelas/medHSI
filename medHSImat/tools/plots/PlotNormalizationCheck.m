@@ -1,10 +1,34 @@
+%======================================================================
+%> @brief PlotNormalizationCheck  plots the values recovered after normalization.
+%>
+%> The user needs to input a custom mask.
+%> Disable in config::[disableReflectranceExtremaPlots].
+%>
+%> @b Usage
+%> plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param Iin [hsi] | The measurement image
+%> @param Iblack [hsi] | The black image
+%> @param Iwhite [hsi] | The white image
+%> @param Inorm [hsi] | The normalization image
+%======================================================================
 function PlotNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
-%%PlotNormalizationCheck plots the values recovered after normalization
-%   user needs to input a mask
+% PlotNormalizationCheck  plots the values recovered after normalization.
 %
-%   Usage:
-%   PlotsNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
-%   plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
+% The user needs to input a custom mask.
+% Disable in config::[disableReflectranceExtremaPlots].
+%
+% @b Usage
+% plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
+% @endcode
+%
+% @param fig [int] | The figure handle
+% @param Iin [hsi] | The measurement image
+% @param Iblack [hsi] | The black image
+% @param Iwhite [hsi] | The white image
+% @param Inorm [hsi] | The normalization image
 
 %Need to draw mask
 mask = Iin.GetCustomMask();

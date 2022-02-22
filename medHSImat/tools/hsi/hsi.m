@@ -752,6 +752,47 @@ classdef hsi
             dispImage = GetDisplayImageInternal(rescale(obj.Value), varargin{:});
         end
 
+        % ======================================================================
+        %> @brief SubimageMontage plots a montage of the subimages of a hyperspectral image.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> hsIm.SubimageMontage(1);
+        %> @endcode
+        %>
+        %> @param obj [hsi] | An instance of the hsi class
+        %> @param fig [int] | The figure handle
+        % ======================================================================
+        function [] = SubimageMontage(obj, fig)
+            % SubimageMontage plots a montage of the subimages of a hyperspectral image.
+            %
+            % @b Usage
+            %
+            % @code
+            % hsIm.SubimageMontage(1);
+            % @endcode
+            %
+            % @param obj [hsi] | An instance of the hsi class
+            % @param fig [int] | The figure handle
+            fig = figure(fig);
+            clf(fig);
+            [~, ~, z] = size(obj.Value);
+            vals = floor(linspace(1, z, 10));
+            w = hsiUtility.GetWavelengths(z);
+
+            tlo = tiledlayout(fig, 2, 5, 'TileSpacing', 'None');
+            for i = 1:numel(vals)
+                ax = nexttile(tlo);
+                img = squeeze(obj.Value(:, :, vals(i)));
+                imshow(img, 'Parent', ax);
+                wavelength = w(vals(i));
+                title([num2str(wavelength), 'nm'])
+            end
+
+            plots.SavePlot(fig);
+        end
+
         %% Metrics %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
         %> @brief GetBandCorrelation returns pixel correlations at each spectral band.
@@ -1015,9 +1056,13 @@ classdef hsi
             else
                 fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('dataset'), config.GetSetting('normalization'));
             end
-            fprintf('Filename: %s.\n', targetFilename);
-            load(targetFilename, 'spectralData');
-            obj = spectralData;
+            if exist(targetFilename, 'file')
+                fprintf('Filename: %s.\n', targetFilename);
+                load(targetFilename, 'spectralData');
+                obj = spectralData;
+            else
+                error('The filename %s does not exist.\n', targetFilename);
+            end
         end
 
         %======================================================================

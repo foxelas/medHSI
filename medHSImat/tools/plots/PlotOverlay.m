@@ -1,23 +1,38 @@
+%======================================================================
+%> @brief PlotOverlay applies a mask over a base image.
+%>
+%> @b Usage
+%>
+%> @code
+%> plots.Overlay(fig, baseIm, topIm, figTitle);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param baseIm [numeric array] | The base image
+%> @param topIm [numeric array] | The top image
+%> @param figTitle [char] | The figure title
+%======================================================================
 function [] = PlotOverlay(baseIm, topIm, figTitle, fig)
-% PlotOverlay plots an image with an overlay mask
+% PlotOverlay applies a mask over a base image.
 %
-%   Usage:
-%   PlotOverlay(baseIm, topIm, figTitle, fig)
+% @b Usage
+%
+% @code
+% plots.Overlay(fig, baseIm, topIm, figTitle);
+% @endcode
+%
+% @param fig [int] | The figure handle
+% @param baseIm [numeric array] | The base image
+% @param topIm [numeric array] | The top image
+% @param figTitle [char] | The figure title
 
-hasTitle = true;
-if nargin < 4
-    hasTitle = isnumeric(figTitle);
-    if ~hasTitle
-        fig = figTitle;
-        figTitle = '';
-    end
-end
+hasTitle = ~isempty(figTitle);
 
 imshow(imoverlay(baseIm, topIm, 'cyan'), 'InitialMagnification', 67);
 if hasTitle
     title(figTitle);
 end
 
-SavePlot(fig);
+plots.SavePlot(fig);
 
 end
