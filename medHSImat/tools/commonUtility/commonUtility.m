@@ -45,9 +45,8 @@ classdef commonUtility
         %> @endcode
         %>
         %> @param directoryType [string] | The type of the directory to be recovered
-        %> @b Optional
-        %> @param filename [string] | The name of the file. Default: ''.
-        %> @param extension [string] | The file extension. Default: '.mat'.
+        %> @param filename [string] | Optional: The name of the file. Default: ''
+        %> @param extension [string] | Optional: The file extension. Default: '.mat'
         %>
         %> @retval fullPath [string] | The full path to the target file
         % ======================================================================
@@ -64,9 +63,8 @@ classdef commonUtility
             % @endcode
             %
             % @param directoryType [string] | The type of the directory to be recovered
-            % @b Optional
-            % @param filename [string] | The name of the file. Default: ''.
-            % @param extension [string] | The file extension. Default: '.mat'.
+            % @param filename [string] | Optional: The name of the file. Default: ''
+            % @param extension [string] | Optional: The file extension. Default: '.mat'
             %
             % @retval fullPath [string] | The full path to the target file
             if nargin < 2

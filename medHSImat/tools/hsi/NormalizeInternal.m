@@ -11,10 +11,9 @@
 %> @endcode
 %>
 %> @param obj [hsi] | An instance of the hsi class
-%> @b Optional varargin
 %> @param white [numeric array] | The white reference image
 %> @param black [numeric array] | The black reference image
-%> @param method [string] | The normalization method ('scaling' or 'raw')
+%> @param method [string] | Optional: The normalization method ('scaling' or 'raw'). Default: 'scaling'
 %>
 %> @return instance of the hsi class
 % ======================================================================
@@ -31,10 +30,9 @@ function hsInorm = NormalizeInternal(hsIm, Iwhite, Iblack, method)
 % @endcode
 %
 % @param obj [hsi] | An instance of the hsi class
-% @b Optional varargin
 % @param white [numeric array] | The white reference image
 % @param black [numeric array] | The black reference image
-% @param method [string] | The normalization method ('scaling' or 'raw')
+% @param method [string] | Optional: The normalization method ('scaling' or 'raw'). Default: 'scaling'
 %
 % @return instance of the hsi class
 

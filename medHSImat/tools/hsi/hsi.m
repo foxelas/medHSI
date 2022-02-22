@@ -260,15 +260,14 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
-        %> @param colorLevelsForKMeans [int] | Color levels for Kmeans. Default is 6.
-        %> @param attemptsForKMeans [int] | Attempts for Kmeans. Default is 3.
-        %> @param layerSelectionThreshold [double] | Threshold for layer
+        %> @param colorLevelsForKMeans [int] | Optional: Color levels for Kmeans. Default is 6.
+        %> @param attemptsForKMeans [int] | Optional: Attempts for Kmeans. Default is 3.
+        %> @param layerSelectionThreshold [double] | Optional: Threshold for layer
         %> selection. Default is 0.1.
-        %> @param bigHoleCoefficient [double] | Coefficient for closing big
+        %> @param bigHoleCoefficient [double] | Optional: Coefficient for closing big
         %> holes. Default is 1000.
-        %> @param closingCoefficient [double] | Coefficient for closing operation. Default is 2.
-        %> @param openingCoefficient [double] | Coefficient for opening operation. Default is 5.
+        %> @param closingCoefficient [double] | Optional: Coefficient for closing operation. Default is 2.
+        %> @param openingCoefficient [double] | Optional: Coefficient for opening operation. Default is 5.
         %>
         %> @retval fgMask [numeric array] | A foreground mask
         % ======================================================================
@@ -288,15 +287,14 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
-            % @param colorLevelsForKMeans [int] | Color levels for Kmeans. Default is 6.
-            % @param attemptsForKMeans [int] | Attempts for Kmeans. Default is 3.
-            % @param layerSelectionThreshold [double] | Threshold for layer
+            % @param colorLevelsForKMeans [int] | Optional: Color levels for Kmeans. Default is 6.
+            % @param attemptsForKMeans [int] | Optional: Attempts for Kmeans. Default is 3.
+            % @param layerSelectionThreshold [double] | Optional: Threshold for layer
             % selection. Default is 0.1.
-            % @param bigHoleCoefficient [double] | Coefficient for closing big
+            % @param bigHoleCoefficient [double] | Optional: Coefficient for closing big
             % holes. Default is 1000.
-            % @param closingCoefficient [double] | Coefficient for closing operation. Default is 2.
-            % @param openingCoefficient [double] | Coefficient for opening operation. Default is 5.
+            % @param closingCoefficient [double] | Optional: Coefficient for closing operation. Default is 2.
+            % @param openingCoefficient [double] | Optional: Coefficient for opening operation. Default is 5.
             %
             % @retval fgMask [numeric array] | A foreground mask
 
@@ -317,8 +315,7 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
-        %> @param subMasks [numeric array] | Array of submasks
+        %> @param subMasks [numeric array] | Optional: Array of submasks
         %>
         %> @retval averages [numeric array] | A stack of average spectra
         %> for each mask. Each row is the average corresponding to a
@@ -338,8 +335,7 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
-            % @param subMasks [numeric array] | Array of submasks
+            % @param subMasks [numeric array] | Optional: Array of submasks
             %
             % @retval averages [numeric array] | A stack of average spectra
             % for each mask. Each row is the average corresponding to a
@@ -363,7 +359,6 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
         %> @param white [numeric array] | The white reference image
         %> @param black [numeric array] | The black reference image
         %> @param method [string] | The normalization method ('scaling' or 'raw')
@@ -384,7 +379,6 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
             % @param white [numeric array] | The white reference image
             % @param black [numeric array] | The black reference image
             % @param method [string] | The normalization method ('scaling' or 'raw')
@@ -485,7 +479,6 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
         %> @param components [int] | The number of components
         %> @param label [numeric array] | Superpixel labels
         %>
@@ -503,7 +496,6 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
             % @param components [int] | The number of components
             % @param label [numeric array] | Superpixel labels
             %
@@ -566,7 +558,6 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
         %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
@@ -599,7 +590,6 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
             % @param method [string] | The method for dimension reduction
             % @param q [int] | The number of components to be retained
             % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
@@ -629,7 +619,6 @@ classdef hsi
         %>
         %> @param obj [hsi] | An instance of the hsi class
         %> @param method [string] | The method for dimension reduction
-        %> @b Optional varargin
         %> @param q [int] | The number of components to be retained
         %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
         %>
@@ -649,7 +638,6 @@ classdef hsi
             %
             % @param obj [hsi] | An instance of the hsi class
             % @param method [string] | The method for dimension reduction
-            % @b Optional varargin
             % @param q [int] | The number of components to be retained
             % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
             %
@@ -673,7 +661,6 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
         %> @param method [string] | The method for display image creation
         %> ('rgb' or 'channel')
         %> @param channelNumber [int] | The target channel number
@@ -695,7 +682,6 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
             % @param method [string] | The method for display image creation
             % ('rgb' or 'channel')
             % @param channelNumber [int] | The target channel number
@@ -720,7 +706,6 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
-        %> @b Optional varargin
         %> @param method [string] | The method for display image creation
         %> ('rgb' or 'channel')
         %> @param channelNumber [int] | The target channel number
@@ -743,7 +728,6 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
-            % @b Optional varargin
             % @param method [string] | The method for display image creation
             % ('rgb' or 'channel')
             % @param channelNumber [int] | The target channel number

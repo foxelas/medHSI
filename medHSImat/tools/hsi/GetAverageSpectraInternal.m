@@ -12,8 +12,7 @@
 %> @endcode
 %>
 %> @param obj [hsi] | An instance of the hsi class
-%> @b Optional varargin
-%> @param subMasks [numeric array] | Array of submasks
+%> @param subMasks [numeric array] | Optional: Array of submasks
 %>
 %> @retval averages [numeric array] | A stack of average spectra
 %> for each mask. Each row is the average corresponding to a
@@ -33,8 +32,7 @@ function spectrumCurves = GetAverageSpectraInternal(hsi, subMasks)
 % @endcode
 %
 % @param obj [hsi] | An instance of the hsi class
-% @b Optional varargin
-% @param subMasks [numeric array] | Array of submasks
+% @param subMasks [numeric array] | Optional: Array of submasks
 %
 % @retval averages [numeric array] | A stack of average spectra
 % for each mask. Each row is the average corresponding to a

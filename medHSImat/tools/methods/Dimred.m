@@ -19,7 +19,6 @@
 %> @endcode
 %>
 %> @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
-%> @b Optional varargin
 %> @param method [string] | The method for dimension reduction
 %> @param q [int] | The number of components to be retained
 %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
@@ -55,7 +54,6 @@ function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, 
 % @endcode
 %
 % @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
-% @b Optional varargin
 % @param method [string] | The method for dimension reduction
 % @param q [int] | The number of components to be retained
 % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation

@@ -107,8 +107,7 @@ classdef plots
         %> @endcode
         %>
         %> @param style [char] | The line group style. Default: 'class'.
-        %> @b Optional
-        %> @param names [cell array] | The line group names
+        %> @param names [cell array] | Optional: The line group names
         %>
         %> @retval lineColorMap [map] | The line color map
         %======================================================================
@@ -129,8 +128,7 @@ classdef plots
             % @endcode
             %
             % @param style [char] | The line group style. Default: 'class'.
-            % @b Optional
-            % @param names [cell array] | The line group names
+            % @param names [cell array] | Optional: The line group names
             %
             % @retval lineColorMap [map] | The line color map
 

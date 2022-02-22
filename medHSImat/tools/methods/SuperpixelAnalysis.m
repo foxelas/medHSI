@@ -11,7 +11,6 @@
 %> @endcode
 %>
 %> @param hsIm [hsi] | An instance of the hsi class
-%> @b Optional
 %> @param isManual [boolean] | A  flag to show whether is manual (local)
 %> implementation or by SuperPCA package. Default: false.
 %> @param pixelNum [int] | The number of superpixels. Default: 20.
@@ -35,7 +34,6 @@ function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, isManual, pixe
 % @endcode
 %
 % @param hsIm [hsi] | An instance of the hsi class
-% @b Optional
 % @param isManual [boolean] | A  flag to show whether is manual (local)
 % implementation or by SuperPCA package. Default: false.
 % @param pixelNum [int] | The number of superpixels. Default: 20.
