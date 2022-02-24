@@ -317,7 +317,8 @@ classdef hsiUtility
             %% Setup
             disp('Initializing [ExportH5Dataset]...');
 
-            fileName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('datasets'), strcat('hsi_', config.GetSetting('datasetsFolderName'), '_full', '.h5'));
+            fileName = commonUtility.GetFilename('output',  ...
+            fullfile(config.GetSetting('datasetsFolderName'), strcat('hsi_', config.GetSetting('datasetsFolderName'), '_full')), 'h5');
 
             if exist(fileName, 'file') > 0
                 disp('Deleting previously exported .h5 dataset.');

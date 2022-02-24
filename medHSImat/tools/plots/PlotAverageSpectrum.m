@@ -55,7 +55,8 @@ subplot(1, 3, 3);
 imshow(rgb);
 title(figTitle);
 
-baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('spectraCheck'), config.GetSetting('fileName'));
+baseFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('spectraCheck'), config.GetSetting('fileName')), '');
+
 config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
 plots.SavePlot(fig);
 

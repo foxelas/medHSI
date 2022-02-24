@@ -1,6 +1,8 @@
 %======================================================================
 %> @brief PlotMontageFolderContents plots contents of a folder as a montage.
 %>
+%> Need to set config::[saveFolder] for image output.
+%>
 %> @b Usage
 %>
 %> @code
@@ -20,6 +22,8 @@
 function [] = PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
 % PlotMontageFolderContents plots contents of a folder as a montage.
 %
+% Need to set config::[saveFolder] for image output.
+%
 % @b Usage
 %
 % @code
@@ -37,7 +41,7 @@ function [] = PlotMontageFolderContents(path, criteria, figTitle, standardDim, i
 % @param imageLimit [int] | The maximum number of subimages to be montaged
 
 if isempty(path)
-    path = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'));
+    path = commonUtility.GetFilename('output', config.GetSetting('saveFolder'), '');
 end
 
 if nargin < 2

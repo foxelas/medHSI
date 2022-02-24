@@ -16,17 +16,19 @@ classdef trainUtility
         %> @b Usage
         %>
         %> @code
-        %> dataset = 'pslData';
-        %> hsiUtility.PrepareDataset(dataset, {'tissue', true});
+        %> baseDataset = 'pslData';
+        %> hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
         %> augType = 'set1';
-        %> trainUtility.Augment(dataset, augType);
+        %> augmentedDataset = 'pslDataAug';
+        %> AugmentInternal(baseDataset, augmentedDataset, augType);
         %> @endcode
         %>
-        %> @param dataset [char] | The dataset
-        %> @param augType [char] | The augmentation type ('set1' or 'set2')
+        %> @param baseDataset [char] | The base dataset
+        %> @param augmentedDataset [char] | The augmented dataset
+        %> @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
         %>
         % ======================================================================
-        function [] = Augment(dataset, augType)
+        function [] = Augment(varargin)
             % Augment applies augmentation on the dataset
             %
             % The base dataset should be already saved before running augmentation.
@@ -37,17 +39,18 @@ classdef trainUtility
             % @b Usage
             %
             % @code
-            % dataset = 'pslData';
-            % hsiUtility.PrepareDataset(dataset, {'tissue', true});
+            % baseDataset = 'pslData';
+            % hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
             % augType = 'set1';
-            % trainUtility.Augment(dataset, augType);
+            % augmentedDataset = 'pslDataAug';
+            % AugmentInternal(baseDataset, augmentedDataset, augType);
             % @endcode
             %
-            % @param dataset [char] | The dataset
-            % @param augType [char] | The augmentation type ('set1' or 'set2')
+            % @param baseDataset [char] | The base dataset
+            % @param augmentedDataset [char] | The augmented dataset
+            % @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
             %
-            %
-            AugmentInternal(dataset, augType);
+            AugmentInternal(varargin{:});
         end
 
         % ======================================================================
@@ -448,6 +451,8 @@ classdef trainUtility
         % ======================================================================
         %> @brief ValidateTest2 returns the results after cross validation of a classifier.
         %>
+        %> Need to set config::[saveFolder] for image output.
+        %>
         %> @b Usage
         %>
         %> @code
@@ -469,6 +474,8 @@ classdef trainUtility
         % ======================================================================
         function [valTrain, valTest] = ValidateTest2(X, y, Xvalid, yvalid, sRGBs, fgMasks, cvp, method, q)
             % ValidateTest2 returns the results after cross validation of a classifier.
+            %
+            % Need to set config::[saveFolder] for image output.
             %
             % @b Usage
             %
@@ -502,8 +509,8 @@ classdef trainUtility
             origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
             predLabels = hsi.RecoverSpatialDimensions(predlabels, origSizes, fgMasks);
             for i = 1:numel(sRGBs)
-                imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), ...
-                    strcat('pred_', num2str(i), '_', method, '_', num2str(q), '.png'));
+                imgFilename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), ...
+                    strcat('pred_', num2str(i), '_', method, '_', num2str(q))), 'png');
                 config.SetSetting('plotName', imgFilename);
                 plots.Overlay(4, sRGBs{i}, predLabels{i}, strcat(method, '-', num2str(q)));
             end

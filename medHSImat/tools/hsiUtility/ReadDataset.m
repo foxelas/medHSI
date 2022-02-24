@@ -65,7 +65,7 @@ config.SetSetting('experiment', experiment);
 config.SetSetting('cropBorders', true);
 isTest = config.GetSetting('isTest');
 
-basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshotsFolderName'));
+basedir = commonUtility.GetFilename('output', config.GetSetting('snapshotsFolderName'), '');
 
 %% Read h5 data
 [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
@@ -76,7 +76,7 @@ if isTest
     configurations = [outRows.Configuration];
 end
 
-for i = 1:(-1) % length(targetIDs)
+for i = 1:length(targetIDs)
     close all;
 
     id = targetIDs(i);

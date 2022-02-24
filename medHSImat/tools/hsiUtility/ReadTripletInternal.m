@@ -63,7 +63,8 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         || ~exist(commonUtility.GetFilename('black', targetName), 'file') ...
         || ~exist(commonUtility.GetFilename('white', targetName), 'file')
 
-    plotBaseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('snapshotsFolderName'), 'ReadTriplets', targetName);
+    plotBaseDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'ReadTriplets', targetName), '');
+
     figure(1);
     title('Target Image');
     imshow(GetDisplayImageInternal(spectralData, 'rgb'));

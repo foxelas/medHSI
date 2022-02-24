@@ -115,8 +115,8 @@ else
 end
 
 if config.GetSetting('showFigures')
-    filepath = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('backgroundRemovalFolderName'), ...
-        strcat(config.GetSetting('fileName'), '_foreground.jpg'));
+    filepath = commonUtility.GetFilename('output', fullfile(config.GetSetting('backgroundRemovalFolderName'), ...
+        strcat(config.GetSetting('fileName'), '_foreground')), 'jpg');
     config.SetSetting('plotName', filepath);
     plots.Overlay(1, Irgb, fgMask);
 end

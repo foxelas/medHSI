@@ -2,6 +2,8 @@
 %> @brief SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
 %> the result.
 %>
+%> Need to set config::[saveFolder] for image output.
+%>
 %> @b Usage
 %>
 %> @code
@@ -24,6 +26,8 @@
 function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, isManual, pixelNum, pcNum)
 % SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
 % the result.
+%
+% Need to set config::[saveFolder] for image output.
 %
 % @b Usage
 %
@@ -55,7 +59,7 @@ end
 if nargin < 4
     pcNum = 3;
 end
-savedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), config.GetSetting('fileName'));
+savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
 
 %% Preparation
 srgb = hsIm.GetDisplayImage('rgb');

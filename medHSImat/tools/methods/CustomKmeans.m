@@ -2,6 +2,8 @@
 %> @brief CustomKmeans applies kmeans clustering to an hsi and visualizes
 %> the result.
 %>
+%> Need to set config::[saveFolder] for image output.
+%>
 %> @b Usage
 %>
 %> @code
@@ -18,6 +20,8 @@
 function [labels] = CustomKmeans(hsIm, clusterNum)
 % CustomKmeans applies kmeans clustering to an hsi and visualizes
 % the result.
+%
+% Need to set config::[saveFolder] for image output.
 %
 % @b Usage
 %
@@ -40,7 +44,7 @@ Xcol = hsIm.GetMaskedPixels(fgMask);
 
 labels = hsi.RecoverSpatialDimensions(labelsCol, size(fgMask), fgMask);
 
-savedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), config.GetSetting('fileName'));
+savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
 config.SetSetting('plotName', fullfile(savedir, 'kmeans-clustering'));
 plots.Superpixels(1, srgb, labels, '', 'color', fgMask);
 

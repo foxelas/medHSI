@@ -21,15 +21,31 @@ clc;
 %%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
+baseDataset = 'pslCore';
+
 config.SetOpt();
 config.SetSetting('isTest', false);
 config.SetSetting('database', 'psl');
-config.SetSetting('dataset', 'pslCore');
+config.SetSetting('dataset', baseDataset);
 config.SetSetting('normalization', 'byPixel');
 
-config.SetSetting('outputDir', strcat(config.GetSetting('outputDir'), config.GetSetting('dataset')));
 CheckImportData();
 
 dbSelection = {'tissue', true};
+
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-hsiUtility.PrepareDataset('pslCore', dbSelection);
+% hsiUtility.PrepareDataset('pslCore', dbSelection);
+
+
+% %%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
+% t20211104_ApplyScriptToEachImage;
+% t20211207_PrepareLabels;
+% t20211207_PrepareSummaryFigures
+% t20211208_TestSVM
+% t20211230_PrintSampleHSI
+% t20220121_Dimred
+% t20220122_Dimred
+% t210910_ReadHands
+
+augDataset = 'pslCoreAugmented';
+trainUtility.Augment(baseDataset, augDataset, 'set1');

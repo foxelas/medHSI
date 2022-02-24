@@ -276,10 +276,12 @@ classdef hsiInfo
                 figure(3);
                 imshow(c);
 
-                config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsFolderName'), strcat(targetID)));
+                labelsFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsFolderName'), strcat(targetID)), '');
+                config.SetSetting('plotName', labelsFolder);
                 plots.SavePlot(2);
 
-                config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsAppliedFolderName'), strcat(targetID)));
+                labelsAppliedFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsAppliedFolderName'), strcat(targetID)), '');
+                config.SetSetting('plotName', labelsAppliedFolder);
                 plots.SavePlot(3);
 
                 labelMask = uint8(labelMask);

@@ -9,17 +9,19 @@
 %> @b Usage
 %>
 %> @code
-%> dataset = 'pslData';
-%> hsiUtility.PrepareDataset(dataset, {'tissue', true});
+%> baseDataset = 'pslData';
+%> hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
 %> augType = 'set1';
-%> AugmentInternal(dataset, augType);
+%> augmentedDataset = 'pslDataAug';
+%> AugmentInternal(baseDataset, augmentedDataset, augType);
 %> @endcode
 %>
-%> @param dataset [char] | The dataset
-%> @param augType [char] | The augmentation type ('set1' or 'set2')
+%> @param baseDataset [char] | The base dataset
+%> @param augmentedDataset [char] | The augmented dataset
+%> @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
 %>
 % ======================================================================
-function [] = AugmentInternal(dataset, augType)
+function [] = AugmentInternal(baseDataset, augmentedDataset, augType)
 % AugmentInternal applies augmentation on the dataset
 %
 % The base dataset should be already saved before running augmentation.
@@ -30,26 +32,27 @@ function [] = AugmentInternal(dataset, augType)
 % @b Usage
 %
 % @code
-% dataset = 'pslData';
-% hsiUtility.PrepareDataset(dataset, {'tissue', true});
+% baseDataset = 'pslData';
+% hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
 % augType = 'set1';
-% AugmentInternal(dataset, augType);
+% augmentedDataset = 'pslDataAug';
+% AugmentInternal(baseDataset, augmentedDataset, augType);
 % @endcode
 %
-% @param dataset [char] | The dataset
-% @param augType [char] | The augmentation type ('set1' or 'set2')
+% @param baseDataset [char] | The base dataset
+% @param augmentedDataset [char] | The augmented dataset
+% @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
 %
 
-config.SetSetting('dataset', dataset);
 if nargin < 2
     augType = 'set1';
 end
-config.SetSetting('augmentation', strcat(dataset, '-', augType));
 
 %% Setup
-fprintf('Starting augmentation for dataset: %s ...\n', dataset);
+fprintf('Starting augmentation for dataset: %s ...\n', baseDataset);
 
 %% Read h5 data
+config.SetSetting('dataset', baseDataset);
 [datanames, targetNames] = commonUtility.DatasetInfo();
 
 if length(datanames) ~= length(targetNames)
@@ -62,8 +65,10 @@ for i = 1:length(targetNames)
 
     %% load HSI from .mat file to verify it is working and to prepare preview images
     targetName = targetNames{i};
-    [spectralData, labelImg] = hsiUtility.LoadHSIAndLabel(targetName, 'dataset');
+    config.SetSetting('dataset', baseDataset);
+    [spectralData, labelImg] = hsiUtility.LoadHsiAndLabel(targetName);
 
+    config.SetSetting('dataset', augmentedDataset);
     if ~isempty(labelImg)
         switch augType
             case 'set0' % No augmentation
@@ -107,13 +112,11 @@ for i = 1:length(targetNames)
 end
 
 %% preview of the entire dataset
-
-path1 = strrep(commonUtility.GetFilename('augmentation', ...
-    config.GetSetting('snapshotsFolderName')), '.mat', '');
-plots.MontageFolderContents(1, path1, '*.jpg', 'Augmented Dataset');
+outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'preprocessed'), '');
+plots.MontageFolderContents(1, outputDir, '*.jpg', 'Augmented Dataset');
 close all;
 
-fprintf('The augmented dataset is saved in folder %s \n', commonUtility.GetFilename('augmentation', '*'));
+fprintf('The augmented dataset is saved in folder %s \n', commonUtility.GetFilename('dataset', 'none', ''));
 disp('Finished augmenting.');
 end
 
@@ -129,10 +132,13 @@ else
     data = spectralData;
     label = labelImg;
 end
-filename = commonUtility.GetFilename('augmentation', strcat(targetName, '_', num2str(folds)));
+filename = commonUtility.GetFilename('dataset', strcat(targetName, '_', num2str(folds)));
 save(filename, 'data', 'label');
-filename = commonUtility.GetFilename('augmentation', ...
-    fullfile(config.GetSetting('snapshotsFolderName'), strcat(targetName, '_', num2str(folds))), 'jpg');
+fprintf('Saved new data sample at: %s \n', filename);
+outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'preprocessed'), '');
+filename = config.DirMake(outputDir, strcat(targetName, '_', num2str(folds), '.jpg'));
 dispImageRgb = data.GetDisplayRescaledImage('rgb');
 imwrite(dispImageRgb, filename, 'jpg');
+fprintf('Saved image preview at: %s \n', filename);
+
 end

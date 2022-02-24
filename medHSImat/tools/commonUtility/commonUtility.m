@@ -35,13 +35,15 @@ classdef commonUtility
         % ======================================================================
         %> @brief GetFilename returns the the directories for saved data.
         %>
-        %> For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'augmentation' or 'h5'
+        %> For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'output' or 'h5'
         %>
         %> @b Usage
         %>
         %> @code
         %> filename = num2str(id);
         %> fullPath = commonUtility.GetFilename('label', filename);
+        %>
+        %> dirOnly = commonUtility.GetFilename('dataset', 'none', '');
         %> @endcode
         %>
         %> @param directoryType [string] | The type of the directory to be recovered
@@ -53,13 +55,15 @@ classdef commonUtility
         function [fullPath] = GetFilename(directoryType, filename, extension)
             % GetFilename returns the the directories for saved data.
             %
-            % For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'augmentation' or 'h5'
+            % For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'output' or 'h5'
             %
             % @b Usage
             %
             % @code
             % filename = num2str(id);
             % fullPath = commonUtility.GetFilename('label', filename);
+            %
+            % dirOnly = commonUtility.GetFilename('dataset', 'none', '');
             % @endcode
             %
             % @param directoryType [string] | The type of the directory to be recovered
@@ -119,20 +123,24 @@ classdef commonUtility
                         strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ...
                         filename);
 
-                case 'augmentation'
-                    fullPath = config.DirMake(config.GetSetting('matDir'), ...
-                        config.GetSetting('augmentationFolderName'), filename);
-
                 case 'h5'
                     fullPath = config.DirMake(config.GetSetting('matDir'), ...
                         config.GetSetting('database'), filename);
+
+                case 'output'
+                    fullPath = config.DirMake(config.DirMake(config.GetSetting('outputDir'), ...
+                        config.GetSetting('dataset'), filename));
 
                 otherwise
                     error('Unsupported dataType.');
             end
 
-            [~, ~, ext] = fileparts(fullPath);
-            if isempty(ext)
+            [dirpath, target, ext] = fileparts(fullPath);
+            if strcmp(target, 'none')
+                fullPath = strrep(fullfile(dirpath, '.'), '.', '');
+            elseif isempty(extension)
+                fullPath = fullfile(dirpath, target);
+            elseif isempty(ext)
                 fullPath = strcat(fullPath, '.', extension);
             elseif ~strcmp(strrep(ext, '.', ''), extension)
                 fullPath = strrep(fullPath, ext, strcat('.', extension));

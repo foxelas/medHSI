@@ -82,7 +82,7 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('normCheckFolderName'));
+baseFolder = commonUtility.GetFilename('output', config.GetSetting('normCheckFolderName'), '');
 
 config.SetSetting('plotName', fullfile(baseFolder, strcat(config.GetSetting('fileName'), '_raw.jpg')));
 plots.SavePlot(fig);
