@@ -46,7 +46,7 @@ for i = 1:length(tmp.raw)
                 case 'importDir'
                     varValue = fullfile(dataDir, 'import\');
                 case 'matDir'
-                    varValue = fullfile(outputDir, 'matfiles', 'hsi\');   
+                    varValue = fullfile(outputDir, 'matfiles', 'hsi\');
                 case 'paramDir'
                     varValue = fullfile(dataDir, 'parameters\');
             end

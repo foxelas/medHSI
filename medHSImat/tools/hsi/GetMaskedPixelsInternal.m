@@ -34,6 +34,9 @@ function [maskedPixels] = GetMaskedPixelsInternal(I, mask)
 % @retval maskedPixels [numeric array] | A 2D array of pixel
 % spectra aligned vertically. One row is one pixel's spectrum
 
+if ~islogical(mask)
+    mask = logical(mask);
+end
 [m, n, w] = size(I);
 IFlat = reshape(I, [m * n, w]);
 maskFlat = reshape(mask, [m * n, 1]);

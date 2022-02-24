@@ -39,9 +39,13 @@ else
     Irgb = I;
 end
 
-figure(1);
+fig = figure;
 title('Draw a polygon on the figure');
 mask = roipoly(Irgb);
 title('Draw a polygon on the figure');
 
+if ~islogical(mask)
+    mask = logical(mask);
+end
+close(fig);
 end

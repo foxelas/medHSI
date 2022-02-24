@@ -31,6 +31,8 @@ function PlotNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
 % @param Inorm [hsi] | The normalization image
 
 %Need to draw mask
+close all;
+
 mask = Iin.GetCustomMask();
 Iin_mask = Iin.GetMaskedPixels(mask);
 Iblack_mask = GetMaskedPixelsInternal(Iblack, mask);
@@ -39,7 +41,7 @@ Inorm_mask = Inorm.GetMaskedPixels(mask);
 x = hsiUtility.GetWavelengths(size(Iin_mask, 2));
 
 close all;
-figure(fig);
+fig = figure(fig);
 clf;
 hold on;
 plot(x, mean(reshape(Iwhite_mask, [size(Iwhite_mask, 1), size(Iwhite_mask, 2)])), 'DisplayName', 'Average White', 'LineWidth', 2);
@@ -61,7 +63,7 @@ fprintf('If minVal is negative and wavelenth is at the extreme, then it is disca
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Reflectance (a.u.)', 'FontSize', 15);
 
-figure(fig+1);
+fig2 = figure();
 clf;
 hold on
 for i = 1:size(Inorm_mask, 1)
@@ -80,15 +82,15 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('normCheckFolderName'), config.GetSetting('fileName'));
+baseFolder = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('normCheckFolderName'));
 
-config.SetSetting('plotName', strcat(baseFolder, '_raw.jpg'));
+config.SetSetting('plotName', fullfile(baseFolder, strcat(config.GetSetting('fileName'), '_raw.jpg')));
 plots.SavePlot(fig);
-config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
-plots.SavePlot(fig+1);
-fig3 = figure(fig+2);
+config.SetSetting('plotName', fullfile(baseFolder, strcat(config.GetSetting('fileName'), '_norm.jpg')));
+plots.SavePlot(fig2);
+fig3 = figure();
 rgb = Iin.GetDisplayImage();
-config.SetSetting('plotName', strcat(baseFolder, '_mask.jpg'));
+config.SetSetting('plotName', fullfile(baseFolder, strcat(config.GetSetting('fileName'), '_mask.jpg')));
 plots.Overlay(fig3, rgb, mask);
 
 end

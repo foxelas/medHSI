@@ -63,8 +63,9 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         || ~exist(commonUtility.GetFilename('black', targetName), 'file') ...
         || ~exist(commonUtility.GetFilename('white', targetName), 'file')
 
-    plotBaseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('snapshotsFolderName'), config.GetSetting('experiment'), 'ReadDataset');
+    plotBaseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('snapshotsFolderName'), 'ReadTriplets', targetName);
     figure(1);
+    title('Target Image');
     imshow(GetDisplayImageInternal(spectralData, 'rgb'));
     config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));
     plots.SavePlot(1);
@@ -86,6 +87,7 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         end
         [white, ~, wavelengths] = hsiUtility.ReadH5(filename);
         figure(2);
+        title('White Reference Image');
         imshow(GetDisplayImageInternal(white, 'rgb'));
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_', num2str(config.GetSetting('integrationTime')))));
         SavePlot(2);
@@ -123,6 +125,7 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         end
         [blackReflectance, ~, ~] = hsiUtility.ReadH5(filename);
         figure(3);
+        title('Black Reference Image');
         imshow(GetDisplayImageInternal(blackReflectance, 'rgb'));
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime')))));
         plots.SavePlot(3);

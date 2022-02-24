@@ -276,10 +276,10 @@ classdef hsiInfo
                 figure(3);
                 imshow(c);
 
-                config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labels'), strcat(targetID)));
+                config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsFolderName'), strcat(targetID)));
                 plots.SavePlot(2);
 
-                config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsApplied'), strcat(targetID)));
+                config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('labelsAppliedFolderName'), strcat(targetID)));
                 plots.SavePlot(3);
 
                 labelMask = uint8(labelMask);
@@ -320,13 +320,13 @@ classdef hsiInfo
             % @param sampleID [char] | The sampleID of the target sample
             %
             % @retval diagnosis [char] | The diagnosis string
-            
+
             diagnosis = '';
             dataTable = databaseUtility.GetDiagnosisTable();
             if ~isempty(dataTable)
                 id = find(strcmp(dataTable.SampleID, sampleId), 1);
                 if ~isempty(id)
-                    diagnosis = dataTable{id, 'Diagnosis'}{1, 1};                
+                    diagnosis = dataTable{id, 'Diagnosis'}{1, 1};
                 end
             end
         end

@@ -68,7 +68,7 @@ classdef databaseUtility
                 value = column{id};
             else
                 value = column(id);
-            end 
+            end
         end
 
         % ======================================================================

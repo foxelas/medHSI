@@ -174,7 +174,7 @@ classdef hsi
         %>
         %> @param obj [hsi] | An instance of the hsi class
         %> @param inMask [numeric array] | Optional: A target mask. Default: The foreground mask
-        %> @param isForegroundOnly [boolean] | Optional: Flag to show if foreground mask is applied. Default: true 
+        %> @param isForegroundOnly [boolean] | Optional: Flag to show if foreground mask is applied. Default: true
         %>
         %> @retval maskedPixels [numeric array] | A 2D array of pixel
         %> spectra aligned vertically. One row is one pixel's spectrum
@@ -193,18 +193,18 @@ classdef hsi
             %
             % @param obj [hsi] | An instance of the hsi class
             % @param inMask [numeric array] | Optional: A target mask. Default: The foreground mask
-            % @param isForegroundOnly [boolean] | Optional: Flag to show if foreground mask is applied. Default: true 
-            % 
-            % foreground mask is applied. Default: true 
-            % 
+            % @param isForegroundOnly [boolean] | Optional: Flag to show if foreground mask is applied. Default: true
+            %
+            % foreground mask is applied. Default: true
+            %
             %
             % @retval maskedPixels [numeric array] | A 2D array of pixel
             % spectra aligned vertically. One row is one pixel's spectrum
 
             if nargin < 3
-                isForegroundOnly = true; 
-            end 
-            
+                isForegroundOnly = true;
+            end
+
             I = obj.Value;
             if nargin < 2
                 inMask = obj.FgMask;

@@ -36,7 +36,6 @@ function hsInorm = NormalizeInternal(hsIm, Iwhite, Iblack, method)
 %
 % @return instance of the hsi class
 
-eps = 0.000000001;
 if nargin < 4
     method = 'scaling';
 end
@@ -65,6 +64,8 @@ end
 switch method
     case 'scaling'
         denom = Iwhite - Iblack;
+        eps = 10^(-6);
+        %         eps = abs(mean(denom, 'all'));
         denom(denom <= 0) = eps;
         Inorm = (Iin - Iblack) ./ denom;
 
@@ -79,8 +80,7 @@ hsInorm = hsIm;
 hsInorm.Value = Inorm;
 
 if ~config.GetSetting('disableNormalizationCheck')
-    fig = 1;
-    plots.NormalizationCheck(fig, hsIm, Iblack, Iwhite, hsInorm);
+    plots.NormalizationCheck(1, hsIm, Iblack, Iwhite, hsInorm);
 end
 
 hsInorm = hsInorm.Max(0);

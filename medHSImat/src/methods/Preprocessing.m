@@ -44,17 +44,16 @@ if ~strcmp(option, 'raw')
     blackReflectance = hsiUtility.LoadHSIReference(targetID, 'black');
     hsIm = hsIm.Normalize(whiteReflectance, blackReflectance);
 
-    value = hsIm.Value;
-
     %%Crop extreme spectra
+    value = hsIm.Value;
     value = value(:, :, hsiUtility.GetWavelengths(311, 'index'));
+    hsIm.Value = value;
 
     %%Remove background
     if ~isempty(hsIm.FgMask)
-        hsIm.Value = value;
         col = hsIm.GetMaskedPixels(ones(size(hsIm.FgMask)), false);
-        colMask = reshape(hsIm.FgMask, [size(hsIm.FgMask,1) * size(hsIm.FgMask,2), 1]);
-        col(~colMask) = 0; 
+        colMask = reshape(hsIm.FgMask, [size(hsIm.FgMask, 1) * size(hsIm.FgMask, 2), 1]);
+        col(~colMask, :) = 0;
         value = hsi.RecoverSpatialDimensions(col, size(hsIm.FgMask));
         hsIm.Value = value;
     end

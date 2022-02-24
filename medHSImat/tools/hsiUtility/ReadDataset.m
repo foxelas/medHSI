@@ -51,9 +51,9 @@ function [] = ReadDataset(dataset, condition, readForeground)
 %@param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
 %
 
-if nargin < 3 
+if nargin < 3
     readForeground = true;
-end 
+end
 
 %% Setup
 disp('');
@@ -63,8 +63,9 @@ config.SetSetting('dataset', dataset);
 experiment = dataset;
 config.SetSetting('experiment', experiment);
 config.SetSetting('cropBorders', true);
-config.SetSetting('saveFolder', fullfile(config.GetSetting('snapshotsFolderName'), experiment));
 isTest = config.GetSetting('isTest');
+
+basedir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('snapshotsFolderName'));
 
 %% Read h5 data
 [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
@@ -75,7 +76,7 @@ if isTest
     configurations = [outRows.Configuration];
 end
 
-for i = 1:length(targetIDs)
+for i = 1:(-1) % length(targetIDs)
     close all;
 
     id = targetIDs(i);
@@ -95,7 +96,7 @@ for i = 1:length(targetIDs)
     else
         tissueType = 'Fixed';
     end
-    
+
     if isTest
         saveName = StrrepAll(filenames{i});
     else
@@ -127,27 +128,27 @@ for i = 1:length(targetIDs)
 
     figure(1);
     imshow(dispImageRaw);
-    config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'rgb', saveName));
+    config.SetSetting('plotName', config.DirMake(basedir, 'rgb', saveName));
     plots.SavePlot(1);
 
     figure(2);
     imshow(dispImageRgb);
-    config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'preprocessed', saveName));
+    config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed', saveName));
     plots.SavePlot(2);
 
-    config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'preprocessed_channels', saveName));
+    config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed_channels', saveName));
     spectralData.SubimageMontage(3);
     pause(0.1);
 end
 
 %% preview of the entire dataset
 
-path1 = fullfile(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'preprocessed');
+path1 = fullfile(basedir, 'preprocessed');
 plots.MontageFolderContents(1, path1, '*.jpg', 'Dataset');
 plots.MontageFolderContents(3, path1, '*raw.jpg', 'Dataset raw');
 plots.MontageFolderContents(4, path1, '*fix.jpg', 'Dataset fix');
 
-path2 = fullfile(config.GetSetting('outputDir'), config.GetSetting('saveFolder'), 'rgb');
+path2 = fullfile(basedir, 'rgb');
 plots.MontageFolderContents(2, path2, '*.jpg', 'sRGB');
 plots.MontageFolderContents(5, path2, '*raw.jpg', 'sRGB raw');
 plots.MontageFolderContents(6, path2, '*fix.jpg', 'sRGB fix');

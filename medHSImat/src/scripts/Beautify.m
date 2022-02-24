@@ -2,11 +2,11 @@ clear all;
 close all;
 
 %% Apply beautifier
-basedir = fullfile(config.GetSetting('parentDir'), 'medHSI\');
+basedir = fullfile(config.GetSetting('executionDir'), 'medHSI\');
 
 subdirName = {'setup', 'tools', 'src'};
 for j = 1:numel(subdirName)
-    MBeautify.formatFiles(fullfile(basedir, 'medHSIma', subdirName{j}, '\'), '*.m');
+    MBeautify.formatFiles(fullfile(basedir, 'medHSImat', subdirName{j}, '\'), '*.m');
     toolsdir = fullfile(basedir, 'medHSImat', subdirName{j});
     dirList = dir(toolsdir);
     for i = 3:numel(dirList)

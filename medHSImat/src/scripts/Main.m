@@ -1,8 +1,8 @@
-clc; 
+clc;
 
 % %%%%%%%%%%%%%%%%%%%%% Initialization %%%%%%%%%%%%%%%%%%%%%
 % config.SetOpt();
-% 
+%
 % config.SetSetting('normalization', 'byPixel');
 % % config.SetSetting('dataDate', 20210706);
 % % config.SetSetting('integrationTime', 618);
@@ -14,7 +14,7 @@ clc;
 % config.SetSetting('database', 'calib');
 % config.SetSetting('dataDir', 'D:\elena\mspi\2_saitamaHSI\calib\');
 % config.SetSetting('outputDir', fullfile(config.GetSetting('outputDir'), '001-DataTest'));
-% 
+%
 % readForeground = false;
 % hsiUtility.PrepareDataset('handsOnly', {'hand', false}, readForeground);
 
@@ -24,7 +24,10 @@ clc;
 config.SetOpt();
 config.SetSetting('isTest', false);
 config.SetSetting('database', 'psl');
+config.SetSetting('dataset', 'pslCore');
 config.SetSetting('normalization', 'byPixel');
+
+config.SetSetting('outputDir', strcat(config.GetSetting('outputDir'), config.GetSetting('dataset')));
 CheckImportData();
 
 dbSelection = {'tissue', true};
