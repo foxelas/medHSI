@@ -206,6 +206,8 @@ classdef hsiUtility
         %> saved in config::[matDir]\\[database]\\[tripletsName]\\*_xxx.mat, where
         %> xxx is either '_target', '_white' or '_black'.
         %>
+        %> To chose a mask for uni spectrum normalization, set config::['useCustomMask']
+        %>
         %> @b Usage
         %>
         %> @code
@@ -229,6 +231,8 @@ classdef hsiUtility
             % (if exist) images are read one-by-one for the same target. Each HSI is
             % saved in config::[matDir]\[database]\[tripletsName]\*_xxx.mat, where
             % xxx is either '_target', '_white' or '_black'.
+            %
+            % To chose a mask for uni spectrum normalization, set config::['useCustomMask']
             %
             % @b Usage
             %

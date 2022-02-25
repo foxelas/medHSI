@@ -34,7 +34,11 @@ CheckImportData();
 dbSelection = {'tissue', true};
 
 %%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-% hsiUtility.PrepareDataset('pslCore', dbSelection);
+%Disable normalization check during data reading 
+config.SetSetting('disableNormalizationCheck', true);
+%Do no use mask for unispectrum calculation
+config.SetSetting('useCustomMask', false);
+hsiUtility.PrepareDataset('pslCore', dbSelection);
 
 
 % %%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
