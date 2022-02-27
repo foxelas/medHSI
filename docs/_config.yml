@@ -40,7 +40,7 @@ show_excerpts: false # set to true to show excerpts on the homepage
 # this and add the path to the pages in order as they should show up
 header_pages:
   - _pages/about.md
-  - _pages/index.html
+  - _pages/about.md
 
 
 # Build settings
@@ -51,7 +51,6 @@ plugins:
 
 include:
   - _pages
-  - documentation
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
