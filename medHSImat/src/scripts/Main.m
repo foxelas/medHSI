@@ -6,19 +6,19 @@
 %> The MedHSI package allows you to read and process Hyper-Spectral Images (HSI)
 %> captured with a TopCon Spectroradiometer (.h5 files).
 %>
-%> The framework has been specifically developed for macropathology-related tasks. The methods are tested on hyper-spectral images (in the visible range) of Pigmented Skin Lesions.
+%>The framework has been specifically developed for macropathology-related tasks. 
 %>
-%> @section Details 
-%> Refer to https://foxelas.github.io/medHSI/.
+%>The methods are tested on hyper-spectral images (in the visible range) of Pigmented Skin Lesions.
+%>
+%> @section  Details
+%> For details refer to https://foxelas.github.io/medHSI/.
+%>
+%> The structure is desctribed in @ref descr. Also, check pages @b Classes and @b Files.
+%>
+%> If you find any mistakes or bugs, contact me by email at ealoupogianni[ at ]outlook.com.
 %>
 %> @section Installation 
 %> Check the @ref installation page. 
-%>
-%> @section structure Structure
-%> Check pages @b Classes and @b Files.
-%>
-%> @section contact Contact 
-%> If you find any mistakes or bugs, contact me by email at ealoupogianni[ at ]outlook.com.
 %>
 %> @section cite Cite 
 %> Cite as Aloupogianni, E. (2022) ``MedHSI package for Hyperspectral Medical Image Processing'' (Version 1.0) [https://github.com/foxelas/medHSI].
