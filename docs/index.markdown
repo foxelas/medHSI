@@ -15,7 +15,7 @@ You can clone or download a [.zip](https://github.com/foxelas/medHSI/archive/ref
 
 ### Usage
 
-Check [Project Structure]({{ site.baseurl }}{% link _pages/structure.md %}).
+Check the [documentation]({{ site.baseurl }}{% link _documentation/index.html %}) for MATLAB 
 
 ### Contact
 

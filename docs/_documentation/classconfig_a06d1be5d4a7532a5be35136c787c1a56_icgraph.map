@@ -1,0 +1,4 @@
+<map id="GetSetting" name="GetSetting">
+<area shape="rect" id="node1" title="GetSetting gets a setting value from the config structure." alt="" coords="208,13,289,39"/>
+<area shape="rect" id="node2" href="$classdatabase_utility.html#a1944d606f84b05f3b11c287b729de53e" title="GetFileConditions returns file conditions according to the input arguments." alt="" coords="5,5,160,47"/>
+</map>
