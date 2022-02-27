@@ -39,8 +39,8 @@ show_excerpts: false # set to true to show excerpts on the homepage
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
 header_pages:
-  - _documentation/index
-  - _documentation/index.html
+  - documentation/index
+  - documentation/index.html
   - _pages/about.md
 
 # Build settings
