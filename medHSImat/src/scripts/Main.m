@@ -1,55 +1,71 @@
-clc;
-
-% %%%%%%%%%%%%%%%%%%%%% Initialization %%%%%%%%%%%%%%%%%%%%%
-% config.SetOpt();
-%
-% config.SetSetting('normalization', 'byPixel');
-% % config.SetSetting('dataDate', 20210706);
-% % config.SetSetting('integrationTime', 618);
-% config.SetSetting('cropBorders', true);
-%
-% % Pending fix db
-% %%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
-% config.SetSetting('isTest', true);
-% config.SetSetting('database', 'calib');
-% config.SetSetting('dataDir', 'D:\elena\mspi\2_saitamaHSI\calib\');
-% config.SetSetting('outputDir', fullfile(config.GetSetting('outputDir'), '001-DataTest'));
-%
-% readForeground = false;
-% hsiUtility.PrepareDataset('handsOnly', {'hand', false}, readForeground);
-
-%%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
-baseDataset = 'pslCore';
-
-config.SetOpt();
-config.SetSetting('isTest', false);
-config.SetSetting('database', 'psl');
-config.SetSetting('dataset', baseDataset);
-config.SetSetting('normalization', 'byPixel');
-
-CheckImportData();
-
-dbSelection = {'tissue', true};
-
-%%%%%%%%%%%%%%%%%%%%% Export RGB %%%%%%%%%%%%%%%%%%%%%
-%Disable normalization check during data reading 
-config.SetSetting('disableNormalizationCheck', true);
-%Do no use mask for unispectrum calculation
-config.SetSetting('useCustomMask', false);
-hsiUtility.PrepareDataset('pslCore', dbSelection);
-
-
-% %%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
-% t20211104_ApplyScriptToEachImage;
-% t20211207_PrepareLabels;
-% t20211207_PrepareSummaryFigures
-% t20211208_TestSVM
-% t20211230_PrintSampleHSI
-% t20220121_Dimred
-% t20220122_Dimred
-% t210910_ReadHands
-
-augDataset = 'pslCoreAugmented';
-trainUtility.Augment(baseDataset, augDataset, 'set1');
+%======================================================================
+%> @mainpage Documentation guidelines
+%>
+%> @section intro Introduction
+%>
+%> The MedHSI package allows you to read and process Hyper-Spectral Images (HSI)
+%> captured with a TopCon Spectroradiometer (.h5 files).
+%>
+%> The framework has been specifically developed for macropathology-related tasks. The methods are tested on hyper-spectral images (in the visible range) of Pigmented Skin Lesions.
+%>
+%> @section Details 
+%> Refer to https://foxelas.github.io/medHSI/.
+%>
+%> @section Installation 
+%> Check the @ref installation page. 
+%>
+%> @section structure Structure
+%> Check pages @b Classes and @b Files.
+%>
+%> @section contact Contact 
+%> If you find any mistakes or bugs, contact me by email at ealoupogianni[ at ]outlook.com.
+%>
+%> @section cite Cite 
+%> Cite as Aloupogianni, E. (2022) ``MedHSI package for Hyperspectral Medical Image Processing'' (Version 1.0) [https://github.com/foxelas/medHSI].
+%>
+%> @page installation Installation
+%>
+%> @section Description 
+%> 
+%> The MedHSI package allows you to read and process Hyper-Spectral Images (HSI)
+%> captured with a TopCon Spectroradiometer (.h5 files).
+%>
+%> This package contains two branches :
+%> - medHSIMat branch for MATLAB 2020
+%>   - Used for data import, preprocessing, normalization, dimension reduction and graphics production
+%> - medHSIpy branch for python 3.8
+%>   - Used classification and segmentation tasks 
+%> 
+%> @section before Before installation
+%> - Download relevant MATLAB dependencies 
+%>    - Check dependencies at https://foxelas.github.io/medHSI/dependencies/
+%>    1. Open MATLAB and navigate to folder ..//medHSI//medHSImat//setup
+%>    2. Install necessary dependencies by runnning
+%> @code
+%> script 'setup_matlab.m'
+%> @endcode 
+%>
+%> @section Installation 
+%> - Download the package from GitHub
+%>		- You can clone or download a @b .zip file at https://github.com/foxelas/medHSI
+%> - (Optional) Run demo
+%>    - Move demo folder outside medHSI folder
+%>    - Add demo folder to matlab path
+%>    - Replace conf/config.ini with setup/demos/config.ini
+%>    - Run 
+%> @code 
+%> script 'demo_init.m'
+%> @endcode
+%> 
+%> @page descr Description
+%>
+%> @section Details 
+%> 
+%> The MedHSIMat folders contains subfolders for different uses.
+%> - @b tools
+%>   - Contains key classes for MedHSI processing.
+%> - @b src
+%>   - Contains user-defined scripts and functions for task customization.
+%> - @b setup
+%>   - Contains setup files and demo scripts
+%======================================================================

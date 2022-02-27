@@ -1,9 +1,40 @@
+% ======================================================================
+%> @brief GetSolaxSpectra reconstructs values for Solax-IO illumination.
+%>
+%> Either read values from file in config::[importDir] or reconstruct it with spline.
+%>
+%> @b Usage
+%>
+%> @code
+%> illum = GetSolaxSpectra();
+%>
+%> illum = GetSolaxSpectra('reconstructed');
+%> @endcode
+%>
+%> @param method [string] | Optional: Recovery method. Default: 'real'.
+%> @param showImage [boolean] | Optional: Flag to show image. Default: false.
+%>
+%> @retval solaxSpec [array] | The solax illumination spectra
+%> @retval wavelengths [array] | The sampling wavelengths
+% ======================================================================
 function [solaxSpec, wavelengths] = GetSolaxSpectra(method, showImage)
-%%GETSOLAXSPECTRA reconstructs values for Solax-IO illumination
+% GetSolaxSpectra reconstructs values for Solax-IO illumination.
 %
-%   Usage:
-%   illum = GetSolaxSpectra();
-%   illum = GetSolaxSpectra('reconstructed');
+% Either read values from file in config::[importDir] or reconstruct it with spline.
+%
+% @b Usage
+%
+% @code
+% illum = GetSolaxSpectra();
+%
+% illum = GetSolaxSpectra('reconstructed');
+% @endcode
+%
+% @param method [string] | Optional: Recovery method. Default: 'real'.
+% @param showImage [boolean] | Optional: Flag to show image. Default: false.
+%
+% @retval solaxSpec [array] | The solax illumination spectra
+% @retval wavelengths [array] | The sampling wavelengths
 
 if nargin < 1
     method = 'real';
@@ -34,7 +65,6 @@ end
 end
 
 function [solaxSpec, x] = ReconstructSolaxIoIlluminationSpectrum(saveDir)
-%saveDir = "D:\temp\Google Drive\titech\research\experiments\output\5. Progress Reports\img";
 
 x = [350, 360, 370, 380, 400, 410, 425, 450, 460, 480, 520, 525, 530, 575, 620, 625, 630, 640, 660, 690, 695, 700, 725, 750, 800]';
 y = [0, 0, 0, 0, 20, 63, 40, 82, 80, 58, 80.5, 79.5, 80, 68, 73, 72, 73, 70, 60, 39.5, 40, 30, 15, 9, 0]';

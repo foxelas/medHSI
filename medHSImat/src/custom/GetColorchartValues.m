@@ -1,16 +1,50 @@
+% ======================================================================
+%> @brief GetColorchartValues fetches expected values for each color patch in the colorchart.
+%>
+%> The values are saved in config::['importDir'].
+%>
+%> @b Usage
+%>
+%> @code
+%> [values, valueNames, additionalValues] = GetColorchartValues();
+%> % returns the expected values for colorchart spectra
+%>   
+%> [values] = GetColorchartValues('colorchartRGB');
+%> returns the expected values for colorchart RGB space
+%>
+%> [values] = GetColorchartValues('colorchartLab');
+%> returns the expected values for colorchart Lab space
+%> @endcode
+%>
+%> @param name [string array] | Optional: Type of required value, choose between {'colorchartSpectra', 'colorchartRGB', 'colorchartLab', 'colorchartOrder'}. Default: 'colorchartSpectra'.
+%>
+%> @retval values [array] | Patch values
+%> @retval valueNames [array] | Patch names
+%> @retval additionalValues [array] | Additional patch values
+% ======================================================================
 function [values, valueNames, additionalValues] = GetColorchartValues(name)
-%GetColorchartValues fetches expected values
+% GetColorchartValues fetches expected values for each color patch in the colorchart.
 %
-%   Usage:
-%   [values, valueNames, additionalValues] = GetColorchartValues() returns
-%   the expected values for colorchart spectra
+% The values are saved in config::['importDir'].
 %
-%   [values] = GetColorchartValues('colorchartRGB') returns the expected
-%   values for colorchart RGB space
+% @b Usage
 %
-%   [values] = GetColorchartValues('colorchartLab') returns the
-%   expected values for colorchart Lab space
+% @code
+% [values, valueNames, additionalValues] = GetColorchartValues();
+% % returns the expected values for colorchart spectra
+%   
+% [values] = GetColorchartValues('colorchartRGB');
+% returns the expected values for colorchart RGB space
 %
+% [values] = GetColorchartValues('colorchartLab');
+% returns the expected values for colorchart Lab space
+% @endcode
+%
+% @param name [string array] | Optional: Type of required value, choose between {'colorchartSpectra', 'colorchartRGB', 'colorchartLab', 'colorchartOrder'}. Default: 'colorchartSpectra'.
+%
+% @retval values [array] | Patch values
+% @retval valueNames [array] | Patch names
+% @retval additionalValues [array] | Additional patch values
 
 if nargin < 1
     name = 'colorchartSpectra';

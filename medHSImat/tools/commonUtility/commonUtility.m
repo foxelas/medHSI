@@ -158,10 +158,12 @@ classdef commonUtility
         %> [datanames, targetIDs] = commonUtility.DatasetInfo();
         %> @endcode
         %>
+        %> @param bySample [boolean] | Optional: Flag about whether only unique sample ids should be recovered. Default: true.
+        %>
         %> @retval datanames [string] | The datanames of saved files
         %> @retval targetIDs [string] | The targetIDs of saved files
         % ======================================================================
-        function [datanames, targetIDs] = DatasetInfo()
+        function [datanames, targetIDs] = DatasetInfo(bySample)
             % DatasetInfo returns datanames and targetIDs in the current dataset.
             %
             % The dataset is fetched from the directory according config::['dataset'].
@@ -172,18 +174,30 @@ classdef commonUtility
             % [datanames, targetIDs] = commonUtility.DatasetInfo();
             % @endcode
             %
+            % @param bySample [boolean] | Optional: Flag about whether only unique sample ids should be recovered. Default: true.
+            % 
             % @retval datanames [string] | The datanames of saved files
             % @retval targetIDs [string] | The targetIDs of saved files
 
+            if nargin < 1 
+                bySample = false;
+            end 
+            
             fdir = dir(strrep(commonUtility.GetFilename('dataset'), '.mat', '\*.mat'));
             if numel(fdir) < 1
                 error('You should first read the dataset. Use hsiUtility.ReadDataset().');
 
             else
                 datanames = {fdir.name};
-                unNames = cellfun(@(x) strsplit(x, {'_', '.'}), datanames', 'un', 0);
-                unNames = cellfun(@(x) x{1}, unNames, 'un', 0);
-                targetIDs = unique(unNames);
+                if bySample
+                    unNames = cellfun(@(x) strsplit(x, {'_', '.'}), datanames', 'un', 0);
+                    unNames = cellfun(@(x) x{1}, unNames, 'un', 0);
+                    targetIDs = unique(unNames);
+                else
+                    unNames = cellfun(@(x) strsplit(x, {'.'}), datanames', 'un', 0);
+                    unNames = cellfun(@(x) x{1}, unNames, 'un', 0);
+                    targetIDs = unique(unNames);
+                end
             end
         end
 

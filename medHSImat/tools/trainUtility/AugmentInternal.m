@@ -53,7 +53,7 @@ fprintf('Starting augmentation for dataset: %s ...\n', baseDataset);
 
 %% Read h5 data
 config.SetSetting('dataset', baseDataset);
-[datanames, targetNames] = commonUtility.DatasetInfo();
+[datanames, targetNames] = commonUtility.DatasetInfo(true);
 
 if length(datanames) ~= length(targetNames)
     disp('Is the target dataset already augmented? You may want to check it.');
@@ -66,30 +66,30 @@ for i = 1:length(targetNames)
     %% load HSI from .mat file to verify it is working and to prepare preview images
     targetName = targetNames{i};
     config.SetSetting('dataset', baseDataset);
-    [spectralData, labelImg] = hsiUtility.LoadHsiAndLabel(targetName);
+    [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
 
     config.SetSetting('dataset', augmentedDataset);
-    if ~isempty(labelImg)
+    if ~isempty(labelInfo)
         switch augType
             case 'set0' % No augmentation
                 folds = 0;
-                AugmentAndSave([], spectralData, labelImg, folds, targetName);
+                TransformAndSave([], spectralData, labelInfo, folds, targetName);
 
             case 'set1' % Vertical and horizontal flip
                 folds = 0;
-                AugmentAndSave([], spectralData, labelImg, folds, targetName);
+                TransformAndSave([], spectralData, labelInfo, folds, targetName);
 
                 folds = folds + 1;
                 transFunc = @(x) flip(x, 1);
-                AugmentAndSave(transFunc, spectralData, labelImg, folds, targetName);
+                TransformAndSave(transFunc, spectralData, labelInfo, folds, targetName);
 
                 folds = folds + 1;
                 transFunc = @(x) flip(x, 2);
-                AugmentAndSave(transFunc, spectralData, labelImg, folds, targetName);
+                TransformAndSave(transFunc, spectralData, labelInfo, folds, targetName);
 
                 folds = folds + 1;
                 transFunc = @(x) flip(flip(x, 2), 1);
-                AugmentAndSave(transFunc, spectralData, labelImg, folds, targetName);
+                TransformAndSave(transFunc, spectralData, labelInfo, folds, targetName);
 
             case 'set2' % 360 degree random rotation
 
@@ -101,7 +101,7 @@ for i = 1:length(targetNames)
                         img0 = imrotate3(img0, 180, [j, k, 0]);
 
                         %% rotate labels
-                        labelImg = imrotate(img, 180);
+                        labelInfo = imrotate(img, 180);
 
                     end
                 end
@@ -120,24 +120,53 @@ fprintf('The augmented dataset is saved in folder %s \n', commonUtility.GetFilen
 disp('Finished augmenting.');
 end
 
-
-function [] = AugmentAndSave(transFun, spectralData, labelImg, folds, targetName)
+% ======================================================================
+%> @brief TransformAndSave transforms and saves a sample.
+%>
+%> @b Usage
+%>
+%> @code
+%> folds = folds + 1;
+%> transFunc = @(x) flip(x, 1);
+%> TransformAndSave(transFunc, spectralData, labelInfo, folds, targetName);
+%> @endcode
+%>
+%> @param transFunc [function handle] | The transformation function
+%> @param spectralData [hsi] | An instance of the hsi class
+%> @param labelInfo [hsiInfom] | An instance of the hsiInfo class 
+%> @param folds [int] | The current augmentation fold 
+%> @param targetName [str] | The target name
+%>
+% ======================================================================
+function [] = TransformAndSave(transFun, spectralData, labelInfo, folds, targetName)
+% TransformAndSave transforms and saves a sample.
+%
+% @b Usage
+%
+% @code
+% folds = folds + 1;
+% transFunc = @(x) flip(x, 1);
+% TransformAndSave(transFunc, spectralData, labelInfo, folds, targetName);
+% @endcode
+%
+% @param transFunc [function handle] | The transformation function
+% @param spectralData [hsi] | An instance of the hsi class
+% @param labelInfo [hsiInfom] | An instance of the hsiInfo class 
+% @param folds [int] | The current augmentation fold 
+% @param targetName [str] | The target name
 
 if ~isempty(transFun)
-    data = spectralData;
-    data.Value = transFun(spectralData.Value);
-    data.FgMask = transFun(spectralData.FgMask);
-    label = transFun(labelImg);
-else
-    data = spectralData;
-    label = labelImg;
+    spectralData.Value = transFun(spectralData.Value);
+    spectralData.FgMask = transFun(spectralData.FgMask);
+    labelInfo.Labels = transFun(labelInfo.Labels);
 end
 filename = commonUtility.GetFilename('dataset', strcat(targetName, '_', num2str(folds)));
-save(filename, 'data', 'label');
+save(filename, 'spectralData', 'labelInfo', '-v7.3');
 fprintf('Saved new data sample at: %s \n', filename);
+
 outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'preprocessed'), '');
 filename = config.DirMake(outputDir, strcat(targetName, '_', num2str(folds), '.jpg'));
-dispImageRgb = data.GetDisplayRescaledImage('rgb');
+dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 imwrite(dispImageRgb, filename, 'jpg');
 fprintf('Saved image preview at: %s \n', filename);
 
