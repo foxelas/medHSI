@@ -41,6 +41,8 @@ show_excerpts: false # set to true to show excerpts on the homepage
 header_pages:
   - _pages/about.md
   - documentation/index.html
+  - documentation/index
+  - documentation
 
 # Build settings
 theme: minima
