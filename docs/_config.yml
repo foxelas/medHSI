@@ -40,7 +40,9 @@ show_excerpts: false # set to true to show excerpts on the homepage
 # this and add the path to the pages in order as they should show up
 header_pages:
   - _pages/about.md
-  - _pages/about.md
+  - /documentation/index.html
+  - documentation/index.html
+  
 
 
 # Build settings
@@ -50,6 +52,7 @@ plugins:
   - jekyll-seo-tag
 
 include:
+  - documentation
   - _pages
 # Exclude from processing.
 # The following items will not be processed, by default.
