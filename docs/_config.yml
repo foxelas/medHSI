@@ -26,8 +26,8 @@ title: MedHSI
 author: foxelas
 
 description: > # this means to ignore newlines until "twitter_username:"
-  Quick description on how to use this repo
-  to process hyperspectral images in pathology
+  A repo to process 
+  hyperspectral images in pathology
 # Note keeping
 # social links
 twitter_username: foxelas
@@ -39,8 +39,8 @@ show_excerpts: false # set to true to show excerpts on the homepage
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
 header_pages:
-  - documentation/index.html
   - _pages/about.md
+  - documentation/index.html
 
 # Build settings
 theme: minima
