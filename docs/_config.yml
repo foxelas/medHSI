@@ -40,11 +40,8 @@ show_excerpts: false # set to true to show excerpts on the homepage
 # this and add the path to the pages in order as they should show up
 header_pages:
   - _pages/about.md
-  - documentation/segment_8m.html
-  - documentation/
-  - documentation
-  - documentation/index.html
-  - documentation/index
+  - _pages/index.html
+
 
 # Build settings
 theme: minima
