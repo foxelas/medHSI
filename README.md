@@ -1,6 +1,6 @@
 ## An organized set of functions for Hyperspectral Images
 
-Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology related tasks (Obi laboratory, Tokyo Institute of Technology in collaboration with Kobayashi laboratory, Saitama Medical University)
+Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology related tasks (Obi laboratory, Tokyo Institute of Technology in collaboration with Kobayashi laboratory, Saitama Medical University). Find out more at [foxelas.github.io/medHSI/](https://foxelas.github.io/medHSI/).
 
 ### Collaborators
 
