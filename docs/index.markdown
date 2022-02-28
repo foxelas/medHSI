@@ -10,7 +10,7 @@ Hyper-Spectral Image (HSI) Processing for medical images, specifically for macro
 The methods are tested on hyper-spectral images (in the visible range) of Pigmented Skin Lesions.
 
 <figure>
-	<img src="assets/images/example_hsi.jpg" width="400" />
+	<img src="assets/images/example_hsi.jpg"  alt="Example of Hyperspectral image" class="center" width="400" />
   <figcaption>Example of the hyperspectral subimages of sample skin tissue.</figcaption>
 </figure>
 
