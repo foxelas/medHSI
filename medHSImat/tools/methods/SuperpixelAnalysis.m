@@ -99,7 +99,7 @@ plots.Superpixels(2, srgb, labels, '', 'color', fgMask);
 config.SetSetting('plotName', fullfile(savedir, 'pc'));
 plots.Components(scores, pcNum, 3);
 
-if ~config.GetSetting('saveImages')
+if config.GetSetting('showFigures')
     pause(0.5);
 
     %% Plot eigenvectors

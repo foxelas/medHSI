@@ -1,14 +1,14 @@
-% clc;
-% %%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
-% baseDataset = 'pslCore';
-% 
-% config.SetOpt();
-% config.SetSetting('isTest', false);
-% config.SetSetting('database', 'psl');
-% config.SetSetting('dataset', baseDataset);
-% config.SetSetting('normalization', 'byPixel');
+clc;
+%%%%%%%%%%%%%%%%%%%%% PSL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
+baseDataset = 'pslCore';
+
+config.SetOpt();
+config.SetSetting('isTest', false);
+config.SetSetting('database', 'psl');
+config.SetSetting('dataset', baseDataset);
+config.SetSetting('normalization', 'byPixel');
 % 
 % CheckImportData();
 % 
@@ -21,19 +21,20 @@
 % config.SetSetting('useCustomMask', false);
 % hsiUtility.PrepareDataset('pslCore', dbSelection);
 % 
-%%%%%%%%%%%%%%%%%%%%% Augment Dataset %%%%%%%%%%%%%%%%%%%%%
-augDataset = 'pslCoreAugmented';
-trainUtility.Augment(baseDataset, augDataset, 'set1');
+% %%%%%%%%%%%%%%%%%%%%% Augment Dataset %%%%%%%%%%%%%%%%%%%%%
+% augDataset = 'pslCoreAugmented';
+% trainUtility.Augment(baseDataset, augDataset, 'set1');
 % 
 % %%%%%%%%%%%%%%%%%%%%% Export Dataset %%%%%%%%%%%%%%%%%%%%%
 % config.SetSetting('dataset', baseDataset);
 % hsiUtility.ExportH5Dataset();
-
-config.SetSetting('dataset', augDataset);
-hsiUtility.ExportH5Dataset();
+% 
+% config.SetSetting('dataset', augDataset);
+% hsiUtility.ExportH5Dataset();
 
 % %%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
-% t20211104_ApplyScriptToEachImage;
+Basics_Kmeans;
+
 % t20211207_PrepareLabels;
 % t20211207_PrepareSummaryFigures
 % t20211208_TestSVM
