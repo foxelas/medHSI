@@ -9,8 +9,10 @@ title: An organized processing framework for Hyper-Spectral Images in Medicine
 Hyper-Spectral Image (HSI) Processing for medical images, specifically for macropathology-related tasks.
 The methods are tested on hyper-spectral images (in the visible range) of Pigmented Skin Lesions.
 
-Example of the hyperspectral subimages of sample skin tissue.
-<img src="assets/images/example_hsi.jpg" width="400" />
+<figure>
+	<img src="assets/images/example_hsi.jpg" width="400" />
+  <figcaption>Example of the hyperspectral subimages of sample skin tissue.</figcaption>
+</figure>
 
 ### Download
 
