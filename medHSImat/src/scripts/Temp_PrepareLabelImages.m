@@ -1,3 +1,4 @@
+function Temp_PrepareLabelImages()
 %% PENDING FIX 
 dirpath = fullfile(config.GetSetting('outputDir'), 'labels-manual');
 dirList = dir(fullfile(dirpath, '*.jpg'));
@@ -50,4 +51,6 @@ for i = 1:numel(dirList)
 
     config.SetSetting('plotName', fullfile(applieddir, dirList(i).name));
     SavePlot(3);
+end
+
 end

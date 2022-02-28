@@ -257,11 +257,13 @@ classdef plots
         %======================================================================
         %> @brief AverageSpectrum plots average spectra using a promt for custom mask selection.
         %>
+        %> Need to set config::'saveFolder' for saving purposes.
         %> For more details check @c function PlotAverageSpectrum .
         %>
         %> @b Usage
         %>
         %> @code
+        %> config.SetSetting('saveFolder', 'Spectra-Example');
         %> plots.AverageSpectrum(fig, hsIm, figTitle);
         %> @endcode
         %>
@@ -272,11 +274,13 @@ classdef plots
         function [] = AverageSpectrum(fig, varargin)
             % AverageSpectrum plots average spectra using a promt for custom mask selection.
             %
+            % Need to set config::'saveFolder' for saving purposes.
             % For more details check @c function PlotAverageSpectrum .
             %
             % @b Usage
             %
             % @code
+            % config.SetSetting('saveFolder', 'Spectra-Example');
             % plots.AverageSpectrum(fig, hsIm, figTitle);
             % @endcode
             %

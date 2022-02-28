@@ -1,9 +1,12 @@
 %======================================================================
 %> @brief PlotAverageSpectrum plots average spectra using a promt for custom mask selection.
 %>
+%> Need to set config::'saveFolder' for saving purposes.
+%>
 %> @b Usage
 %>
 %> @code
+%> config.SetSetting('saveFolder', 'Spectra-Example');
 %> plots.AverageSpectrum(fig, hsIm, figTitle);
 %> @endcode
 %>
@@ -14,9 +17,12 @@
 function PlotAverageSpectrum(hsIm, figTitle, fig)
 % PlotAverageSpectrum plots average spectra using a promt for custom mask selection.
 %
+% Need to set config::'saveFolder' for saving purposes.
+%
 % @b Usage
 %
 % @code
+% config.SetSetting('saveFolder', 'Spectra-Example');
 % plots.AverageSpectrum(fig, hsIm, figTitle);
 % @endcode
 %
@@ -55,7 +61,7 @@ subplot(1, 3, 3);
 imshow(rgb);
 title(figTitle);
 
-baseFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('spectraCheck'), config.GetSetting('fileName')), '');
+baseFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
 
 config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
 plots.SavePlot(fig);
