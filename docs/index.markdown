@@ -20,7 +20,7 @@ You can clone or download a [.zip](https://github.com/foxelas/medHSI/archive/ref
 
 ### Usage
 
-Check the [documentation](https://foxelas.github.io/medHSIdocs/) for MATLAB.
+Check the [documentation]({{ site.baseurl }}{% link documentation/index.html %}) for MATLAB 
 
 ### Contact
 
