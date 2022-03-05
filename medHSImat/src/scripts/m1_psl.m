@@ -34,6 +34,9 @@ config.SetSetting('normalization', 'byPixel');
 
 % %%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%
 Basics_Kmeans;
+Basics_SuperPCA;
+Basics_PrintSampleHSI;
+Basics_SummaryFigs;
 
 % t20211207_PrepareLabels;
 % t20211207_PrepareSummaryFigures

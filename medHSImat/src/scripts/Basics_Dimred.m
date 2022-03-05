@@ -1,28 +1,29 @@
-%Date: 2022-01-21
+function Basics_Dimred()
+
 clc;
 close all;
 
 rng(1); % For reproducibility
-numSamples = 6;
-testingSample = 5;
+% numSamples = 6;
+% testingSample = 5;
+% target = 'fix';
 
-config.SetOpt();
-config.SetSetting('isTest', false);
-config.SetSetting('database', 'psl');
-config.SetSetting('normalization', 'byPixel');
-config.SetSetting('experiment', 'T20220122-Dimred');
+experiment = strcat('Dimred', date());
+config.SetSetting('experiment', experiment);
+config.SetSetting('saveFolder', experiment);
 
+fprintf('Running for dataset %s\n', config.GetSetting('dataset'));
 %%%%%%%%%%%%%%%%%%%%%% Fix %%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Read h5 data
 folds = 5;
-testingSamples = [5];
-numSamples = 6;
 content = {'tissue', true};
-target = 'fix';
-useCustomMask = true;
-[cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = trainUtility.PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask);
-filename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'cvpInfo.mat');
+testTargets = {'166'};
+dataType = 'pixel';
+hasLabels = true;
+
+[X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
+filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'cvpInfo'));
 save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
 
 %%%%%%%%%%%%%%%%%%%%%% Train Validate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -134,6 +135,8 @@ for q = qs
     [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X(:, 1:q), y, Xtest(:, 1:q), ytest, sRGBs, fgMasks, cvp, 'SuperPCA', q);
 end
 
+end
+
 %%%%%%%%%%%%%%%%%%%%% Assisting Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [acc] = critfun(scores, labels)
 SVMModel = fitcsvm(scores, labels, 'Standardize', true, 'KernelFunction', 'RBF', ...
@@ -145,3 +148,4 @@ end
 function [scores] = transformSPCAFun(x)
 scores = x.Transform('SuperPCA', 100);
 end
+

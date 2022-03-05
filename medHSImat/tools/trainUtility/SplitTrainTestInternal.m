@@ -83,7 +83,7 @@ useTransform = ~(nargin < 6);
 
 %% Read h5 data
 config.SetSetting('dataset', dataset);
-[datanames, targetIDs] = commonUtility.DatasetInfo();
+[~, targetIDs] = commonUtility.DatasetInfo();
 
 X = [];
 y = [];
@@ -98,26 +98,24 @@ else
 end
 
 k = 0;
-numData = 0;
 for i = 1:length(targetIDs)
 
     baseTargetName = targetIDs{i};
-    targetNames = datanames(contains(datanames, baseTargetName));
+    targetNames = targetIDs(contains(targetIDs, baseTargetName));
 
     for j = 1:numel(targetNames)
         targetName = targetNames{j};
 
         %% load HSI from .mat file
-        [I, label] = hsiUtility.LoadHSIAndLabel(targetName, 'dataset');
+        [I, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
 
         fgMask = I.FgMask;
-        if ~isempty(label) %% TOREMOVE
-            numData = numData + 1;
+        if ~isempty(labelInfo) %% TOREMOVE
 
             if strcmp(dataType, 'image')
                 xdata = I.Value;
                 if hasLabels
-                    ydata = label;
+                    ydata = double(labelInfo.Labels);
                 else
                     ydata = [];
                 end
@@ -131,7 +129,7 @@ for i = 1:length(targetIDs)
                 end
                 xdata = Xcol;
                 if hasLabels
-                    ydata = GetMaskedPixelsInternal(label, fgMask);
+                    ydata = double(GetMaskedPixelsInternal(labelInfo.Labels, fgMask));
                 else
                     ydata = [];
                 end
@@ -169,8 +167,21 @@ for i = 1:length(targetIDs)
     end
 end
 
+if strcmp(dataType, 'image')
+    numData = numel(X);
+else
+    numData = size(X,1);
+end
 if numData >= folds
     cvp = trainUtility.KfoldPartitions(numData, folds);
 end
+
+%TO REMOVE
+factors = 10;
+kk = floor(decimate(1:size(X,1), factors));
+X = X(kk, :);
+y = y(kk, :);
+numData = size(X,1);
+cvp = trainUtility.KfoldPartitions(numData, folds);
 
 end
