@@ -176,12 +176,12 @@ if numData >= folds
     cvp = trainUtility.KfoldPartitions(numData, folds);
 end
 
-%TO REMOVE
-factors = 10;
-kk = floor(decimate(1:size(X,1), factors));
-X = X(kk, :);
-y = y(kk, :);
-numData = size(X,1);
-cvp = trainUtility.KfoldPartitions(numData, folds);
+% %TO REMOVE
+% factors = 2;
+% kk = floor(decimate(1:size(X,1), factors));
+% X = X(kk, :);
+% y = y(kk, :);
+% numData = size(X,1);
+% cvp = trainUtility.KfoldPartitions(numData, folds);
 
 end

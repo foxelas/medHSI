@@ -91,42 +91,42 @@ for q = qs
     [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'rfi', q);
 end
 
-%%%%%%%%%%%%%%%%%%%%% SFS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-fprintf('SFS: \n\n');
-
-for q = qs
-    fprintf('SFS: %d \n\n', q);
-
-    tic;
-    maxdev = chi2inv(.95, 1);
-    opt = statset('display', 'iter', ...
-        'TolFun', maxdev, ...
-        'TolTypeFun', 'abs');
-
-    inmodel = sequentialfs(@critfun, X, y, ...
-        'cv', 'none', ...
-        'nullmodel', true, ...
-        'options', opt, ...
-        'direction', 'forward', ...
-        'KeepIn', 1, ...
-        'NFeatures', q);
-    tt = toc;
-    fprintf('Runtime %.5f \n\n', tt);
-
-    imo = inmodel(1:q);
-    scoresrf = X(:, imo);
-    [accuracy, sensitivity, specificity] = RunKfoldValidation(scoresrf, y, cvp, 'rfi', q);
-end
+% %%%%%%%%%%%%%%%%%%%%% SFS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% fprintf('SFS: \n\n');
+% 
+% for q = qs
+%     fprintf('SFS: %d \n\n', q);
+% 
+%     tic;
+%     maxdev = chi2inv(.95, 1);
+%     opt = statset('display', 'iter', ...
+%         'TolFun', maxdev, ...
+%         'TolTypeFun', 'abs');
+% 
+%     inmodel = sequentialfs(@critfun, X, y, ...
+%         'cv', 'none', ...
+%         'nullmodel', true, ...
+%         'options', opt, ...
+%         'direction', 'forward', ...
+%         'KeepIn', 1, ...
+%         'NFeatures', q);
+%     tt = toc;
+%     fprintf('Runtime %.5f \n\n', tt);
+% 
+%     imo = inmodel(1:q);
+%     scoresrf = X(:, imo);
+%     [accuracy, sensitivity, specificity] = RunKfoldValidation(scoresrf, y, cvp, 'rfi', q);
+% end
 
 
 %%%%%%%%%%%%%%%%%%%%% Super PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic;
-[cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = trainUtility.PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, false, @transformSPCAFun);
+[X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds, @transformSPCAFun);
 tdimred = toc;
 fprintf('Runtime %.5f \n\n', tdimred);
 
-filename = fullfile(config.GetSetting('output'), config.GetSetting('experiment'), 'superPCA_cvpInfo.mat');
+filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'superPCA_cvpInfo'));
 save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
 
 for q = qs
