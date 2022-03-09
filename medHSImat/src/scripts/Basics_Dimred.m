@@ -4,10 +4,8 @@ clc;
 close all;
 
 rng(1); % For reproducibility
-% numSamples = 6;
-% testingSample = 5;
-% target = 'fix';
 
+config.SetSetting('dataset', 'pslTest'); 
 experiment = strcat('Dimred', date());
 config.SetSetting('experiment', experiment);
 config.SetSetting('saveFolder', experiment);
@@ -17,7 +15,6 @@ fprintf('Running for dataset %s\n', config.GetSetting('dataset'));
 
 %% Read h5 data
 folds = 5;
-content = {'tissue', true};
 testTargets = {'166'};
 dataType = 'pixel';
 hasLabels = true;
