@@ -1,5 +1,6 @@
 function Temp_PrepareLabelImages()
-%% PENDING FIX 
+
+%% PENDING FIX
 dirpath = fullfile(config.GetSetting('outputDir'), 'labels-manual');
 dirList = dir(fullfile(dirpath, '*.jpg'));
 
@@ -11,11 +12,11 @@ applieddir = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('l
 
 for i = 1:numel(dirList)
 
-	%% PENDING FIX 
+    %% PENDING FIX
     parts = strsplit(dirList(i).name, '_');
     sampleId = parts{1};
     id = targetIDs(strcmp([outRows.SampleID], sampleId));
-	
+
     targetName = num2str(id);
 
     hsIm = hsiUtility.LoadHSI(targetName, 'dataset');

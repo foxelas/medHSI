@@ -8,7 +8,7 @@
 %> @code
 %> [values, valueNames, additionalValues] = GetColorchartValues();
 %> % returns the expected values for colorchart spectra
-%>   
+%>
 %> [values] = GetColorchartValues('colorchartRGB');
 %> returns the expected values for colorchart RGB space
 %>
@@ -32,7 +32,7 @@ function [values, valueNames, additionalValues] = GetColorchartValues(name)
 % @code
 % [values, valueNames, additionalValues] = GetColorchartValues();
 % % returns the expected values for colorchart spectra
-%   
+%
 % [values] = GetColorchartValues('colorchartRGB');
 % returns the expected values for colorchart RGB space
 %

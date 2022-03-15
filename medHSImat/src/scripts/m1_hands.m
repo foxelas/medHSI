@@ -15,4 +15,3 @@ config.SetSetting('outputDir', fullfile(config.GetSetting('outputDir'), '001-Dat
 
 readForeground = false;
 hsiUtility.PrepareDataset('handsOnly', {'hand', false}, readForeground);
-

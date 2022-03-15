@@ -5,7 +5,7 @@ close all;
 
 rng(1); % For reproducibility
 
-config.SetSetting('dataset', 'pslTest'); 
+config.SetSetting('dataset', 'pslTest');
 experiment = strcat('Dimred', date());
 config.SetSetting('experiment', experiment);
 config.SetSetting('saveFolder', experiment);
@@ -89,18 +89,18 @@ for q = qs
 end
 
 % %%%%%%%%%%%%%%%%%%%%% SFS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
+%
 % fprintf('SFS: \n\n');
-% 
+%
 % for q = qs
 %     fprintf('SFS: %d \n\n', q);
-% 
+%
 %     tic;
 %     maxdev = chi2inv(.95, 1);
 %     opt = statset('display', 'iter', ...
 %         'TolFun', maxdev, ...
 %         'TolTypeFun', 'abs');
-% 
+%
 %     inmodel = sequentialfs(@critfun, X, y, ...
 %         'cv', 'none', ...
 %         'nullmodel', true, ...
@@ -110,7 +110,7 @@ end
 %         'NFeatures', q);
 %     tt = toc;
 %     fprintf('Runtime %.5f \n\n', tt);
-% 
+%
 %     imo = inmodel(1:q);
 %     scoresrf = X(:, imo);
 %     [accuracy, sensitivity, specificity] = RunKfoldValidation(scoresrf, y, cvp, 'rfi', q);
@@ -145,4 +145,3 @@ end
 function [scores] = transformSPCAFun(x)
 scores = x.Transform('SuperPCA', 100);
 end
-

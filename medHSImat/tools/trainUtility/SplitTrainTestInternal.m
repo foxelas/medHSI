@@ -119,7 +119,7 @@ for i = 1:length(targetIDs)
                 else
                     ydata = [];
                 end
-                
+
             elseif strcmp(dataType, 'hsi')
                 xdata = I;
                 if hasLabels
@@ -127,7 +127,7 @@ for i = 1:length(targetIDs)
                 else
                     ydata = [];
                 end
-                
+
             elseif strcmp(dataType, 'pixel')
                 if useTransform
                     scores = transformFun(I);
@@ -160,7 +160,7 @@ for i = 1:length(targetIDs)
 
                 if strcmp(dataType, 'image') || strcmp(dataType, 'hsi')
                     jj = numel(Xtest) + 1;
-                    Xtest{j} = xdata;s
+                    Xtest{j} = xdata; s
                     ytest{j} = ydata;
                 else
                     Xtest = [Xtest; xdata];
@@ -180,11 +180,11 @@ end
 if strcmp(dataType, 'image')
     numData = numel(X);
 else
-    numData = size(X,1);
+    numData = size(X, 1);
 end
 if numData >= folds
     cvp = trainUtility.KfoldPartitions(numData, folds);
-else 
+else
     cvp = [];
 end
 

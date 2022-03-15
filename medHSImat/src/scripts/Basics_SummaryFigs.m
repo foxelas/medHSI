@@ -1,6 +1,6 @@
 function Basics_SummaryFigs()
 
-baseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('dataset') );
+baseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('dataset'));
 
 % Remove last two images from Montage Folder Contents
 plots.MontageFolderContents(1, fullfile(baseDir, config.GetSetting('labelsAppliedFolderName'), '\'), [], 'Labels');

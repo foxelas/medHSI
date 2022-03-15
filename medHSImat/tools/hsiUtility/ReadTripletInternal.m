@@ -5,7 +5,7 @@
 %> (if exist) images are read one-by-one for the same target. Each HSI is
 %> saved in config::[matDir]\\[database]\\[tripletsName]\\*_xxx.mat, where
 %> xxx is either '_target', '_white' or '_black'.
-%> 
+%>
 %> To chose a mask for uni spectrum normalization, set config::['useCustomMask']
 %>
 %> @b Usage
@@ -101,7 +101,7 @@ if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
         if config.GetSetting('useCustomMask')
             uniMask = GetCustomMaskInternal(white);
         else
-            uniMask = ones(size(white,1), size(white,2));
+            uniMask = ones(size(white, 1), size(white, 2));
         end
         uniSpectrum = GetMaskedPixelsInternal(white, uniMask);
         config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(config.GetSetting('integrationTime')))));

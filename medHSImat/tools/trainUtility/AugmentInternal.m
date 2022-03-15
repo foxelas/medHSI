@@ -133,8 +133,8 @@ end
 %>
 %> @param transFunc [function handle] | The transformation function
 %> @param spectralData [hsi] | An instance of the hsi class
-%> @param labelInfo [hsiInfom] | An instance of the hsiInfo class 
-%> @param folds [int] | The current augmentation fold 
+%> @param labelInfo [hsiInfom] | An instance of the hsiInfo class
+%> @param folds [int] | The current augmentation fold
 %> @param targetName [str] | The target name
 %>
 % ======================================================================
@@ -151,8 +151,8 @@ function [] = TransformAndSave(transFun, spectralData, labelInfo, folds, targetN
 %
 % @param transFunc [function handle] | The transformation function
 % @param spectralData [hsi] | An instance of the hsi class
-% @param labelInfo [hsiInfom] | An instance of the hsiInfo class 
-% @param folds [int] | The current augmentation fold 
+% @param labelInfo [hsiInfom] | An instance of the hsiInfo class
+% @param folds [int] | The current augmentation fold
 % @param targetName [str] | The target name
 
 if ~isempty(transFun)

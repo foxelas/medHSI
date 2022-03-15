@@ -8,7 +8,7 @@ config.SetSetting('saveFolder', 'Spectra-Example');
 for j = 1:4
     targetName = num2str(sampleIds(j));
     config.SetSetting('fileName', targetName);
-    [Inorm, labelInfo]= hsiUtility.LoadHsiAndLabel(targetName);
+    [Inorm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
     plots.AverageSpectrum(1, Inorm, labelInfo.Diagnosis);
 end
 

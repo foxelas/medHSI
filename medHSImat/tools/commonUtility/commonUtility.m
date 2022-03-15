@@ -175,14 +175,14 @@ classdef commonUtility
             % @endcode
             %
             % @param bySample [boolean] | Optional: Flag about whether only unique sample ids should be recovered. Default: true.
-            % 
+            %
             % @retval datanames [string] | The datanames of saved files
             % @retval targetIDs [string] | The targetIDs of saved files
 
-            if nargin < 1 
+            if nargin < 1
                 bySample = false;
-            end 
-            
+            end
+
             fdir = dir(strrep(commonUtility.GetFilename('dataset'), '.mat', '\*.mat'));
             if numel(fdir) < 1
                 error('You should first read the dataset. Use hsiUtility.ReadDataset().');
@@ -357,9 +357,8 @@ classdef commonUtility
             sensitivity = cmat(2, 2) / (cmat(2, 1) + cmat(2, 2));
             specificity = cmat(1, 1) / (cmat(1, 1) + cmat(1, 2));
         end
-        
-        
-        
+
+
         % ======================================================================
         %> @brief Sam returns the Spectral Angle Mapper value
         %>
@@ -393,15 +392,15 @@ classdef commonUtility
             % @param reference [vector] | The vector of the reference curve
             %
             % @retval simVal [numeric] | The coefficient value
-            if size(target,1) == size(reference, 1)
+            if size(target, 1) == size(reference, 1)
                 simVal = sam(target, reference);
-            elseif size(target,1) == size(reference, 2) ||  size(target,2) == size(reference, 1) 
+            elseif size(target, 1) == size(reference, 2) || size(target, 2) == size(reference, 1)
                 simVal = sam(target, reference');
             else
                 error('Incorrect dimensions between spectral curves.');
             end
         end
-        
-        
+
+
     end
 end
