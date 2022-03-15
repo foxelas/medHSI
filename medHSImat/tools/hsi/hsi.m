@@ -1070,9 +1070,9 @@ classdef hsi
         %> @b Usage
         %>
         %> @code
-        %> [recHsi] = hsi.RecoverOriginalDimensionsInternal(redIm, origSize, mask);
+        %> [recHsi] = hsi.RecoverSpatialDimensions(redIm, origSize, mask);
         %>
-        %> [recHsi] = hsi.RecoverOriginalDimensionsInternal(scores, imgSizes, masks);
+        %> [recHsi] = hsi.RecoverSpatialDimensions(scores, imgSizes, masks);
         %> @endcode
         %>
         %> @param obj [hsi] | An hsi instance
@@ -1091,9 +1091,9 @@ classdef hsi
             % @b Usage
             %
             % @code
-            % [recHsi] = hsi.RecoverOriginalDimensionsInternal(redIm, origSize, mask);
+            % [recHsi] = hsi.RecoverSpatialDimensions(redIm, origSize, mask);
             %
-            % [recHsi] = hsi.RecoverOriginalDimensionsInternal(scores, imgSizes, masks);
+            % [recHsi] = hsi.RecoverSpatialDimensions(scores, imgSizes, masks);
             % @endcode
             %
             % @param obj [hsi] | An hsi instance
@@ -1104,6 +1104,54 @@ classdef hsi
             [recHsi] = RecoverOriginalDimensionsInternal(varargin{:});
         end
 
+        %======================================================================
+        %> @brief SAMscore returns SAM scores for a target hsi image.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
+        %> @endcode
+        %>
+        %> @param obj [hsi] | An hsi instance
+        %>
+        %> @retval scoreImg [array] | The minimum SAM score
+        %> @retval labelImg [array] | The labels of minimum SAM score
+        %> @retval argminImg [array] | The argmin of minimum SAM score
+        %======================================================================
+        function [scoreImg, labelImg, argminImg] = SAMscore(obj)
+        % SAMscore returns SAM scores for a target hsi image.
+        %
+        % @b Usage
+        %
+        % @code
+        % [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
+        % @endcode
+        %
+        % @param obj [hsi] | An hsi instance
+        %
+        % @retval scoreImg [array] | The minimum SAM score
+        % @retval labelImg [array] | The labels of minimum SAM score
+        % @retval argminImg [array] | The argmin of minimum SAM score
+            refLib = hsiUtility.GetReferenceLibrary();
+            xCol = obj.GetMaskedPixels();
+            pixelN = size(xCol,1);
+
+            samVals = zeros(numel(refLib), pixelN);
+            for jj = 1:numel(refLib)
+                 samVals(jj, :) = sam(permute(xCol, [3, 1, 2]), refLib(jj).Data);
+            end
+            [scoreImg, argminImg] = min(samVals, [], 1);
+            labelImg = arrayfun(@(x) refLib(x).Label, argminImg);
+            
+            scoreImg = hsi.RecoverSpatialDimensions(scoreImg', size(obj.FgMask), obj.FgMask);
+            labelImg = hsi.RecoverSpatialDimensions(labelImg', size(obj.FgMask), obj.FgMask);
+            argminImg = hsi.RecoverSpatialDimensions(argminImg', size(obj.FgMask), obj.FgMask);
+            
+            labelImg = uint8(labelImg);
+            argminImg = uint8(argminImg);
+        end
+        
         %======================================================================
         %> @brief IsHsi checks if a variable is of an hsi instance
         %>

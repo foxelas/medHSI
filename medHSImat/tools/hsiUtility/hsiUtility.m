@@ -531,6 +531,7 @@ classdef hsiUtility
             % Benign (0)) and 'Diagnosis'.
             %
             refLib = struct('Data', [], 'Label', [], 'Diagnosis', []);
+            vals = { [ 220, 92, 104, 81]; [167, 70, 194, 145]};
             k = 0;
             for i = 1:length(refIDs)
                 targetName = num2str(refIDs{i});
@@ -541,24 +542,48 @@ classdef hsiUtility
                 labelImg = labelInfo.Labels;
                 diagnosis = labelInfo.Diagnosis;
 
+%                 figure(1); 
+%                 imshow(hsiIm.GetDisplayImage());
+%                 b = vals{i};                 
+%                 malLabel = zeros(size(hsiIm.FgMask));
+%                 malLabel(b(1)-3:b(1)+3, b(2)-3:b(2)+3) = 1; 
+%                 malLabel = hsiIm.FgMask & malLabel;
                 malLabel = hsiIm.FgMask & labelImg;
                 malData = mean(hsiIm.GetMaskedPixels(malLabel));
                 k = k + 1;
                 refLib(k).Data = malData;
                 refLib(k).Label = 1;
                 refLib(k).Diagnosis = diagnosis;
-
+                
+                config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask',num2str(k)) ), 'jpg'));
+                title('Cyan areas are is considered');
+                plots.Overlay(1, hsiIm.GetDisplayImage(), malLabel);
+ 
+%                 benLabel = zeros(size(hsiIm.FgMask));
+%                 benLabel(b(3)-3:b(3)+3, b(4)-3:b(4)+3) = 1;
+%                 benLabel = hsiIm.FgMask & benLabel;
                 benLabel = hsiIm.FgMask & ~labelImg;
                 benData = mean(hsiIm.GetMaskedPixels(benLabel));
                 k = k + 1;
                 refLib(k).Data = benData;
                 refLib(k).Label = 0;
                 refLib(k).Diagnosis = diagnosis;
+                
+                config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask',num2str(k)) ), 'jpg'));
+                title('Cyan areas are is considered');
+                plots.Overlay(1, hsiIm.GetDisplayImage(), benLabel);
             end
+            
+            config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), 'references'), 'jpg'));
+            labs = {'Benign', 'Malignant'};
+            suffix = cellfun(@(x) labs(x+1), {refLib.Label} );
+            names = cellfun(@(x,y) strjoin({x, y}, {' '}), {refLib.Diagnosis}, suffix, 'UniformOutput', false);
+            plots.Spectra(2, cell2mat({refLib.Data}'), hsiUtility.GetWavelengths(numel(refLib(1).Data)), ... 
+                names, 'SAM Library Spectra', {'-', ':', '-', ':'});
 
             saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
             save(saveName, 'refLib');
-
+            fprintf('The reference library is loaded from %s.\n', saveName);
         end
 
         %======================================================================
@@ -599,8 +624,10 @@ classdef hsiUtility
             % Benign (0)) and 'Disease'.
             %
             saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
-            if exist(saveName, 'file') > 0
+            if exist(saveName, 'file') == 2
                 load(saveName, 'refLib');
+                %fprintf('The reference library is loaded from %s.\n', saveName);
+
             else
                 refLib = [];
                 disp('The reference library is not created yet. Use hsiUtility.PrepareReferenceLibrary.');

@@ -84,6 +84,9 @@ end
 ax = gca;
 ax.YAxis.Exponent = 0;
 
+% fig = gcf;
+% fig.WindowState = 'maximized';
+
 plots.SavePlot(fig);
 
 end

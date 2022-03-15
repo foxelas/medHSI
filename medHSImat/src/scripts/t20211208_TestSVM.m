@@ -1,16 +1,29 @@
 %Date: 2021-12-08
 
-config.SetOpt();
-config.SetSetting('isTest', false);
-config.SetSetting('database', 'psl');
-config.SetSetting('normalization', 'byPixel');
-config.SetSetting('experiment', 'T20211215-SVM');
+rng(1); % For reproducibility
 
-config.SetSetting('dataset', 'pslBase');
-[X1, y1, ~, ~, ~, ~, ~] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), {}, 'pixel', true);
+config.SetSetting('dataset', 'pslTest'); 
+experiment = 'T20211215-SVM';
+config.SetSetting('experiment', experiment);
+config.SetSetting('saveFolder', experiment);
 
-rng(1);
-SVMModel = fitcsvm(X, y, 'KernelScale', 'auto', 'Standardize', false, 'Verbose', 1, 'NumPrint', 1000, 'IterationLimit', 10^5);
+fprintf('Running for dataset %s\n', config.GetSetting('dataset'));
+%%%%%%%%%%%%%%%%%%%%%% Fix %%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Read h5 data
+folds = 5;
+testTargets = {'166'};
+dataType = 'pixel';
+hasLabels = true;
+
+[X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
+
+% factors = 2;
+% kk = floor(decimate(1:size(X,1), factors));
+% X = X(kk, :);
+% y = y(kk, :);
+
+SVMModel = fitcsvm(X, y,  'KernelFunction', 'RBF', 'KernelScale', 'auto', 'Standardize', false, 'Verbose', 1, 'NumPrint', 1000, 'IterationLimit', 10^5);
 
 CVSVMModel = crossval(SVMModel);
 classLoss = kfoldLoss(CVSVMModel)

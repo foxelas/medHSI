@@ -21,7 +21,7 @@
 %>
 %> @param dataset [char] | The dataset
 %> @param testTargets [string array] | The targetIDs of test targets
-%> @param dataType [char] | The data type, either 'image' or 'pixel'
+%> @param dataType [char] | The data type, either 'hsi', 'image' or 'pixel'
 %> @param hasLabels [boolean] | A flag to return labels
 %> @param folds [int] | The number of folds
 %> @param transformFun [function handle] | The function handle for the function to be applied
@@ -58,7 +58,7 @@ function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(data
 %
 % @param dataset [char] | The dataset
 % @param testTargets [string array] | The targetIDs of test targets
-% @param dataType [char] | The data type, either 'image' or 'pixel'
+% @param dataType [char] | The data type, either 'hsi', 'image' or 'pixel'
 % @param hasLabels [boolean] | A flag to return labels
 % @param folds [int] | The number of folds
 % @param transformFun [function handle] | The function handle for the function to be applied
@@ -119,7 +119,15 @@ for i = 1:length(targetIDs)
                 else
                     ydata = [];
                 end
-
+                
+            elseif strcmp(dataType, 'hsi')
+                xdata = I;
+                if hasLabels
+                    ydata = labelInfo;
+                else
+                    ydata = [];
+                end
+                
             elseif strcmp(dataType, 'pixel')
                 if useTransform
                     scores = transformFun(I);
@@ -139,9 +147,10 @@ for i = 1:length(targetIDs)
             end
 
             if isempty(find(contains(testTargets, targetName), 1))
-                if strcmp(dataType, 'image')
-                    X = {X; xdata};
-                    y = {y; ydata};
+                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi')
+                    jj = numel(X) + 1;
+                    X{jj} = xdata;
+                    y{jj} = ydata;
                 else
                     X = [X; xdata];
                     y = [y; ydata];
@@ -149,9 +158,10 @@ for i = 1:length(targetIDs)
 
             else
 
-                if strcmp(dataType, 'image')
-                    Xtest = {Xtest; xdata};
-                    ytest = {ytest; ydata};
+                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi')
+                    jj = numel(Xtest) + 1;
+                    Xtest{j} = xdata;s
+                    ytest{j} = ydata;
                 else
                     Xtest = [Xtest; xdata];
                     ytest = [ytest; ydata];
@@ -174,9 +184,11 @@ else
 end
 if numData >= folds
     cvp = trainUtility.KfoldPartitions(numData, folds);
+else 
+    cvp = [];
 end
 
-% %TO REMOVE
+% %TOREMOVE
 % factors = 2;
 % kk = floor(decimate(1:size(X,1), factors));
 % X = X(kk, :);
