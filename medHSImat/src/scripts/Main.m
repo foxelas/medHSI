@@ -13,7 +13,7 @@
 %> @section  Details
 %> For details refer to https://foxelas.github.io/medHSI/.
 %>
-%> The structure is desctribed in @ref descr. Also, check pages @b Classes and @b Files.
+%> The structure is described in @ref descr. Also, check pages @b Classes and @b Files.
 %>
 %> If you find any mistakes or bugs, contact me by email at ealoupogianni[ at ]outlook.com.
 %>

@@ -13,6 +13,7 @@
 %> @endcode
 %>
 %> @param hsIm [hsi] | An instance of the hsi class
+%> @param labelInfo [hsiInfo] | An instance of the  hsiInfo class
 %> @param isManual [boolean] | A  flag to show whether is manual (local)
 %> implementation or by SuperPCA package. Default: false.
 %> @param pixelNum [int] | The number of superpixels. Default: 20.
@@ -23,7 +24,7 @@
 %> @retval validLabels [numeric array] | The superpixel labels that refer
 %> to tissue pixels
 % ======================================================================
-function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, isManual, pixelNum, pcNum)
+function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, labelInfo, varargin)
 % SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
 % the result.
 %
@@ -38,6 +39,7 @@ function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, isManual, pixe
 % @endcode
 %
 % @param hsIm [hsi] | An instance of the hsi class
+% @param labelInfo [hsiInfo] | An instance of the  hsiInfo class
 % @param isManual [boolean] | A  flag to show whether is manual (local)
 % implementation or by SuperPCA package. Default: false.
 % @param pixelNum [int] | The number of superpixels. Default: 20.
@@ -48,56 +50,24 @@ function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, isManual, pixe
 % @retval validLabels [numeric array] | The superpixel labels that refer
 % to tissue pixels
 
-if nargin < 2
-    isManual = false;
+if nargin < 2 
+    labelInfo = [];
 end
 
-if nargin < 3
-    pixelNum = 20;
-end
-
-if nargin < 4
-    pcNum = 3;
-end
 savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
 
 %% Preparation
 srgb = hsIm.GetDisplayImage('rgb');
 fgMask = hsIm.FgMask;
 
-%% Calculate superpixels
-if isManual
-    %%Apply PCA to entire image
-    [coeff, scores, latent, explained, ~] = hsIm.Dimred('pca', pcNum, fgMask);
-    explained(1:pcNum);
-    latent(1:pcNum);
-
-    % Use the 1st PCA component for superpixel calculation
-    redImage = rescale(squeeze(scores(:, :, 1)));
-    [labels, ~] = superpixels(redImage, pixelNum);
-
-    % Keep only pixels that belong to the tissue (Superpixel might assign
-    % background pixels also). The last label is background label.
-    [labels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
-
-else
-    %%super-pixels segmentation
-    labels = hsIm.Cubseg(pixelNum);
-
-    % Keep only pixels that belong to the tissue (Superpixel might assign
-    % background pixels also). The last label is background label.
-    [labels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
-
-    %%SupePCA based DR
-    scores = hsIm.SPCA(pcNum, labels);
-end
+[scores, labels, validLabels] = hsIm.SuperPCA(varargin{:});
 
 config.SetSetting('plotName', fullfile(savedir, 'superpixel_segments'));
 plots.Superpixels(1, srgb, labels);
 config.SetSetting('plotName', fullfile(savedir, 'superpixel_mask'));
 plots.Superpixels(2, srgb, labels, '', 'color', fgMask);
 config.SetSetting('plotName', fullfile(savedir, 'pc'));
-plots.Components(scores, pcNum, 3);
+plots.Components(scores, 3);
 
 if config.GetSetting('showFigures')
     pause(0.5);
@@ -140,63 +110,3 @@ if config.GetSetting('showFigures')
 end
 end
 
-% ======================================================================
-%> @brief CleanLabels returns superpixel labels that contain tissue pixels.
-%>
-%> Keep only pixels that belong to the tissue (Superpixel might assign
-%> background pixels also). The last label is background label.
-%>
-%> @b Usage
-%>
-%> @code
-%> [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
-%> @endcode
-%>
-%> @param labels [numeric array] | The labels of the superpixels
-%> @param fgMask [numeric array] | The foreground mask
-%> @param pixelNum [int] | The number of superpixels.
-%>
-%> @retval cleanLabels [numeric array] | The labels of the superpixels
-%> @retval validLabels [numeric array] | The superpixel labels that refer
-%> to tissue pixels
-% ======================================================================
-function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
-% CleanLabels returns superpixel labels that contain tissue pixels.
-%
-% Keep only pixels that belong to the tissue (Superpixel might assign
-% background pixels also). The last label is background label.
-%
-% @b Usage
-%
-% @code
-% [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum);
-% @endcode
-%
-% @param labels [numeric array] | The labels of the superpixels
-% @param fgMask [numeric array] | The foreground mask
-% @param pixelNum [int] | The number of superpixels.
-%
-% @retval cleanLabels [numeric array] | The labels of the superpixels
-% @retval validLabels [numeric array] | The superpixel labels that refer
-% to tissue pixels
-
-labels(~fgMask) = pixelNum;
-
-pixelLim = 10;
-labelTags = unique(labels)';
-labelTags = labelTags(labelTags ~= pixelNum); % Remove last label (background pixels)
-validLabels = [];
-k = 0;
-
-for i = labelTags
-    sumPixel = sum(labels == i, 'all');
-    if sumPixel < pixelLim %Ignore superpixel labels with too few pixels
-        labels(labels == i) = pixelNum;
-    else
-        k = k + 1;
-        validLabels(k) = i;
-    end
-end
-
-cleanLabels = labels;
-end

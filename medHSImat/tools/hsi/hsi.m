@@ -440,80 +440,7 @@ classdef hsi
             % @return instance of the hsi class
             obj = Preprocessing(obj, targetID);
         end
-
-        %% Segmentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % ======================================================================
-        %> @brief Cubseg performs segmentation on the hyperspectral image.
-        %>
-        %> From toolbox SuperPCA [link].
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> labels = hsIm.Cubseg(superixelNumber);
-        %> @endcode
-        %>
-        %> @param obj [hsi] | An instance of the hsi class
-        %> @param superixelNumber [int] | The number of superpixels
-        %>
-        %> @retval labels [numeric array] | The labels for the superpixel
-        %> segmentation
-        % ======================================================================
-        function [labels] = Cubseg(obj, varargin)
-            % Cubseg performs segmentation on the hyperspectral image.
-            %
-            % From toolbox SuperPCA [link].
-            %
-            % @b Usage
-            %
-            % @code
-            % labels = hsIm.Cubseg(superixelNumber);
-            % @endcode
-            %
-            % @param obj [hsi] | An instance of the hsi class
-            % @param superixelNumber [int] | The number of superpixels
-            %
-            % @retval labels [numeric array] | The labels for the superpixel
-            % segmentation
-            labels = cubseg(obj.Value, varargin{:});
-        end
-
-        % ======================================================================
-        %> @brief SPCA performs superPCA.
-        %>
-        %> From toolbox SuperPCA [link].
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> scores = hsIm.SPCA(superixelNumber);
-        %> @endcode
-        %>
-        %> @param obj [hsi] | An instance of the hsi class
-        %> @param components [int] | The number of components
-        %> @param label [numeric array] | Superpixel labels
-        %>
-        %> @retval scores [numeric array] | The transformed values
-        % ======================================================================
-        function [scores] = SPCA(obj, varargin)
-            % SPCA performs superPCA.
-            %
-            % From toolbox SuperPCA [link].
-            %
-            % @b Usage
-            %
-            % @code
-            % scores = hsIm.SPCA(superixelNumber);
-            % @endcode
-            %
-            % @param obj [hsi] | An instance of the hsi class
-            % @param components [int] | The number of components
-            % @param label [numeric array] | Superpixel labels
-            %
-            % @retval scores [numeric array] | The transformed values
-            scores = SuperPCA(obj.Value, varargin{:});
-        end
-
+        
         %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
         %> @brief ToColumn reshapes the Value to a column of spectra.
@@ -988,6 +915,203 @@ classdef hsi
             ind = isinf(obj.Value);
         end
 
+        %======================================================================
+        %> @brief SAMscore returns SAM scores for a target hsi image.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
+        %> @endcode
+        %>
+        %> @param obj [hsi] | An hsi instance
+        %>
+        %> @retval scoreImg [array] | The minimum SAM score
+        %> @retval labelImg [array] | The labels of minimum SAM score
+        %> @retval argminImg [array] | The argmin of minimum SAM score
+        %======================================================================
+        function [scoreImg, labelImg, argminImg] = SAMscore(obj)
+            % SAMscore returns SAM scores for a target hsi image.
+            %
+            % @b Usage
+            %
+            % @code
+            % [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
+            % @endcode
+            %
+            % @param obj [hsi] | An hsi instance
+            %
+            % @retval scoreImg [array] | The minimum SAM score
+            % @retval labelImg [array] | The labels of minimum SAM score
+            % @retval argminImg [array] | The argmin of minimum SAM score
+            refLib = hsiUtility.GetReferenceLibrary();
+            xCol = obj.GetMaskedPixels();
+            pixelN = size(xCol, 1);
+
+            samVals = zeros(numel(refLib), pixelN);
+            for jj = 1:numel(refLib)
+                samVals(jj, :) = sam(permute(xCol, [3, 1, 2]), refLib(jj).Data);
+            end
+            [scoreImg, argminImg] = min(samVals, [], 1);
+            labelImg = arrayfun(@(x) refLib(x).Label, argminImg);
+
+            scoreImg = hsi.RecoverSpatialDimensions(scoreImg', size(obj.FgMask), obj.FgMask);
+            labelImg = hsi.RecoverSpatialDimensions(labelImg', size(obj.FgMask), obj.FgMask);
+            argminImg = hsi.RecoverSpatialDimensions(argminImg', size(obj.FgMask), obj.FgMask);
+
+            labelImg = uint8(labelImg);
+            argminImg = uint8(argminImg);
+        end
+        
+        % ======================================================================
+        %> @brief SuperPCA applies SuperPCA to an hsi object.
+        %>
+        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
+        %> 
+        %> @b Usage
+        %>
+        %> @code
+        %> [scores, labels, validLabels] = hsi.SuperPCA(hsIm);
+        %>
+        %> [scores, labels, validLabels] = hsi.SuperPCA(hsIm, isManual, pixelNum, pcNum);
+        %> @endcode
+        %>
+        %> @param hsIm [hsi] | An instance of the hsi class
+        %> @param isManual [boolean] | A  flag to show whether is manual (local)
+        %> implementation or by SuperPCA package. Default: false.
+        %> @param pixelNum [int] | The number of superpixels. Default: 20.
+        %> @param pcNum [int] | The number of PCA components. Default: 3.
+        %>
+        %> @retval scores [numeric array] | The PCA scores
+        %> @retval labels [numeric array] | The labels of the superpixels
+        %> @retval validLabels [numeric array] | The superpixel labels that refer
+        %> to tissue pixels
+        % ======================================================================
+        function [scores, labels, validLabels] = SuperPCA(obj, isManual, pixelNum, pcNum)
+        % SuperPCA applies SuperPCA to an hsi object.
+        %
+        % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
+        %
+        % @b Usage
+        %
+        % @code
+        % [scores, labels, validLabels] = hsi.SuperPCA(hsIm);
+        %
+        % [scores, labels, validLabels] = hsi.SuperPCA(hsIm, isManual, pixelNum, pcNum);
+        % @endcode
+        %
+        % @param hsIm [hsi] | An instance of the hsi class
+        % @param isManual [boolean] | A  flag to show whether is manual (local)
+        % implementation or by SuperPCA package. Default: false.
+        % @param pixelNum [int] | The number of superpixels. Default: 20.
+        % @param pcNum [int] | The number of PCA components. Default: 3.
+        %
+        % @retval scores [numeric array] | The PCA scores
+        % @retval labels [numeric array] | The labels of the superpixels
+        % @retval validLabels [numeric array] | The superpixel labels that refer
+        % to tissue pixels                 
+            if nargin < 2
+                isManual = false;
+            end
+
+            if nargin < 3
+                pixelNum = 20;
+            end
+
+            if nargin < 4
+                pcNum = 3;
+            end
+
+            fgMask = obj.FgMask;
+            %% Calculate superpixels
+            if isManual
+                %%Apply PCA to entire image
+                [~, scores, latent, explained, ~] = obj.Dimred('pca', pcNum, fgMask);
+%                 explained(1:pcNum);
+%                 latent(1:pcNum);
+
+                % Use the 1st PCA component for superpixel calculation
+                redImage = rescale(squeeze(scores(:, :, 1)));
+                [labels, ~] = superpixels(redImage, pixelNum);
+
+                % Keep only pixels that belong to the tissue (Superpixel might assign
+                % background pixels also). The last label is background label.
+                [labels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
+
+            else
+                %%super-pixels segmentation
+                labels = cubseg(obj.Value, pixelNum);
+
+                % Keep only pixels that belong to the tissue (Superpixel might assign
+                % background pixels also). The last label is background label.
+                [labels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
+
+                %%SupePCA based DR
+                scores = SuperPCA(obj.Value, pcNum, labels);
+            end
+
+        end
+        
+        % ======================================================================
+        %> @brief MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
+        %>
+        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
+        %> 
+        %> @b Usage
+        %>
+        %> @code
+        %> [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm);
+        %>
+        %> [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
+        %> @endcode
+        %>
+        %> @param hsIm [hsi] | An instance of the hsi class
+        %> @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
+        %> @param pcNum [int] | Otional: The number of PCA components. Default: 3.
+        %>
+        %> @retval scores [cell array] | The PCA scores
+        %> @retval labels [cell array] | The labels of the superpixels
+        %> @retval validLabels [cell array] | The superpixel labels that refer
+        %> to tissue pixels
+        % ======================================================================      
+        function [scores, labels, validLabels] = MultiscaleSuperPCA(obj, pixelNumArray, pcNum)
+        % MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
+        %
+        % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
+        % 
+        % @b Usage
+        %
+        % @code
+        % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm);
+        %
+        % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
+        % @endcode
+        %
+        % @param hsIm [hsi] | An instance of the hsi class
+        % @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
+        % @param pcNum [int] | Otional: The number of PCA components. Default: 3.
+        %
+        % @retval scores [cell array] | The PCA scores
+        % @retval labels [cell array] | The labels of the superpixels
+        % @retval validLabels [cell array] | The superpixel labels that refer
+        % to tissue pixels        
+            if nargin < 2
+                pixelNumArray = floor(50*sqrt(2).^[-2:2]);
+            end
+            
+            if nargin < 3 
+                pcNum = 3;
+            end 
+            
+            N = numel(pixelNumArray);
+            scores = cell(N,1);
+            labels = cell(N,1);
+            validLabels = cell(N,1);
+            for i=1:N
+                pixelNum = pixelNumArray(i);
+                [scores{i}, labels{i}, validLabels{i}] = obj.SuperPCA(false, pixelNum, pcNum);
+            end 
+        end 
     end
 
     methods (Static)
@@ -1105,54 +1229,6 @@ classdef hsi
         end
 
         %======================================================================
-        %> @brief SAMscore returns SAM scores for a target hsi image.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
-        %> @endcode
-        %>
-        %> @param obj [hsi] | An hsi instance
-        %>
-        %> @retval scoreImg [array] | The minimum SAM score
-        %> @retval labelImg [array] | The labels of minimum SAM score
-        %> @retval argminImg [array] | The argmin of minimum SAM score
-        %======================================================================
-        function [scoreImg, labelImg, argminImg] = SAMscore(obj)
-            % SAMscore returns SAM scores for a target hsi image.
-            %
-            % @b Usage
-            %
-            % @code
-            % [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
-            % @endcode
-            %
-            % @param obj [hsi] | An hsi instance
-            %
-            % @retval scoreImg [array] | The minimum SAM score
-            % @retval labelImg [array] | The labels of minimum SAM score
-            % @retval argminImg [array] | The argmin of minimum SAM score
-            refLib = hsiUtility.GetReferenceLibrary();
-            xCol = obj.GetMaskedPixels();
-            pixelN = size(xCol, 1);
-
-            samVals = zeros(numel(refLib), pixelN);
-            for jj = 1:numel(refLib)
-                samVals(jj, :) = sam(permute(xCol, [3, 1, 2]), refLib(jj).Data);
-            end
-            [scoreImg, argminImg] = min(samVals, [], 1);
-            labelImg = arrayfun(@(x) refLib(x).Label, argminImg);
-
-            scoreImg = hsi.RecoverSpatialDimensions(scoreImg', size(obj.FgMask), obj.FgMask);
-            labelImg = hsi.RecoverSpatialDimensions(labelImg', size(obj.FgMask), obj.FgMask);
-            argminImg = hsi.RecoverSpatialDimensions(argminImg', size(obj.FgMask), obj.FgMask);
-
-            labelImg = uint8(labelImg);
-            argminImg = uint8(argminImg);
-        end
-
-        %======================================================================
         %> @brief IsHsi checks if a variable is of an hsi instance
         %>
         %> @b Usage
@@ -1180,6 +1256,67 @@ classdef hsi
 
             flag = isequal(class(obj), 'hsi');
         end
+
+        % ======================================================================
+        %> @brief CleanLabels returns superpixel labels that contain tissue pixels.
+        %>
+        %> Keep only pixels that belong to the tissue (Superpixel might assign
+        %> background pixels also). The last label is background label.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [cleanLabels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
+        %> @endcode
+        %>
+        %> @param labels [numeric array] | The labels of the superpixels
+        %> @param fgMask [numeric array] | The foreground mask
+        %> @param pixelNum [int] | The number of superpixels.
+        %>
+        %> @retval cleanLabels [numeric array] | The labels of the superpixels
+        %> @retval validLabels [numeric array] | The superpixel labels that refer
+        %> to tissue pixels
+        % ======================================================================
+        function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
+        % CleanLabels returns superpixel labels that contain tissue pixels.
+        %
+        % Keep only pixels that belong to the tissue (Superpixel might assign
+        % background pixels also). The last label is background label.
+        %
+        % @b Usage
+        %
+        % @code
+        % [cleanLabels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
+        % @endcode
+        %
+        % @param labels [numeric array] | The labels of the superpixels
+        % @param fgMask [numeric array] | The foreground mask
+        % @param pixelNum [int] | The number of superpixels.
+        %
+        % @retval cleanLabels [numeric array] | The labels of the superpixels
+        % @retval validLabels [numeric array] | The superpixel labels that refer
+        % to tissue pixels
+
+        labels(~fgMask) = pixelNum;
+
+        pixelLim = 10;
+        labelTags = unique(labels)';
+        labelTags = labelTags(labelTags ~= pixelNum); % Remove last label (background pixels)
+        validLabels = [];
+        k = 0;
+
+        for i = labelTags
+            sumPixel = sum(labels == i, 'all');
+            if sumPixel < pixelLim %Ignore superpixel labels with too few pixels
+                labels(labels == i) = pixelNum;
+            else
+                k = k + 1;
+                validLabels(k) = i;
+            end
+        end
+
+        cleanLabels = labels;
+    end
 
     end
 end

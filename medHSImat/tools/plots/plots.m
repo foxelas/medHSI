@@ -17,12 +17,12 @@ classdef plots
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
-        %> @param functionName [Function Handle] | Handle of the target function to be applied
+        %> @param funcHandle [Function Handle] | Handle of the target function to be applied
         %> @param varargin [Cell array] | The arguments necessary for the target function
         %>
         %> @retval varargout [Cell array] | The return values of the target function
         %======================================================================
-        function [varargout] = Apply(fig, functionName, varargin)
+        function [varargout] = Apply(fig, funcHandle, varargin)
             % Apply runs a plotting function.
             %
             % The function should take the figure handle as last argument.
@@ -34,7 +34,7 @@ classdef plots
             % @endcode
             %
             % @param fig [int] | The figure handle
-            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param funcHandle [Function Handle] | Handle of the target function to be applied
             % @param varargin [Cell array] | The arguments necessary for the target function
             %
             % @retval varargout [Cell array] | The return values of the target function
@@ -48,16 +48,16 @@ classdef plots
             end
 
             newVarargin = varargin;
-            expectedArgs = nargin(functionName);
+            expectedArgs = nargin(funcHandle);
             for i = (length(newVarargin) + 1):(expectedArgs - 1)
                 newVarargin{i} = [];
             end
             newVarargin{length(newVarargin)+1} = fig;
 
-            if nargout(functionName) > 0
-                varargout{:} = functionName(newVarargin{:});
+            if nargout(funcHandle) > 0
+                varargout{:} = funcHandle(newVarargin{:});
             else
-                functionName(newVarargin{:});
+                funcHandle(newVarargin{:});
                 varargout{:} = {};
             end
         end
@@ -515,7 +515,82 @@ classdef plots
 
             plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
         end
+ 
+        %======================================================================
+        %> @brief Montage plots the montage of an image list. 
+        %>
+        %> @b Usage
+        %> plots.Montage(1, labels, names, plotName); 
+        %> @endcode
+        %>
+        %> @param figNum [int] | The figure handle
+        %> @param img [cell array] | The list of images 
+        %> @param names [cell array] | The list of image names
+        %> @param plotName [char] | The plotName
+        %======================================================================
+        function [] = Montage(figNum, img, names, plotName)
+        % Montage plots the montage of an image list.
+        %
+        % @b Usage
+        % plots.Montage(1, labels, names, plotName); 
+        % @endcode
+        %
+        % @param figNum [int] | The figure handle
+        % @param img [cell array] | The list of images 
+        % @param names [cell array] | The list of image names
+        % @param plotName [char] | The plotName
+        
+            fig = figure(figNum); 
+            tlo = tiledlayout(fig,2,3,'TileSpacing','None');
+            for i = 1:numel(img)
+                ax = nexttile(tlo); 
+                imshow(img{i},'Parent',ax)
+                title(names{i});
+            end
+            config.SetSetting('plotName', plotName);
+            plots.SavePlot(fig); 
+        end
+        
+        %======================================================================
+        %> @brief MontageCmap plots the heat map montage of an image list.
+        %>
+        %> @b Usage
+        %> plots.MontageCmap(1, labels, names, plotName); 
+        %> @endcode
+        %>
+        %> @param figNum [int] | The figure handle
+        %> @param img [cell array] | The list of images 
+        %> @param names [cell array] | The list of image names
+        %> @param plotName [char] | The plotName
+        %======================================================================
+        function [] = MontageCmap(figNum, img, names, plotName)
+        % MontageCmap plots the heat map montage of an image list.
+        %
+        % @b Usage
+        % plots.MontageCmap(1, labels, names, plotName); 
+        % @endcode
+        %
+        % @param figNum [int] | The figure handle
+        % @param img [cell array] | The list of images 
+        % @param names [cell array] | The list of image names
+        % @param plotName [char] | The plotName
 
+            minval = min(cellfun(@(x) min(x, [], 'all'), img));
+            maxval = max(cellfun(@(x) max(x, [], 'all'), img));
+
+            fig = figure(figNum); 
+            tlo = tiledlayout(fig,2,3,'TileSpacing','None');
+            for i = 1:numel(img)
+                ax = nexttile(tlo); 
+                imagesc(img{i}, [minval maxval])
+                colormap('parula');
+                c = colorbar;
+                title(names{i});
+            end
+            config.SetSetting('plotName', plotName);
+            plots.SavePlot(fig); 
+        end 
+            
         %======================================================================
         %> @brief ReferenceLibrary  plots the reference spectra in the library.
         %>

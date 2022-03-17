@@ -21,12 +21,12 @@ classdef apply
         %> apply.ToEach(@CustomKmeans, 5);
         %> @endcode
         %>
-        %> @param functionName [Function Handle] | Handle of the target function to be applied
+        %> @param funcHandle [Function Handle] | Handle of the target function to be applied
         %> @param varargin [Cell array] | The arguments necessary for the target function
         %>
         %> @retval varargout [Cell array] | The return values of the target function
         % ======================================================================
-        function [varargout] = ToEach(functionName, varargin)
+        function [varargout] = ToEach(funcHandle, varargin)
             % ScriptToEachImage applies a script on each of the data samples in the dataset.
             %
             % The target function should have arguments in the format of (hsIm,
@@ -39,7 +39,7 @@ classdef apply
             % apply.ToEach(@CustomKmeans, 5);
             % @endcode
             %
-            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param funcHandle [Function Handle] | Handle of the target function to be applied
             % @param varargin [Cell array] | The arguments necessary for the target function
             %
             % @retval varargout [Cell array] | The return values of the target function
@@ -53,15 +53,15 @@ classdef apply
 
                 %% load HSI from .mat file
                 targetID = targetIDs{i};
-                hsIm = hsi.Load(targetID, 'dataset');
+                [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetID);
 
                 config.SetSetting('fileName', targetID);
 
                 %% Change to Relevant Script
-                if nargout(functionName) > 0
-                    varargout{:} = functionName(hsIm, varargin{:});
+                if nargout(funcHandle) > 0
+                    varargout{:} = funcHandle(hsIm, labelInfo, varargin{:});
                 else
-                    functionName(hsIm, varargin{:});
+                    funcHandle(hsIm, labelInfo, varargin{:});
                     varargout{:} = {};
                 end
             end
@@ -75,12 +75,12 @@ classdef apply
         %> apply.DisableFigures(@apply.SuperpixelAnalysis);
         %> @endcode
         %>
-        %> @param functionName [Function Handle] | Handle of the target function to be applied
+        %> @param funcHandle [Function Handle] | Handle of the target function to be applied
         %> @param varargin [Cell array] | The arguments necessary for the target function
         %>
         %> @retval varargout [Cell array] | The return values of the target function
         % ======================================================================
-        function [varargout] = DisableFigures(functionName, varargin)
+        function [varargout] = DisableFigures(funcHandle, varargin)
             % DisableFigures applies a script while suppressing figure production and saving.
             %
             % @b Usage
@@ -89,7 +89,7 @@ classdef apply
             % apply.DisableFigures(@apply.SuperpixelAnalysis);
             % @endcode
             %
-            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param funcHandle [Function Handle] | Handle of the target function to be applied
             % @param varargin [Cell array] | The arguments necessary for the target function
             %
             % @retval varargout [Cell array] | The return values of the target function
@@ -101,10 +101,10 @@ classdef apply
             config.SetSetting('saveImages', false);
             warning('on', 'all');
 
-            if nargout(functionName) > 0
-                varargout{:} = functionName(varargin{:});
+            if nargout(funcHandle) > 0
+                varargout{:} = funcHandle(varargin{:});
             else
-                functionName(varargin{:});
+                funcHandle(varargin{:});
                 varargout{:} = {};
             end
 
@@ -122,12 +122,12 @@ classdef apply
         %> apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
         %> @endcode
         %>
-        %> @param functionName [Function Handle] | Handle of the target function to be applied
+        %> @param funcHandle [Function Handle] | Handle of the target function to be applied
         %> @param varargin [Cell array] | The arguments necessary for the target function
         %>
         %> @retval varargout [Cell array] | The return values of the target function
         % ======================================================================
-        function [varargout] = DisableSaveFigures(functionName, varargin)
+        function [varargout] = DisableSaveFigures(funcHandle, varargin)
             % DisableSaveFigures applies a script while suppressing figure saving.
             %
             % @b Usage
@@ -136,7 +136,7 @@ classdef apply
             % apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
             % @endcode
             %
-            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param funcHandle [Function Handle] | Handle of the target function to be applied
             % @param varargin [Cell array] | The arguments necessary for the target function
             %
             % @retval varargout [Cell array] | The return values of the target function
@@ -144,10 +144,10 @@ classdef apply
             saveImages = config.GetSetting('saveImages');
             config.SetSetting('saveImages', false);
             warning('on', 'all');
-            if nargout(functionName) > 0
-                varargout{:} = functionName(varargin{:});
+            if nargout(funcHandle) > 0
+                varargout{:} = funcHandle(varargin{:});
             else
-                functionName(varargin{:});
+                funcHandle(varargin{:});
                 varargout{:} = {};
             end
 
@@ -169,14 +169,14 @@ classdef apply
         %> meanVals = apply.RowFunc(@mean, hsIm);
         %> @endcode
         %>
-        %> @param functionName [Function Handle] | Handle of the target function to be applied
+        %> @param funcHandle [Function Handle] | Handle of the target function to be applied
         %> @param X [numeric array] | The input data as an array, where each
         %> row is a feature vector.
         %> @param varargin [Cell array] | The arguments necessary for the target function
         %>
         %> @retval result [Cell array] | The return values of the target function
         % ======================================================================
-        function [result] = RowFunc(functionName, X, varargin)
+        function [result] = RowFunc(funcHandle, X, varargin)
             % RowFunc applies a function on each row of the input.
             %
             % Is the input data is an hsi instance, then the pixels that
@@ -190,7 +190,7 @@ classdef apply
             % meanVals = apply.RowFunc(@mean, hsIm);
             % @endcode
             %
-            % @param functionName [Function Handle] | Handle of the target function to be applied
+            % @param funcHandle [Function Handle] | Handle of the target function to be applied
             % @param X [numeric array] | The input data as an array, where each
             % row is a feature vector.
             % @param varargin [Cell array] | The arguments necessary for the target function
@@ -204,17 +204,17 @@ classdef apply
             rows = size(X, 1);
             result = cell(rows, 1);
             for i = 1:rows
-                if nargout(functionName) > 0
-                    if nargin(functionName) > 1
-                        varargout{:} = functionName(X(rows, :), varargin{:});
+                if nargout(funcHandle) > 0
+                    if nargin(funcHandle) > 1
+                        varargout{:} = funcHandle(X(rows, :), varargin{:});
                     else
-                        varargout{:} = functionName(X(rows, :));
+                        varargout{:} = funcHandle(X(rows, :));
                     end
                 else
-                    if nargin(functionName) > 1
-                        functionName(X(rows, :), varargin{:});
+                    if nargin(funcHandle) > 1
+                        funcHandle(X(rows, :), varargin{:});
                     else
-                        functionName(X(rows, :));
+                        funcHandle(X(rows, :));
                     end
                     varargout{:} = {};
                 end
