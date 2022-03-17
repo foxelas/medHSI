@@ -440,7 +440,7 @@ classdef hsi
             % @return instance of the hsi class
             obj = Preprocessing(obj, targetID);
         end
-        
+
         %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
         %> @brief ToColumn reshapes the Value to a column of spectra.
@@ -962,12 +962,12 @@ classdef hsi
             labelImg = uint8(labelImg);
             argminImg = uint8(argminImg);
         end
-        
+
         % ======================================================================
         %> @brief SuperPCA applies SuperPCA to an hsi object.
         %>
-        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
-        %> 
+        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+        %>
         %> @b Usage
         %>
         %> @code
@@ -988,28 +988,28 @@ classdef hsi
         %> to tissue pixels
         % ======================================================================
         function [scores, labels, validLabels] = SuperPCA(obj, isManual, pixelNum, pcNum)
-        % SuperPCA applies SuperPCA to an hsi object.
-        %
-        % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
-        %
-        % @b Usage
-        %
-        % @code
-        % [scores, labels, validLabels] = hsi.SuperPCA(hsIm);
-        %
-        % [scores, labels, validLabels] = hsi.SuperPCA(hsIm, isManual, pixelNum, pcNum);
-        % @endcode
-        %
-        % @param hsIm [hsi] | An instance of the hsi class
-        % @param isManual [boolean] | A  flag to show whether is manual (local)
-        % implementation or by SuperPCA package. Default: false.
-        % @param pixelNum [int] | The number of superpixels. Default: 20.
-        % @param pcNum [int] | The number of PCA components. Default: 3.
-        %
-        % @retval scores [numeric array] | The PCA scores
-        % @retval labels [numeric array] | The labels of the superpixels
-        % @retval validLabels [numeric array] | The superpixel labels that refer
-        % to tissue pixels                 
+            % SuperPCA applies SuperPCA to an hsi object.
+            %
+            % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+            %
+            % @b Usage
+            %
+            % @code
+            % [scores, labels, validLabels] = hsi.SuperPCA(hsIm);
+            %
+            % [scores, labels, validLabels] = hsi.SuperPCA(hsIm, isManual, pixelNum, pcNum);
+            % @endcode
+            %
+            % @param hsIm [hsi] | An instance of the hsi class
+            % @param isManual [boolean] | A  flag to show whether is manual (local)
+            % implementation or by SuperPCA package. Default: false.
+            % @param pixelNum [int] | The number of superpixels. Default: 20.
+            % @param pcNum [int] | The number of PCA components. Default: 3.
+            %
+            % @retval scores [numeric array] | The PCA scores
+            % @retval labels [numeric array] | The labels of the superpixels
+            % @retval validLabels [numeric array] | The superpixel labels that refer
+            % to tissue pixels
             if nargin < 2
                 isManual = false;
             end
@@ -1023,12 +1023,13 @@ classdef hsi
             end
 
             fgMask = obj.FgMask;
+
             %% Calculate superpixels
             if isManual
                 %%Apply PCA to entire image
                 [~, scores, latent, explained, ~] = obj.Dimred('pca', pcNum, fgMask);
-%                 explained(1:pcNum);
-%                 latent(1:pcNum);
+                %                 explained(1:pcNum);
+                %                 latent(1:pcNum);
 
                 % Use the 1st PCA component for superpixel calculation
                 redImage = rescale(squeeze(scores(:, :, 1)));
@@ -1051,12 +1052,12 @@ classdef hsi
             end
 
         end
-        
+
         % ======================================================================
         %> @brief MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
         %>
-        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
-        %> 
+        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+        %>
         %> @b Usage
         %>
         %> @code
@@ -1073,45 +1074,45 @@ classdef hsi
         %> @retval labels [cell array] | The labels of the superpixels
         %> @retval validLabels [cell array] | The superpixel labels that refer
         %> to tissue pixels
-        % ======================================================================      
+        % ======================================================================
         function [scores, labels, validLabels] = MultiscaleSuperPCA(obj, pixelNumArray, pcNum)
-        % MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
-        %
-        % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
-        % 
-        % @b Usage
-        %
-        % @code
-        % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm);
-        %
-        % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
-        % @endcode
-        %
-        % @param hsIm [hsi] | An instance of the hsi class
-        % @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
-        % @param pcNum [int] | Otional: The number of PCA components. Default: 3.
-        %
-        % @retval scores [cell array] | The PCA scores
-        % @retval labels [cell array] | The labels of the superpixels
-        % @retval validLabels [cell array] | The superpixel labels that refer
-        % to tissue pixels        
+            % MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
+            %
+            % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+            %
+            % @b Usage
+            %
+            % @code
+            % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm);
+            %
+            % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
+            % @endcode
+            %
+            % @param hsIm [hsi] | An instance of the hsi class
+            % @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
+            % @param pcNum [int] | Otional: The number of PCA components. Default: 3.
+            %
+            % @retval scores [cell array] | The PCA scores
+            % @retval labels [cell array] | The labels of the superpixels
+            % @retval validLabels [cell array] | The superpixel labels that refer
+            % to tissue pixels
             if nargin < 2
                 pixelNumArray = floor(50*sqrt(2).^[-2:2]);
             end
-            
-            if nargin < 3 
+
+            if nargin < 3
                 pcNum = 3;
-            end 
-            
+            end
+
             N = numel(pixelNumArray);
-            scores = cell(N,1);
-            labels = cell(N,1);
-            validLabels = cell(N,1);
-            for i=1:N
+            scores = cell(N, 1);
+            labels = cell(N, 1);
+            validLabels = cell(N, 1);
+            for i = 1:N
                 pixelNum = pixelNumArray(i);
                 [scores{i}, labels{i}, validLabels{i}] = obj.SuperPCA(false, pixelNum, pcNum);
-            end 
-        end 
+            end
+        end
     end
 
     methods (Static)
@@ -1278,45 +1279,45 @@ classdef hsi
         %> to tissue pixels
         % ======================================================================
         function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
-        % CleanLabels returns superpixel labels that contain tissue pixels.
-        %
-        % Keep only pixels that belong to the tissue (Superpixel might assign
-        % background pixels also). The last label is background label.
-        %
-        % @b Usage
-        %
-        % @code
-        % [cleanLabels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
-        % @endcode
-        %
-        % @param labels [numeric array] | The labels of the superpixels
-        % @param fgMask [numeric array] | The foreground mask
-        % @param pixelNum [int] | The number of superpixels.
-        %
-        % @retval cleanLabels [numeric array] | The labels of the superpixels
-        % @retval validLabels [numeric array] | The superpixel labels that refer
-        % to tissue pixels
+            % CleanLabels returns superpixel labels that contain tissue pixels.
+            %
+            % Keep only pixels that belong to the tissue (Superpixel might assign
+            % background pixels also). The last label is background label.
+            %
+            % @b Usage
+            %
+            % @code
+            % [cleanLabels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
+            % @endcode
+            %
+            % @param labels [numeric array] | The labels of the superpixels
+            % @param fgMask [numeric array] | The foreground mask
+            % @param pixelNum [int] | The number of superpixels.
+            %
+            % @retval cleanLabels [numeric array] | The labels of the superpixels
+            % @retval validLabels [numeric array] | The superpixel labels that refer
+            % to tissue pixels
 
-        labels(~fgMask) = pixelNum;
+            labels(~fgMask) = pixelNum;
 
-        pixelLim = 10;
-        labelTags = unique(labels)';
-        labelTags = labelTags(labelTags ~= pixelNum); % Remove last label (background pixels)
-        validLabels = [];
-        k = 0;
+            pixelLim = 10;
+            labelTags = unique(labels)';
+            labelTags = labelTags(labelTags ~= pixelNum); % Remove last label (background pixels)
+            validLabels = [];
+            k = 0;
 
-        for i = labelTags
-            sumPixel = sum(labels == i, 'all');
-            if sumPixel < pixelLim %Ignore superpixel labels with too few pixels
-                labels(labels == i) = pixelNum;
-            else
-                k = k + 1;
-                validLabels(k) = i;
+            for i = labelTags
+                sumPixel = sum(labels == i, 'all');
+                if sumPixel < pixelLim %Ignore superpixel labels with too few pixels
+                    labels(labels == i) = pixelNum;
+                else
+                    k = k + 1;
+                    validLabels(k) = i;
+                end
             end
-        end
 
-        cleanLabels = labels;
-    end
+            cleanLabels = labels;
+        end
 
     end
 end

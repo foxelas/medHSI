@@ -28,7 +28,7 @@ function [] = Basics_Init(experiment, dataset)
 
 if nargin > 1
     config.SetSetting('dataset', dataset);
-end 
+end
 
 rng(1); % For reproducibility
 
@@ -37,4 +37,4 @@ config.SetSetting('saveFolder', experiment);
 config.SetSetting('showFigures', true);
 
 fprintf('Running for dataset %s\n', config.GetSetting('dataset'));
-end 
+end

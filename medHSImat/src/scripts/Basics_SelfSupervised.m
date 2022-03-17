@@ -1,16 +1,18 @@
 function [] = Basics_SelfSupervised()
 
-option = 'msuperpca'; 
+option = 'msuperpca';
 
 if strcmpi(option, 'sam')
-    %% SAM 
+
+    %% SAM
     experiment = strcat('SAM segmentation-BCC');
     Basics_Init(experiment);
 
     apply.ToEach(@SAMAnalysis);
 
 elseif strcmpi(option, 'superpca')
-    %% SuperPCA 
+
+    %% SuperPCA
     pixelNum = 20;
     pcNum = 5;
 
@@ -41,23 +43,24 @@ elseif strcmpi(option, 'superpca')
     GetMontagetCollection('pc3');
 
 elseif strcmpi(option, 'msuperpca')
-    %% Multiscale SuperPCA 
+
+    %% Multiscale SuperPCA
     experiment = strcat('MultiscaleSuperPCA-Manual', date());
     Basics_Init(experiment);
 
     apply.ToEach(@MultiscaleSuperpixelAnalysis);
 
-else 
+else
     fprintf('Unsupported [option] value.\n');
 end
 
 end
 
 function GetMontagetCollection(target)
-    criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
-    plots.MontageFolderContents(1, [], criteria);
-    criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'fix');
-    plots.MontageFolderContents(2, [], criteria, strcat(target, ' for fix'));
-    criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'raw');
-    plots.MontageFolderContents(3, [], criteria, strcat(target, ' for ex-vivo'));
+criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
+plots.MontageFolderContents(1, [], criteria);
+criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'fix');
+plots.MontageFolderContents(2, [], criteria, strcat(target, ' for fix'));
+criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'raw');
+plots.MontageFolderContents(3, [], criteria, strcat(target, ' for ex-vivo'));
 end

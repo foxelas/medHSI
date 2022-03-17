@@ -42,13 +42,13 @@ function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = Basics_SplitTrain(experimen
 % @retval sRGBs [cell array] | The array of sRGBs for test hsi data
 % @retval fgMasks [cell array] | The foreground masks of sRGBs for test hsi data
 %
-    Basics_Init(experiment, dataset);
+Basics_Init(experiment, dataset);
 
-    folds = 5;
-    testTargets = {}; % {'166'};
-    dataType = 'hsi';
-    hasLabels = true;
+folds = 5;
+testTargets = {}; % {'166'};
+dataType = 'hsi';
+hasLabels = true;
 
-    [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
+[X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
 
 end

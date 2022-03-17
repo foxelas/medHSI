@@ -515,82 +515,82 @@ classdef plots
 
             plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
         end
- 
+
         %======================================================================
-        %> @brief Montage plots the montage of an image list. 
+        %> @brief Montage plots the montage of an image list.
         %>
         %> @b Usage
-        %> plots.Montage(1, labels, names, plotName); 
+        %> plots.Montage(1, labels, names, plotName);
         %> @endcode
         %>
         %> @param figNum [int] | The figure handle
-        %> @param img [cell array] | The list of images 
+        %> @param img [cell array] | The list of images
         %> @param names [cell array] | The list of image names
         %> @param plotName [char] | The plotName
         %======================================================================
         function [] = Montage(figNum, img, names, plotName)
-        % Montage plots the montage of an image list.
-        %
-        % @b Usage
-        % plots.Montage(1, labels, names, plotName); 
-        % @endcode
-        %
-        % @param figNum [int] | The figure handle
-        % @param img [cell array] | The list of images 
-        % @param names [cell array] | The list of image names
-        % @param plotName [char] | The plotName
-        
-            fig = figure(figNum); 
-            tlo = tiledlayout(fig,2,3,'TileSpacing','None');
+            % Montage plots the montage of an image list.
+            %
+            % @b Usage
+            % plots.Montage(1, labels, names, plotName);
+            % @endcode
+            %
+            % @param figNum [int] | The figure handle
+            % @param img [cell array] | The list of images
+            % @param names [cell array] | The list of image names
+            % @param plotName [char] | The plotName
+
+            fig = figure(figNum);
+            tlo = tiledlayout(fig, 2, 3, 'TileSpacing', 'None');
             for i = 1:numel(img)
-                ax = nexttile(tlo); 
-                imshow(img{i},'Parent',ax)
+                ax = nexttile(tlo);
+                imshow(img{i}, 'Parent', ax)
                 title(names{i});
             end
             config.SetSetting('plotName', plotName);
-            plots.SavePlot(fig); 
+            plots.SavePlot(fig);
         end
-        
+
         %======================================================================
         %> @brief MontageCmap plots the heat map montage of an image list.
         %>
         %> @b Usage
-        %> plots.MontageCmap(1, labels, names, plotName); 
+        %> plots.MontageCmap(1, labels, names, plotName);
         %> @endcode
         %>
         %> @param figNum [int] | The figure handle
-        %> @param img [cell array] | The list of images 
+        %> @param img [cell array] | The list of images
         %> @param names [cell array] | The list of image names
         %> @param plotName [char] | The plotName
         %======================================================================
         function [] = MontageCmap(figNum, img, names, plotName)
-        % MontageCmap plots the heat map montage of an image list.
-        %
-        % @b Usage
-        % plots.MontageCmap(1, labels, names, plotName); 
-        % @endcode
-        %
-        % @param figNum [int] | The figure handle
-        % @param img [cell array] | The list of images 
-        % @param names [cell array] | The list of image names
-        % @param plotName [char] | The plotName
+            % MontageCmap plots the heat map montage of an image list.
+            %
+            % @b Usage
+            % plots.MontageCmap(1, labels, names, plotName);
+            % @endcode
+            %
+            % @param figNum [int] | The figure handle
+            % @param img [cell array] | The list of images
+            % @param names [cell array] | The list of image names
+            % @param plotName [char] | The plotName
 
             minval = min(cellfun(@(x) min(x, [], 'all'), img));
             maxval = max(cellfun(@(x) max(x, [], 'all'), img));
 
-            fig = figure(figNum); 
-            tlo = tiledlayout(fig,2,3,'TileSpacing','None');
+            fig = figure(figNum);
+            tlo = tiledlayout(fig, 2, 3, 'TileSpacing', 'None');
             for i = 1:numel(img)
-                ax = nexttile(tlo); 
-                imagesc(img{i}, [minval maxval])
+                ax = nexttile(tlo);
+                imagesc(img{i}, [minval, maxval])
                 colormap('parula');
                 c = colorbar;
                 title(names{i});
             end
             config.SetSetting('plotName', plotName);
-            plots.SavePlot(fig); 
-        end 
-            
+            plots.SavePlot(fig);
+        end
+
         %======================================================================
         %> @brief ReferenceLibrary  plots the reference spectra in the library.
         %>

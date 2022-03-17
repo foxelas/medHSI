@@ -2,8 +2,8 @@
 %> @brief MultiscaleSuperpixelAnalysis applies Multiscale SuperPCA to an hsi and visualizes
 %> the result.
 %>
-%> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
-%> 
+%> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+%>
 %> Need to set config::[saveFolder] for image output.
 %>
 %> @b Usage
@@ -29,8 +29,8 @@ function [scores, labels, validLabels] = MultiscaleSuperpixelAnalysis(hsIm, labe
 % MultiscaleSuperpixelAnalysis applies Multiscale SuperPCA to an hsi and visualizes
 % the result.
 %
-% Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA . 
-% 
+% Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+%
 % Need to set config::[saveFolder] for image output.
 %
 % @b Usage
@@ -53,7 +53,7 @@ function [scores, labels, validLabels] = MultiscaleSuperpixelAnalysis(hsIm, labe
 % to tissue pixels
 close all;
 
-if nargin < 2 
+if nargin < 2
     labelInfo = [];
 end
 
@@ -65,35 +65,30 @@ srgb = hsIm.GetDisplayImage('rgb');
 [scores, labels, validLabels] = hsIm.MultiscaleSuperPCA(varargin{:});
 
 N = numel(scores);
-pixelNumArray =[ 9, 14, 20, 28, 40];
+pixelNumArray = [9, 14, 20, 28, 40];
 
-pc1 = cell(N,1);
-pc2 = cell(N,1);
-pc3 = cell(N,1);
-names = cell(N,1);
-for i=1:N
-    names{i} = strjoin( {'Superpixels:', num2str(pixelNumArray(i))}, {' '});
+pc1 = cell(N, 1);
+pc2 = cell(N, 1);
+pc3 = cell(N, 1);
+names = cell(N, 1);
+for i = 1:N
+    names{i} = strjoin({'Superpixels:', num2str(pixelNumArray(i))}, {' '});
     labels{i} = labeloverlay(srgb, labels{i});
-    pc1{i} = scores{i}(:,:,1);
-    pc2{i} = scores{i}(:,:,2);
-    pc3{i} = scores{i}(:,:,3);
-end 
-
-plotName = fullfile(savedir, 'superpixel_segments.jpg');
-plots.Montage(1, labels, names, plotName); 
-
-plotName = fullfile(savedir, 'PC1.jpg');
-plots.MontageCmap(2, pc1, names, plotName); 
-
-plotName = fullfile(savedir, 'PC2.jpg');
-plots.MontageCmap(3, pc2, names, plotName); 
-
-plotName = fullfile(savedir, 'PC3.jpg');
-plots.MontageCmap(4, pc3, names, plotName); 
-
+    pc1{i} = scores{i}(:, :, 1);
+    pc2{i} = scores{i}(:, :, 2);
+    pc3{i} = scores{i}(:, :, 3);
 end
 
+plotName = fullfile(savedir, 'superpixel_segments.jpg');
+plots.Montage(1, labels, names, plotName);
 
+plotName = fullfile(savedir, 'PC1.jpg');
+plots.MontageCmap(2, pc1, names, plotName);
 
+plotName = fullfile(savedir, 'PC2.jpg');
+plots.MontageCmap(3, pc2, names, plotName);
 
+plotName = fullfile(savedir, 'PC3.jpg');
+plots.MontageCmap(4, pc3, names, plotName);
 
+end

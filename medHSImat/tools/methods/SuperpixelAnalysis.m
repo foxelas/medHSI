@@ -50,7 +50,7 @@ function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, labelInfo, var
 % @retval validLabels [numeric array] | The superpixel labels that refer
 % to tissue pixels
 
-if nargin < 2 
+if nargin < 2
     labelInfo = [];
 end
 
@@ -109,4 +109,3 @@ if config.GetSetting('showFigures')
     end
 end
 end
-
