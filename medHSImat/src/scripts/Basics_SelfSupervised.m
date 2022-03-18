@@ -1,5 +1,5 @@
 function [] = Basics_SelfSupervised()
-
+clc;
 option = 'msuperpca';
 
 if strcmpi(option, 'sam')
@@ -47,8 +47,9 @@ elseif strcmpi(option, 'msuperpca')
     %% Multiscale SuperPCA
     experiment = strcat('MultiscaleSuperPCA-Manual', date());
     Basics_Init(experiment);
-
-    apply.ToEach(@MultiscaleSuperpixelAnalysis);
+    
+    pixelNumArray = floor(50*sqrt(2).^[-2:2]);
+    apply.ToEach(@MultiscaleSuperpixelAnalysis, pixelNumArray);
 
 else
     fprintf('Unsupported [option] value.\n');

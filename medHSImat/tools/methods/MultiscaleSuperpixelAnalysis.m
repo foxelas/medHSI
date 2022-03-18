@@ -63,9 +63,9 @@ savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFo
 srgb = hsIm.GetDisplayImage('rgb');
 
 [scores, labels, validLabels] = hsIm.MultiscaleSuperPCA(varargin{:});
+pixelNumArray = floor(50*sqrt(2).^[-2:2]);
 
 N = numel(scores);
-pixelNumArray = [9, 14, 20, 28, 40];
 
 pc1 = cell(N, 1);
 pc2 = cell(N, 1);

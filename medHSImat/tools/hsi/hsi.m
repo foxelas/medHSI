@@ -1097,7 +1097,7 @@ classdef hsi
             % @retval validLabels [cell array] | The superpixel labels that refer
             % to tissue pixels
             if nargin < 2
-                pixelNumArray = floor(50*sqrt(2).^[-2:2]);
+                pixelNumArray = floor(20*sqrt(2).^[-2:2]);
             end
 
             if nargin < 3
