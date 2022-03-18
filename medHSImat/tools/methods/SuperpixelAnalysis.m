@@ -54,6 +54,7 @@ if nargin < 2
     labelInfo = [];
 end
 
+close all;
 savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
 
 %% Preparation
@@ -107,5 +108,8 @@ if config.GetSetting('showFigures')
         plots.SavePlot(7);
         pause(0.5);
     end
+    
+    criteria = 'eigenvectors*.jpg';
+    plots.MontageFolderContents(8, strcat(savedir, '\'), criteria, 'Eigenvectors for each superpixel', [800, 800]);
 end
 end

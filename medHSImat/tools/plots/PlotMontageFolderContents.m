@@ -86,7 +86,7 @@ if ~isOneFolder
         imageList = cell(numel(targetIDs), 1);
     end
     c = 1;
-    for i = 3:imageNum
+    for i = 3:imageNum + 2
         if (hasTargetType & find(targetIDs == str2double(fileList(i).name))) | ~hasTargetType
             img = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
             imageList{c} = imresize(img, [numrows, numcols]);
@@ -113,7 +113,7 @@ else
     if imageNum > imageLimit
         imageNum = imageLimit;
     end
-    imageList = cell(numel(imageNum), 1);
+    imageList = cell(imageNum, 1);
 
     for i = 1:imageNum
         img = imread(fullfile(fileList(i).folder, fileList(i).name));

@@ -35,6 +35,7 @@ for i = 1:pcNum
     img = squeeze(hsIm(:, :, i));
     mask = (img ~= 0);
     h = imagesc(img, 'AlphaData', mask);
+    axis image;
     title(strcat('PC', num2str(i)));
     colorbar;
     config.SetSetting('plotName', strcat(plotName, num2str(i)));

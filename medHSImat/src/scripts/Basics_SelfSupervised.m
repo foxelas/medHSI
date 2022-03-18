@@ -1,6 +1,6 @@
 function [] = Basics_SelfSupervised()
 clc;
-option = 'msuperpca';
+option = 'superpca';
 
 if strcmpi(option, 'sam')
 
@@ -59,9 +59,9 @@ end
 
 function GetMontagetCollection(target)
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
-plots.MontageFolderContents(1, [], criteria);
+plots.MontageFolderContents(1, [], criteria, [], [800, 800]);
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'fix');
-plots.MontageFolderContents(2, [], criteria, strcat(target, ' for fix'));
+plots.MontageFolderContents(2, [], criteria, strcat(target, ' for fix'), [800, 800]);
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'raw');
-plots.MontageFolderContents(3, [], criteria, strcat(target, ' for ex-vivo'));
+plots.MontageFolderContents(3, [], criteria, strcat(target, ' for ex-vivo'), [800, 800]);
 end
