@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief DimredInternal reduces the dimensions of the hyperspectral image.
 %>
-%> Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+%> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 %> details check @c function Dimred.
 %>
 %> @b Usage
@@ -20,6 +20,7 @@
 %> @param method [string] | The method for dimension reduction
 %> @param q [int] | The number of components to be retained
 %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+%> @param varargin [cell array] | Optional additional arguments for methods that require them 
 %>
 %> @retval coeff [numeric array] | The transformation coefficients
 %> @retval scores [numeric array] | The transformed values
@@ -30,10 +31,10 @@
 %> values
 %> @retval Mdl [model] | The dimension reduction model
 % ======================================================================
-function [coeff, scores, latent, explained, objective] = DimredInternal(X, method, q, mask)
+function [coeff, scores, latent, explained, objective] = DimredInternal(X, method, q, mask, varargin)
 % DimredInternal reduces the dimensions of the hyperspectral image.
 %
-% Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+% Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 % details check @c function Dimred.
 %
 % @b Usage
@@ -52,6 +53,7 @@ function [coeff, scores, latent, explained, objective] = DimredInternal(X, metho
 % @param method [string] | The method for dimension reduction
 % @param q [int] | The number of components to be retained
 % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+% @param varargin [cell array] | Optional additional arguments for methods that require them 
 %
 % @retval coeff [numeric array] | The transformation coefficients
 % @retval scores [numeric array] | The transformed values
@@ -62,12 +64,12 @@ function [coeff, scores, latent, explained, objective] = DimredInternal(X, metho
 % values
 % @retval Mdl [model] | The dimension reduction model
 
-hasMask = nargin > 3;
+hasMask = nargin > 3 & ~isempty(mask);
 
-keepSpatialDim = strcmpi(method, 'SuperPCA');
+keepSpatialDim = contains(method, 'SuperPCA');
 
 if keepSpatialDim
-    [coeff, scores, latent, explained, objective] = Dimred(X, method, q);
+    [coeff, scores, latent, explained, objective] = Dimred(X, method, q, varargin{:});
     if hasMask
         scores = GetMaskedPixelsInternal(scores, mask);
     end
@@ -79,7 +81,7 @@ else
         Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
     end
 
-    [coeff, scores, latent, explained, objective] = Dimred(Xcol, method, q);
+    [coeff, scores, latent, explained, objective] = Dimred(Xcol, method, q, varargin{:});
 
     if hasMask
         scores = hsi.RecoverSpatialDimensions(scores, size(X), mask);

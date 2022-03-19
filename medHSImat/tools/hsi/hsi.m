@@ -480,7 +480,7 @@ classdef hsi
         % ======================================================================
         %> @brief Dimred reduces the dimensions of the hyperspectral image.
         %>
-        %> Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+        %> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
         %> details check @c function Dimred.
         %>
         %> @b Usage
@@ -499,6 +499,7 @@ classdef hsi
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
         %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+        %> @param varargin [cell array] | Optional additional arguments for methods that require them 
         %>
         %> @retval coeff [numeric array] | The transformation coefficients
         %> @retval scores [numeric array] | The transformed values
@@ -512,7 +513,7 @@ classdef hsi
         function [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
             % Dimred reduces the dimensions of the hyperspectral image.
             %
-            % Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+            % Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
             % details check @c function Dimred.
             %
             % @b Usage
@@ -531,6 +532,7 @@ classdef hsi
             % @param method [string] | The method for dimension reduction
             % @param q [int] | The number of components to be retained
             % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+            % @param varargin [cell array] | Optional additional arguments for methods that require them 
             %
             % @retval coeff [numeric array] | The transformation coefficients
             % @retval scores [numeric array] | The transformed values
@@ -546,7 +548,7 @@ classdef hsi
         % ======================================================================
         %> @brief Transform applies a transform to the hyperspectral data.
         %>
-        %> Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+        %> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
         %> details check @c function Dimred.
         %>
         %> @b Usage
@@ -559,13 +561,14 @@ classdef hsi
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
         %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+        %> @param varargin [cell array] | Optional additional arguments for methods that require them 
         %>
         %> @retval scores [numeric array] | The transformed values
         % ======================================================================
         function [scores] = Transform(obj, method, varargin)
             % Transform applies a transform to the hyperspectral data.
             %
-            % Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+            % Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
             % details check @c function Dimred.
             %
             % @b Usage
@@ -578,6 +581,7 @@ classdef hsi
             % @param method [string] | The method for dimension reduction
             % @param q [int] | The number of components to be retained
             % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+            % @param varargin [cell array] | Optional additional arguments for methods that require them 
             %
             % @retval scores [numeric array] | The transformed values
             [~, scores, ~, ~, ~] = DimredInternal(obj.Value, method, varargin{:});

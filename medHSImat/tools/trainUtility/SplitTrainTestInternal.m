@@ -4,6 +4,7 @@
 %> For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
 %> For more details check @c function SplitTrainTestInternal .
 %> The base dataset should be already saved before running augmentation.
+%> This function can also handle multiscale transformations.
 %>
 %> @b Usage
 %>
@@ -26,10 +27,10 @@
 %> @param folds [int] | The number of folds
 %> @param transformFun [function handle] | The function handle for the function to be applied
 %>
-%> @retval X [numeric array] | The train data
-%> @retval y [numeric array] | The train values
-%> @retval Xtest [numeric array] | The test data
-%> @retval ytest [numeric array] | The test values
+%> @retval X [numeric array or cell array] | The train data
+%> @retval y [numeric array or cell array] | The train values
+%> @retval Xtest [numeric array or cell array] | The test data
+%> @retval ytest [numeric array or cell array] | The test values
 %> @retval cvp [cell array] | The cross validation index splits
 %> @retval sRGBs [cell array] | The array of sRGBs for test hsi data
 %> @retval fgMasks [cell array] | The foreground masks of sRGBs for test hsi data
@@ -41,6 +42,7 @@ function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(data
 % For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
 % For more details check @c function SplitTrainTestInternal .
 % The base dataset should be already saved before running augmentation.
+% This function can also handle multiscale transformations.
 %
 % @b Usage
 %
@@ -63,10 +65,10 @@ function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(data
 % @param folds [int] | The number of folds
 % @param transformFun [function handle] | The function handle for the function to be applied
 %
-% @retval X [numeric array] | The train data
-% @retval y [numeric array] | The train values
-% @retval Xtest [numeric array] | The test data
-% @retval ytest [numeric array] | The test values
+% @retval X [numeric array or cell array] | The train data
+% @retval y [numeric array or cell array] | The train values
+% @retval Xtest [numeric array or cell array] | The test data
+% @retval ytest [numeric array or cell array] | The test values
 % @retval cvp [cell array] | The cross validation index splits
 % @retval sRGBs [cell array] | The array of sRGBs for test hsi data
 % @retval fgMasks [cell array] | The foreground masks of sRGBs for test hsi data
@@ -131,11 +133,10 @@ for i = 1:length(targetIDs)
             elseif strcmp(dataType, 'pixel')
                 if useTransform
                     scores = transformFun(I);
-                    Xcol = GetMaskedPixelsInternal(scores, fgMask);
+                    xdata = GetMaskedPixelsInternal(scores, fgMask);
                 else
-                    Xcol = I.GetMaskedPixels(fgMask);
+                    xdata = I.GetMaskedPixels(fgMask);
                 end
-                xdata = Xcol;
                 if hasLabels
                     ydata = double(GetMaskedPixelsInternal(labelInfo.Labels, fgMask));
                 else
@@ -147,10 +148,18 @@ for i = 1:length(targetIDs)
             end
 
             if isempty(find(contains(testTargets, targetName), 1))
-                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi')
+                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi') 
                     jj = numel(X) + 1;
                     X{jj} = xdata;
                     y{jj} = ydata;
+                    
+                elseif iscell(xdata)
+                    if ~iscell(X)
+                        X = cell(numel(xdata),1);
+                    end
+                    X = cellfun(@(x, i) [x; xdata{i}], X, num2cell(1:numel(xdata))', 'un', 0);
+                    y = [y; ydata];
+                    
                 else
                     X = [X; xdata];
                     y = [y; ydata];
@@ -158,10 +167,18 @@ for i = 1:length(targetIDs)
 
             else
 
-                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi')
+                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi') 
                     jj = numel(Xtest) + 1;
-                    Xtest{j} = xdata; s
-                    ytest{j} = ydata;
+                    Xtest{jj} = xdata; 
+                    ytest{jj} = ydata;
+                    
+                elseif iscell(xdata)
+                    if ~iscell(Xtest)
+                        Xtest = cell(numel(xdata),1);
+                    end
+                    Xtest = cellfun(@(x, i) [x; xdata{i}], Xtest, num2cell(1:numel(xdata))', 'un', 0);
+                    ytest = [ytest; ydata];
+                    
                 else
                     Xtest = [Xtest; xdata];
                     ytest = [ytest; ydata];

@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief Dimred reduces the dimensions of the hyperspectral image.
 %>
-%> Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+%> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 %> details check @c function Dimred.
 %>
 %> @b Usage
@@ -22,6 +22,7 @@
 %> @param method [string] | The method for dimension reduction
 %> @param q [int] | The number of components to be retained
 %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+%> @param varargin [cell array] | Optional additional arguments for methods that require them 
 %>
 %> @retval coeff [numeric array] | The transformation coefficients
 %> @retval scores [numeric array] | The transformed values
@@ -33,10 +34,10 @@
 %> @retval Mdl [model] | The dimension reduction model
 % ======================================================================
 
-function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, q, mask)
+function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, q, mask, varargin)
 % Dimred reduces the dimensions of the hyperspectral image.
 %
-% Currently PCA, RICA, SuperPCA, LDA, QDA are available. For more
+% Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 % details check @c function Dimred.
 %
 % @b Usage
@@ -57,6 +58,7 @@ function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, 
 % @param method [string] | The method for dimension reduction
 % @param q [int] | The number of components to be retained
 % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+% @param varargin [cell array] | Optional additional arguments for methods that require them 
 %
 % @retval coeff [numeric array] | The transformation coefficients
 % @retval scores [numeric array] | The transformed values
@@ -112,11 +114,39 @@ end
 
 %% SuperPCA
 if strcmpi(method, 'superpca')
-    pixelNum = 5;
+    if isempty(varargin)
+        pixelNum = 20;
+    else 
+        pixelNum = varargin{1};
+    end
+    
     %%super-pixels segmentation
     superpixels = cubseg(X, pixelNum);
 
     %%SupePCA based DR
     scores = SuperPCA(X, q, superpixels);
 end
+
+if strcmpi(method, 'msuperpca')
+    
+    if isempty(varargin)
+        pixelNumArray = floor(20*sqrt(2).^[-2:2]);
+    else 
+        pixelNumArray = varargin{1};
+    end
+      
+    N = numel(pixelNumArray);
+    scores = cell(N, 1);
+    for i = 1:N
+        pixelNum = pixelNumArray(i);
+        
+        %%super-pixels segmentation
+        superpixels = cubseg(X, pixelNum);
+
+        %%SupePCA based DR
+        scores{i} = SuperPCA(X, q, superpixels);    
+    end     
+            
+end
+
 end
