@@ -13,8 +13,13 @@ DEFAULT_HEIGHT = 64
 
 def load_data():
     conf = hsi_utils.parse_config()
-    fpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['datasets'], "hsi_normalized_full.h5")
-
+    outputDir = conf['Directories']['outputDir']
+    datasetName = conf['Data Settings']['dataset']
+    fileName = 'hsi_'+ 'normalized' + '_full' +'.h5'
+    # fileName = 'hsi_'+ datasetName + '_full' +'.h5'
+    folderName = conf['Folder Names']['datasetsFolderName']
+    fpath = os.path.join(outputDir, datasetName, folderName, fileName)
+    print(fpath)
     dataList, keyList = hsi_utils.load_dataset(fpath, 'image')
 
     sampleIds = [153, 172, 166, 169, 178, 184]
@@ -30,7 +35,9 @@ def load_data():
     croppedData = hsi_utils.center_crop_list(dataList, DEFAULT_HEIGHT, DEFAULT_HEIGHT, True)
 
     # Prepare labels
-    labelpath = os.path.join(conf['Directories']['outputDir'],  conf['Folder Names']['labelsManual'])
+    labelpath = os.path.join(conf['Directories']['outputDir'], conf['Data Settings']['dataset'],
+    '00-Labels-Processed')
+    # conf['Folder Names']['labelsManual'])
     labelRgb = hsi_utils.load_label_images(labelpath)
 
     # for (x,y) in zip(dataList, labelRgb):
@@ -81,7 +88,7 @@ def get_model_filename(suffix='', extension='txt', folder = None):
         model_name = str(today) + '_'
     
     savedir = os.path.join(hsi_utils.conf['Directories']['outputDir'],
-        hsi_utils.conf['Folder Names']['pythonTest'])
+        hsi_utils.conf['Data Settings']['dataset'], hsi_utils.conf['Folder Names']['pythonTestFolderName'])
     if folder is not None:
         savedir = os.path.join(savedir, folder)
 
@@ -115,9 +122,11 @@ def save_model_info(model, folder = None):
 
 def show_label_montage(): 
     croppedData, croppedLabels = load_data()
-    filename = os.path.join(hsi_utils.conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
+    filename = os.path.join(hsi_utils.conf['Directories']['outputDir'], hsi_utils.conf['Data Settings']['dataset'], 
+        hsi_utils.conf['Folder Names']['pythonTestFolderName'], 'normalized-montage.jpg')        
     hsi_utils.show_montage(croppedData, filename, 'srgb')
-    filename = os.path.join(hsi_utils.conf['Directories']['outputDir'], 'T20211207-python', 'labels-montage.jpg')
+    filename =os.path.join(hsi_utils.conf['Directories']['outputDir'], hsi_utils.conf['Data Settings']['dataset'], 
+        hsi_utils.conf['Folder Names']['pythonTestFolderName'], 'labels-montage.jpg')
     hsi_utils.show_montage(croppedLabels, filename, 'grey')
 
 
@@ -153,3 +162,5 @@ def visualize(hsi, gt, pred, folder = None):
 
     plt.show()
 
+#### Init 
+#show_label_montage()

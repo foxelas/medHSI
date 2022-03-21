@@ -60,7 +60,7 @@ def parse_config():
 conf = parse_config()
 
 def get_savedir():
-    dirName = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['pythonTest'])
+    dirName = os.path.join(conf['Directories']['outputDir'], conf['Data Settings']['dataset'], conf['Folder Names']['pythonTestFolderName'])
     return dirName
 
 def get_tripletdir():
@@ -103,9 +103,14 @@ def load_black_mat(fname, varname):
 def load_dataset(fpath, sampleType='pixel', ash5=0):
     f = load_from_h5(fpath)
     hsiList = []
+
+    #keyList = f[next(iter(f))]
     keyList = list(f.keys())
+    print(keyList)
+    #print("Elements per sample", list(f.keys()))
 
     for keyz in keyList:
+        print(keyz)
         if ash5 == 1:
             val = f[keyz]
         else:
@@ -309,7 +314,7 @@ def show_montage(dataList, filename = None, imgType = 'srgb', channel = 150):
         m = skimage.util.montage(hsiList)
 
     if filename == None: 
-        filename = os.path.join(conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
+        filename = os.path.join(conf['Directories']['outputDir'], conf['Data Settings']['dataset'], conf['Folder Names']['pythonTestFolderName'], 'normalized-montage.jpg')
     skimage.io.imsave(filename, m)
 
 

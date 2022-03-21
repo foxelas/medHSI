@@ -64,7 +64,11 @@ function [coeff, scores, latent, explained, objective] = DimredInternal(X, metho
 % values
 % @retval Mdl [model] | The dimension reduction model
 
-hasMask = nargin > 3 & ~isempty(mask);
+if nargin > 3
+    hasMask = ~isempty(mask);
+else 
+    hasMask = false;
+end
 
 keepSpatialDim = contains(method, 'SuperPCA');
 

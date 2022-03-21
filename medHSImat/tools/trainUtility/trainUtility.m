@@ -703,11 +703,14 @@ classdef trainUtility
             predlabels = trainUtility.Predict(Mdl, testscores);
             origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
             predLabels = hsi.RecoverSpatialDimensions(predlabels, origSizes, fgMasks);
+            trueLabels = hsi.RecoverSpatialDimensions(yvalid, origSizes, fgMasks);
             for i = 1:numel(sRGBs)
                 imgFilename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), ...
                     strcat('pred_', num2str(i), '_', method, '_', num2str(q))), 'png');
                 config.SetSetting('plotName', imgFilename);
-                plots.Overlay(4, sRGBs{i}, predLabels{i}, strcat(method, '-', num2str(q)));
+                jacsim = jaccard(predLabels{i}, trueLabels{i});
+                figTitle =  sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim * 100), '%)'));
+                plots.Overlay(4, sRGBs{i}, predLabels{i}, figTitle);
             end
         end        
     end

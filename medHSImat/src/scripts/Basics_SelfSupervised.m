@@ -1,14 +1,16 @@
 function [] = Basics_SelfSupervised()
 clc;
-option = 'superpca';
+option = 'sam';
 
 if strcmpi(option, 'sam')
 
     %% SAM
-    experiment = strcat('SAM segmentation-BCC');
+    experiment = strcat('SAM segmentation-BCC&MCC');
     Basics_Init(experiment);
 
-    apply.ToEach(@SAMAnalysis);
+    apply.ToEach(@SAMAnalysis);    
+    GetMontagetCollection('predLabel');
+
 
 elseif strcmpi(option, 'superpca')
 
@@ -58,10 +60,8 @@ end
 end
 
 function GetMontagetCollection(target)
+path = commonUtility.GetFilename('output', config.GetSetting('saveFolder'), '');
+fprintf('Montage from path %s.\n', path);
 criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
 plots.MontageFolderContents(1, [], criteria, [], [800, 800]);
-criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'fix');
-plots.MontageFolderContents(2, [], criteria, strcat(target, ' for fix'), [800, 800]);
-criteria = struct('TargetDir', 'subfolders', 'TargetName', target, 'TargetType', 'raw');
-plots.MontageFolderContents(3, [], criteria, strcat(target, ' for ex-vivo'), [800, 800]);
 end
