@@ -124,13 +124,15 @@ end
 
 % imageList = imageList(1:end-2);
 
-r = ceil(numel(imageList)/4);
-montage(imageList, 'Size', [r, 4]);
-if ~isempty(figTitle)
-    title(strrep(figTitle, '_', ' '));
-end
+if numel(imageList) > 0 
+    r = ceil(numel(imageList)/4);
+    montage(imageList, 'Size', [r, 4]);
+    if ~isempty(figTitle)
+        title(strrep(figTitle, '_', ' '));
+    end
 
-%save in parent dir
-config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
-plots.SavePlot(fig);
+    %save in parent dir
+    config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
+    plots.SavePlot(fig);
+end
 end

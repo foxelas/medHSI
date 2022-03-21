@@ -18,15 +18,17 @@
 %> ReadDataset('handsDataset',{'hand', false});
 %>
 %> ReadDataset('pslData', {'tissue', true});
+%>
+%> ReadDataset('pslData', {'tissue', true}, true, {'raw', false});
 %> @endcode
 %>
 %> @param dataset [char] | The dataset
-%> @param condition [cell array] | The conditions for reading files
+%> @param contentConditions [cell array] | The content conditions for reading files
 %> @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
-%>
+%> @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none
 %======================================================================
-function [] = ReadDataset(dataset, condition, readForeground)
-% @brief ReadDataset reads the dataset.
+function [] = ReadDataset(dataset, contentConditions, readForeground, targetConditions)
+% ReadDataset reads the dataset.
 %
 % ReadDataset reads a group of hsi data according to condition, prepares
 % .mat files for the raw spectral data, applies preprocessing and returns
@@ -36,20 +38,23 @@ function [] = ReadDataset(dataset, condition, readForeground)
 %  Data samples are saved in .mat files so that one contains a
 % 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 % hsiInfo) variable.
-% The save location is config::[matDir]\[dataset]\*.mat.
-% Snapshot images are saved in config::[outputDir]\[snapshotsFolderName]\[dataset]\.
+% The save location is config::[matDir]\\[dataset]\\*.mat.
+% Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\.
 %
 % @b Usage
+%
 % @code
 % ReadDataset('handsDataset',{'hand', false});
 %
 % ReadDataset('pslData', {'tissue', true});
+%
+% ReadDataset('pslData', {'tissue', true}, true, {'raw', false});
 % @endcode
 %
 % @param dataset [char] | The dataset
-% @param condition [cell array] | The conditions for reading files
-%@param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
-%
+% @param contentConditions [cell array] | The content conditions for reading files
+% @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
+% @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none
 
 if nargin < 3
     readForeground = true;
@@ -68,7 +73,11 @@ isTest = config.GetSetting('isTest');
 basedir = commonUtility.GetFilename('output', config.GetSetting('snapshotsFolderName'), '');
 
 %% Read h5 data
-[filenames, targetIDs, outRows] = databaseUtility.Query(condition);
+if nargin < 4 
+    [filenames, targetIDs, outRows] = databaseUtility.Query(contentConditions);
+else
+    [filenames, targetIDs, outRows] = databaseUtility.Query(contentConditions, [], [], [], [], targetConditions);
+end
 
 integrationTimes = [outRows.IntegrationTime];
 dates = [outRows.CaptureDate];
@@ -81,7 +90,7 @@ for i = 1:length(targetIDs)
 
     id = targetIDs(i);
     fprintf('Running for data %d. \n', id);
-    target = databaseUtility.GetValueFromTable(outRows, 'Target', i);
+    targetConditions = databaseUtility.GetValueFromTable(outRows, 'Target', i);
     content = databaseUtility.GetValueFromTable(outRows, 'Content', i);
     config.SetSetting('integrationTime', integrationTimes(i));
     config.SetSetting('dataDate', num2str(dates(i)));
@@ -105,7 +114,7 @@ for i = 1:length(targetIDs)
     saveName = strcat(saveName, '.jpg');
 
     %% write triplet HSI in .mat file
-    rawImg = hsiUtility.ReadTriplet(content, target);
+    rawImg = hsiUtility.ReadTriplet(content, targetConditions);
 
     %% load HSI from .mat file to verify it is working and to prepare preview images
     config.SetSetting('fileName', targetID);

@@ -25,6 +25,8 @@ function [] = Basics_Init(experiment, dataset)
 % @param experiment [char] | The name of the experiment
 % @param dataset [char] | Optional: The name of the dataset.Default:
 % config::[dataset].
+close all;
+clc;
 
 if nargin > 1
     config.SetSetting('dataset', dataset);
