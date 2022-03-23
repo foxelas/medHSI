@@ -89,7 +89,7 @@ for i = 1:length(targetIDs)
     close all;
 
     id = targetIDs(i);
-    fprintf('Running for data %d. \n', id);
+    fprintf('\nRunning for data %d. \n', id);
     targetConditions = databaseUtility.GetValueFromTable(outRows, 'Target', i);
     content = databaseUtility.GetValueFromTable(outRows, 'Content', i);
     config.SetSetting('integrationTime', integrationTimes(i));
@@ -116,38 +116,40 @@ for i = 1:length(targetIDs)
     %% write triplet HSI in .mat file
     rawImg = hsiUtility.ReadTriplet(content, targetConditions);
 
-    %% load HSI from .mat file to verify it is working and to prepare preview images
-    config.SetSetting('fileName', targetID);
-    rawIm = hsi(rawImg, readForeground, targetID, sampleID, tissueType);
-    dispImageRaw = rawIm.GetDisplayRescaledImage('rgb');
+    if ~isempty(rawImg)
+        %% load HSI from .mat file to verify it is working and to prepare preview images
+        config.SetSetting('fileName', targetID);
+        rawIm = hsi(rawImg, readForeground, targetID, sampleID, tissueType);
+        dispImageRaw = rawIm.GetDisplayRescaledImage('rgb');
 
-    %% Preprocess HSI and save
-    spectralData = Preprocessing(rawIm, targetID);
-    dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
+        %% Preprocess HSI and save
+        spectralData = Preprocessing(rawIm, targetID);
+        dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 
-    %% Read Label
-    labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
+        %% Read Label
+        labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
 
-    %% Save data info in a file
-    filename = commonUtility.GetFilename('dataset', targetID);
-    save(filename, 'spectralData', 'labelInfo', '-v7.3');
+        %% Save data info in a file
+        filename = commonUtility.GetFilename('dataset', targetID);
+        save(filename, 'spectralData', 'labelInfo', '-v7.3');
 
-    %% Plot images
-    close all;
+        %% Plot images
+        close all;
 
-    figure(1);
-    imshow(dispImageRaw);
-    config.SetSetting('plotName', config.DirMake(basedir, 'rgb', saveName));
-    plots.SavePlot(1);
+        figure(1);
+        imshow(dispImageRaw);
+        config.SetSetting('plotName', config.DirMake(basedir, 'rgb', saveName));
+        plots.SavePlot(1);
 
-    figure(2);
-    imshow(dispImageRgb);
-    config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed', saveName));
-    plots.SavePlot(2);
+        figure(2);
+        imshow(dispImageRgb);
+        config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed', saveName));
+        plots.SavePlot(2);
 
-    config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed_channels', saveName));
-    spectralData.SubimageMontage(3);
-    pause(0.1);
+        config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed_channels', saveName));
+        spectralData.SubimageMontage(3);
+        pause(0.1);
+    end
 end
 
 %% preview of the entire dataset

@@ -61,92 +61,101 @@ if iscell(filename)
     filename = filename{1};
 end
 targetName = num2str(tableId);
+
 [spectralData, ~, ~] = hsiUtility.ReadH5(filename);
+if ~isempty(spectralData)  
 
-if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
-        || ~exist(commonUtility.GetFilename('black', targetName), 'file') ...
-        || ~exist(commonUtility.GetFilename('white', targetName), 'file')
+    if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
+            || ~exist(commonUtility.GetFilename('black', targetName), 'file') ...
+            || ~exist(commonUtility.GetFilename('white', targetName), 'file')
 
-    plotBaseDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'ReadTriplets', targetName), '');
+        plotBaseDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'ReadTriplets', targetName), '');
 
-    figure(1);
-    title('Target Image');
-    imshow(GetDisplayImageInternal(spectralData, 'rgb'));
-    config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));
-    plots.SavePlot(1);
-    filename = config.DirMake(commonUtility.GetFilename('target', targetName));
-    fprintf('Target data [spectralData] is saved at %s.\n', filename);
-    save(filename, 'spectralData', '-v7.3');
+        figure(1);
+        title('Target Image');
+        imshow(GetDisplayImageInternal(spectralData, 'rgb'));
+        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));
+        plots.SavePlot(1);
+        filename = config.DirMake(commonUtility.GetFilename('target', targetName));
+        fprintf('Target data [spectralData] is saved at %s.\n', filename);
+        save(filename, 'spectralData', '-v7.3');
 
-    if ~strcmp(config.GetSetting('normalization'), 'raw')
+        if ~strcmp(config.GetSetting('normalization'), 'raw')
 
-        %% White image
-        if config.GetSetting('isTest')
-            fcWhite = databaseUtility.GetFileConditions('whiteReflectance', target);
-        else
-            fcWhite = databaseUtility.GetFileConditions('white', target);
-        end
-        [filename, ~, ~] = databaseUtility.Query(fcWhite{:});
-        if iscell(filename)
-            filename = filename{1};
-        end
-        [white, ~, wavelengths] = hsiUtility.ReadH5(filename);
-        figure(2);
-        title('White Reference Image');
-        imshow(GetDisplayImageInternal(white, 'rgb'));
-        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_', num2str(config.GetSetting('integrationTime')))));
-        SavePlot(2);
-
-        %%UniSpectrum
-        if config.GetSetting('useCustomMask')
-            uniMask = GetCustomMaskInternal(white);
-        else
-            uniMask = ones(size(white, 1), size(white, 2));
-        end
-        uniSpectrum = GetMaskedPixelsInternal(white, uniMask);
-        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(config.GetSetting('integrationTime')))));
-        plots.Spectra(4, uniSpectrum, wavelengths, '99%-white', 'Reflectance Spectrum of White Balance Sheet');
-
-        %%BandMax
-        [m, n, w] = size(white);
-        bandmaxSpectrum = max(reshape(white, m*n, w), [], 1);
-        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_bandmax_', num2str(config.GetSetting('integrationTime')))));
-        plots.Spectra(5, bandmaxSpectrum, wavelengths, 'Bandmax spectrum', 'Bandmax Spectrum for the current Image');
-
-        fullReflectanceByPixel = white;
-        filename = commonUtility.GetFilename('white', targetName);
-        fprintf('White data [fullReflectanceByPixel] is saved at %s.\n', filename);
-        save(filename, 'fullReflectanceByPixel', 'uniSpectrum', 'bandmaxSpectrum', '-v7.3');
-
-        %% Black Image
-        if config.GetSetting('isTest')
-            if blackIsCapOn
-                fcBlack = databaseUtility.GetFileConditions('capOn', target);
+            %% White image
+            if config.GetSetting('isTest')
+                fcWhite = databaseUtility.GetFileConditions('whiteReflectance', target);
             else
-                fcBlack = databaseUtility.GetFileConditions('lightsOff', target);
+                fcWhite = databaseUtility.GetFileConditions('white', target);
             end
-        else
-            fcBlack = databaseUtility.GetFileConditions('black', target);
-        end
-        [filename, ~, ~] = databaseUtility.Query(fcBlack{:});
-        if iscell(filename)
-            filename = filename{1};
-        end
-        [blackReflectance, ~, ~] = hsiUtility.ReadH5(filename);
-        figure(3);
-        title('Black Reference Image');
-        imshow(GetDisplayImageInternal(blackReflectance, 'rgb'));
-        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime')))));
-        plots.SavePlot(3);
+            [filename, ~, ~] = databaseUtility.Query(fcWhite{:});
+            if iscell(filename)
+                filename = filename{1};
+            end
+            [white, ~, wavelengths] = hsiUtility.ReadH5(filename);
+            figure(2);
+            title('White Reference Image');
+            imshow(GetDisplayImageInternal(white, 'rgb'));
+            config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_', num2str(config.GetSetting('integrationTime')))));
+            SavePlot(2);
 
-        filename = commonUtility.GetFilename('black', targetName);
-        fprintf('Black data [blackReflectance] is saved at %s.\n', filename);
-        save(filename, 'blackReflectance', '-v7.3');
+            fullReflectanceByPixel = white;
+            filename = commonUtility.GetFilename('white', targetName);
+            fprintf('White data [fullReflectanceByPixel] is saved at %s.\n', filename);
+            
+            if config.GetSetting('isTest')
+                %%UniSpectrum
+                if config.GetSetting('useCustomMask')
+                    uniMask = GetCustomMaskInternal(white);
+                else
+                    uniMask = ones(size(white, 1), size(white, 2));
+                end
+                uniSpectrum = GetMaskedPixelsInternal(white, uniMask);
+                config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(config.GetSetting('integrationTime')))));
+                plots.Spectra(4, uniSpectrum, wavelengths, '99%-white', 'Reflectance Spectrum of White Balance Sheet');
+
+                %%BandMax
+                [m, n, w] = size(white);
+                bandmaxSpectrum = max(reshape(white, m*n, w), [], 1);
+                config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_bandmax_', num2str(config.GetSetting('integrationTime')))));
+                plots.Spectra(5, bandmaxSpectrum, wavelengths, 'Bandmax spectrum', 'Bandmax Spectrum for the current Image');
+                save(filename, 'fullReflectanceByPixel', 'uniSpectrum', 'bandmaxSpectrum', '-v7.3');
+            else
+                save(filename, 'fullReflectanceByPixel', '-v7.3');
+            end
+
+            %% Black Image
+            if config.GetSetting('isTest')
+                if blackIsCapOn
+                    fcBlack = databaseUtility.GetFileConditions('capOn', target);
+                else
+                    fcBlack = databaseUtility.GetFileConditions('lightsOff', target);
+                end
+            else
+                fcBlack = databaseUtility.GetFileConditions('black', target);
+            end
+            [filename, ~, ~] = databaseUtility.Query(fcBlack{:});
+            if iscell(filename)
+                filename = filename{1};
+            end
+            [blackReflectance, ~, ~] = hsiUtility.ReadH5(filename);
+            figure(3);
+            title('Black Reference Image');
+            imshow(GetDisplayImageInternal(blackReflectance, 'rgb'));
+            config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime')))));
+            plots.SavePlot(3);
+
+            filename = commonUtility.GetFilename('black', targetName);
+            fprintf('Black data [blackReflectance] is saved at %s.\n', filename);
+            save(filename, 'blackReflectance', '-v7.3');
+        else
+            disp('Read only capture data, ignore white and black images.');
+        end
     else
-        disp('Read only capture data, ignore white and black images.');
+        disp('Triplet files already exist.');
     end
 else
-    disp('Triple files already exist.');
+    spectralData = [];
 end
 
 end

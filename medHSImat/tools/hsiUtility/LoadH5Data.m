@@ -40,13 +40,20 @@ if ~exist(saveFilename, 'file')
     %h5disp(currentFile);
     %h5info(currentFile);
 
-    spectralData = double(h5read(currentFile, '/SpectralImage'));
+    if exist(currentFile) > 0
+        spectralData = double(h5read(currentFile, '/SpectralImage'));
 
-    wavelengths = h5read(currentFile, '/Wavelengths');
-    imageX = h5read(currentFile, '/MeasurementImages/Tristimulus_X');
-    imageY = h5read(currentFile, '/MeasurementImages/Tristimulus_Y');
-    imageZ = h5read(currentFile, '/MeasurementImages/Tristimulus_Z');
-    imageXYZ = cat(3, imageX, imageY, imageZ);
+        wavelengths = h5read(currentFile, '/Wavelengths');
+        imageX = h5read(currentFile, '/MeasurementImages/Tristimulus_X');
+        imageY = h5read(currentFile, '/MeasurementImages/Tristimulus_Y');
+        imageZ = h5read(currentFile, '/MeasurementImages/Tristimulus_Z');
+        imageXYZ = cat(3, imageX, imageY, imageZ);
+    else
+        spectralData = [];
+        imageXYZ = [];
+        wavelengths = [];
+        fprintf('File does not exist.\nDirectory %s\n', currentFile);
+    end
 
     save(saveFilename, 'spectralData', 'imageXYZ', 'wavelengths', '-v7.3');
 else
