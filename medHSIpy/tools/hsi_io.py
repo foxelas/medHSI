@@ -15,41 +15,15 @@ def load_data():
     conf = hsi_utils.parse_config()
     outputDir = conf['Directories']['outputDir']
     datasetName = conf['Data Settings']['dataset']
-    fileName = 'hsi_'+ 'normalized' + '_full' +'.h5'
-    # fileName = 'hsi_'+ datasetName + '_full' +'.h5'
+    fileName = 'hsi_'+ datasetName + '_full' +'.h5'
     folderName = conf['Folder Names']['datasetsFolderName']
     fpath = os.path.join(outputDir, datasetName, folderName, fileName)
-    print(fpath)
-    dataList, keyList = hsi_utils.load_dataset(fpath, 'image')
-
-    sampleIds = [153, 172, 166, 169, 178, 184]
-    print("Target Sample Images", sampleIds)
-
-    keepInd = [keyList.index('sample' + str(id)) for id in sampleIds]
-    print(keepInd)
-
-    if not keepInd is None:
-        dataList = [ dataList[i] for i in keepInd]
+    print("Read from ", fpath)
+    dataList, keyList, labelImages = hsi_utils.load_dataset(fpath, 'image')
 
     # Prepare input data
     croppedData = hsi_utils.center_crop_list(dataList, DEFAULT_HEIGHT, DEFAULT_HEIGHT, True)
 
-    # Prepare labels
-    labelpath = os.path.join(conf['Directories']['outputDir'], conf['Data Settings']['dataset'],
-    '00-Labels-Processed')
-    # conf['Folder Names']['labelsManual'])
-    labelRgb = hsi_utils.load_label_images(labelpath)
-
-    # for (x,y) in zip(dataList, labelRgb):
-    #     if x.shape[0] != y.shape[0] or x.shape[1] != y.shape[1]:
-    #         print('Error: images have different size!')
-    #         print(x.shape)
-    #         print(y.shape)
-    #         hsi_utils.show_display_image(x)
-    #         plt.imshow(y, cmap='gray')
-    #         plt.show()
-
-    labelImages = hsi_utils.get_labels_from_mask(labelRgb)
     croppedLabels = hsi_utils.center_crop_list(labelImages)
 
     # for (x,y) in zip(croppedData, croppedLabels):
@@ -163,4 +137,4 @@ def visualize(hsi, gt, pred, folder = None):
     plt.show()
 
 #### Init 
-#show_label_montage()
+show_label_montage()

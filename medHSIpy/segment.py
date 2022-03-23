@@ -1,6 +1,8 @@
 from random import seed
 from datetime import date
 
+from pandas import options
+
 from tools import hio
 import tools.hsi_segment_from_sm as segsm
 import tools.hsi_segment_from_scratch as segscratch
@@ -45,13 +47,14 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
 
         model.compile(
             'Adam',
-            loss='categorical_crossentropy')
+            loss='categorical_crossentropy'
+            )
 
         # fit model
         history = model.fit(
         x=xtrain,
         y=ytrain,
-        batch_size=64,
+        batch_size=4,
         epochs=200,
         validation_data=(xtest, ytest),
         )
@@ -62,17 +65,19 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
 # From segmentation_models: 'sm_vgg', 'sm_inception', 'sm_resnet'
 # From scratch: 'cnn3d_unbalanced', 'cnn3d_balanced', 'cnn2d'
 
-framework = 'cnn3d_unbalanced'
-model, history = get_framework(framework, x_train, x_test, y_train, y_test)
+#framework = 'sm_inception'
+flist = ['cnn3d_balanced', 'cnn3d_unbalanced', 'sm_vgg', 'sm_resnet', 'sm_inception']
+for framework in flist: 
+    model, history = get_framework(framework, x_train, x_test, y_train, y_test)
 
-folder = str(date.today()) + '_' + framework 
-hio.save_model_info(model, folder)
+    folder = str(date.today()) + '_' + framework 
+    hio.save_model_info(model, folder)
 
-hio.plot_history(history, folder)
+    hio.plot_history(history, folder)
 
-#prepare again in order to avoid pre-processing errors 
-x_train, x_test, y_train, y_test = hio.get_train_test()
+    #prepare again in order to avoid pre-processing errors 
+    x_train, x_test, y_train, y_test = hio.get_train_test()
 
-preds = model.predict(x_test)
-for (hsi, gt, pred) in zip(x_test, y_test, preds):
-   hio.visualize(hsi, gt, pred, folder)
+    preds = model.predict(x_test)
+    for (hsi, gt, pred) in zip(x_test, y_test, preds):
+        hio.visualize(hsi, gt, pred, folder)
