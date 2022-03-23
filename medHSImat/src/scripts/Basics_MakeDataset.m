@@ -42,4 +42,5 @@ if strcmpi(baseDataset, 'pslFix')
     hsiUtility.PrepareDataset(baseDataset, dbSelection, true, target);
 end
 
+hsiUtility.ExportH5Dataset();
 end

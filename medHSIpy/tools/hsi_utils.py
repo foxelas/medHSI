@@ -55,6 +55,8 @@ def parse_config():
     # print("Loading from settings conf/config.ini \n")
     # print("Sections")
     # print(config.sections())
+    
+    # config['Data Settings']['dataset'] = 'pslTestAugmented'
     return config
 
 conf = parse_config()
@@ -100,25 +102,21 @@ def load_black_mat(fname, varname):
     hsi = load_from_mat73(fname + '_black.mat', varname) 
     return hsi
 
-def load_dataset(fpath, sampleType='pixel', ash5=0):
+def load_dataset(fpath, sampleType='pixel'):
     f = load_from_h5(fpath)
     hsiList = []
+    labelList = []
 
-    #keyList = f[next(iter(f))]
     keyList = list(f.keys())
-    print(keyList)
-    #print("Elements per sample", list(f.keys()))
 
     for keyz in keyList:
-        print(keyz)
-        if ash5 == 1:
-            val = f[keyz]
-        else:
-            val = f[keyz][:]
-        
+        val = f[keyz]['hsi'][:]
+        lab = f[keyz]['label'][:]
+
         if val.shape[2] != 311:
             val = np.transpose(val, [1, 2, 0])
         hsiList.append(val)
+        labelList.append(lab.astype(np.int8))
 
     dataList = []
     if sampleType == 'pixel':
@@ -129,7 +127,7 @@ def load_dataset(fpath, sampleType='pixel', ash5=0):
         dataList = hsiList
     else:
         not_supported('SampleType')
-    return dataList, keyList          
+    return dataList, keyList, labelList          
 
 def load_images(fpath):
     images = []
@@ -150,7 +148,10 @@ def load_label_images(fpath):
 def get_labels_from_mask(imgList):
     labels = []
     for img in imgList: 
-        grayIm = cv2.convertScaleAbs(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))  
+        if img.ndim > 2: 
+            grayIm = cv2.convertScaleAbs(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))  
+        else: 
+            grayIm = img
         #print("Min", np.min(np.min(grayIm)), "and Max ", np.max(np.max(grayIm)))     	
         (thresh, blackAndWhiteImage) = cv2.threshold(grayIm, 170, 255, cv2.THRESH_BINARY)  	
         labelImg = np.logical_not(blackAndWhiteImage)

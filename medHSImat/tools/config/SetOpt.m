@@ -1,7 +1,7 @@
 % ======================================================================
-%> @brief SetOpt sets parameters for running from Config.ini
+%> @brief SetOpt sets parameters for running from config.ini
 %>
-%> The values are recovered from MedHSIMat\\conf\\Config.ini.
+%> The values are recovered from MedHSIMat\\conf\\config.ini.
 %> Values are saved in an .ini format.
 %>
 %> @b Usage
@@ -12,9 +12,9 @@
 %>
 % ======================================================================
 function [] = SetOpt()
-% SetOpt sets parameters for running from Config.ini
+% SetOpt sets parameters for running from config.ini
 %
-% The values are recovered from MedHSIMat\\conf\\Config.ini.
+% The values are recovered from MedHSIMat\\conf\\config.ini.
 % Values are saved in an .ini format.
 %
 % @b Usage
@@ -24,8 +24,8 @@ function [] = SetOpt()
 % @endcode
 %
 
-disp('Reading configuration file [Config.ini] ...');
-inputSettingsFile = fullfile(config.GetConfDir(), 'Config.ini');
+disp('Reading configuration file [config.ini] ...');
+inputSettingsFile = fullfile(config.GetConfDir(), 'config.ini');
 
 tmp = delimread(inputSettingsFile, {', '}, 'raw');
 for i = 1:length(tmp.raw)

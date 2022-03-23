@@ -137,6 +137,20 @@ classdef segment
             plots.GetMontagetCollection('predLabel');
         end
 
+        function ByICA()
+            experiment = strcat('FastICA');
+            Basics_Init(experiment);
+            icNum = 3;
+            apply.ToEach(@DimredAnalysis, 'ica', icNum);
+        end
+        
+        function ByRICA()
+            experiment = strcat('RICA');
+            Basics_Init(experiment);
+            icNum = 3;
+            apply.ToEach(@DimredAnalysis, 'rica', icNum);
+        end
+        
         function BySuperPCA()
 
             %% SuperPCA
@@ -150,11 +164,14 @@ classdef segment
             isManual = true;
             apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
 
-            plots.GetMontagetCollection('eigenvectors');
-            plots.GetMontagetCollection('superpixel_mask');
-            plots.GetMontagetCollection('pc1');
-            plots.GetMontagetCollection('pc2');
-            plots.GetMontagetCollection('pc3');
+            close all;
+            if config.GetSetting('isTest')
+                plots.GetMontagetCollection(1, 'eigenvectors');
+            end
+            plots.GetMontagetCollection(2, 'superpixel_mask');
+            plots.GetMontagetCollection(3, 'pc1');
+            plots.GetMontagetCollection(4, 'pc2');
+            plots.GetMontagetCollection(5, 'pc3');
 
             %% From SuperPCA package
             experiment = strcat('SuperPCA', date());
@@ -163,11 +180,14 @@ classdef segment
             isManual = false;
             apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
 
-            plots.GetMontagetCollection('eigenvectors');
-            plots.GetMontagetCollection('superpixel_mask');
-            plots.GetMontagetCollection('pc1');
-            plots.GetMontagetCollection('pc2');
-            plots.GetMontagetCollection('pc3');
+            close all;
+            if config.GetSetting('isTest')
+                plots.GetMontagetCollection(1, 'eigenvectors');
+            end
+            plots.GetMontagetCollection(2, 'superpixel_mask');
+            plots.GetMontagetCollection(3, 'pc1');
+            plots.GetMontagetCollection(4, 'pc2');
+            plots.GetMontagetCollection(5, 'pc3');
         end
 
         function ByMSuperPCA()

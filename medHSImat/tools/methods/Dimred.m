@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief Dimred reduces the dimensions of the hyperspectral image.
 %>
-%> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
+%> Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 %> details check @c function Dimred.
 %>
 %> @b Usage
@@ -37,7 +37,7 @@
 function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, q, mask, varargin)
 % Dimred reduces the dimensions of the hyperspectral image.
 %
-% Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
+% Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 % details check @c function Dimred.
 %
 % @b Usage
@@ -83,14 +83,20 @@ if nargin < 4
     mask = [];
 end
 
+rng default % For reproducibility
+
 %% PCA
 if strcmpi(method, 'pca')
     [coeff, scores, latent, tsquared, explained] = pca(X, 'NumComponents', q);
 end
 
+%% FastICA
+if strcmpi(method, 'ica')
+    [scores, ~, coeff] = fastica(X', 'numOfIC', q);
+end
+
 %% RICA
 if strcmpi(method, 'rica')
-    rng default % For reproducibility
     Mdl = rica(X, q, 'IterationLimit', 100, 'Lambda', 1);
     coeff = Mdl.TransformWeights;
     scores = X * coeff;

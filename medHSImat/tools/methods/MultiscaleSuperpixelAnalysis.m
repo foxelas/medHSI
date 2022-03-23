@@ -91,4 +91,6 @@ plots.MontageCmap(3, plotPath, pc2, names);
 plotPath = fullfile(savedir, 'PC3.jpg');
 plots.MontageCmap(4, plotPath, pc3, names);
 
+pause(0.5);
+
 end

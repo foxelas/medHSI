@@ -7,17 +7,18 @@
 %> @b Usage
 %>
 %> @code
-%> CustomKmeans(hsIm, 5);
+%> CustomKmeans(hsIm, [], 5);
 %>
 %> apply.ToEach(@CustomKmeans, 5);
 %> @endcode
 %>
 %> @param hsIm [hsi] | An instance of the hsi class
+%> @retval labels [numeric array] | The labels of the superpixels
 %> @param clusterNum [int] | The number of clusters
 %>
 %> @retval labels [numeric array] | The cluster labels
 % ======================================================================
-function [labels] = CustomKmeans(hsIm, clusterNum)
+function [labels] = CustomKmeans(hsIm, labelInfo, clusterNum)
 % CustomKmeans applies kmeans clustering to an hsi and visualizes
 % the result.
 %
@@ -26,17 +27,21 @@ function [labels] = CustomKmeans(hsIm, clusterNum)
 % @b Usage
 %
 % @code
-% CustomKmeans(hsIm, 5);
+% CustomKmeans(hsIm, [], 5);
 %
 % apply.ToEach(@CustomKmeans, 5);
 % @endcode
 %
 % @param hsIm [hsi] | An instance of the hsi class
+% @retval labels [numeric array] | The labels of the superpixels
 % @param clusterNum [int] | The number of clusters
 %
 % @retval labels [numeric array] | The cluster labels
+if nargin < 2
+    labelInfo = [];
+end
 
-srgb = hsIm.GetDisplayImage('rgb');
+srgb = hsIm.GetDisplayImage();
 fgMask = hsIm.FgMask;
 
 Xcol = hsIm.GetMaskedPixels(fgMask);
@@ -54,4 +59,10 @@ end
 
 plots.Spectra(2, fullfile(savedir, 'kmeans-centroids'), C, hsiUtility.GetWavelengths(size(hsIm.Value, 3)), names, 'Kmeans centroids');
 
+img = {srgb, labels};
+names = { strjoin({'SampleID: ', hsIm.SampleID}, {' '}) , 'Clustering'};
+plotPath = fullfile(savedir, 'kmeans');
+plots.MontageCmap(3, plotPath, img, names);
+
+pause(0.5);
 end

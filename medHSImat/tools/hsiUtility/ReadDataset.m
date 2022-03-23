@@ -12,6 +12,10 @@
 %> The save location is config::[matDir]\\[dataset]\\*.mat.
 %> Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\.
 %>
+%> If it fails during writing in config.mat, consider running MATLAB as administrator.
+%> Alternatively, in Windows 10 go to Settings > Update & Security > Windows Security >
+%> Virus and Threat protection > Manage Ransomware Protection > Allow an app through controlled folder access > Add Matlab. 
+%>
 %> @b Usage
 %>
 %> @code
@@ -40,6 +44,10 @@ function [] = ReadDataset(dataset, contentConditions, readForeground, targetCond
 % hsiInfo) variable.
 % The save location is config::[matDir]\\[dataset]\\*.mat.
 % Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\.
+%
+% If it fails during writing in config.mat, consider running MATLAB as administrator.
+% Alternatively, in Windows 10 go to Settings > Update & Security > Windows Security >
+% Virus and Threat protection > Manage Ransomware Protection > Allow an app through controlled folder access > Add Matlab. 
 %
 % @b Usage
 %
@@ -120,6 +128,7 @@ for i = 1:length(targetIDs)
 
         %% load HSI from .mat file to verify it is working and to prepare preview images
         config.SetSetting('fileName', targetID);
+
         rawIm = hsi(rawImg, readForeground, targetID, sampleID, tissueType);
         dispImageRaw = rawIm.GetDisplayRescaledImage('rgb');
 
@@ -145,8 +154,6 @@ for i = 1:length(targetIDs)
 
         subImagePath = config.DirMake(basedir, 'preprocessed_channels', saveName);
         spectralData.SubimageMontage(3, subImagePath);
-
-        pause(0.1);
     end
 end
 

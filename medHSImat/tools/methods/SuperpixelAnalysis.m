@@ -53,27 +53,29 @@ function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, labelInfo, var
 if nargin < 2
     labelInfo = [];
 end
-
-close all;
 savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
 
+close all;
+
 %% Preparation
-srgb = hsIm.GetDisplayImage('rgb');
+srgb = hsIm.GetDisplayImage();
 fgMask = hsIm.FgMask;
 
 [scores, labels, validLabels] = hsIm.SuperPCA(varargin{:});
 
-plotPath = fullfile(savedir, 'superpixel_segments');
-plots.Superpixels(1, plotPath, srgb, labels);
-plotPath = fullfile(savedir, 'superpixel_mask');
-plots.Superpixels(2, plotPath, srgb, labels, '', 'color', fgMask);
-plotBasePath = fullfile(savedir, 'pc');
-plots.Components(scores, 3, 3, plotBasePath);
-
 img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
-names = {'sRGB Image', 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'predLabel'), 'jpg');
-plots.Montage(4, plotPath, img, names);
+names = { strjoin({'SampleID: ', hsIm.SampleID}, {' '}) , 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
+plotPath = fullfile(savedir, 'spca');
+plots.MontageCmap(1, plotPath, img, names);
+
+plotPath = fullfile(savedir, 'superpixel_segments');
+plots.Superpixels(2, plotPath, srgb, labels);
+plotPath = fullfile(savedir, 'superpixel_mask');
+plots.Superpixels(3, plotPath, srgb, labels, '', 'color', fgMask);
+plotBasePath = fullfile(savedir, 'pc');
+plots.Components(scores, 3, 4, plotBasePath);
+
+pause(0.5);
 
 if config.GetSetting('isTest')
     pause(0.5);
@@ -85,29 +87,29 @@ if config.GetSetting('isTest')
     wavelengths = hsiUtility.GetWavelengths(size(Xcol, 2));
     basePath = fullfile(savedir, 'eigenvectors');
     coeff = Dimred(Xcol, 'pca', numComp);
-    plots.Eigenvectors(6, basePath, coeff, wavelengths, numComp, 'Eigenvectors for the entire image');
+    plots.Eigenvectors(7, basePath, coeff, wavelengths, numComp, 'Eigenvectors for the entire image');
     for i = validLabels
         superpixelMask = labels == i;
         Xcol = hsIm.GetMaskedPixels(superpixelMask);
         coeff = Dimred(Xcol, 'pca', numComp);
         figTitle = strcat('Eigenvectors for Superpixel #', num2str(i));
-        plots.Eigenvectors(6, strcat(basePath, num2str(i)), coeff, wavelengths, numComp, figTitle);
+        plots.Eigenvectors(7, strcat(basePath, num2str(i)), coeff, wavelengths, numComp, figTitle);
     end
 
     %% Plot statistics
     statistic = 'covariance';
     basePath = fullfile(savedir, statistic);
     figTitle = 'Covariance for the entire image';
-    plots.BandStatistics(7, basePath, Xcol, statistic, figTitle);
+    plots.BandStatistics(8, basePath, Xcol, statistic, figTitle);
 
     for i = validLabels
         superpixelMask = labels == i;
         Xcol = hsIm.GetMaskedPixels(superpixelMask);
         figTitle = strcat('Covariance for Superpixel #', num2str(i));
-        plots.BandStatistics(7, strcat(basePath, num2str(i)), Xcol, statistic, figTitle);
+        plots.BandStatistics(8, strcat(basePath, num2str(i)), Xcol, statistic, figTitle);
     end
 
     criteria = 'eigenvectors*.jpg';
-    plots.MontageFolderContents(8, strcat(savedir, '\'), criteria, 'Eigenvectors for each superpixel', [800, 800]);
+    plots.MontageFolderContents(9, strcat(savedir, '\'), criteria, 'Eigenvectors for each superpixel', [800, 800]);
 end
 end

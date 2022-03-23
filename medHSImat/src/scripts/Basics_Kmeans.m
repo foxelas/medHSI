@@ -1,5 +1,5 @@
 function Basics_Kmeans()
-experiment = strcat('Kmeans', date());
+experiment = 'Kmeans';
 config.SetSetting('experiment', experiment);
 config.SetSetting('saveFolder', experiment);
 apply.ToEach(@CustomKmeans, 5);

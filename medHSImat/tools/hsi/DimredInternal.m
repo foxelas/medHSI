@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief DimredInternal reduces the dimensions of the hyperspectral image.
 %>
-%> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
+%> Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 %> details check @c function Dimred.
 %>
 %> @b Usage
@@ -34,7 +34,7 @@
 function [coeff, scores, latent, explained, objective] = DimredInternal(X, method, q, mask, varargin)
 % DimredInternal reduces the dimensions of the hyperspectral image.
 %
-% Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
+% Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
 % details check @c function Dimred.
 %
 % @b Usage

@@ -105,7 +105,7 @@ classdef plots
             if nargin > 1
                 config.SetSetting('plotPath', plotPath);
             end
-            SavePlot(fig, plotPath);
+            SavePlot(fig);
         end
 
         %======================================================================
@@ -450,13 +450,13 @@ classdef plots
             % @param img2 [numeric array] | The right image
             % @param figTitle [char] | The figure title
 
-            fig = figure(fig);
+            figHandle = figure(fig);
             clf;
             imshowpair(img1, img2, 'Scaling', 'joint');
             if nargin > 4
                 title(figTitle);
             end
-            plots.SavePlot(fig, plotPath);
+            plots.SavePlot(figHandle, plotPath);
         end
 
         %======================================================================
@@ -486,11 +486,12 @@ classdef plots
             % @param plotPath [char] | The path for saving plot figures
             % @param img [numeric array] | The left image
             % @param figTitle [char] | The figure title
-            plots.Apply(fig, plotPath, @(x) imshow(x), img);
+            figHandle = figure(fig); clf;
+            imshow(img);
             if nargin > 3
                 title(figTitle);
             end
-            plots.SavePlot(fig);
+            plots.SavePlot(figHandle, plotPath);
         end
 
         %======================================================================
@@ -520,11 +521,12 @@ classdef plots
             % @param plotPath [char] | The path for saving plot figures
             % @param img [numeric array] | The left image
             % @param figTitle [char] | The figure title
-            plots.Apply(fig, plotPath, @(x) imagesc(x), img);
+            figHandle = figure(fig); clf;
+            imagesc(img);
             if nargin > 3
                 title(figTitle);
             end
-            plots.SavePlot(fig);
+            plots.SavePlot(figHandle, plotPath);
         end
 
         %======================================================================
@@ -649,7 +651,7 @@ classdef plots
             plotPath = commonUtility.GetFilename('output', config.GetSetting('saveFolder'), '');
             fprintf('Montage from path %s.\n', plotPath);
             criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
-            plots.Apply(fig, plotPath, plots.MontageFolderContents, [], criteria, [], [800, 800]);
+            plots.Apply(fig, plotPath, @PlotMontageFolderContents, [], criteria, [], [800, 800]);
         end
 
         %======================================================================
@@ -738,8 +740,9 @@ classdef plots
         %> @param plotPath [char] | The path for saving plot figures
         %> @param img [cell array] | The list of images
         %> @param names [cell array] | The list of image names
+        %> @param hasLimits [boolean] | Optional: A flag to show whether scaling has limits. Default: true.
         %======================================================================
-        function [] = MontageCmap(figNum, plotPath, img, names)
+        function [] = MontageCmap(figNum, plotPath, img, names, hasLimits)
             % MontageCmap plots the heat map montage of an image list.
             %
             % @b Usage
@@ -750,18 +753,37 @@ classdef plots
             % @param plotPath [char] | The path for saving plot figures
             % @param img [cell array] | The list of images
             % @param names [cell array] | The list of image names
+            % @param hasLimits [boolean] | Optional: A flag to show whether scaling has limits. Default: true.
 
-            minval = min(cellfun(@(x) min(x, [], 'all'), img));
-            maxval = max(cellfun(@(x) max(x, [], 'all'), img));
+
+            cmapIndex = cell2mat(cellfun(@(x) ndims(x) < 3, img, 'un', 0));
+            cmapImg = img(cmapIndex);
+            if nargin < 5 
+                hasLimits = true;
+            end 
+            if hasLimits 
+                minval = min(cellfun(@(x) min(x, [], 'all'), cmapImg));
+                maxval = max(cellfun(@(x) max(x, [], 'all'), cmapImg));
+            end
 
             fig = figure(figNum);
             clf;
-            tlo = tiledlayout(fig, 2, 3, 'TileSpacing', 'None');
+            numRow = ceil(numel(img) / 2);
+            numCol = mod(numel(img), 2) + 2;
+            tlo = tiledlayout(fig, numRow, numCol, 'TileSpacing', 'None');
             for i = 1:numel(img)
                 ax = nexttile(tlo);
-                imagesc(img{i}, [minval, maxval])
-                colormap('parula');
-                c = colorbar;
+                if cmapIndex(i) 
+                    if hasLimits
+                        imagesc(img{i}, [minval, maxval])
+                    else
+                        imagesc(img{i});
+                    end
+                    colormap('turbo');
+                    c = colorbar;
+                else
+                    imshow(img{i}, 'Parent', ax);
+                end
                 title(names{i});
             end
             plots.SavePlot(fig, plotPath);
