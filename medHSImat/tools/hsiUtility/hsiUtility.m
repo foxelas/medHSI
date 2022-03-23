@@ -348,23 +348,23 @@ classdef hsiUtility
                     sampleID = str2num(spectralData.SampleID);
                     targetID = str2num(spectralData.ID);
 
-                    curName = strcat('/hsi/sample', targetName);
+                    curName = strcat('/sample', targetName, '/hsi');
                     h5create(fileName, curName, size(dataValue));
                     h5write(fileName, curName, dataValue);
 
-                    curName = strcat('/mask/sample', targetName);
+                    curName = strcat('/sample', targetName, '/mask');
                     h5create(fileName, curName, size(dataMask));
                     h5write(fileName, curName, dataMask);
 
-                    curName = strcat('/label/sample', targetName);
+                    curName = strcat('/sample', targetName, '/label');
                     h5create(fileName, curName, size(label));
                     h5write(fileName, curName, label);
 
-                    curName = strcat('/sampleID/sample', targetName);
+                    curName = strcat('/sample', targetName, '/sampleID');
                     h5create(fileName, curName, size(sampleID));
                     h5write(fileName, curName, sampleID);
 
-                    curName = strcat('/targetID/sample', targetName);
+                    curName = strcat('/sample', targetName, '/targetID');
                     h5create(fileName, curName, size(targetID));
                     h5write(fileName, curName, targetID);
 
