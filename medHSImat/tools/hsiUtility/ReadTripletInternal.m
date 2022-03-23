@@ -63,7 +63,7 @@ end
 targetName = num2str(tableId);
 
 [spectralData, ~, ~] = hsiUtility.ReadH5(filename);
-if ~isempty(spectralData)  
+if ~isempty(spectralData)
 
     if ~exist(commonUtility.GetFilename('target', targetName), 'file') ...
             || ~exist(commonUtility.GetFilename('black', targetName), 'file') ...
@@ -71,11 +71,9 @@ if ~isempty(spectralData)
 
         plotBaseDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'ReadTriplets', targetName), '');
 
-        figure(1);
-        title('Target Image');
-        imshow(GetDisplayImageInternal(spectralData, 'rgb'));
-        config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime')))));
-        plots.SavePlot(1);
+        dispImageRgbPath = config.DirMake(plotBaseDir, strcat(target, '_', num2str(config.GetSetting('integrationTime'))));
+        plots.Show(1, dispImageRgbPath, GetDisplayImageInternal(spectralData, 'rgb'), 'Target Image');
+
         filename = config.DirMake(commonUtility.GetFilename('target', targetName));
         fprintf('Target data [spectralData] is saved at %s.\n', filename);
         save(filename, 'spectralData', '-v7.3');
@@ -93,16 +91,13 @@ if ~isempty(spectralData)
                 filename = filename{1};
             end
             [white, ~, wavelengths] = hsiUtility.ReadH5(filename);
-            figure(2);
-            title('White Reference Image');
-            imshow(GetDisplayImageInternal(white, 'rgb'));
-            config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_', num2str(config.GetSetting('integrationTime')))));
-            SavePlot(2);
+            savePath = config.DirMake(plotBaseDir, strcat('0_white_', num2str(config.GetSetting('integrationTime'))));
+            plots.Show(2, savePath, GetDisplayImageInternal(white, 'rgb'), 'White Reference Image');
 
             fullReflectanceByPixel = white;
             filename = commonUtility.GetFilename('white', targetName);
             fprintf('White data [fullReflectanceByPixel] is saved at %s.\n', filename);
-            
+
             if config.GetSetting('isTest')
                 %%UniSpectrum
                 if config.GetSetting('useCustomMask')
@@ -111,14 +106,14 @@ if ~isempty(spectralData)
                     uniMask = ones(size(white, 1), size(white, 2));
                 end
                 uniSpectrum = GetMaskedPixelsInternal(white, uniMask);
-                config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(config.GetSetting('integrationTime')))));
-                plots.Spectra(4, uniSpectrum, wavelengths, '99%-white', 'Reflectance Spectrum of White Balance Sheet');
+                plotPath = config.DirMake(plotBaseDir, strcat('0_white_unispectrum_', num2str(config.GetSetting('integrationTime'))));
+                plots.Spectra(4, plotPath, uniSpectrum, wavelengths, '99%-white', 'Reflectance Spectrum of White Balance Sheet');
 
                 %%BandMax
                 [m, n, w] = size(white);
                 bandmaxSpectrum = max(reshape(white, m*n, w), [], 1);
-                config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_white_bandmax_', num2str(config.GetSetting('integrationTime')))));
-                plots.Spectra(5, bandmaxSpectrum, wavelengths, 'Bandmax spectrum', 'Bandmax Spectrum for the current Image');
+                plotPath = config.DirMake(plotBaseDir, strcat('0_white_bandmax_', num2str(config.GetSetting('integrationTime'))));
+                plots.Spectra(5, plotPath, bandmaxSpectrum, wavelengths, 'Bandmax spectrum', 'Bandmax Spectrum for the current Image');
                 save(filename, 'fullReflectanceByPixel', 'uniSpectrum', 'bandmaxSpectrum', '-v7.3');
             else
                 save(filename, 'fullReflectanceByPixel', '-v7.3');
@@ -139,11 +134,8 @@ if ~isempty(spectralData)
                 filename = filename{1};
             end
             [blackReflectance, ~, ~] = hsiUtility.ReadH5(filename);
-            figure(3);
-            title('Black Reference Image');
-            imshow(GetDisplayImageInternal(blackReflectance, 'rgb'));
-            config.SetSetting('plotName', config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime')))));
-            plots.SavePlot(3);
+            savePath = config.DirMake(plotBaseDir, strcat('0_black_', num2str(config.GetSetting('integrationTime'))));
+            plots.Show(3, savePath, GetDisplayImageInternal(blackReflectance, 'rgb'), 'Black Reference Image');
 
             filename = commonUtility.GetFilename('black', targetName);
             fprintf('Black data [blackReflectance] is saved at %s.\n', filename);

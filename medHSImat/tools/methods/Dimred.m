@@ -22,7 +22,7 @@
 %> @param method [string] | The method for dimension reduction
 %> @param q [int] | The number of components to be retained
 %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-%> @param varargin [cell array] | Optional additional arguments for methods that require them 
+%> @param varargin [cell array] | Optional additional arguments for methods that require them
 %>
 %> @retval coeff [numeric array] | The transformation coefficients
 %> @retval scores [numeric array] | The transformed values
@@ -58,7 +58,7 @@ function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, 
 % @param method [string] | The method for dimension reduction
 % @param q [int] | The number of components to be retained
 % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-% @param varargin [cell array] | Optional additional arguments for methods that require them 
+% @param varargin [cell array] | Optional additional arguments for methods that require them
 %
 % @retval coeff [numeric array] | The transformation coefficients
 % @retval scores [numeric array] | The transformed values
@@ -116,10 +116,10 @@ end
 if strcmpi(method, 'superpca')
     if isempty(varargin)
         pixelNum = 20;
-    else 
+    else
         pixelNum = varargin{1};
     end
-    
+
     %%super-pixels segmentation
     superpixels = cubseg(X, pixelNum);
 
@@ -128,25 +128,25 @@ if strcmpi(method, 'superpca')
 end
 
 if strcmpi(method, 'msuperpca')
-    
+
     if isempty(varargin)
         pixelNumArray = floor(20*sqrt(2).^[-2:2]);
-    else 
+    else
         pixelNumArray = varargin{1};
     end
-      
+
     N = numel(pixelNumArray);
     scores = cell(N, 1);
     for i = 1:N
         pixelNum = pixelNumArray(i);
-        
+
         %%super-pixels segmentation
         superpixels = cubseg(X, pixelNum);
 
         %%SupePCA based DR
-        scores{i} = SuperPCA(X, q, superpixels);    
-    end     
-            
+        scores{i} = SuperPCA(X, q, superpixels);
+    end
+
 end
 
 end

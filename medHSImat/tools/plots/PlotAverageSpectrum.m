@@ -62,12 +62,9 @@ imshow(rgb);
 title(figTitle);
 
 baseFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
-
-config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
-plots.SavePlot(fig);
+plots.SavePlot(fig, strcat(baseFolder, '_norm.jpg'));
 
 fig2 = figure;
-config.SetSetting('plotName', strcat(baseFolder, '_mask.jpg'));
-plots.Overlay(fig2, rgb, mask);
+plots.Overlay(fig2, strcat(baseFolder, '_mask.jpg'), rgb, mask);
 
 end

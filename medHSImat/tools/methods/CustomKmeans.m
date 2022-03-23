@@ -45,15 +45,13 @@ Xcol = hsIm.GetMaskedPixels(fgMask);
 labels = hsi.RecoverSpatialDimensions(labelsCol, size(fgMask), fgMask);
 
 savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
-config.SetSetting('plotName', fullfile(savedir, 'kmeans-clustering'));
-plots.Superpixels(1, srgb, labels, '', 'color', fgMask);
+plots.Superpixels(1, fullfile(savedir, 'kmeans-clustering'), srgb, labels, '', 'color', fgMask);
 
 names = cell(clusterNum, 1);
 for i = 1:clusterNum
     names{i} = strcat('Centroid', num2str(i));
 end
-config.SetSetting('plotName', fullfile(savedir, 'kmeans-centroids'));
-plots.Spectra(2, C, hsiUtility.GetWavelengths(size(hsIm.Value, 3)), names, 'Kmeans centroids');
-ylim([0, 1]);
-plots.SavePlot(2);
+
+plots.Spectra(2, fullfile(savedir, 'kmeans-centroids'), C, hsiUtility.GetWavelengths(size(hsIm.Value, 3)), names, 'Kmeans centroids');
+
 end

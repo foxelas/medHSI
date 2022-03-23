@@ -18,7 +18,7 @@ CheckImportData();
 config.SetSetting('disableNormalizationCheck', true);
 %Do no use mask for unispectrum calculation
 config.SetSetting('useCustomMask', false);
-    
+
 if strcmpi(baseDataset, 'pslCore')
     dbSelection = {'tissue', true};
     hsiUtility.PrepareDataset(baseDataset, dbSelection);
@@ -42,5 +42,4 @@ if strcmpi(baseDataset, 'pslFix')
     hsiUtility.PrepareDataset(baseDataset, dbSelection, true, target);
 end
 
-end 
-
+end

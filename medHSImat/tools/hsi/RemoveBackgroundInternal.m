@@ -117,8 +117,7 @@ end
 if config.GetSetting('showFigures')
     filepath = commonUtility.GetFilename('output', fullfile(config.GetSetting('backgroundRemovalFolderName'), ...
         strcat(config.GetSetting('fileName'), '_foreground')), 'jpg');
-    config.SetSetting('plotName', filepath);
-    plots.Overlay(1, Irgb, fgMask);
+    plots.Overlay(1, filepath, Irgb, fgMask);
 end
 
 updI = I .* repmat(double(fgMask), [1, 1, z]);

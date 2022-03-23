@@ -78,13 +78,11 @@ subplot(2, 2, 4);
 imshowpair(predImg, labelInfo.Labels, 'Scaling', 'joint');
 title(sprintf('SSIM: %.5f', ssimval));
 
-config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, strcat('sam_', hsIm.ID)), 'jpg'));
-plots.SavePlot(1);
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, strcat('sam_', hsIm.ID)), 'jpg');
+plots.SavePlot(1, plotPath);
 
-fig2 = figure(2); clf;
-imshowpair(predImg, labelInfo.Labels, 'Scaling', 'joint');
-title(sprintf('ID:%s',  hsIm.ID));
-config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'predLabel'), 'jpg'));
-plots.SavePlot(fig2);
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'predLabel'), 'jpg');
+figTitle = sprintf('ID:%s', hsIm.ID);
+plots.Pair(2, plotPath, predImg, labelInfo.Labels, figTitle);
 
 end

@@ -555,9 +555,8 @@ classdef hsiUtility
                 refLib(k).Label = 1;
                 refLib(k).Diagnosis = diagnosis;
 
-                config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask', num2str(k))), 'jpg'));
-                title('Cyan areas are is considered');
-                plots.Overlay(1, hsiIm.GetDisplayImage(), malLabel);
+                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask', num2str(k))), 'jpg');
+                plots.Overlay(1, plotPath, hsiIm.GetDisplayImage(), malLabel);
 
                 %                 benLabel = zeros(size(hsiIm.FgMask));
                 %                 benLabel(b(3)-3:b(3)+3, b(4)-3:b(4)+3) = 1;
@@ -569,16 +568,16 @@ classdef hsiUtility
                 refLib(k).Label = 0;
                 refLib(k).Diagnosis = diagnosis;
 
-                config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask', num2str(k))), 'jpg'));
-                title('Cyan areas are is considered');
-                plots.Overlay(1, hsiIm.GetDisplayImage(), benLabel);
+                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask', num2str(k))), 'jpg');
+                plots.Overlay(2, plotPath, hsiIm.GetDisplayImage(), benLabel);
+
             end
 
-            config.SetSetting('plotName', commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), 'references'), 'jpg'));
             labs = {'Benign', 'Malignant'};
             suffix = cellfun(@(x) labs(x+1), {refLib.Label});
             names = cellfun(@(x, y) strjoin({x, y}, {' '}), {refLib.Diagnosis}, suffix, 'UniformOutput', false);
-            plots.Spectra(2, cell2mat({refLib.Data}'), hsiUtility.GetWavelengths(numel(refLib(1).Data)), ...
+            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), 'references'), 'jpg');
+            plots.Spectra(2, plotPath, cell2mat({refLib.Data}'), hsiUtility.GetWavelengths(numel(refLib(1).Data)), ...
                 names, 'SAM Library Spectra', {'-', ':', '-', ':'});
 
             saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));

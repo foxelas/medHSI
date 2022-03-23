@@ -499,7 +499,7 @@ classdef hsi
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
         %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-        %> @param varargin [cell array] | Optional additional arguments for methods that require them 
+        %> @param varargin [cell array] | Optional additional arguments for methods that require them
         %>
         %> @retval coeff [numeric array] | The transformation coefficients
         %> @retval scores [numeric array] | The transformed values
@@ -532,7 +532,7 @@ classdef hsi
             % @param method [string] | The method for dimension reduction
             % @param q [int] | The number of components to be retained
             % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-            % @param varargin [cell array] | Optional additional arguments for methods that require them 
+            % @param varargin [cell array] | Optional additional arguments for methods that require them
             %
             % @retval coeff [numeric array] | The transformation coefficients
             % @retval scores [numeric array] | The transformed values
@@ -561,7 +561,7 @@ classdef hsi
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
         %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-        %> @param varargin [cell array] | Optional additional arguments for methods that require them 
+        %> @param varargin [cell array] | Optional additional arguments for methods that require them
         %>
         %> @retval scores [numeric array] | The transformed values
         % ======================================================================
@@ -581,7 +581,7 @@ classdef hsi
             % @param method [string] | The method for dimension reduction
             % @param q [int] | The number of components to be retained
             % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-            % @param varargin [cell array] | Optional additional arguments for methods that require them 
+            % @param varargin [cell array] | Optional additional arguments for methods that require them
             %
             % @retval scores [numeric array] | The transformed values
             [~, scores, ~, ~, ~] = DimredInternal(obj.Value, method, varargin{:});
@@ -689,8 +689,9 @@ classdef hsi
         %>
         %> @param obj [hsi] | An instance of the hsi class
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path to save the figure plot
         % ======================================================================
-        function [] = SubimageMontage(obj, fig)
+        function [] = SubimageMontage(obj, fig, plotPath)
             % SubimageMontage plots a montage of the subimages of a hyperspectral image.
             %
             % @b Usage
@@ -701,6 +702,8 @@ classdef hsi
             %
             % @param obj [hsi] | An instance of the hsi class
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path to save the figure plot
+
             fig = figure(fig);
             clf(fig);
             [~, ~, z] = size(obj.Value);
@@ -716,7 +719,7 @@ classdef hsi
                 title([num2str(wavelength), 'nm'])
             end
 
-            plots.SavePlot(fig);
+            plots.SavePlot(fig, plotPath);
         end
 
         %% Metrics %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -182,25 +182,25 @@ classdef trainUtility
         %> @retval SVMModel [model] | The trained SVM model
         % ======================================================================
         function [SVMModel] = SVM(Xtrain, ytrain)
-        % SVM trains an RBF SVM classifier.
-        %
-        % You can alter the settings of the SVM classifier according to your specifications.
-        %
-        % @b Usage
-        %
-        % @code
-        % SVMModel = SVM(Xtrain, ytrain);
-        % @endcode
-        %
-        % @param Xtrain [numeric array] | The train data
-        % @param ytrain [numeric array] | The train labels
-        %
-        % @retval SVMModel [model] | The trained SVM model
-        
+            % SVM trains an RBF SVM classifier.
+            %
+            % You can alter the settings of the SVM classifier according to your specifications.
+            %
+            % @b Usage
+            %
+            % @code
+            % SVMModel = SVM(Xtrain, ytrain);
+            % @endcode
+            %
+            % @param Xtrain [numeric array] | The train data
+            % @param ytrain [numeric array] | The train labels
+            %
+            % @retval SVMModel [model] | The trained SVM model
+
             SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'RBF', ...
                 'KernelScale', 'auto', 'Cost', [0, 1; 3, 0]);
         end
-        
+
         % ======================================================================
         %> @brief RunSVM trains and test an SVM classifier.
         %>
@@ -247,7 +247,7 @@ classdef trainUtility
 
             [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, predlabels);
         end
-        
+
         % ======================================================================
         %> @brief StackMultiscale trains a collection of stacked classifiers.
         %>
@@ -276,55 +276,55 @@ classdef trainUtility
         %> @retval XvalidTrans [numeric array] | The transformed test data
         % ======================================================================
         function [accuracy, sensitivity, specificity, st, models, XtrainTrans, XvalidTrans] = StackMultiscale(classifierFun, transformFun, numScales, fusionMethod, Xtrain, ytrain, Xvalid, yvalid)
-        % StackMultiscale trains a collection of stacked classifiers.
-        %
-        % @b Usage
-        %
-        % @code
-        % transformFun = @(x,i) x{i};
-        % [accuracy, sensitivity, specificity, st, SVMModel, XtrainTrans, XvalidTrans] = trainUtility.StackMultiscale(@trainUtility.SVM, transformFun, 5, 'voting', Xtrain, ytrain, Xvalid, yvalid);
-        % @endcode
-        %
-        % @param classifierFun [function handle] | The classifier function
-        % @param transformFun [function handle] | The transform function
-        % @param numScales [int] | The number of scales / stacked models
-        % @param fusionMethod [char] | The fusion method
-        % @param Xtrain [numeric array] | The train data
-        % @param ytrain [numeric array] | The train labels
-        % @param Xvalid [numeric array] | The test data
-        % @param yvalid [numeric array] | The test labels
-        %
-        % @retval accuracy [numeric] | The model accuracy
-        % @retval sensitivity [numeric] | The model sensitivity
-        % @retval specificity [numeric] | The model specificity
-        % @retval st [double] | The train run time
-        % @retval SVMModel [model] | The trained SVM model
-        % @retval XtrainTrans [numeric array] | The transformed train data
-        % @retval XvalidTrans [numeric array] | The transformed test data
-        
+            % StackMultiscale trains a collection of stacked classifiers.
+            %
+            % @b Usage
+            %
+            % @code
+            % transformFun = @(x,i) x{i};
+            % [accuracy, sensitivity, specificity, st, SVMModel, XtrainTrans, XvalidTrans] = trainUtility.StackMultiscale(@trainUtility.SVM, transformFun, 5, 'voting', Xtrain, ytrain, Xvalid, yvalid);
+            % @endcode
+            %
+            % @param classifierFun [function handle] | The classifier function
+            % @param transformFun [function handle] | The transform function
+            % @param numScales [int] | The number of scales / stacked models
+            % @param fusionMethod [char] | The fusion method
+            % @param Xtrain [numeric array] | The train data
+            % @param ytrain [numeric array] | The train labels
+            % @param Xvalid [numeric array] | The test data
+            % @param yvalid [numeric array] | The test labels
+            %
+            % @retval accuracy [numeric] | The model accuracy
+            % @retval sensitivity [numeric] | The model sensitivity
+            % @retval specificity [numeric] | The model specificity
+            % @retval st [double] | The train run time
+            % @retval SVMModel [model] | The trained SVM model
+            % @retval XtrainTrans [numeric array] | The transformed train data
+            % @retval XvalidTrans [numeric array] | The transformed test data
+
             st = 0;
-            models = cell(numScales,1);
-            XtrainTrans = cell(numScales,1);
-            XvalidTrans = cell(numScales,1);
-            for scale = 1:numScales 
-                
+            models = cell(numScales, 1);
+            XtrainTrans = cell(numScales, 1);
+            XvalidTrans = cell(numScales, 1);
+            for scale = 1:numScales
+
                 XtrainScale = transformFun(Xtrain, scale);
                 XvalidScale = transformFun(Xvalid, scale);
-                
+
                 tic;
                 Mdl = classifierFun(XtrainScale, ytrain);
                 tclassifiertemp = toc;
-                st = st + tclassifiertemp; 
-                
-                models{scale}= Mdl;
+                st = st + tclassifiertemp;
+
+                models{scale} = Mdl;
                 XtrainTrans{scale} = XtrainScale;
                 XvalidTrans{scale} = XvalidScale;
-            end 
-            
-            predLabels = trainUtility.Predict(models, XvalidTrans, fusionMethod);            
+            end
+
+            predLabels = trainUtility.Predict(models, XvalidTrans, fusionMethod);
             [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, predLabels);
         end
-        
+
         % ======================================================================
         %> @brief Predict returns the predicted labels from the model.
         %>
@@ -343,42 +343,42 @@ classdef trainUtility
         %> @retval predLabels [numeric array] | The predicted labels
         % ======================================================================
         function predLabels = Predict(Mdl, Xtest, fusionMethod)
-        % Predict returns the predicted labels from the model.
-        %
-        % @b Usage
-        %
-        % @code
-        % predLabels = trainUtility.Predict(Mdl, Xtest);
-        %
-        % predLabels = trainUtility.Predict(Mdl, Xtest, 'voting');
-        % @endcode
-        %
-        % @retval Mdl [model] | The trained model
-        % @param Xtest [numeric array] | The test data
-        % @param fusionMethod [char] | Optional: The fusion method. Default: 'voting'.
-        %
-        % @retval predLabels [numeric array] | The predicted labels
-        
-            if nargin < 3 
+            % Predict returns the predicted labels from the model.
+            %
+            % @b Usage
+            %
+            % @code
+            % predLabels = trainUtility.Predict(Mdl, Xtest);
+            %
+            % predLabels = trainUtility.Predict(Mdl, Xtest, 'voting');
+            % @endcode
+            %
+            % @retval Mdl [model] | The trained model
+            % @param Xtest [numeric array] | The test data
+            % @param fusionMethod [char] | Optional: The fusion method. Default: 'voting'.
+            %
+            % @retval predLabels [numeric array] | The predicted labels
+
+            if nargin < 3
                 fusionMethod = 'voting';
             end
-            
+
             if iscell(Mdl)
                 models = Mdl;
                 numModels = numel(models);
-                preds = zeros(size(Xtest{1},1), numModels);
+                preds = zeros(size(Xtest{1}, 1), numModels);
                 for i = 1:numModels
                     Mdl = models{i};
                     scores = Xtest{i};
                     preds(:, i) = predict(Mdl, scores);
                 end
-                
+
                 if strcmpi(fusionMethod, 'voting')
-                    predLabels = round(sum(preds ./ size(preds,2), 2));
+                    predLabels = round(sum(preds./size(preds, 2), 2));
                 else
                     error('Not supported fusion method.')
                 end
-            
+
             else
                 predLabels = predict(Mdl, Xtest);
             end
@@ -435,11 +435,11 @@ classdef trainUtility
             % @retval SVMModel [model] | The trained SVM model
             % @retval Xtrainscores [numeric array] | The dimension-reduced train data
             % @retval Xvalidscores [numeric array] | The dimension-reduced test data
-            
+
             Xtrainscores = Xtrain;
             Xvalidscores = Xvalid;
             tdimred = 0;
-            
+
             switch lower(method)
                 case 'pca'
                     tic;
@@ -497,11 +497,11 @@ classdef trainUtility
                     Xvalidscores = encode(autoenc, Xvalid')';
                     [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores, yvalid);
 
-                case 'msuperpca'         
-                    [accuracy, sensitivity, specificity, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.StackMultiscale(@trainUtility.SVM, varargin{1}, varargin{2}, 'voting', Xtrain, ytrain, Xvalid, yvalid);                 
-                    
+                case 'msuperpca'
+                    [accuracy, sensitivity, specificity, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.StackMultiscale(@trainUtility.SVM, varargin{1}, varargin{2}, 'voting', Xtrain, ytrain, Xvalid, yvalid);
+
                 otherwise
-                    
+
                     [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrain, ytrain, Xvalid, yvalid);
             end
         end
@@ -557,20 +557,20 @@ classdef trainUtility
 
             for k = 1:numvalidsets
                 if iscell(X)
-                    Xtrain = cellfun(@(x) x(cvp.training(k),:), X, 'un', 0);
-                    Xvalid = cellfun(@(x) x(cvp.test(k),:), X, 'un', 0);
+                    Xtrain = cellfun(@(x) x(cvp.training(k), :), X, 'un', 0);
+                    Xvalid = cellfun(@(x) x(cvp.test(k), :), X, 'un', 0);
                 else
                     Xtrain = X(cvp.training(k), :);
                     Xvalid = X(cvp.test(k), :);
                 end
-                
+
                 if iscell(y)
-                    ytrain = cellfun(@(x) y(cvp.training(k),:), X, 'un', 0);
-                    yvalid = cellfun(@(x) y(cvp.test(k),:), X, 'un', 0);
+                    ytrain = cellfun(@(x) y(cvp.training(k), :), X, 'un', 0);
+                    yvalid = cellfun(@(x) y(cvp.test(k), :), X, 'un', 0);
                 else
                     ytrain = y(cvp.training(k), :);
                     yvalid = y(cvp.test(k), :);
-                end 
+                end
 
                 [acc(k), sens(k), spec(k), tdimred, st(k), ~, ~, ~] = trainUtility.DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q, varargin{:});
             end
@@ -644,7 +644,7 @@ classdef trainUtility
         %> [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q);
         %>
         %> transformFun = @(x, i) IndexCell(x, i);
-        %> numScales = numel(pixelNumArray); 
+        %> numScales = numel(pixelNumArray);
         %> [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q, transformFun, numScales);
         %> @endcode
         %>
@@ -673,7 +673,7 @@ classdef trainUtility
             % [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q);
             %
             % transformFun = @(x, i) IndexCell(x, i);
-            % numScales = numel(pixelNumArray); 
+            % numScales = numel(pixelNumArray);
             % [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q, transformFun, numScales);
             % @endcode
             %
@@ -690,7 +690,7 @@ classdef trainUtility
             %
             % @retval valTrain [numeric array] | The train performance results
             % @retval valTest [numeric array] | The validation performance results
-            
+
             [accuracy, sensitivity, specificity, tdimred, tclassifier] = trainUtility.RunKfoldValidation(X, y, cvp, method, q, varargin{:});
             valTrain = [accuracy, sensitivity, specificity, tdimred, tclassifier];
             fprintf('Train - Accuracy: %.5f, Sensitivity: %.5f, Specificity: %.5f, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
@@ -705,13 +705,12 @@ classdef trainUtility
             predLabels = hsi.RecoverSpatialDimensions(predlabels, origSizes, fgMasks);
             trueLabels = hsi.RecoverSpatialDimensions(yvalid, origSizes, fgMasks);
             for i = 1:numel(sRGBs)
-                imgFilename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), ...
+                imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), ...
                     strcat('pred_', num2str(i), '_', method, '_', num2str(q))), 'png');
-                config.SetSetting('plotName', imgFilename);
                 jacsim = jaccard(predLabels{i}, trueLabels{i});
-                figTitle =  sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim * 100), '%)'));
-                plots.Overlay(4, sRGBs{i}, predLabels{i}, figTitle);
+                figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
+                plots.Overlay(4, imgFilePath, sRGBs{i}, predLabels{i}, figTitle);
             end
-        end        
+        end
     end
 end

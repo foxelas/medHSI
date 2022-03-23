@@ -13,16 +13,19 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> [varargout] = plots.Apply(1, @PlotSpectra, spectra);
+        %> [varargout] = plots.Apply(1, '\temp\folder\name.jpg', @PlotSpectra, spectra);
+        %>
+        %> [varargout] = plots.Apply(1, [], @PlotSpectra, spectra);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param funcHandle [Function Handle] | Handle of the target function to be applied
         %> @param varargin [Cell array] | The arguments necessary for the target function
         %>
         %> @retval varargout [Cell array] | The return values of the target function
         %======================================================================
-        function [varargout] = Apply(fig, funcHandle, varargin)
+        function [varargout] = Apply(fig, plotPath, funcHandle, varargin)
             % Apply runs a plotting function.
             %
             % The function should take the figure handle as last argument.
@@ -30,10 +33,13 @@ classdef plots
             % @b Usage
             %
             % @code
-            % [varargout] = plots.Apply(1, @PlotSpectra, spectra);
+            % [varargout] = plots.Apply(1, '\temp\folder\name.jpg', @PlotSpectra, spectra);
+            %
+            % [varargout] = plots.Apply(1, [], @PlotSpectra, spectra);
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param funcHandle [Function Handle] | Handle of the target function to be applied
             % @param varargin [Cell array] | The arguments necessary for the target function
             %
@@ -45,6 +51,10 @@ classdef plots
                 clf(fig);
             else
                 fig = gcf;
+            end
+
+            if ~isempty(plotPath)
+                config.SetSetting('plotPath', plotPath);
             end
 
             newVarargin = varargin;
@@ -65,29 +75,37 @@ classdef plots
         %======================================================================
         %> @brief SavePlot saves a figure plot.
         %>
-        %> The plot name should be set beforehand in config::[plotName].
+        %> The plot name should be set beforehand in config::[plotPath].
         %>
         %> @b Usage
         %>
         %> @code
         %> plots.SavePlot(1);
+        %> plots.SavePlot(1, '\temp\folder\name.jpg');
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %======================================================================
-        function [] = SavePlot(fig)
+        function [] = SavePlot(fig, plotPath)
             % SavePlot saves a figure plot.
             %
-            % The plot name should be set beforehand in config::[plotName].
+            % The plot name should be set beforehand in config::[plotPath].
             %
             % @b Usage
             %
             % @code
             % plots.SavePlot(1);
+            % plots.SavePlot(1, '\temp\folder\name.jpg');
             % @endcode
             %
             % @param fig [int] | The figure handle
-            SavePlot(fig);
+            % @param plotPath [char] | The path for saving plot figures
+
+            if nargin > 1
+                config.SetSetting('plotPath', plotPath);
+            end
+            SavePlot(fig, plotPath);
         end
 
         %======================================================================
@@ -178,18 +196,19 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> [imCorr] = plots.BandStatistics(fig, inVectors, 'correlation');
+        %> [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'correlation');
         %>
-        %> [imCorr] = plots.BandStatistics(fig, inVectors, 'covariance');
+        %> [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'covariance');
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param inVectors [numeric array] | The input vectors
         %> @param statistic [char] | The statistic name
         %>
         %> @retval imCorr [numeric array] | The statistics values
         %======================================================================
-        function [imCorr] = BandStatistics(fig, varargin)
+        function [imCorr] = BandStatistics(fig, plotPath, varargin)
             % BandStatistics plots statistics among spectral bands.
             %
             % For more details check @c function PlotBandStatistics .
@@ -197,18 +216,19 @@ classdef plots
             % @b Usage
             %
             % @code
-            % [imCorr] = plots.BandStatistics(fig, inVectors, 'correlation');
+            % [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'correlation');
             %
-            % [imCorr] = plots.BandStatistics(fig, inVectors, 'covariance');
+            % [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'covariance');
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param inVectors [numeric array] | The input vectors
             % @param statistic [char] | The statistic name
             %
             % @retval imCorr [numeric array] | The statistics values
 
-            [imCorr] = plots.Apply(fig, @PlotBandStatistics, varargin{:});
+            [imCorr] = plots.Apply(fig, plotPath, @PlotBandStatistics, varargin{:});
         end
 
         %======================================================================
@@ -219,19 +239,20 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.Spectra(fig, spectra, wavelengths, names, figTitle, markers);
+        %> plots.Spectra(fig, '\temp\folder\name.jpg', spectra, wavelengths, names, figTitle, markers);
         %>
-        %> plots.Spectra(fig, spectra);
+        %> plots.Spectra(fig, '\temp\folder\name.jpg', spectra);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param spectra [numeric array] | The input vectors
         %> @param wavelengths [numeric array] | The wavlength values
         %> @param names [cell array] | The curve names
         %> @param figTitle [char] | The figure title
         %> @param markers [cell array] | The curve markers
         %======================================================================
-        function [] = Spectra(fig, varargin)
+        function [] = Spectra(fig, plotPath, varargin)
             % Spectra plots multiple spectra together.
             %
             % For more details check @c function PlotSpectra .
@@ -239,19 +260,20 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.Spectra(fig, spectra, wavelengths, names, figTitle, markers);
+            % plots.Spectra(fig, '\temp\folder\name.jpg', spectra, wavelengths, names, figTitle, markers);
             %
-            % plots.Spectra(fig, spectra);
+            % plots.Spectra(fig, '\temp\folder\name.jpg', spectra);
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param spectra [numeric array] | The input vectors
             % @param wavelengths [numeric array] | The wavlength values
             % @param names [cell array] | The curve names
             % @param figTitle [char] | The figure title
             % @param markers [cell array] | The curve markers
 
-            plots.Apply(fig, @PlotSpectra, varargin{:});
+            plots.Apply(fig, plotPath, @PlotSpectra, varargin{:});
         end
 
         %======================================================================
@@ -263,15 +285,15 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> config.SetSetting('saveFolder', 'Spectra-Example');
-        %> plots.AverageSpectrum(fig, hsIm, figTitle);
+        %> plots.AverageSpectrum(fig, '\temp\folder\name.jpg', hsIm, figTitle);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param hsIm [hsi] | An instance of the hsi class
         %> @param figTitle [char] | The figure title
         %======================================================================
-        function [] = AverageSpectrum(fig, varargin)
+        function [] = AverageSpectrum(fig, plotPath, varargin)
             % AverageSpectrum plots average spectra using a promt for custom mask selection.
             %
             % Need to set config::'saveFolder' for saving purposes.
@@ -280,15 +302,15 @@ classdef plots
             % @b Usage
             %
             % @code
-            % config.SetSetting('saveFolder', 'Spectra-Example');
-            % plots.AverageSpectrum(fig, hsIm, figTitle);
+            % plots.AverageSpectrum(fig, '\temp\folder\name.jpg', hsIm, figTitle);
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param hsIm [hsi] | An instance of the hsi class
             % @param figTitle [char] | The figure title
 
-            plots.Apply(fig, @PlotAverageSpectrum, varargin{:});
+            plots.Apply(fig, plotPath, @PlotAverageSpectrum, varargin{:});
         end
 
         %======================================================================
@@ -299,12 +321,13 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.Components(fig, hsIm, pcNum);
+        %> plots.Components(hsIm, pcNum, figStart, '\temp\folder\name.jpg');
         %> @endcode
         %>
-        %> @param fig [int] | The figure handle
         %> @param hsIm [hsi] | An instance of the hsi class
         %> @param pcNum [int] | The number of components
+        %> @param fig [int] | The figure handle
+        %> @param plotBasePath [char] | The base path for saving plot figures
         %======================================================================
         function [] = Components(varargin)
             % Components plots the components of a hyperspectral image.
@@ -312,12 +335,13 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.Components(fig, hsIm, pcNum);
+            % plots.Components(hsIm, pcNum, figStart, '\temp\folder\name.jpg');
             % @endcode
             %
-            % @param fig [int] | The figure handle
             % @param hsIm [hsi] | An instance of the hsi class
             % @param pcNum [int] | The number of components
+            % @param fig [int] | The figure handle
+            % @param plotBasePath [char] | The base path for saving plot figures
 
             PlotComponents(varargin{:});
         end
@@ -330,15 +354,16 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.Eigenvectors(fig, coeff, xValues, pcNum);
+        %> plots.Eigenvectors(fig, plotPath, coeff, xValues, pcNum);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param eigenvec [numeric array] | The eigenvectors
         %> @param xValues [numeric vector] | The x-axis values
         %> @param pcNum [int] | Optional: The number of components. Default: 3
         %======================================================================
-        function [] = Eigenvectors(fig, varargin)
+        function [] = Eigenvectors(fig, plotPath, varargin)
             % Eigenvectors plots the eigenvectors of a decomposition.
             %
             % For more details check @c function PlotEigenvectors .
@@ -346,15 +371,16 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.Eigenvectors(fig, coeff, xValues, pcNum);
+            % plots.Eigenvectors(fig, plotPath, coeff, xValues, pcNum);
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param eigenvec [numeric array] | The eigenvectors
             % @param xValues [numeric vector] | The x-axis values
             % @param pcNum [int] | Optional: The number of components. Default: 3
 
-            plots.Apply(fig, @PlotEigenvectors, varargin{:});
+            plots.Apply(fig, plotPath, @PlotEigenvectors, varargin{:});
         end
 
         %======================================================================
@@ -365,15 +391,16 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.Overlay(fig, baseIm, topIm, figTitle);
+        %> plots.Overlay(fig, plotPath, baseIm, topIm, figTitle);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param baseIm [numeric array] | The base image
         %> @param topIm [numeric array] | The top image
         %> @param figTitle [char] | The figure title
         %======================================================================
-        function [] = Overlay(fig, varargin)
+        function [] = Overlay(fig, plotPath, varargin)
             % Overlay applies a mask over a base image.
             %
             % For more details check @c function PlotOverlay .
@@ -381,15 +408,123 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.Overlay(fig, baseIm, topIm, figTitle);
+            % plots.Overlay(fig, plotPath, baseIm, topIm, figTitle);
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param baseIm [numeric array] | The base image
             % @param topIm [numeric array] | The top image
             % @param figTitle [char] | The figure title
 
-            plots.Apply(fig, @PlotOverlay, varargin{:});
+            plots.Apply(fig, plotPath, @PlotOverlay, varargin{:});
+        end
+
+        %======================================================================
+        %> @brief Pair displays a pair of images side by side.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> plots.Pair(fig, plotPath, baseIm, topIm, figTitle);
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
+        %> @param img1 [numeric array] | The left image
+        %> @param img2 [numeric array] | The right image
+        %> @param figTitle [char] | The figure title
+        %======================================================================
+        function [] = Pair(fig, plotPath, img1, img2, figTitle)
+            % Pair displays a pair of images side by side.
+            %
+            % @b Usage
+            %
+            % @code
+            % plots.Pair(fig, plotPath, baseIm, topIm, figTitle);
+            % @endcode
+            %
+            % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
+            % @param img1 [numeric array] | The left image
+            % @param img2 [numeric array] | The right image
+            % @param figTitle [char] | The figure title
+
+            fig = figure(fig);
+            clf;
+            imshowpair(img1, img2, 'Scaling', 'joint');
+            if nargin > 4
+                title(figTitle);
+            end
+            plots.SavePlot(fig, plotPath);
+        end
+
+        %======================================================================
+        %> @brief Show displays an image.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> plots.Show(fig, plotPath, img, figTitle);
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
+        %> @param img [numeric array] | The left image
+        %> @param figTitle [char] | The figure title
+        %======================================================================
+        function [] = Show(fig, plotPath, img, figTitle)
+            % Show displays an image.
+            %
+            % @b Usage
+            %
+            % @code
+            % plots.Show(fig, plotPath, img, figTitle);
+            % @endcode
+            %
+            % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
+            % @param img [numeric array] | The left image
+            % @param figTitle [char] | The figure title
+            plots.Apply(fig, plotPath, @(x) imshow(x), img);
+            if nargin > 3
+                title(figTitle);
+            end
+            plots.SavePlot(fig);
+        end
+
+        %======================================================================
+        %> @brief Cmap displays a gray image with a jet colormap.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> plots.Cmap(fig, plotPath, img, figTitle);
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
+        %> @param img [numeric array] | The left image
+        %> @param figTitle [char] | The figure title
+        %======================================================================
+        function [] = Cmap(fig, plotPath, img, figTitle)
+            % Cmap displays a gray image with a jet colormap.
+            %
+            % @b Usage
+            %
+            % @code
+            % plots.Cmap(fig, plotPath, img, figTitle);
+            % @endcode
+            %
+            % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
+            % @param img [numeric array] | The left image
+            % @param figTitle [char] | The figure title
+            plots.Apply(fig, plotPath, @(x) imagesc(x), img);
+            if nargin > 3
+                title(figTitle);
+            end
+            plots.SavePlot(fig);
         end
 
         %======================================================================
@@ -400,19 +535,20 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.Superpixels(fig, baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', []);
+        %> plots.Superpixels(fig, plotPath, baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', []);
         %>
-        %> plots.Superpixels(fig, baseImage, labels, 'Superpixels of image 3', 'color', fgMask);
+        %> plots.Superpixels(fig, plotPath, baseImage, labels, 'Superpixels of image 3', 'color', fgMask);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param baseIm [numeric array] | The base image
         %> @param topIm [numeric array] | The top image
         %> @param figTitle [char] | The figure title
         %> @param plotType [char] | The plot type, either 'color' or 'boundary'
         %> @param fgMask [numeric array] | The foreground mask
         %======================================================================
-        function [] = Superpixels(fig, varargin)
+        function [] = Superpixels(fig, plotPath, varargin)
             % Superpixels plots superpixel labels
             %
             % For more details check @c function PlotSuperpixels .
@@ -420,18 +556,19 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.Superpixels(fig, baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', []);
+            % plots.Superpixels(fig, plotPath, baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', []);
             %
-            % plots.Superpixels(fig, baseImage, labels, 'Superpixels of image 3', 'color', fgMask);
+            % plots.Superpixels(fig, plotPath, baseImage, labels, 'Superpixels of image 3', 'color', fgMask);
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param baseIm [numeric array] | The base image
             % @param topIm [numeric array] | The top image
             % @param figTitle [char] | The figure title
             % @param plotType [char] | The plot type, either 'color' or 'boundary'
             % @param fgMask [numeric array] | The foreground mask
-            plots.Apply(fig, @PlotSuperpixels, varargin{:});
+            plots.Apply(fig, plotPath, @PlotSuperpixels, varargin{:});
         end
 
         %======================================================================
@@ -475,7 +612,44 @@ classdef plots
             % @param figTitle [char] | The figure title
             % @param standardDim [int vector] | The dimensions for subimage resizing
             % @param imageLimit [int] | The maximum number of subimages to be montaged
-            plots.Apply(fig, @PlotMontageFolderContents, varargin{:});
+            plots.Apply(fig, [], @PlotMontageFolderContents, varargin{:});
+        end
+
+        %======================================================================
+        %> @brief GetMontagetCollection plots a montage of images with a target filename under different subfolders.
+        %>
+        %> The base output folder is assumed to be pre-set with config::['saveFolder'].
+        %> Subfolders are assumed to be named with a sample's TargetID.
+        %> For more details check @c function PlotMontageFolderContents .
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> plots.GetMontagetCollection(1, 'eigenvectors');
+        %> @endcode
+        %>
+        %> @param fig [int] | The figure handle
+        %> @param target [char] | The target filename
+        %======================================================================
+        function GetMontagetCollection(fig, target)
+            % GetMontagetCollection plots a montage of images with a target filename under different subfolders.
+            %
+            % The base output folder is assumed to be pre-set with config::['saveFolder'].
+            % Subfolders are assumed to be named with a sample's TargetID.
+            % For more details check @c function PlotMontageFolderContents .
+            %
+            % @b Usage
+            %
+            % @code
+            % plots.GetMontagetCollection('eigenvectors');
+            % @endcode
+            %
+            % @param fig [int] | The figure handle
+            % @param target [char] | The target filename
+            plotPath = commonUtility.GetFilename('output', config.GetSetting('saveFolder'), '');
+            fprintf('Montage from path %s.\n', plotPath);
+            criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
+            plots.Apply(fig, plotPath, plots.MontageFolderContents, [], criteria, [], [800, 800]);
         end
 
         %======================================================================
@@ -486,16 +660,17 @@ classdef plots
         %> Disable in config::[disableReflectranceExtremaPlots].
         %>
         %> @b Usage
-        %> plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
+        %> plots.NormalizationCheck(fig, plotPath, Iin, Iblack, Iwhite, Inorm);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param Iin [hsi] | The measurement image
         %> @param Iblack [hsi] | The black image
         %> @param Iwhite [hsi] | The white image
         %> @param Inorm [hsi] | The normalization image
         %======================================================================
-        function [] = NormalizationCheck(fig, varargin)
+        function [] = NormalizationCheck(fig, plotPath, varargin)
             % NormalizationCheck  plots the values recovered after normalization.
             %
             % For more details check @c function PlotNormalizationCheck .
@@ -503,82 +678,84 @@ classdef plots
             % Disable in config::[disableReflectranceExtremaPlots].
             %
             % @b Usage
-            % plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
+            % plots.NormalizationCheck(fig, plotPath, Iin, Iblack, Iwhite, Inorm);
             % @endcode
             %
             % @param fig [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param Iin [hsi] | The measurement image
             % @param Iblack [hsi] | The black image
             % @param Iwhite [hsi] | The white image
             % @param Inorm [hsi] | The normalization image
             %====================================================
 
-            plots.Apply(fig, @PlotNormalizationCheck, varargin{:});
+            plots.Apply(fig, plotPath, @PlotNormalizationCheck, varargin{:});
         end
 
         %======================================================================
         %> @brief Montage plots the montage of an image list.
         %>
         %> @b Usage
-        %> plots.Montage(1, labels, names, plotName);
+        %> plots.Montage(1, plotPath, labels, names, plotPath);
         %> @endcode
         %>
         %> @param figNum [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param img [cell array] | The list of images
         %> @param names [cell array] | The list of image names
-        %> @param plotName [char] | The plotName
         %======================================================================
-        function [] = Montage(figNum, img, names, plotName)
+        function [] = Montage(figNum, plotPath, img, names)
             % Montage plots the montage of an image list.
             %
             % @b Usage
-            % plots.Montage(1, labels, names, plotName);
+            % plots.Montage(1, plotPath, labels, names, plotPath);
             % @endcode
             %
             % @param figNum [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param img [cell array] | The list of images
             % @param names [cell array] | The list of image names
-            % @param plotName [char] | The plotName
 
             fig = figure(figNum);
+            clf;
             tlo = tiledlayout(fig, 2, 3, 'TileSpacing', 'None');
             for i = 1:numel(img)
                 ax = nexttile(tlo);
                 imshow(img{i}, 'Parent', ax)
                 title(names{i});
             end
-            config.SetSetting('plotName', plotName);
-            plots.SavePlot(fig);
+            plots.SavePlot(fig, plotPath);
         end
 
         %======================================================================
         %> @brief MontageCmap plots the heat map montage of an image list.
         %>
         %> @b Usage
-        %> plots.MontageCmap(1, labels, names, plotName);
+        %> plots.MontageCmap(1, plotPath, labels, names);
         %> @endcode
         %>
         %> @param figNum [int] | The figure handle
+        %> @param plotPath [char] | The path for saving plot figures
         %> @param img [cell array] | The list of images
         %> @param names [cell array] | The list of image names
-        %> @param plotName [char] | The plotName
         %======================================================================
-        function [] = MontageCmap(figNum, img, names, plotName)
+        function [] = MontageCmap(figNum, plotPath, img, names)
             % MontageCmap plots the heat map montage of an image list.
             %
             % @b Usage
-            % plots.MontageCmap(1, labels, names, plotName);
+            % plots.MontageCmap(1, plotPath, labels, names);
             % @endcode
             %
             % @param figNum [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
             % @param img [cell array] | The list of images
             % @param names [cell array] | The list of image names
-            % @param plotName [char] | The plotName
 
             minval = min(cellfun(@(x) min(x, [], 'all'), img));
             maxval = max(cellfun(@(x) max(x, [], 'all'), img));
 
             fig = figure(figNum);
+            clf;
             tlo = tiledlayout(fig, 2, 3, 'TileSpacing', 'None');
             for i = 1:numel(img)
                 ax = nexttile(tlo);
@@ -587,8 +764,7 @@ classdef plots
                 c = colorbar;
                 title(names{i});
             end
-            config.SetSetting('plotName', plotName);
-            plots.SavePlot(fig);
+            plots.SavePlot(fig, plotPath);
         end
 
         %======================================================================
@@ -632,8 +808,8 @@ classdef plots
                 end
             end
             figTitle = 'Reference Spectra';
-            config.SetSetting('plotName', config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png'));
-            plots.Apply(fig, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
+            plotPath = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png');
+            plots.Apply(fig, plotPath, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
         end
 
         %======================================================================
@@ -663,12 +839,12 @@ classdef plots
 
             fig = figure();
             plot(lambdaIn, illumination, 'DisplayName', config.GetSetting('illuminationSource'));
-            config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'illumination'));
+            plotPath = fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'illumination');
             title('Illumination');
             xlabel('Wavelength (nm)');
             ylabel('Radiant Intensity (a.u.)');
             legend();
-            plots.SavePlot(fig);
+            plots.SavePlot(fig, plotPath);
         end
 
         %======================================================================
@@ -702,11 +878,11 @@ classdef plots
             plot(lambdaIn, xyz(:, 3), 'DisplayName', 'z');
             hold off
             legend();
-            config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'interpColorMatchingFunctions'));
             title('Interpolated Color Matching Functions');
             xlabel('Wavelength (nm)');
             ylabel('Weight (a.u.)');
-            plots.SavePlot(fig);
+            plotPath = fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'interpColorMatchingFunctions');
+            plots.SavePlot(fig, plotPath);
 
         end
 
@@ -788,8 +964,8 @@ classdef plots
             %set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0, 1, 1]);
 
             % config.SetSetting('saveEps', false);
-            config.SetSetting('plotName', fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'skinChromophoreExtinctionCoeff'));
-            plots.SavePlot(fig);
+            plotPath = fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'skinChromophoreExtinctionCoeff');
+            plots.SavePlot(fig, plotPath);
 
             filename = commonUtility.GetFilename('param', 'extinctionCoefficients');
             save(filename, 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');

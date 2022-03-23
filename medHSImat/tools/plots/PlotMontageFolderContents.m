@@ -124,7 +124,7 @@ end
 
 % imageList = imageList(1:end-2);
 
-if numel(imageList) > 0 
+if numel(imageList) > 0
     r = ceil(numel(imageList)/4);
     montage(imageList, 'Size', [r, 4]);
     if ~isempty(figTitle)
@@ -132,7 +132,6 @@ if numel(imageList) > 0
     end
 
     %save in parent dir
-    config.SetSetting('plotName', fullfile(pathstr, strcat(lower(saveName), '.jpg')));
-    plots.SavePlot(fig);
+    plots.SavePlot(fig, fullfile(pathstr, strcat(lower(saveName), '.jpg')));
 end
 end

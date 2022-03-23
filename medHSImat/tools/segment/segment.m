@@ -127,5 +127,58 @@ classdef segment
             se = strel('disk', 5);
             outLabels = imclose(BW2, se);
         end
+
+        function BySAM()
+
+            experiment = strcat('SAM segmentation-BCC&MCC');
+            Basics_Init(experiment);
+
+            apply.ToEach(@SAMAnalysis);
+            plots.GetMontagetCollection('predLabel');
+        end
+
+        function BySuperPCA()
+
+            %% SuperPCA
+            pixelNum = 20;
+            pcNum = 5;
+
+            %% Manual
+            experiment = strcat('SuperPCA-Manual', date());
+            Basics_Init(experiment);
+
+            isManual = true;
+            apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
+
+            plots.GetMontagetCollection('eigenvectors');
+            plots.GetMontagetCollection('superpixel_mask');
+            plots.GetMontagetCollection('pc1');
+            plots.GetMontagetCollection('pc2');
+            plots.GetMontagetCollection('pc3');
+
+            %% From SuperPCA package
+            experiment = strcat('SuperPCA', date());
+            Basics_Init(experiment);
+
+            isManual = false;
+            apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
+
+            plots.GetMontagetCollection('eigenvectors');
+            plots.GetMontagetCollection('superpixel_mask');
+            plots.GetMontagetCollection('pc1');
+            plots.GetMontagetCollection('pc2');
+            plots.GetMontagetCollection('pc3');
+        end
+
+        function ByMSuperPCA()
+
+            %% Multiscale SuperPCA
+            experiment = strcat('MultiscaleSuperPCA-Manual', date());
+            Basics_Init(experiment);
+
+            pixelNumArray = floor(50*sqrt(2).^[-2:2]);
+            apply.ToEach(@MultiscaleSuperpixelAnalysis, pixelNumArray);
+        end
     end
+
 end

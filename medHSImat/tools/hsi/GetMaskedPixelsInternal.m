@@ -45,12 +45,12 @@ end
 if iscell(I)
     imgs = I;
     n = numel(imgs);
-    maskedPixels = cell(n,1);
+    maskedPixels = cell(n, 1);
     for i = 1:n
         I = imgs{i};
         maskedPixels{i} = GetMaskedPixelsInternal(I, mask);
     end
-else 
+else
     [m, n, w] = size(I);
     IFlat = reshape(I, [m * n, w]);
     maskFlat = reshape(mask, [m * n, 1]);

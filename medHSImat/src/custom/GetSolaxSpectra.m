@@ -97,11 +97,9 @@ ylabel('Relative Spectrum (%)', 'FontSize', 15)
 title('Using [smoothingspline] fitting', 'FontSize', 15)
 
 config.SetSetting('cropBorders', true);
-config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_lininterp.png'));
-plots.SavePlot(fig1);
+plots.SavePlot(fig1, fullfile(saveDir, 'solaxSpectrum_lininterp.png'));
 
-config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_spline.png'));
-plots.SavePlot(fig2);
+plots.SavePlot(fig2, fullfile(saveDir, 'solaxSpectrum_spline.png'));
 
 wavelengths = [380:780]';
 solaxSpec = f2(wavelengths);
@@ -116,8 +114,7 @@ ylim([0, 100]);
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Relative Illumination Spectrum (%)', 'FontSize', 15);
 title('For Solax-iO light source', 'FontSize', 15);
-config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
-plots.SavePlot(fig3);
+plots.SavePlot(fig3, fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
 
 filename = commonUtility.GetFilename('param', 'solax_reconstructed_spectrum');
 save(filename, 'solaxSpec', 'solaxLocalMaxWavelengths');
@@ -140,7 +137,6 @@ xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Relative Illumination Spectrum (%)', 'FontSize', 15);
 title('For Solax-iO light source', 'FontSize', 15);
 legend(h, 'Location', 'northeast', 'FontSize', 15);
-config.SetSetting('plotName', fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
-plots.SavePlot(fig4);
+plots.SavePlot(fig4, fullfile(saveDir, 'solaxSpectrum_reconstructed.png'));
 
 end

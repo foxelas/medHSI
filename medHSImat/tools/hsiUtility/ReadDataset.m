@@ -73,7 +73,7 @@ isTest = config.GetSetting('isTest');
 basedir = commonUtility.GetFilename('output', config.GetSetting('snapshotsFolderName'), '');
 
 %% Read h5 data
-if nargin < 4 
+if nargin < 4
     [filenames, targetIDs, outRows] = databaseUtility.Query(contentConditions);
 else
     [filenames, targetIDs, outRows] = databaseUtility.Query(contentConditions, [], [], [], [], targetConditions);
@@ -117,6 +117,7 @@ for i = 1:length(targetIDs)
     rawImg = hsiUtility.ReadTriplet(content, targetConditions);
 
     if ~isempty(rawImg)
+
         %% load HSI from .mat file to verify it is working and to prepare preview images
         config.SetSetting('fileName', targetID);
         rawIm = hsi(rawImg, readForeground, targetID, sampleID, tissueType);
@@ -136,18 +137,15 @@ for i = 1:length(targetIDs)
         %% Plot images
         close all;
 
-        figure(1);
-        imshow(dispImageRaw);
-        config.SetSetting('plotName', config.DirMake(basedir, 'rgb', saveName));
-        plots.SavePlot(1);
+        dispImageRawPath = config.DirMake(basedir, 'rgb', saveName);
+        plots.Show(1, dispImageRawPath, dispImageRaw);
 
-        figure(2);
-        imshow(dispImageRgb);
-        config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed', saveName));
-        plots.SavePlot(2);
+        dispImageRgbPath = config.DirMake(basedir, 'preprocessed', saveName);
+        plots.Show(2, dispImageRgbPath, dispImageRgb);
 
-        config.SetSetting('plotName', config.DirMake(basedir, 'preprocessed_channels', saveName));
-        spectralData.SubimageMontage(3);
+        subImagePath = config.DirMake(basedir, 'preprocessed_channels', saveName);
+        spectralData.SubimageMontage(3, subImagePath);
+
         pause(0.1);
     end
 end

@@ -20,7 +20,7 @@
 %> @param method [string] | The method for dimension reduction
 %> @param q [int] | The number of components to be retained
 %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-%> @param varargin [cell array] | Optional additional arguments for methods that require them 
+%> @param varargin [cell array] | Optional additional arguments for methods that require them
 %>
 %> @retval coeff [numeric array] | The transformation coefficients
 %> @retval scores [numeric array] | The transformed values
@@ -53,7 +53,7 @@ function [coeff, scores, latent, explained, objective] = DimredInternal(X, metho
 % @param method [string] | The method for dimension reduction
 % @param q [int] | The number of components to be retained
 % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-% @param varargin [cell array] | Optional additional arguments for methods that require them 
+% @param varargin [cell array] | Optional additional arguments for methods that require them
 %
 % @retval coeff [numeric array] | The transformation coefficients
 % @retval scores [numeric array] | The transformed values
@@ -66,7 +66,7 @@ function [coeff, scores, latent, explained, objective] = DimredInternal(X, metho
 
 if nargin > 3
     hasMask = ~isempty(mask);
-else 
+else
     hasMask = false;
 end
 

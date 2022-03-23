@@ -1,4 +1,4 @@
-function Basics_Dimred()
+function [valTrain, valTest] = Basics_Dimred()
 
 experiment = strcat('Dimred', date());
 Basics_Init(experiment);
@@ -46,6 +46,48 @@ j = j + 1;
 fprintf('QDA: \n\n');
 j = j + 1;
 [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'qda', 1);
+
+
+%%%%%%%%%%%%%%%%%%%%% Super PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tic;
+[X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds, @transformSPCAFun);
+tdimred = toc;
+fprintf('Runtime %.5f \n\n', tdimred);
+
+filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'superPCA_cvpInfo'));
+save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
+
+for q = qs
+    fprintf('SuperPCA: %d \n\n', q);
+    j = j + 1;
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X(:, 1:q), y, Xtest(:, 1:q), ytest, sRGBs, fgMasks, cvp, 'SuperPCA', q);
+end
+
+%%%%%%%%%%%%%%%%%%%%% Multiscale Super PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+pixelNumArray = floor(20*sqrt(2).^[-2:2]);
+
+for q = qs
+    fprintf('MSuperPCA: %d \n\n', q);
+
+    tic;
+    [X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds, @(x) x.Transform('MSuperPCA', q, [], pixelNumArray));
+    tdimred = toc;
+    fprintf('Runtime %.5f \n\n', tdimred);
+
+    transformFun = @(x, i) IndexCell(x, i);
+    numScales = numel(pixelNumArray);
+
+    j = j + 1;
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'MSuperPCA', q, transformFun, numScales);
+end
+
+filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), strcat('msuperPCA_cvpInfo')));
+save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
+
+
+[X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
+filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'cvpInfo'));
+save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
 
 for q = qs
     fprintf('AE: %d \n\n', q);
@@ -110,46 +152,6 @@ end
 % end
 
 
-%%%%%%%%%%%%%%%%%%%%% Super PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tic;
-[X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds, @transformSPCAFun);
-tdimred = toc;
-fprintf('Runtime %.5f \n\n', tdimred);
-
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'superPCA_cvpInfo'));
-save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
-
-for q = qs
-    fprintf('SuperPCA: %d \n\n', q);
-    j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X(:, 1:q), y, Xtest(:, 1:q), ytest, sRGBs, fgMasks, cvp, 'SuperPCA', q);
-end
-
-%%%%%%%%%%%%%%%%%%%%% Multiscale Super PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-j = 0;
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'cvpInfo'));
-load(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
-
-pixelNumArray = floor(20*sqrt(2).^[-2:2]);
-
-for q = qs
-    fprintf('MSuperPCA: %d \n\n', q);
-    
-    tic;
-    [X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds, @(x) x.Transform('MSuperPCA', q, [], pixelNumArray));
-    tdimred = toc;
-    fprintf('Runtime %.5f \n\n', tdimred);
-    
-    transformFun = @(x, i) IndexCell(x, i);
-    numScales = numel(pixelNumArray);
-    
-    j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'MSuperPCA', q, transformFun, numScales);
-end
-
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), strcat('msuperPCA_cvpInfo')));
-save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
-
 end
 
 %%%%%%%%%%%%%%%%%%%%% Assisting Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,6 +162,10 @@ predlabels = predict(SVMModel, scores);
 [acc, ~, ~] = metrics.Evaluations(labels, predlabels);
 end
 
+function [scores] = transformSPCAFun(x)
+scores = x.Transform('SuperPCA', 100);
+end
+
 function [scores] = IndexCell(x, i)
-    scores = x{i};
+scores = x{i};
 end

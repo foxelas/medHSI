@@ -47,29 +47,25 @@ explainedFull(1:3)
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Fig 1: Dimred with different training %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 close all;
 
-figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'temp.png');
-config.SetSetting('plotName', figName);
 fig = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
 
 subplot(1, 3, 1);
-PlotEigenvectors(coeff2, wavelengths, q, fig);
+PlotEigenvectors(coeff2, wavelengths, q);
 ylim([-0.2, 0.2]);
 title('Training across Dataset');
 
 subplot(1, 3, 2);
-PlotEigenvectors(coeff1, wavelengths, q, fig);
+PlotEigenvectors(coeff1, wavelengths, q);
 ylim([-0.2, 0.2]);
 title('Training per Sample');
 
 subplot(1, 3, 3);
-PlotEigenvectors(coeff3, wavelengths, q, fig);
+PlotEigenvectors(coeff3, wavelengths, q);
 ylim([-0.2, 0.2]);
 title('Training per Suprepixel');
 
 figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '_comparison_pca.png'));
-config.SetSetting('plotName', figName);
-
-plots.SavePlot(fig);
+plots.SavePlot(fig, figName);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Fig 2: Display all Dimred %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -89,8 +85,6 @@ for i = targets
     srgb = I.GetDisplayRescaledImage();
     [coeff2, scores2, latent, explained, objective] = I.Dimred('rica', q, mask);
 
-    figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'temp.png');
-    config.SetSetting('plotName', figName);
     fig = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
 
     subplot(1, 3, 1);
@@ -106,12 +100,7 @@ for i = targets
     title('RICA');
 
     figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '_comparison_img.png'));
-    config.SetSetting('plotName', figName);
-
-    plots.SavePlot(fig);
-
-    figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), 'temp.png');
-    config.SetSetting('plotName', figName);
+    plots.SavePlot(fig, figName);
 
     fig2 = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
 
@@ -130,9 +119,7 @@ for i = targets
     title('Transform Vectors (RICA)');
 
     figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '_comparison_pcavsrica.png'));
-    config.SetSetting('plotName', figName);
-
-    plots.SavePlot(fig2);
+    plots.SavePlot(fig2, figName);
 
 end
 
@@ -173,8 +160,7 @@ for i = targets
     imshow(scoresFull);
 
     figName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), targetName, strcat('scores.png'));
-    config.SetSetting('plotName', figName);
-    plots.SavePlot(2);
+    plots.SavePlot(2, figName);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fig2
     figure(3);
@@ -198,8 +184,7 @@ for i = targets
     title('Training across Dataset');
 
     figName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), targetName, strcat('projection.png'));
-    config.SetSetting('plotName', figName);
-    plots.SavePlot(3);
+    plots.SavePlot(3, figName);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fig3
     figure(4);
@@ -225,18 +210,17 @@ for i = targets
 
     wavelengths = hsiUtility.GetWavelengths(size(coeff, 1));
     subplot(2, 3, [2, 5]);
-    PlotEigenvectors(coeff, wavelengths, q, 4);
+    PlotEigenvectors(coeff, wavelengths, q);
     ylim([-0.1, 0.2]);
     title('Transform Vectors (per Sample)');
 
     subplot(2, 3, [3, 6]);
-    PlotEigenvectors(coeffFull, wavelengths, q, 4);
+    PlotEigenvectors(coeffFull, wavelengths, q);
     ylim([-0.1, 0.2]);
     title('Transform Vectors (across Dataset)');
 
     figName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), targetName, strcat('eigevecs.png'));
-    config.SetSetting('plotName', figName);
-    plots.SavePlot(4);
+    plots.SavePlot(4, figName);
 
 end
 

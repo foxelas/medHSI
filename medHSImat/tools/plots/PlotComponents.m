@@ -4,31 +4,32 @@
 %> @b Usage
 %>
 %> @code
-%> plots.Components(fig, hsIm, pcNum);
+%> plots.Components(fig, hsIm, pcNum, 1, '\temp\folder\img');
 %> @endcode
 %>
-%> @param fig [int] | The figure handle
 %> @param hsIm [hsi] | An instance of the hsi class
 %> @param pcNum [int] | The number of components
+%> @param fig [int] | The figure handle
+%> @param plotBasePath [char] | The base path for saving plot figures
 %======================================================================
-function [] = PlotComponents(hsIm, pcNum, figStart)
+function [] = PlotComponents(hsIm, pcNum, figStart, plotBasePath)
 % PlotComponents plots the components of a hyperspectral image.
 %
 % @b Usage
 %
 % @code
-% plots.Components(fig, hsIm, pcNum);
+% plots.Components(fig, hsIm, pcNum, 1, '\temp\folder\img');
 % @endcode
 %
-% @param fig [int] | The figure handle
 % @param hsIm [hsi] | An instance of the hsi class
 % @param pcNum [int] | The number of components
+% @param fig [int] | The figure handle
+% @param plotBasePath [char] | The base path for saving plot figures
 
-if nargin < 3
+if isempty(figStart)
     figStart = 1;
 end
 
-plotName = config.GetSetting('plotName');
 for i = 1:pcNum
     fig = figStart + i - 1;
     figure(fig);
@@ -38,8 +39,8 @@ for i = 1:pcNum
     axis image;
     title(strcat('PC', num2str(i)));
     colorbar;
-    config.SetSetting('plotName', strcat(plotName, num2str(i)));
-    plots.SavePlot(fig);
+    plotPath = strcat(plotBasePath, num2str(i));
+    plots.SavePlot(fig, plotPath);
 end
 
 end

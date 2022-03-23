@@ -148,18 +148,18 @@ for i = 1:length(targetIDs)
             end
 
             if isempty(find(contains(testTargets, targetName), 1))
-                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi') 
+                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi')
                     jj = numel(X) + 1;
                     X{jj} = xdata;
                     y{jj} = ydata;
-                    
+
                 elseif iscell(xdata)
                     if ~iscell(X)
-                        X = cell(numel(xdata),1);
+                        X = cell(numel(xdata), 1);
                     end
                     X = cellfun(@(x, i) [x; xdata{i}], X, num2cell(1:numel(xdata))', 'un', 0);
                     y = [y; ydata];
-                    
+
                 else
                     X = [X; xdata];
                     y = [y; ydata];
@@ -167,18 +167,18 @@ for i = 1:length(targetIDs)
 
             else
 
-                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi') 
+                if strcmp(dataType, 'image') || strcmp(dataType, 'hsi')
                     jj = numel(Xtest) + 1;
-                    Xtest{jj} = xdata; 
+                    Xtest{jj} = xdata;
                     ytest{jj} = ydata;
-                    
+
                 elseif iscell(xdata)
                     if ~iscell(Xtest)
-                        Xtest = cell(numel(xdata),1);
+                        Xtest = cell(numel(xdata), 1);
                     end
                     Xtest = cellfun(@(x, i) [x; xdata{i}], Xtest, num2cell(1:numel(xdata))', 'un', 0);
                     ytest = [ytest; ydata];
-                    
+
                 else
                     Xtest = [Xtest; xdata];
                     ytest = [ytest; ydata];

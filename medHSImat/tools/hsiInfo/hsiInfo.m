@@ -267,22 +267,12 @@ classdef hsiInfo
                 figure(1);
                 imshow(fgMask);
 
-                figure(2);
-                imshow(labelMask);
+                labelsFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsFolderName'), strcat(targetID)), '');
+                plots.Show(2, labelsFolder, labelMask);
 
                 labelMask = labelMask & fgMask;
-                c = imoverlay(imBase, labelMask, 'c');
-
-                figure(3);
-                imshow(c);
-
-                labelsFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsFolderName'), strcat(targetID)), '');
-                config.SetSetting('plotName', labelsFolder);
-                plots.SavePlot(2);
-
                 labelsAppliedFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsAppliedFolderName'), strcat(targetID)), '');
-                config.SetSetting('plotName', labelsAppliedFolder);
-                plots.SavePlot(3);
+                plots.Overlay(3, labelsAppliedFolder, imBase, labelMask, 'Label Mask');
 
                 labelMask = uint8(labelMask);
 
