@@ -78,11 +78,17 @@ subplot(2, 2, 4);
 imshowpair(predImg, labelInfo.Labels, 'Scaling', 'joint');
 title(sprintf('SSIM: %.5f', ssimval));
 
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, strcat('sam_', hsIm.ID)), 'jpg');
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, strcat('sam_', hsIm.ID)), 'png');
 plots.SavePlot(1, plotPath);
 
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'predLabel'), 'jpg');
-figTitle = sprintf('ID:%s', hsIm.ID);
+jac = commonUtility.Jaccard(predImg, labelInfo.Labels);
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'predLabel'), 'png');
+figTitle = {labelInfo.Diagnosis; sprintf('jac:%.2f%%', jac *100)};
 plots.Pair(2, plotPath, predImg, labelInfo.Labels, figTitle);
+
+img = {hsIm.GetDisplayImage(), double(argminImg) ./ 4};
+names = { strjoin({'SampleID: ', hsIm.SampleID}, {' '}) , 'Argmin SAM'};
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'sam_grouping'), 'png');
+plots.MontageWithLabel(3, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
 end

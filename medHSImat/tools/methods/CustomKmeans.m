@@ -60,9 +60,9 @@ end
 plots.Spectra(2, fullfile(savedir, 'kmeans-centroids'), C, hsiUtility.GetWavelengths(size(hsIm.Value, 3)), names, 'Kmeans centroids');
 
 img = {srgb, labels};
-names = { strjoin({'SampleID: ', hsIm.SampleID}, {' '}) , 'Clustering'};
+names = { labelInfo.Diagnosis , 'Clustering'};
 plotPath = fullfile(savedir, 'kmeans');
-plots.MontageCmap(3, plotPath, img, names);
+plots.MontageWithLabel(3, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
 pause(0.5);
 end

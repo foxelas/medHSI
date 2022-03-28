@@ -531,7 +531,6 @@ classdef hsiUtility
             % Benign (0)) and 'Diagnosis'.
             %
             refLib = struct('Data', [], 'Label', [], 'Diagnosis', []);
-            vals = {[220, 92, 104, 81]; [167, 70, 194, 145]};
             k = 0;
             for i = 1:length(refIDs)
                 targetName = num2str(refIDs{i});
@@ -577,7 +576,7 @@ classdef hsiUtility
             suffix = cellfun(@(x) labs(x+1), {refLib.Label});
             names = cellfun(@(x, y) strjoin({x, y}, {' '}), {refLib.Diagnosis}, suffix, 'UniformOutput', false);
             plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), 'references'), 'jpg');
-            plots.Spectra(2, plotPath, cell2mat({refLib.Data}'), hsiUtility.GetWavelengths(numel(refLib(1).Data)), ...
+            plots.Spectra(3, plotPath, cell2mat({refLib.Data}'), hsiUtility.GetWavelengths(numel(refLib(1).Data)), ...
                 names, 'SAM Library Spectra', {'-', ':', '-', ':'});
 
             saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));

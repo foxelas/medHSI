@@ -120,7 +120,7 @@ classdef commonUtility
 
                 case 'referenceLib'
                     fullPath = config.DirMake(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('referenceLibraryName')), ...
+                        strcat(config.GetSetting('dataset'), config.GetSetting('referenceLibraryName')), ...
                         filename);
 
                 case 'h5'
@@ -314,6 +314,17 @@ classdef commonUtility
             errVal = sqrt(((measured - reconstructed) * (measured - reconstructed)')/N);
         end
 
+        function jac = Jaccard(predLabel, realLabel)         
+            if ismatrix(predLabel) || ismatrix(realLabel)
+                predLabel = predLabel(:);
+                realLabel = realLabel(:);
+            end
+            
+            predLabel = logical(predLabel);
+            realLabel = logical(realLabel);
+            
+            jac = jaccard(predLabel, realLabel);
+        end 
         % ======================================================================
         %> @brief Evaluations returns performance metrics for classification tasks
         %>

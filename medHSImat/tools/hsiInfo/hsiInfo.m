@@ -243,36 +243,35 @@ classdef hsiInfo
             close all;
 
             targetID = hsIm.ID;
-            maskdir = fullfile(config.GetSetting('dataDir'), config.GetSetting('labelsFolderName'), hsIm.TissueType);
-            dirList = dir(fullfile(maskdir, '*.jpg'));
-            if ~isempty(dirList)
-                labelFilenames = cellfun(@(x) strsplit(x, '_'), {dirList.name}', 'un', 0);
-                labelFilenames = cellfun(@(x) x(1), labelFilenames, 'un', 0);
-                labelFilenames = arrayfun(@(x) x{1}, labelFilenames);
-                idx = find(contains(labelFilenames, hsIm.SampleID), 1);
-            else
-                idx = [];
-            end
-
-            if ~isempty(idx)
+            filename = fullfile(config.GetSetting('dataDir'), config.GetSetting('labelsFolderName'), hsIm.TissueType, strcat(targetID, '.png')); 
+            if exist(filename, 'file') == 2
                 imBase = hsIm.GetDisplayImage();
-                imLab = imread(fullfile(maskdir, dirList(idx).name));
+                imLab = double(imread(filename));
 
                 fgMask = hsIm.FgMask;
-                labelMask = im2gray(imLab) > 127;
-                labelMask = imfill(labelMask, 'holes');
+                labelMask = logical(imfill(imLab, 'holes'));
                 %     se = strel('disk',3);
                 %     labelMask = imclose(labelMask, se);
 
-                figure(1);
-                imshow(fgMask);
-
                 labelsFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsFolderName'), strcat(targetID)), '');
-                plots.Show(2, labelsFolder, labelMask);
-
+                plots.Show(1, labelsFolder, labelMask);
+                
+                if size(labelMask) ~= size(fgMask)
+                    labelMaskOld = labelMask;
+                    labelMask = zeros(size(fgMask));
+                    if abs(size(labelMaskOld,1) - size(labelMask,1) ) > 2 || abs(size(labelMaskOld,2) - size(labelMask,2) ) > 2
+                        fprintf('The image and label matrixes differ too much in size. Please check ID: % and sample %s.\n', hsIm.ID, hsIm.SampleID);
+                    end 
+                    
+                    if (size(labelMaskOld,1) > size(labelMask,1) ) || (size(labelMaskOld,2) > size(labelMask,2) ) 
+                        labelMask = labelMaskOld(1:size(labelMask,1), 1:size(labelMask,2));
+                    else
+                        labelMask(1:size(labelMaskOld,1), 1:size(labelMaskOld,2)) = labelMaskOld;
+                    end
+                end
                 labelMask = labelMask & fgMask;
                 labelsAppliedFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsAppliedFolderName'), strcat(targetID)), '');
-                plots.Overlay(3, labelsAppliedFolder, imBase, labelMask, 'Label Mask');
+                plots.Overlay(2, labelsAppliedFolder, imBase, labelMask);
 
                 labelMask = uint8(labelMask);
 

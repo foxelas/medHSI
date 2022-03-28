@@ -456,6 +456,8 @@ classdef plots
             if nargin > 4
                 title(figTitle);
             end
+            
+            figHandle.Position = [50 50 550 550]; 
             plots.SavePlot(figHandle, plotPath);
         end
 
@@ -742,7 +744,7 @@ classdef plots
         %> @param names [cell array] | The list of image names
         %> @param hasLimits [boolean] | Optional: A flag to show whether scaling has limits. Default: true.
         %======================================================================
-        function [] = MontageCmap(figNum, plotPath, img, names, hasLimits)
+        function [] = MontageCmap(figNum, plotPath, img, names, hasLimits, limitVal)
             % MontageCmap plots the heat map montage of an image list.
             %
             % @b Usage
@@ -761,9 +763,14 @@ classdef plots
             if nargin < 5 
                 hasLimits = true;
             end 
+            
             if hasLimits 
-                minval = min(cellfun(@(x) min(x, [], 'all'), cmapImg));
-                maxval = max(cellfun(@(x) max(x, [], 'all'), cmapImg));
+                if nargin < 6
+                    minval = min(cellfun(@(x) min(x, [], 'all'), cmapImg));
+                    maxval = max(cellfun(@(x) max(x, [], 'all'), cmapImg));
+                    
+                    limitVal = repmat([minval, maxval], numel(img), 1);
+                end
             end
 
             fig = figure(figNum);
@@ -775,12 +782,16 @@ classdef plots
                 ax = nexttile(tlo);
                 if cmapIndex(i) 
                     if hasLimits
-                        imagesc(img{i}, [minval, maxval])
+                        imagesc(ax, img{i}, [limitVal(i, 1), limitVal(i, 2)]);
                     else
-                        imagesc(img{i});
+                        imagesc(ax, img{i});
                     end
-                    colormap('turbo');
-                    c = colorbar;
+                    ax.Visible = 'off'; 
+                    ax.XTick = []; 
+                    ax.YTick = [];
+                    colormap(ax, 'hot');
+                    cb = colorbar(ax);
+                    axis square; 
                 else
                     imshow(img{i}, 'Parent', ax);
                 end
@@ -789,6 +800,39 @@ classdef plots
             plots.SavePlot(fig, plotPath);
         end
 
+        function [] = MontageWithLabel(figNum, plotPath, img, names, labelMask, fgMask)
+            % MontageCmap plots the heat map montage of an image list.
+            %
+            % @b Usage
+            % plots.MontageCmap(1, plotPath, labels, names);
+            % @endcode
+            %
+            % @param figNum [int] | The figure handle
+            % @param plotPath [char] | The path for saving plot figures
+            % @param img [cell array] | The list of images
+            % @param names [cell array] | The list of image names
+            % @param hasLimits [boolean] | Optional: A flag to show whether scaling has limits. Default: true.
+
+            fig = figure(figNum);
+            clf;
+            numRow = ceil(numel(img) / 2);
+            numCol = mod(numel(img), 2) + 2;
+            tlo = tiledlayout(fig, numRow, numCol, 'TileSpacing', 'None');
+            for i = 1:numel(img)
+                ax = nexttile(tlo);
+
+                C = insertObjectMask(rescale(img{i}),edge(labelMask),'Color','r');
+                hold on;
+                h = imshow(C, 'Parent', ax);
+                set(h, 'AlphaData', fgMask);
+
+                hold off;
+                title(names{i});
+            end
+            plots.SavePlot(fig, plotPath);
+        end
+
+    
         %======================================================================
         %> @brief ReferenceLibrary  plots the reference spectra in the library.
         %>

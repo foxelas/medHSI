@@ -88,7 +88,7 @@ if ~isOneFolder
     c = 1;
     for i = 3:imageNum + 2
         if (hasTargetType & find(targetIDs == str2double(fileList(i).name))) | ~hasTargetType
-            img = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.jpg')));
+            img = imread(fullfile(fileList(i).folder, fileList(i).name, strcat(target, '.png')));
             imageList{c} = imresize(img, [numrows, numcols]);
             c = c + 1;
         end
@@ -132,6 +132,6 @@ if numel(imageList) > 0
     end
 
     %save in parent dir
-    plots.SavePlot(fig, fullfile(pathstr, strcat(lower(saveName), '.jpg')));
+    plots.SavePlot(fig, fullfile(pathstr, strcat(lower(saveName), '.png')));
 end
 end

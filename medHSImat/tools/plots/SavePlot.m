@@ -35,16 +35,18 @@ if (saveImages)
     if (~isempty(plotPath))
         filename = strrep(plotPath, '.mat', '');
 
-        [filepath, name, ~] = fileparts(filename);
+        [filepath, name, ext] = fileparts(filename);
         filepathBW = fullfile(filepath, 'bw');
         config.DirMake(filepath);
         config.DirMake(filepathBW);
 
-        filename = fullfile(filepath, strcat(name, '.jpg'));
-        %         filename = strrep(filename, ' ', '_');
+        if isempty(ext)
+            filename = fullfile(filepath, strcat(name, '.png'));
+        end
+        
         if (cropBorders)
             warning('off');
-            export_fig(filename, '-jpg', '-native', '-transparent');
+            export_fig(filename, '-png', '-native', '-transparent');
             warning('on');
         else
             if (saveInHQ)

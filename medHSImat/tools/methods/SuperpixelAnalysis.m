@@ -64,9 +64,15 @@ fgMask = hsIm.FgMask;
 [scores, labels, validLabels] = hsIm.SuperPCA(varargin{:});
 
 img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
-names = { strjoin({'SampleID: ', hsIm.SampleID}, {' '}) , 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
+names = { labelInfo.Diagnosis, 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
+plotPath = fullfile(savedir, 'spca-cmap');
+plots.MontageCmap(1, plotPath, img, names, false);
+
+
+img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
+names = { labelInfo.Diagnosis , 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
 plotPath = fullfile(savedir, 'spca');
-plots.MontageCmap(1, plotPath, img, names);
+plots.MontageWithLabel(1, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
 plotPath = fullfile(savedir, 'superpixel_segments');
 plots.Superpixels(2, plotPath, srgb, labels);

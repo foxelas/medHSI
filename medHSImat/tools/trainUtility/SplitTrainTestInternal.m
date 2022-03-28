@@ -100,7 +100,7 @@ else
 end
 
 k = 0;
-for i = 1:length(targetIDs)
+for i = 1:20 %length(targetIDs)
 
     baseTargetName = targetIDs{i};
     targetNames = targetIDs(contains(targetIDs, baseTargetName));

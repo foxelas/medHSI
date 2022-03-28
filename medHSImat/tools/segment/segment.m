@@ -134,7 +134,7 @@ classdef segment
             Basics_Init(experiment);
 
             apply.ToEach(@SAMAnalysis);
-            plots.GetMontagetCollection('predLabel');
+            plots.GetMontagetCollection(1, 'predLabel');
         end
 
         function ByICA()
@@ -151,6 +151,14 @@ classdef segment
             apply.ToEach(@DimredAnalysis, 'rica', icNum);
         end
         
+        function ByPCA()
+            experiment = strcat('PCA');
+            Basics_Init(experiment);
+            pcNum = 3;
+            apply.ToEach(@DimredAnalysis, 'pca', pcNum);
+        end
+        
+        
         function BySuperPCA()
 
             %% SuperPCA
@@ -158,7 +166,7 @@ classdef segment
             pcNum = 5;
 
             %% Manual
-            experiment = strcat('SuperPCA-Manual', date());
+            experiment = 'SuperPCA-Manual';
             Basics_Init(experiment);
 
             isManual = true;
@@ -174,7 +182,7 @@ classdef segment
             plots.GetMontagetCollection(5, 'pc3');
 
             %% From SuperPCA package
-            experiment = strcat('SuperPCA', date());
+            experiment = 'SuperPCA';
             Basics_Init(experiment);
 
             isManual = false;
@@ -193,12 +201,22 @@ classdef segment
         function ByMSuperPCA()
 
             %% Multiscale SuperPCA
-            experiment = strcat('MultiscaleSuperPCA-Manual', date());
+            experiment = strcat('MultiscaleSuperPCA-Manual');
             Basics_Init(experiment);
 
             pixelNumArray = floor(50*sqrt(2).^[-2:2]);
             apply.ToEach(@MultiscaleSuperpixelAnalysis, pixelNumArray);
         end
+        
+        function By_Kmeans()
+            experiment = 'Kmeans';
+            Basics_Init(experiment);
+            
+            apply.ToEach(@CustomKmeans, 5);
+            plots.GetMontagetCollection(1, 'kmeans-clustering');
+            plots.GetMontagetCollection(2, 'kmeans-centroids');
+        end
+
     end
 
 end

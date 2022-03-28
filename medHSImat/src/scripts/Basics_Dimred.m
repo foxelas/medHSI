@@ -11,7 +11,7 @@ folds = 5;
 testTargets = {'166'};
 dataType = 'pixel';
 hasLabels = true;
-qs = [5, 10, 20, 50, 100];
+qs = [10, 50, 100];
 
 [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
 filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'cvpInfo'));
