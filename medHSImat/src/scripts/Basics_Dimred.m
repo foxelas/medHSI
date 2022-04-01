@@ -3,65 +3,64 @@ function [valTrain, valTest] = Basics_Dimred()
 experiment = strcat('Dimred', date());
 Basics_Init(experiment);
 
+dataset = config.GetSetting('dataset');
 fprintf('Running for dataset %s\n', config.GetSetting('dataset'));
 %%%%%%%%%%%%%%%%%%%%%% Fix %%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Read h5 data
 folds = 5;
-testTargets = {'166'};
-dataType = 'pixel';
-hasLabels = true;
+testTargets = {'163', '181'};
+dataType = 'hsi';
 qs = [10, 50, 100];
-
-[X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'cvpInfo'));
-save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
-
-%%%%%%%%%%%%%%%%%%%%%% Train Validate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-fprintf('Baseline: %d \n\n', 311);
 j = 1;
-[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'none', 311);
 
-for q = qs
-    fprintf('PCA: %d \n\n', q);
-    j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'pca', q);
-end
-
-for q = qs
-    fprintf('RICA: %d \n\n', q);
-    j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'rica', q);
-end
-
-fprintf('Simple: \n\n');
-j = j + 1;
-[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'simple', 2);
-
-fprintf('LDA: \n\n');
-j = j + 1;
-[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'lda', 1);
-
-fprintf('QDA: \n\n');
-j = j + 1;
-[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'qda', 1);
-
+[trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
 
 %%%%%%%%%%%%%%%%%%%%% Super PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tic;
-[X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds, @transformSPCAFun);
-tdimred = toc;
-fprintf('Runtime %.5f \n\n', tdimred);
-
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'superPCA_cvpInfo'));
-save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
 
 for q = qs
     fprintf('SuperPCA: %d \n\n', q);
     j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X(:, 1:q), y, Xtest(:, 1:q), ytest, sRGBs, fgMasks, cvp, 'SuperPCA', q);
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'SuperPCA', q);
 end
+
+%%%%%%%%%%%%%%%%%%%%%% Baseline %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fprintf('Baseline: %d \n\n', 311);
+[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'none', 311);
+
+%%%%%%%%%%%%%%%%%%%%%% PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+for q = qs
+    fprintf('PCA: %d \n\n', q);
+    j = j + 1;
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'pca', q);
+end
+
+%%%%%%%%%%%%%%%%%%%%%% RICA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+for q = qs
+    fprintf('RICA: %d \n\n', q);
+    j = j + 1;
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'rica', q);
+end
+
+%%%%%%%%%%%%%%%%%%%%%% Wavelength Selection %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fprintf('Wavelength Selection: \n\n');
+j = j + 1;
+[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'wavelength-selection', 2);
+
+%%%%%%%%%%%%%%%%%%%%%% LDA/QDA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fprintf('LDA: \n\n');
+j = j + 1;
+[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'lda', 1);
+
+fprintf('QDA: \n\n');
+j = j + 1;
+[valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'qda', 1);
+
 
 %%%%%%%%%%%%%%%%%%%%% Multiscale Super PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 pixelNumArray = floor(20*sqrt(2).^[-2:2]);
@@ -69,32 +68,22 @@ pixelNumArray = floor(20*sqrt(2).^[-2:2]);
 for q = qs
     fprintf('MSuperPCA: %d \n\n', q);
 
-    tic;
-    [X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds, @(x) x.Transform('MSuperPCA', q, [], pixelNumArray));
-    tdimred = toc;
-    fprintf('Runtime %.5f \n\n', tdimred);
-
     transformFun = @(x, i) IndexCell(x, i);
     numScales = numel(pixelNumArray);
 
     j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'MSuperPCA', q, transformFun, numScales);
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MSuperPCA', q, transformFun, numScales);
 end
 
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), strcat('msuperPCA_cvpInfo')));
-save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
 
-
-[X, y, Xtest, ytest, ~, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'cvpInfo'));
-save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');
-
+%%%%%%%%%%%%%%%%%%%%% Autoencoder %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for q = qs
     fprintf('AE: %d \n\n', q);
     j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'autoencoder', q);
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'autoencoder', q);
 end
 
+%%%%%%%%%%%%%%%%%%%%% Random Forest Importance %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 wavelengths = hsiUtility.GetWavelengths(311);
 fprintf('RFI: \n\n');
 tic;
@@ -114,13 +103,10 @@ bar(wavelengths, impOOB);
 title('Unbiased Predictor Importance Estimates');
 xlabel('Predictor variable');
 ylabel('Importance');
-[sortedW, idxOrder] = sort(impOOB, 'descend');
 for q = qs
     fprintf('RFI: %d \n\n', q);
-    ido = idxOrder(1:q);
-    scoresrf = X(:, ido);
     j = j + 1;
-    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(X, y, Xtest, ytest, sRGBs, fgMasks, cvp, 'rfi', q);
+    [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'rfi', q, impOOB);
 end
 
 % %%%%%%%%%%%%%%%%%%%%% SFS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

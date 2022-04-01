@@ -54,81 +54,115 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief SplitTrainTest splits the dataset to train and test.
+        %> @brief PreprocessInternal transforms the dataset into images or pixels as preparation for training.
         %>
         %> For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
-        %> For more details check @c function SplitTrainTestInternal .
-        %> The base dataset should be already saved before running augmentation.
+        %> For more details check @c function PreprocessInternal .
+        %> This function can also handle multiscale transformations.
         %>
         %> @b Usage
         %>
         %> @code
-        %>   dataset = 'pslBase';
-        %>   testTargets = {'153'};
-        %>   dataType = 'pixel';
-        %>   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType);
+        %>   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Preprocess(hsiList, labelInfos, dataType);
         %>
-        %>   hasLabels = true;
         %>   transformFun = @Dimred;
-        %>   folds = 5;
-        %>   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
+        %>   [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, dataType, transformFun);
         %> @endcode
         %>
-        %> @param dataset [char] | The dataset
-        %> @param testTargets [string array] | The targetIDs of test targets
-        %> @param dataType [char] | The data type, either 'image' or 'pixel'
-        %> @param hasLabels [boolean] | A flag to return labels
-        %> @param folds [int] | The number of folds
-        %> @param transformFun [function handle] | The function handle for the function to be applied
+        %> @param hsiList [cell array] | The list of hsi objects
+        %> @param labelInfos [cell array] | The list of hsiInfo objects
+        %> @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
+        %> @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
         %>
-        %> @retval X [numeric array] | The train data
-        %> @retval y [numeric array] | The train values
-        %> @retval Xtest [numeric array] | The test data
-        %> @retval ytest [numeric array] | The test values
-        %> @retval cvp [cell array] | The cross validation index splits
-        %> @retval sRGBs [cell array] | The array of sRGBs for test hsi data
-        %> @retval fgMasks [cell array] | The foreground masks of sRGBs for test hsi data
+        %> @retval X [numeric array or cell array] | The processed data
+        %> @retval y [numeric array or cell array] | The processed values
+        %> @retval sRGBs [cell array] | The array of sRGBs for the data
+        %> @retval fgMasks [cell array] | The foreground masks of sRGBs for the data
+        %> @retval labelImgs [cell array] | The label masks for the data
         %>
         % ======================================================================
-        function [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTest(varargin)
-            % SplitTrainTest splits the dataset to train and test.
+        function [X, y, sRGBs, fgMasks, labelImgs] = Preprocess(hsiList, labelInfos, varargin)
+        % PreprocessInternal transforms the dataset into images or pixels as preparation for training.
+        %
+        % For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
+        % For more details check @c function PreprocessInternal .
+        % This function can also handle multiscale transformations.
+        %
+        % @b Usage
+        %
+        % @code
+        %   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Preprocess(hsiList, labelInfos, dataType);
+        %
+        %   transformFun = @Dimred;
+        %   [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, dataType, transformFun);
+        % @endcode
+        %
+        % @param hsiList [cell array] | The list of hsi objects
+        % @param labelInfos [cell array] | The list of hsiInfo objects
+        % @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
+        % @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
+        %
+        % @retval X [numeric array or cell array] | The processed data
+        % @retval y [numeric array or cell array] | The processed values
+        % @retval sRGBs [cell array] | The array of sRGBs for the data
+        % @retval fgMasks [cell array] | The foreground masks of sRGBs for the data
+        % @retval labelImgs [cell array] | The label masks for the data
+        %
+            [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, varargin{:});
+        end
+        
+        % ======================================================================
+        %> @brief SplitDatasetInternalsplits the dataset to train, test and prepares a cross validation setting.
+        %>
+        %> For more details check @c function SplitDatasetInternal .
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %>   [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
+        %>
+        %>   transformFun = @Dimred;
+        %>   [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testTargets, dataType, transformFun);
+        %> @endcode
+        %>
+        %> @param dataset [char] | The target dataset
+        %> @param folds [numeric] | The number of folds
+        %> @param testTargets [cell array] | The IDs of the test targets 
+        %> @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
+        %> @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
+        %>
+        %> @retval trainData [struct] | The train data
+        %> @retval testData [struct] | The test data
+        %> @retval cvp [struct] | The cross validation settings
+        %>
+        % ======================================================================
+        function [trainData, testData, cvp] = SplitDataset(dataset, folds, testTargets, dataType, varargin)
+            % SplitDatasetInternalsplits the dataset to train, test and prepares a cross validation setting.
             %
-            % For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
-            % For more details check @c function SplitTrainTestInternal .
-            % The base dataset should be already saved before running augmentation.
+            % For more details check @c function SplitDatasetInternal .
             %
             % @b Usage
             %
             % @code
-            %   dataset = 'pslBase';
-            %   testTargets = {'153'};
-            %   dataType = 'pixel';
-            %   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType);
+            %   [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
             %
-            %   hasLabels = true;
             %   transformFun = @Dimred;
-            %   folds = 5;
-            %   [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(dataset, testTargets, dataType, hasLabels, folds, transformFun);
+            %   [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testTargets, dataType, transformFun);
             % @endcode
             %
-            % @param dataset [char] | The dataset
-            % @param testTargets [string array] | The targetIDs of test targets
-            % @param dataType [char] | The data type, either 'image' or 'pixel'
-            % @param hasLabels [boolean] | A flag to return labels
-            % @param folds [int] | The number of folds
-            % @param transformFun [function handle] | The function handle for the function to be applied
+            % @param dataset [char] | The target dataset
+            % @param folds [numeric] | The number of folds
+            % @param testTargets [cell array] | The IDs of the test targets 
+            % @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
+            % @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
             %
-            % @retval X [numeric array] | The train data
-            % @retval y [numeric array] | The train values
-            % @retval Xtest [numeric array] | The test data
-            % @retval ytest [numeric array] | The test values
-            % @retval cvp [cell array] | The cross validation index splits
-            % @retval sRGBs [cell array] | The array of sRGBs for test hsi data
-            % @retval fgMasks [cell array] | The foreground masks of sRGBs for test hsi data
+            % @retval trainData [struct] | The train data
+            % @retval testData [struct] | The test data
+            % @retval cvp [struct] | The cross validation settings
             %
-            [X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = SplitTrainTestInternal(varargin{:});
-        end
-
+            [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testTargets, dataType, varargin{:});
+        end 
+        
         % ======================================================================
         %> @brief KfoldPartitions splits cross validation partitions.
         %>
@@ -198,7 +232,13 @@ classdef trainUtility
             % @retval SVMModel [model] | The trained SVM model
 
             SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'RBF', ...
-                'KernelScale', 'auto', 'Cost', [0, 1; 3, 0]);
+                'KernelScale', 'auto', 'IterationLimit', 10000); %'Cost', [0, 1; 3, 0],
+            numIter = SVMModel.NumIterations;
+            % TO REMOVE
+            if numIter == 10000 
+                disp('SVM finished because of MaxIter reached.')
+            end
+            % TO REMOVE
         end
 
         % ======================================================================
@@ -213,7 +253,6 @@ classdef trainUtility
         %> @param Xtrain [numeric array] | The train data
         %> @param ytrain [numeric array] | The train labels
         %> @param Xvalid [numeric array] | The test data
-        %> @param yvalid [numeric array] | The test labels
         %>
         %> @retval accuracy [numeric] | The model accuracy
         %> @retval sensitivity [numeric] | The model sensitivity
@@ -221,7 +260,7 @@ classdef trainUtility
         %> @retval st [double] | The train run time
         %> @retval SVMModel [model] | The trained SVM model
         % ======================================================================
-        function [accuracy, sensitivity, specificity, st, SVMModel] = RunSVM(Xtrain, ytrain, Xvalid, yvalid)
+        function [predlabels, st, SVMModel] = RunSVM(Xtrain, ytrain, Xvalid)
             % RunSVM trains and test an SVM classifier.
             %
             % @b Usage
@@ -233,19 +272,24 @@ classdef trainUtility
             % @param Xtrain [numeric array] | The train data
             % @param ytrain [numeric array] | The train labels
             % @param Xvalid [numeric array] | The test data
-            % @param yvalid [numeric array] | The test labels
             %
             % @retval accuracy [numeric] | The model accuracy
             % @retval sensitivity [numeric] | The model sensitivity
             % @retval specificity [numeric] | The model specificity
             % @retval st [double] | The train run time
             % @retval SVMModel [model] | The trained SVM model
+            
+            % TO REMOVE
+            factors = 5;
+            kk = ceil(decimate(1:size(Xtrain,1), factors));
+            Xtrain = Xtrain(kk, :);
+            ytrain = ytrain(kk, :);
+            % TO REMOVE 
+            
             tic;
             SVMModel = trainUtility.SVM(Xtrain, ytrain);
             st = toc;
             predlabels = predict(SVMModel, Xvalid);
-
-            [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, predlabels);
         end
 
         % ======================================================================
@@ -275,7 +319,7 @@ classdef trainUtility
         %> @retval XtrainTrans [numeric array] | The transformed train data
         %> @retval XvalidTrans [numeric array] | The transformed test data
         % ======================================================================
-        function [accuracy, sensitivity, specificity, st, models, XtrainTrans, XvalidTrans] = StackMultiscale(classifierFun, transformFun, numScales, fusionMethod, Xtrain, ytrain, Xvalid, yvalid)
+        function [predLabels, st, Mdl, XtrainTrans, XvalidTrans] = StackMultiscale(classifierFun, transformFun, numScales, fusionMethod, Xtrain, ytrain, Xvalid)
             % StackMultiscale trains a collection of stacked classifiers.
             %
             % @b Usage
@@ -322,7 +366,6 @@ classdef trainUtility
             end
 
             predLabels = trainUtility.Predict(models, XvalidTrans, fusionMethod);
-            [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, predLabels);
         end
 
         % ======================================================================
@@ -383,127 +426,139 @@ classdef trainUtility
                 predLabels = predict(Mdl, Xtest);
             end
         end
-
+        
+        % ======================================================================
+        %> @brief Cell2Mat concatenates the contents of a cell array of values to a matrix.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [matArr] = trainUtility.Cell2Mat(cellArr);
+        %> @endcode
+        %>
+        %> @param cellArr [cell array] | The cell array
+        %>
+        %> @retval arr [numeric array] | The array
+        % ======================================================================
+        function [arr] = Cell2Mat(cellArr)
+        % Cell2Mat concatenates the contents of a cell array of values to a matrix.
+        %
+        % @b Usage
+        %
+        % @code
+        % [matArr] = trainUtility.Cell2Mat(cellArr);
+        % @endcode
+        %
+        % @param cellArr [cell array] | The cell array
+        %
+        % @retval arr [numeric array] | The array
+        
+            cellArr = cellfun(@(x) x', cellArr, 'un', 0);
+            arr = [cellArr{:}];
+            arr = arr';              
+        end 
+        
         % ======================================================================
         %> @brief DimredAndTrain trains and test an SVM classifier after dimension reduction.
         %>
         %> @b Usage
         %>
         %> @code
-        %> [accuracy, sensitivity, specificity, tdimred, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q);
+        %> [accuracy, sensitivity, specificity, jac, tdimred, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.DimredAndTrain(trainData, testData, method, q);
         %> @endcode
         %>
-        %> @param Xtrain [numeric array] | The train data
-        %> @param ytrain [numeric array] | The train labels
-        %> @param Xvalid [numeric array] | The test data
-        %> @param yvalid [numeric array] | The test labels
+        %> @param trainData [struct] | The train data
+        %> @param testData [struct] | The test data
         %> @param method [char] | The dimension reduction method
         %> @param q [int] | The reduced dimension
         %> @param varargin | Additional optional arguments
         %>
-        %> @retval accuracy [numeric] | The model accuracy
-        %> @retval sensitivity [numeric] | The model sensitivity
-        %> @retval specificity [numeric] | The model specificity
+        %> @retval accuracy [numeric] | The model's accuracy
+        %> @retval sensitivity [numeric] | The model's sensitivity
+        %> @retval specificity [numeric] | The model's specificity
+        %> @retval jac [numeric] | The model's jaccard coefficient
         %> @retval tdimred [double] | The dimension reduction run time
         %> @retval st [double] | The train run time
         %> @retval SVMModel [model] | The trained SVM model
-        %> @retval Xtrainscores [numeric array] | The dimension-reduced train data
-        %> @retval Xvalidscores [numeric array] | The dimension-reduced test data
+        %> @retval Xvalid [numeric array] | The dimension-reduced test data
         % ======================================================================
-        function [accuracy, sensitivity, specificity, tdimred, st, Mdl, Xtrainscores, Xvalidscores] = DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q, varargin)
-            % DimredAndTrain trains and test an SVM classifier after dimension reduction.
-            %
-            % @b Usage
-            %
-            % @code
-            % [accuracy, sensitivity, specificity, st, SVMModel] = trainUtility.DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q);
-            % @endcode
-            %
-            % @param Xtrain [numeric array] | The train data
-            % @param ytrain [numeric array] | The train labels
-            % @param Xvalid [numeric array] | The test data
-            % @param yvalid [numeric array] | The test labels
-            % @param method [char] | The dimension reduction method
-            % @param q [int] | The reduced dimension
-            % @param varargin | Additional optional arguments
-            %
-            % @retval accuracy [numeric] | The model accuracy
-            % @retval sensitivity [numeric] | The model sensitivity
-            % @retval specificity [numeric] | The model specificity
-            % @retval tdimred [double] | The dimension reduction run time
-            % @retval st [double] | The train run time
-            % @retval SVMModel [model] | The trained SVM model
-            % @retval Xtrainscores [numeric array] | The dimension-reduced train data
-            % @retval Xvalidscores [numeric array] | The dimension-reduced test data
+        function [accuracy, sensitivity, specificity, jac, tdimred, st, Mdl, Xvalid] = DimredAndTrain(trainData, testData, method, q, varargin)
+        % DimredAndTrain trains and test an SVM classifier after dimension reduction.
+        %
+        % @b Usage
+        %
+        % @code
+        % [accuracy, sensitivity, specificity, jac, tdimred, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.DimredAndTrain(trainData, testData, method, q);
+        % @endcode
+        %
+        % @param trainData [struct] | The train data
+        % @param testData [struct] | The test data
+        % @param method [char] | The dimension reduction method
+        % @param q [int] | The reduced dimension
+        % @param varargin | Additional optional arguments
+        %
+        % @retval accuracy [numeric] | The model's accuracy
+        % @retval sensitivity [numeric] | The model's sensitivity
+        % @retval specificity [numeric] | The model's specificity
+        % @retval jac [numeric] | The model's jaccard coefficient
+        % @retval tdimred [double] | The dimension reduction run time
+        % @retval st [double] | The train run time
+        % @retval SVMModel [model] | The trained SVM model
+        % @retval Xvalid [numeric array] | The dimension-reduced test data
 
-            Xtrainscores = Xtrain;
-            Xvalidscores = Xvalid;
-            tdimred = 0;
+            tic;
+            transTrain = cellfun(@(x) x.Transform(method, q, varargin{:}), {trainData.Values}, 'un', 0);
+            tdimred = toc;
+            tdimred = tdimred / numel(transTrain);
+            transTest = cellfun(@(x) x.Transform(method, q, varargin{:}), {testData.Values}, 'un', 0);
 
+            Xtrainscores = trainUtility.Cell2Mat(transTrain);
+            transyTrain = cellfun(@(x,y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {trainData.Labels}, {trainData.Values}, 'un', 0);
+            ytrain = trainUtility.Cell2Mat(transyTrain);
+            
+            Xvalidscores = trainUtility.Cell2Mat(transTest);
+            Xvalid = transTest;
+            transyValid = cellfun(@(x,y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData.Labels}, {testData.Values}, 'un', 0);
+            yvalid = trainUtility.Cell2Mat(transyValid);
+            
             switch lower(method)
-                case 'pca'
+                case 'pca-all'
                     tic;
-                    [coeff, Xtrainscores, latent, explained, objective] = Dimred(Xtrain, 'pca', q);
+                    [coeff, Xtrainscores, ~, ~, ~] = Dimred(Xtrainscores, 'pca', q);
                     tdimred = toc;
-                    Xvalidscores = Xvalid * coeff;
-                    [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores, yvalid);
-
-                case 'rica'
+                    Xvalidscores = Xvalidscores * coeff;
+                    Xvalid = cellfun(@(x) x * coeff, Xvalid, 'un', 0);
+                    [predlabels, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores);
+                                        
+                case 'rica-all'
                     tic;
                     warning('off', 'all');
-                    [coeff, Xtrainscores, ~, ~, ~] = Dimred(Xtrain, 'rica', q);
+                    [coeff, Xtrainscores, ~, ~, ~] = Dimred(Xtrainscores, 'rica', q);
                     warning('on', 'all');
                     tdimred = toc;
-                    Xvalidscores = Xvalid * coeff;
-                    [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores, yvalid);
-
-                case 'simple'
-                    wavelengths = hsiUtility.GetWavelengths(311);
-                    tic;
-                    id1 = find(wavelengths == 540);
-                    id2 = find(wavelengths == 650);
-                    Xtrainscores = Xtrain(:, [id1, id2]);
-                    tdimred = toc;
-                    Xvalidscores = Xvalid(:, [id1, id2]);
-                    [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores, yvalid);
-
-                case 'lda'
-                    tic;
-                    [~, ~, ~, ~, ~, LMdl] = Dimred(Xtrain, 'lda', q, ytrain);
-                    tdimred = toc;
-                    st = tdimred;
-                    ypred1 = predict(LMdl, Xvalid);
-                    [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, ypred1);
-                    Mdl = LMdl;
-
-                case 'qda'
-                    tic;
-                    [~, ~, ~, ~, ~, LMdl] = Dimred(Xtrain, 'qda', q, ytrain);
-                    tdimred = toc;
-                    st = tdimred;
-                    ypred1 = predict(LMdl, Xvalid);
-                    [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, ypred1);
-                    Mdl = LMdl;
-
-                case 'rfi'
-                    [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrain, ytrain, Xvalid, yvalid);
+                    Xvalidscores = Xvalidscores * coeff;
+                    Xvalid = cellfun(@(x) x * coeff, Xvalid, 'un', 0);
+                    [predlabels, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores);                 
 
                 case 'autoencoder'
                     tic;
-                    autoenc = trainAutoencoder(Xtrain', q, 'MaxEpochs', 400, ...
+                    autoenc = trainAutoencoder(Xtrainscores', q, 'MaxEpochs', 400, ...
                         'UseGPU', true);
                     tdimred = toc;
-                    Xtrainscores = encode(autoenc, Xtrain')';
-                    Xvalidscores = encode(autoenc, Xvalid')';
-                    [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores, yvalid);
+                    Xtrainscores = Dimred(Xtrainscores, 'autoencoder', q, autoenc);
+                    Xvalidscores = Dimred(Xvalidscores, 'autoencoder', q, autoenc);
+                    Xvalid = cellfun(@(x) Dimred(x, 'autoencoder', q, autoenc), Xvalid, 'un', 0);
+                    [predlabels, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores);
 
                 case 'msuperpca'
-                    [accuracy, sensitivity, specificity, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.StackMultiscale(@trainUtility.SVM, varargin{1}, varargin{2}, 'voting', Xtrain, ytrain, Xvalid, yvalid);
+                    [predlabels, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.StackMultiscale(@trainUtility.SVM, varargin{1}, varargin{2}, 'voting', Xtrainscores, ytrain, Xvalidscores);
 
                 otherwise
-
-                    [accuracy, sensitivity, specificity, st, Mdl] = trainUtility.RunSVM(Xtrain, ytrain, Xvalid, yvalid);
+                    [predlabels, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores);
             end
+            
+            [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, predlabels);
+            jac = commonUtility.Jaccard(yvalid, predlabels);
         end
 
         % ======================================================================
@@ -515,8 +570,7 @@ classdef trainUtility
         %> [accuracy, sensitivity, specificity, tdimred, tclassifier] = trainUtility.RunKfoldValidation(X, y, cvp, method, q);
         %> @endcode
         %>
-        %> @param X [numeric array] | The data
-        %> @param y [numeric array] | The labels
+        %> @param trainData [struct] | The train data
         %> @param cvp [cell array] | The cross validation index splits
         %> @param method [char] | The dimension reduction method
         %> @param q [int] | The reduced dimension
@@ -525,10 +579,11 @@ classdef trainUtility
         %> @retval accuracy [numeric] | The model accuracy
         %> @retval sensitivity [numeric] | The model sensitivity
         %> @retval specificity [numeric] | The model specificity
+        %> @retval jac [numeric] | The model's jaccard coefficient
         %> @retval tdimred [double] | The dimension reduction run time
         %> @retval tclassifier [double] | The train run time
         % ======================================================================
-        function [accuracy, sensitivity, specificity, tdimred, tclassifier] = RunKfoldValidation(X, y, cvp, method, q, varargin)
+        function [accuracy, sensitivity, specificity, jacCoeff, tdimred, tclassifier] = RunKfoldValidation(trainData, cvp, method, q, varargin)
             % RunKfoldValidation trains and tests an classifier with cross validation.
             %
             % @b Usage
@@ -537,8 +592,7 @@ classdef trainUtility
             % [accuracy, sensitivity, specificity, tdimred, tclassifier] = trainUtility.RunKfoldValidation(X, y, cvp, method, q);
             % @endcode
             %
-            % @param X [numeric array] | The data
-            % @param y [numeric array] | The labels
+            % @param trainData [struct] | The train data
             % @param cvp [cell array] | The cross validation index splits
             % @param method [char] | The dimension reduction method
             % @param q [int] | The reduced dimension
@@ -547,40 +601,30 @@ classdef trainUtility
             % @retval accuracy [numeric] | The model accuracy
             % @retval sensitivity [numeric] | The model sensitivity
             % @retval specificity [numeric] | The model specificity
+            % @retval jac [numeric] | The model's jaccard coefficient
             % @retval tdimred [double] | The dimension reduction run time
             % @retval tclassifier [double] | The train run time
-            numvalidsets = cvp.NumTestSets;
+            numvalidsets = cvp.NumTestSets;   
             acc = zeros(1, numvalidsets);
             sens = zeros(1, numvalidsets);
             spec = zeros(1, numvalidsets);
             st = zeros(1, numvalidsets);
+            jac = zeros(1, numvalidsets);
 
             for k = 1:numvalidsets
-                if iscell(X)
-                    Xtrain = cellfun(@(x) x(cvp.training(k), :), X, 'un', 0);
-                    Xvalid = cellfun(@(x) x(cvp.test(k), :), X, 'un', 0);
-                else
-                    Xtrain = X(cvp.training(k), :);
-                    Xvalid = X(cvp.test(k), :);
-                end
+                trainDataFold = trainData(cvp.training(k));
+                testDataFold = trainData(cvp.test(k));
 
-                if iscell(y)
-                    ytrain = cellfun(@(x) y(cvp.training(k), :), X, 'un', 0);
-                    yvalid = cellfun(@(x) y(cvp.test(k), :), X, 'un', 0);
-                else
-                    ytrain = y(cvp.training(k), :);
-                    yvalid = y(cvp.test(k), :);
-                end
-
-                [acc(k), sens(k), spec(k), tdimred, st(k), ~, ~, ~] = trainUtility.DimredAndTrain(Xtrain, ytrain, Xvalid, yvalid, method, q, varargin{:});
+                [acc(k), sens(k), spec(k), jac(k), tdimred, st(k), ~, ~] = trainUtility.DimredAndTrain(trainDataFold, testDataFold, method, q, varargin{:});
             end
 
             accuracy = mean(acc);
             sensitivity = mean(sens);
             specificity = mean(spec);
             tclassifier = mean(st);
-            fprintf('%d-fold validated - Accuracy: %.5f, Sensitivity: %.5f, Specificity: %.5f, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
-                numvalidsets, accuracy, sensitivity, specificity, tdimred, tclassifier);
+            jacCoeff = mean(jac);
+            fprintf('%d-fold validated - Jaccard: %.3f %% Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
+                numvalidsets, jacCoeff * 100, accuracy *100, sensitivity *100, specificity * 100, tdimred, tclassifier);
         end
 
         % ======================================================================
@@ -641,19 +685,15 @@ classdef trainUtility
         %> @b Usage
         %>
         %> @code
-        %> [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q);
+        %> [valTrain, valTest] = trainUtility.ValidateTest2(trainData, testData, cvp, method, q);
         %>
         %> transformFun = @(x, i) IndexCell(x, i);
         %> numScales = numel(pixelNumArray);
-        %> [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q, transformFun, numScales);
+        %> [valTrain, valTest] = trainUtility.ValidateTest2(trainData, testData, cvp, method, q, transformFun, numScales);
         %> @endcode
         %>
-        %> @param Xtrain [numeric array] | The train data
-        %> @param ytrain [numeric array] | The train labels
-        %> @param Xvalid [numeric array] | The test data
-        %> @param yvalid [numeric array] | The test labels
-        %> @param sRGBs [cell array] | The sRGB images for test data
-        %> @param fgMasks [cell array] | The foreground masks for test data
+        %> @param trainData [struct] | The train data
+        %> @param testData [struct] | The test data
         %> @param cvp [cell array] | The cross validation index splits
         %> @param method [char] | The dimension reduction method
         %> @param q [int] | The reduced dimension
@@ -662,52 +702,55 @@ classdef trainUtility
         %> @retval valTrain [numeric array] | The train performance results
         %> @retval valTest [numeric array] | The validation performance results
         % ======================================================================
-        function [valTrain, valTest] = ValidateTest2(X, y, Xvalid, yvalid, sRGBs, fgMasks, cvp, method, q, varargin)
-            % ValidateTest2 returns the results after cross validation of a classifier.
-            %
-            % Need to set config::[saveFolder] for image output.
-            %
-            % @b Usage
-            %
-            % @code
-            % [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q);
-            %
-            % transformFun = @(x, i) IndexCell(x, i);
-            % numScales = numel(pixelNumArray);
-            % [valTrain, valTest] = trainUtility.ValidateTest2(Xtrain, ytrain, Xtest, ytest, sRGBs, fgMasks, cvp, method, q, transformFun, numScales);
-            % @endcode
-            %
-            % @param Xtrain [numeric array] | The train data
-            % @param ytrain [numeric array] | The train labels
-            % @param Xvalid [numeric array] | The test data
-            % @param yvalid [numeric array] | The test labels
-            % @param sRGBs [cell array] | The sRGB images for test data
-            % @param fgMasks [cell array] | The foreground masks for test data
-            % @param cvp [cell array] | The cross validation index splits
-            % @param method [char] | The dimension reduction method
-            % @param q [int] | The reduced dimension
-            % @param varargin | Additional optional arguments
-            %
-            % @retval valTrain [numeric array] | The train performance results
-            % @retval valTest [numeric array] | The validation performance results
+        function [valTrain, valTest] = ValidateTest2(trainData, testData, cvp, method, q, varargin)
+        % ValidateTest2 returns the results after cross validation of a classifier.
+        %
+        % Need to set config::[saveFolder] for image output.
+        %
+        % @b Usage
+        %
+        % @code
+        % [valTrain, valTest] = trainUtility.ValidateTest2(trainData, testData, cvp, method, q);
+        %
+        % transformFun = @(x, i) IndexCell(x, i);
+        % numScales = numel(pixelNumArray);
+        % [valTrain, valTest] = trainUtility.ValidateTest2(trainData, testData, cvp, method, q, transformFun, numScales);
+        % @endcode
+        %
+        % @param trainData [struct] | The train data
+        % @param testData [struct] | The test data
+        % @param cvp [cell array] | The cross validation index splits
+        % @param method [char] | The dimension reduction method
+        % @param q [int] | The reduced dimension
+        % @param varargin | Additional optional arguments
+        %
+        % @retval valTrain [numeric array] | The train performance results
+        % @retval valTest [numeric array] | The validation performance results
+            
+            
+            [accuracy, sensitivity, specificity, jacCoeff, tdimred, tclassifier] = trainUtility.RunKfoldValidation(trainData, cvp, method, q, varargin{:});
+            valTrain = [jacCoeff, accuracy, sensitivity, specificity, tdimred, tclassifier];
 
-            [accuracy, sensitivity, specificity, tdimred, tclassifier] = trainUtility.RunKfoldValidation(X, y, cvp, method, q, varargin{:});
-            valTrain = [accuracy, sensitivity, specificity, tdimred, tclassifier];
-            fprintf('Train - Accuracy: %.5f, Sensitivity: %.5f, Specificity: %.5f, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
-                accuracy, sensitivity, specificity, tdimred, tclassifier);
-            [accuracy, sensitivity, specificity, tdimred, tclassifier, Mdl, ~, testscores] = trainUtility.DimredAndTrain(X, y, Xvalid, yvalid, method, q, varargin{:});
-            fprintf('Test - Accuracy: %.5f, Sensitivity: %.5f, Specificity: %.5f, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
-                accuracy, sensitivity, specificity, tdimred, tclassifier);
-            valTest = [accuracy, sensitivity, specificity, tdimred, tclassifier];
-
-            predlabels = trainUtility.Predict(Mdl, testscores);
+            
+            [accuracy, sensitivity, specificity, jacCoeff, tdimred, tclassifier, Mdl, testscores] = trainUtility.DimredAndTrain(trainData, testData, method, q, varargin{:});
+            fprintf('Test - Jaccard: %.3f %%, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
+                jacCoeff * 100, accuracy * 100, sensitivity * 100, specificity * 100, tdimred, tclassifier);
+            valTest = [jacCoeff, accuracy, sensitivity, specificity, tdimred, tclassifier];
+            
+            ytest = cellfun(@(x,y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData.Labels}, {testData.Values}, 'un', 0);
+            
+            fgMasks = {testData.Masks};
+            sRGBs = {testData.RGBs};
+            predlabels = cellfun(@(x) trainUtility.Predict(Mdl, x), testscores, 'un', 0);
             origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
-            predLabels = hsi.RecoverSpatialDimensions(predlabels, origSizes, fgMasks);
-            trueLabels = hsi.RecoverSpatialDimensions(yvalid, origSizes, fgMasks);
+
             for i = 1:numel(sRGBs)
+                predLabels = hsi.RecoverSpatialDimensions(predlabels{i}, origSizes{i}, fgMasks{i});
+                trueLabels = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
+                jacsim = commonUtility.Jaccard(predLabels{i}, trueLabels{i});
+
                 imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), ...
                     strcat('pred_', num2str(i), '_', method, '_', num2str(q))), 'png');
-                jacsim = jaccard(predLabels{i}, trueLabels{i});
                 figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
                 plots.Overlay(4, imgFilePath, sRGBs{i}, predLabels{i}, figTitle);
             end

@@ -58,6 +58,56 @@ classdef hsiUtility
             end
         end
 
+        %======================================================================
+        %> @brief LoadDataset loads both hsi and hsiInfo objects in the dataset.
+        %>
+        %> The hsi and hsiInfo objects should have been initialized beforehand with
+        %> hsiUtility.PrepareDataset().
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [hsiList, labelInfoList] = hsiUtility.LoadDataset();
+        %> @endcode
+        %>
+        %> @param dataset [char] | Optional: The target datset. Default: config::['dataset'].
+        %>
+        %> @retval hsiList [cell array] | The cell array of hsi objects
+        %> @retval labelInfoList [cell array] | The cell array of hsiInfo objects
+        %======================================================================
+        function [hsiList, labelInfoList] = LoadDataset(dataset)
+        % LoadDataset loads both hsi and hsiInfo objects in the dataset.
+        %
+        % The hsi and hsiInfo objects should have been initialized beforehand with
+        % hsiUtility.PrepareDataset().
+        %
+        % @b Usage
+        %
+        % @code
+        % [hsiList, labelInfoList] = hsiUtility.LoadDataset();
+        % @endcode
+        %
+        % @param dataset [char] | Optional: The target datset. Default: config::['dataset'].
+        %
+        % @retval hsiList [cell array] | The cell array of hsi objects
+        % @retval labelInfoList [cell array] | The cell array of hsiInfo objects
+
+            if nargin < 1
+                dataset = config.GetSetting('dataset');
+            end
+            config.SetSetting('dataset', dataset);
+            
+            [~, targetIDs] = commonUtility.DatasetInfo(false);
+
+            n = length(targetIDs);
+            hsiList = cell(n, 1);
+            labelInfoList = cell(n, 1);
+            for i = 1:n
+                targetName = targetIDs{i};
+                [hsiList{i}, labelInfoList{i}] = hsiUtility.LoadHsiAndLabel(targetName);
+            end
+        end
+
         %% System properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %======================================================================
         %> @brief GetWavelengths returns the wavelengths of the hyperspectral image

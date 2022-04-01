@@ -1,8 +1,10 @@
 % ======================================================================
 %> @brief Dimred reduces the dimensions of the hyperspectral image.
 %>
-%> Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
-%> details check @c function Dimred.
+%> Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
+%> Additionally, for pre-trained parameters RFI and Autoencoder are available. 
+%> For an unknown method, the input data is returned.
+%> For more details check @c function Dimred.
 %>
 %> @b Usage
 %>
@@ -21,7 +23,7 @@
 %> @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
 %> @param method [string] | The method for dimension reduction
 %> @param q [int] | The number of components to be retained
-%> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+%> @param mask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
 %> @param varargin [cell array] | Optional additional arguments for methods that require them
 %>
 %> @retval coeff [numeric array] | The transformation coefficients
@@ -37,8 +39,10 @@
 function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, q, mask, varargin)
 % Dimred reduces the dimensions of the hyperspectral image.
 %
-% Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
-% details check @c function Dimred.
+% Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
+% Additionally, for pre-trained parameters RFI and Autoencoder are available. 
+% For an unknown method, the input data is returned.
+% For more details check @c function Dimred.
 %
 % @b Usage
 %
@@ -57,7 +61,7 @@ function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, 
 % @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
 % @param method [string] | The method for dimension reduction
 % @param q [int] | The number of components to be retained
-% @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
+% @param mask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
 % @param varargin [cell array] | Optional additional arguments for methods that require them
 %
 % @retval coeff [numeric array] | The transformation coefficients
@@ -85,74 +89,95 @@ end
 
 rng default % For reproducibility
 
+switch lower(method)
 %% PCA
-if strcmpi(method, 'pca')
-    [coeff, scores, latent, tsquared, explained] = pca(X, 'NumComponents', q);
-end
-
+    case 'pca'
+        [coeff, scores, latent, ~, explained] = pca(X, 'NumComponents', q);
+    
 %% FastICA
-if strcmpi(method, 'ica')
-    [scores, ~, coeff] = fastica(X', 'numOfIC', q);
-end
+    case 'ica'
+        [scores, ~, coeff] = fastica(X', 'numOfIC', q);
 
 %% RICA
-if strcmpi(method, 'rica')
-    Mdl = rica(X, q, 'IterationLimit', 100, 'Lambda', 1);
-    coeff = Mdl.TransformWeights;
-    scores = X * coeff;
-    objective = Mdl.FitInfo.Objective;
-end
+    case 'rica'
+        Mdl = rica(X, q, 'IterationLimit', 100, 'Lambda', 1);
+        coeff = Mdl.TransformWeights;
+        scores = X * coeff;
+        objective = Mdl.FitInfo.Objective;
 
 %% Discriminant Analysis (LDA / QDA)
-if isempty(mask) && strcmpi(method, 'lda') && strcmpi(method, 'qda')
-    error('A supervised method requires labels as argument');
-else
-    if strcmp(method, 'lda')
+    case 'lda'
+        if isempty(mask) 
+            error('A supervised method requires labels as argument');
+        end
         Mdl = fitcdiscr(X, mask);
         scores = predict(Mdl, X);
-    end
-
-    if strcmp(method, 'qda')
+        
+    case 'qda'
+        if isempty(mask) 
+            error('A supervised method requires labels as argument');
+        end
         Mdl = fitcdiscr(X, mask, 'DiscrimType', 'quadratic');
         scores = predict(Mdl, X);
-    end
-end
 
+%% Wavelength Selection 
+    case 'wavelength-selection'
+        wavelengths = hsiUtility.GetWavelengths(311);
+        id1 = find(wavelengths == 540);
+        id2 = find(wavelengths == 650);
+        scores = X(:, [id1, id2]);
+        coeff = zeros(wavelegths);
+        coeff(id1) = 1;
+        coeff(id2) = 1; 
+                    
 %% SuperPCA
-if strcmpi(method, 'superpca')
-    if isempty(varargin)
-        pixelNum = 20;
-    else
-        pixelNum = varargin{1};
-    end
-
-    %%super-pixels segmentation
-    superpixels = cubseg(X, pixelNum);
-
-    %%SupePCA based DR
-    scores = SuperPCA(X, q, superpixels);
-end
-
-if strcmpi(method, 'msuperpca')
-
-    if isempty(varargin)
-        pixelNumArray = floor(20*sqrt(2).^[-2:2]);
-    else
-        pixelNumArray = varargin{1};
-    end
-
-    N = numel(pixelNumArray);
-    scores = cell(N, 1);
-    for i = 1:N
-        pixelNum = pixelNumArray(i);
+    case 'superpca'
+        if isempty(varargin)
+            pixelNum = 20;
+        else
+            pixelNum = varargin{1};
+        end
 
         %%super-pixels segmentation
         superpixels = cubseg(X, pixelNum);
 
         %%SupePCA based DR
-        scores{i} = SuperPCA(X, q, superpixels);
-    end
+        scores = SuperPCA(X, q, superpixels);
 
+%% Multiscale SuperPCA
+    case 'msuperpca'
+
+        if isempty(varargin)
+            pixelNumArray = floor(20*sqrt(2).^[-2:2]);
+        else
+            pixelNumArray = varargin{1};
+        end
+
+        N = numel(pixelNumArray);
+        scores = cell(N, 1);
+        for i = 1:N
+            pixelNum = pixelNumArray(i);
+
+            %%super-pixels segmentation
+            superpixels = cubseg(X, pixelNum);
+
+            %%SupePCA based DR
+            scores{i} = SuperPCA(X, q, superpixels);
+        end
+
+    case 'rfi'
+        impOOB = varargin{1};
+        [~, idxOrder] = sort(impOOB, 'descend');
+        ido = idxOrder(1:q);
+        scores = X(:, ido);
+        
+    case 'autoencoder'
+        autoenc = varargin{1};
+        scores = encode(autoenc, X')';
+                            
+    otherwise 
+        scores = X; 
 end
 
-end
+
+end 

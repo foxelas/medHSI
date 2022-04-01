@@ -498,7 +498,6 @@ classdef hsi
         %> @param obj [hsi] | An instance of the hsi class
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
-        %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
         %> @param varargin [cell array] | Optional additional arguments for methods that require them
         %>
         %> @retval coeff [numeric array] | The transformation coefficients
@@ -510,7 +509,7 @@ classdef hsi
         %> values
         %> @retval Mdl [model] | The dimension reduction model
         % ======================================================================
-        function [coeff, scores, latent, explained, objective] = Dimred(obj, varargin)
+        function [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, varargin)
             % Dimred reduces the dimensions of the hyperspectral image.
             %
             % Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
@@ -542,7 +541,7 @@ classdef hsi
             % @retval objective [numeric array] | The objective function
             % values
             % @retval Mdl [model] | The dimension reduction model
-            [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, varargin{:});
+            [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, method, q, obj.FgMask, varargin{:});
         end
 
         % ======================================================================
@@ -560,7 +559,6 @@ classdef hsi
         %> @param obj [hsi] | An instance of the hsi class
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
-        %> @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
         %> @param varargin [cell array] | Optional additional arguments for methods that require them
         %>
         %> @retval scores [numeric array] | The transformed values
@@ -584,9 +582,13 @@ classdef hsi
             % @param varargin [cell array] | Optional additional arguments for methods that require them
             %
             % @retval scores [numeric array] | The transformed values
-            [~, scores, ~, ~, ~] = DimredInternal(obj.Value, method, varargin{:});
+            [~, scores, ~, ~, ~] = obj.Dimred(method, varargin{:});
+            
+            if ndims(scores) > 2 
+                scores = GetMaskedPixelsInternal(scores, obj.FgMask);
+            end
         end
-
+        
         %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
         %> @brief GetDisplayImage returns an RGB image from the hyperspectral data.
