@@ -745,14 +745,14 @@ classdef trainUtility
             origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
 
             for i = 1:numel(sRGBs)
-                predLabels = hsi.RecoverSpatialDimensions(predlabels{i}, origSizes{i}, fgMasks{i});
-                trueLabels = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
-                jacsim = commonUtility.Jaccard(predLabels{i}, trueLabels{i});
+                predMask = hsi.RecoverSpatialDimensions(predlabels{i}, origSizes{i}, fgMasks{i});
+                trueMask = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
+                jacsim = commonUtility.Jaccard(predMask, trueMask);
 
                 imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), ...
                     strcat('pred_', num2str(i), '_', method, '_', num2str(q))), 'png');
                 figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
-                plots.Overlay(4, imgFilePath, sRGBs{i}, predLabels{i}, figTitle);
+                plots.Overlay(4, imgFilePath, sRGBs{i}, predMask, figTitle);
             end
         end
     end
