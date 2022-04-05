@@ -65,8 +65,8 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
 # From segmentation_models: 'sm_vgg', 'sm_inception', 'sm_resnet'
 # From scratch: 'cnn3d_unbalanced', 'cnn3d_balanced', 'cnn2d'
 
-#framework = 'sm_inception'
-flist = ['cnn3d_balanced', 'cnn3d_unbalanced', 'sm_vgg', 'sm_resnet', 'sm_inception']
+#flist = [ 'sm_vgg', 'sm_resnet', 'sm_inception','cnn3d_balanced', 'cnn3d_unbalanced']
+flist = ['cnn3d_unbalanced']
 for framework in flist: 
     model, history = get_framework(framework, x_train, x_test, y_train, y_test)
 

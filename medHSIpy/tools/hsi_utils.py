@@ -109,6 +109,7 @@ def load_dataset(fpath, sampleType='pixel'):
 
     keyList = list(f.keys())
 
+    keyList = keyList[0:19]
     for keyz in keyList:
         val = f[keyz]['hsi'][:]
         lab = f[keyz]['label'][:]
