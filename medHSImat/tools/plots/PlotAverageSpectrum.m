@@ -14,7 +14,7 @@
 %> @param hsIm [hsi] | An instance of the hsi class
 %> @param figTitle [char] | The figure title
 %======================================================================
-function PlotAverageSpectrum(hsIm, figTitle, fig)
+function PlotAverageSpectrum(hsIm, hsImInfo, fig)
 % PlotAverageSpectrum plots average spectra using a promt for custom mask selection.
 %
 % Need to set config::[SaveFolder] for saving purposes.
@@ -30,10 +30,11 @@ function PlotAverageSpectrum(hsIm, figTitle, fig)
 % @param hsIm [hsi] | An instance of the hsi class
 % @param figTitle [char] | The figure title
 
-% Draw mask
-mask = hsIm.GetCustomMask();
-Inorm_mask = hsIm.GetMaskedPixels(mask);
-x = hsiUtility.GetWavelengths(size(Inorm_mask, 2));
+maskROI = logical(hsImInfo.Labels) & hsIm.FgMask;
+maskNonROI = ~logical(hsImInfo.Labels) & hsIm.FgMask; 
+      
+InormROI = hsIm.GetMaskedPixels(maskROI);
+x = hsiUtility.GetWavelengths(size(InormROI, 2));
 rgb = hsIm.GetDisplayImage();
 
 close all;
@@ -41,10 +42,17 @@ fig = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
 
 subplot(1, 3, 1:2);
 hold on
-for i = 1:size(Inorm_mask, 1)
-    plot(x, Inorm_mask(i, :), 'g');
+InormNonROI  = hsIm.GetMaskedPixels(maskNonROI);
+for i = 1:size(InormNonROI, 1)
+    plot(x, InormNonROI(i, :), 'b');
 end
-h = plot(x, mean(reshape(Inorm_mask, [size(Inorm_mask, 1), size(Inorm_mask, 2)])), 'DisplayName', 'Average Normalized', 'LineWidth', 3);
+
+for i = 1:size(InormROI, 1)
+    plot(x, InormROI(i, :), 'g');
+end
+
+h(1) = plot(x, mean(reshape(InormROI, [size(InormROI, 1), size(InormROI, 2)])), 'r--', 'DisplayName', 'Lesion', 'LineWidth', 3);
+h(2) = plot(x, mean(reshape(InormNonROI, [size(InormNonROI, 1), size(InormNonROI, 2)])), 'm--', 'DisplayName', 'Healthy', 'LineWidth', 3);
 hold off
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Reflectance (a.u.)', 'FontSize', 15);
@@ -58,13 +66,11 @@ ax = gca;
 ax.YAxis.Exponent = 0;
 
 subplot(1, 3, 3);
+figTitle = hsImInfo.Diagnosis;
 imshow(rgb);
 title(figTitle);
 
-baseFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting([SaveFolder]), config.GetSetting('FileName')), '');
-plots.SavePlot(fig, strcat(baseFolder, '_norm.jpg'));
-
-fig2 = figure;
-plots.Overlay(fig2, strcat(baseFolder, '_mask.jpg'), rgb, mask);
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), strcat(config.GetSetting('FileName'), '_values')), 'png');
+plots.SavePlot(fig, plotPath);
 
 end

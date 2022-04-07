@@ -54,7 +54,7 @@ classdef hsiUtility
                 load(targetFilename, 'spectralData', 'labelInfo');
             else
                 load(targetFilename, 'spectralData');
-                labelInfo = hsiInfo.Empty();
+                labelInfo = hsiInfo();
             end
         end
 

@@ -214,10 +214,7 @@ classdef config
                 m = matfile(settingsFile);
                 value = m.(parameter);
             else
-                w = warning();
-                if ~strcmp(w.state, 'off')
-                    fprintf('Parameter %s does not exist in the configuration file.\n', parameter);
-                end
+                error('Parameter %s does not exist in the configuration file.');
             end
         end
 
@@ -248,18 +245,8 @@ classdef config
             %
             settingsFile = fullfile(config.GetConfDir(), 'Config.mat');
             m = matfile(settingsFile, 'Writable', true);
-            if nargin < 2 %write default value
-                v = m.options;
-                m.(parameter) = v.(parameter);
-                value = v.(parameter);
-            else
-                m.(parameter) = value;
-            end
-            w = warning();
-            if (length(w) == 1 && (sum(strcmp({w.identifier}, 'all')) == 1)) ...
-                    || (sum(strcmp({w.identifier}, 'all')) > 0 && strcmp(w(strcmp({w.identifier}, 'all')).state, 'off'))
-                config.NotifySetting(parameter, value);
-            end
+            m.(parameter) = value;
+            config.NotifySetting(parameter, value);
         end
 
         % ======================================================================
@@ -295,7 +282,7 @@ classdef config
             elseif isnumeric(paramValue)
                 fprintf('--Setting [%s] to %.2f.\n', paramName, paramValue);
             else
-                warning('Unsupported variable type.\n')
+                error('Unsupported variable type.\n')
             end
         end
 

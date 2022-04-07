@@ -134,6 +134,10 @@ for i = 1:length(targetIDs)
         %% Preprocess HSI and save
         spectralData = Preprocessing(rawIm, targetID);
 
+        %% Save data info in a file
+        filename = commonUtility.GetFilename('dataset', targetID);
+        save(filename, 'spectralData', '-v7.3');
+        
         %% Read Label
         labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
 

@@ -13,8 +13,14 @@ classdef hsiInfo
         SampleID = ''
         %> A numeric 2D array that contains the labels of a sample
         Labels = []
-        %> A string that shows the
+        %> A numeric 2D array that contains the multiclass labels of a sample
+        MultiClassLabels = [];
+        %> A string that shows the diagnosis
         Diagnosis = ''
+        %> A string that shows the benign/malignant type
+        Type = ''
+        %> A string that shows the diagnosis comment 
+        Comment = ''
     end
 
     methods
@@ -28,7 +34,7 @@ classdef hsiInfo
         %> @b Usage
         %>
         %> @code
-        %> labelInfo = hsiInfo('158', '001', labels, 'Carcinoma');
+        %> labelInfo = hsiInfo('158', '001', labels, 'Basal cell carcinoma', 'Malignant', '');
         %> @endcode
         %>
         %> @param targetId [char] | The unique ID of the target sample
@@ -36,10 +42,12 @@ classdef hsiInfo
         %> @param labels [numeric array] | The labels of the target sample
         %> @param diagnosis [char] | The diagnosis (disease name) of the target
         %> sample
-        %
+        %> @param cancerType [char] | The benign/malignant type
+        %> @param comment [char] | The comment of the diagnosis
+        %>
         %> @return instance of the hsiInfo class
         % ======================================================================
-        function [obj] = hsiInfo(targetId, sampleID, labels, diagnosis)
+        function [obj] = hsiInfo(targetId, sampleID, labels, diagnosis, cancerType, comment)
             % hsiInfo prepares an instance of class hsiInfo.
             %
             % If the values are missing, an empty instance is returned.
@@ -49,7 +57,7 @@ classdef hsiInfo
             % @b Usage
             % @code
             %
-            % labelInfo = hsiInfo('158', '001', labels, 'Carcinoma');
+            % labelInfo = hsiInfo('158', '001', labels, 'Basal cell carcinoma', 'Malignant', '');
             % @endcode
             %
             % @param targetId [char] | The unique ID of the target sample
@@ -57,16 +65,24 @@ classdef hsiInfo
             % @param labels [numeric array] | The labels of the target sample
             % @param diagnosis [char] | The diagnosis (disease name) of the target
             % sample
+            % @param cancerType [char] | The benign/malignant type
+            % @param comment [char] | The comment of the diagnosis
+            %
             %
             % @return instance of the hsiInfo class
-
+            
             if nargin < 1
-                obj = hsiInfo('', '', [], '');
+                obj = hsiInfo('', '', [], '', '', '');
             else
                 obj.ID = targetId;
                 obj.SampleID = sampleID;
                 obj.Labels = labels;
+                if ~isempty(labels)
+                    obj.MultiClassLabels = hsiInfo.GetMultiClassLabels(targetId, labels);
+                end
                 obj.Diagnosis = diagnosis;
+                obj.Type = cancerType; 
+                obj.Comment = comment;
             end
         end
 
@@ -74,6 +90,53 @@ classdef hsiInfo
 
     methods (Static)
 
+        % ======================================================================
+        %> @brief GetMultiClassLabels prepares multiclass labels.
+        %>
+        %> The hsi object should be read beforehand. 
+        %> Classes are: background (0), healthy (1), border (2), malignant(3).
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> mcLabels = hsiInfo.GetMultiClassLabels(targetId, labels);
+        %> @endcode
+        %>
+        %> @param targetId [char] | The unique ID of the target sample
+        %> @param labels [numeric array] | The labels of the target sample
+        %>
+        %> @retval mcLabels [numeric array] | The multiclass labels
+        % ======================================================================
+        function mcLabels = GetMultiClassLabels(targetId, labels)
+        % GetMultiClassLabels prepares multiclass labels.
+        %
+        % The hsi object should be read beforehand. 
+        % Classes are: background (0), healthy (1), border (2), malignant(3).
+        %
+        % @b Usage
+        %
+        % @code
+        % mcLabels = hsiInfo.GetMultiClassLabels(targetId, labels);
+        % @endcode
+        %
+        % @param targetId [char] | The unique ID of the target sample
+        % @param labels [numeric array] | The labels of the target sample
+        %
+        % @retval mcLabels [numeric array] | The multiclass labels
+            [hsIm, ~] = hsiUtility.LoadHsiAndLabel(targetId);
+            mcLabels = zeros(size(labels));
+            mcLabels(~logical(hsIm.FgMask)) = 0; %% Background
+            mcLabels(~logical(labels) & hsIm.FgMask) = 1; %% Healthy
+            mcLabels(logical(labels) & hsIm.FgMask) = 3; %% Lesion
+            borderMask = edge(labels);
+            [m, n] = find(borderMask);
+            p = 3;
+            for i = 1:numel(m)
+                borderMask(m-p:m+p, n-p:n+p) = 1;
+            end   
+            mcLabels(borderMask & hsIm.FgMask) = 2; %% Border
+        end
+        
         % ======================================================================
         %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
@@ -86,7 +149,7 @@ classdef hsiInfo
         %> @b Usage
         %>
         %> @code
-        %> labelInfo = hsiInfo.ReadHsiInfo('158', '001', labels, 'Carcinoma');
+        %> labelInfo = hsiInfo.ReadHsiInfo('158', '001', labels, 'Basal cell carcinoma', 'Malignant', '');
         %> @endcode
         %>
         %> @param targetId [char] | The unique ID of the target sample
@@ -106,7 +169,7 @@ classdef hsiInfo
             % @b Usage
             %
             % @code
-            % labelInfo = hsiInfo.ReadHsiInfo('158', '001', labels, 'Carcinoma');
+            % labelInfo = hsiInfo.ReadHsiInfo('158', '001', labels, 'Basal cell carcinoma', 'Malignant', '');
             % @endcode
             %
             % @param targetId [char] | The unique ID of the target sample
@@ -115,8 +178,8 @@ classdef hsiInfo
             % @return instance of the hsiInfo class
 
             labels = hsiInfo.ReadLabel(targetId);
-            diagnosis = hsiInfo.ReadDiagnosis(sampleId);
-            obj = hsiInfo(targetId, sampleId, labels, diagnosis);
+            [diagnosis, cancerType, comment] = hsiInfo.ReadDiagnosis(sampleId);
+            obj = hsiInfo(targetId, sampleId, labels, diagnosis, cancerType, comment);
         end
 
         % ======================================================================
@@ -159,8 +222,8 @@ classdef hsiInfo
             targetId = hsIm.ID;
             sampleId = hsIm.SampleID;
             labels = hsiInfo.ReadLabelFromHsi(hsIm);
-            diagnosis = hsiInfo.ReadDiagnosis(sampleId);
-            obj = hsiInfo(targetId, sampleId, labels, diagnosis);
+            [diagnosis, cancerType, comment] = hsiInfo.ReadDiagnosis(sampleId);
+            obj = hsiInfo(targetId, sampleId, labels, diagnosis, cancerType, comment);
         end
 
         % ======================================================================
@@ -290,14 +353,17 @@ classdef hsiInfo
         %> @b Usage
         %>
         %> @code
-        %> labelInfo = hsiInfo.ReadDiagnosis('001');
+        %> [labelInfo, type, comment] = hsiInfo.ReadDiagnosis('001');
         %> @endcode
         %>
         %> @param sampleID [char] | The sampleID of the target sample
         %
         %> @retval diagnosis [char] | The diagnosis string
+        %> @retval cancerType [char] | The cancer type string
+        %> @retval comment [char] | The comment string
+
         % ======================================================================
-        function [diagnosis] = ReadDiagnosis(sampleId)
+        function [diagnosis, cancerType, comment] = ReadDiagnosis(sampleId)
             % ReadDiagnosis reads diagnosis information from an excel file.
             %
             % Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiseaseInfoTableName].
@@ -305,7 +371,7 @@ classdef hsiInfo
             % @b Usage
             %
             % @code
-            % labelInfo = hsiInfo.ReadDiagnosis('001');
+            % [labelInfo, type, comment] = hsiInfo.ReadDiagnosis('001');
             % @endcode
             %
             % @param sampleID [char] | The sampleID of the target sample
@@ -318,6 +384,8 @@ classdef hsiInfo
                 id = find(strcmp(dataTable.SampleID, sampleId), 1);
                 if ~isempty(id)
                     diagnosis = dataTable{id, 'Diagnosis'}{1, 1};
+                    cancerType = dataTable{id, 'Type'}{1, 1};
+                    comment = dataTable{id, 'Comment'}{1, 1};
                 end
             end
         end
