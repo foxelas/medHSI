@@ -6,6 +6,8 @@
 %> If all arguments are not provided, they are fetched from the config file.
 %> Target settings are: config::[HasResizeOptions], config::[ImageDimension] and config::[SplitToPatches].
 %>
+%> When splitting in patches all black patches are ignored. 
+%> 
 %> @b Usage
 %>
 %> @code
@@ -31,6 +33,8 @@ function ResizeInternal(baseDataset, targetDataset, hasResizeOptions, imageDimen
 %
 % If all arguments are not provided, they are fetched from the config file.
 % Target settings are: config::[HasResizeOptions], config::[ImageDimension] and config::[SplitToPatches].
+%
+% When splitting in patches all black patches are ignored. 
 %
 % @b Usage
 %
