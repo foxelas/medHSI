@@ -26,7 +26,7 @@ function [] = Basics_Init(experiment, dataset)
 close all;
 clc;
 
-if nargin > 1
+if nargin < 2
     config.SetSetting('Dataset', dataset);
 end
 
