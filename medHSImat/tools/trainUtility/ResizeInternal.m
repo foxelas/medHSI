@@ -94,10 +94,14 @@ if config.GetSetting('HasResizeOptions')
         else
             spectralDatas = spectralData;
             labelInfos = labelInfo;
+            k = 0; 
             for j = 1:numel(spectralData)
-                spectralData = spectralDatas{i};
-                labelInfo = labelInfos{i};
-                SaveResizedData(spectralData, labelInfo, targetName, j);
+                spectralData = spectralDatas{j};
+                if sum(spectralData.Value(:)) > 0 
+                    labelInfo = labelInfos{j};
+                    k = k + 1;
+                    SaveResizedData(spectralData, labelInfo, targetName, k);
+                end
             end
         end
 
@@ -122,7 +126,7 @@ end
 
 filename = commonUtility.GetFilename('dataset', targetName);
 if n > 0
-    filename = strrep(targetName, '.mat', strcat('_patch', num2str(n), '.mat'));
+    filename = commonUtility.GetFilename('dataset',  strcat(targetName, '_patch', num2str(n)));
 end
 save(filename, 'spectralData', 'labelInfo', '-v7.3');
 fprintf('Saved new data sample at: %s \n', filename);

@@ -633,17 +633,17 @@ classdef hsiUtility
             % @param patchSize [int] | The target patch size
             %
             % @retval patches [cell array] | The patches
-            [m, n, s] = size(oldValue);
+            [m, n, ~] = size(oldValue);
             a = floor(m / patchSize);
             b = floor(n/patchSize);
             numPatch = a * b;
-            patches = zeros(numPatch, patchSize, patchSize, s);
+            patches = cell(numPatch, 1);
             c = 0;
 
             for i = 1:a
                 for j = 1:b
                     c = c + 1;
-                    patches(c, :, :, :) = oldValue((i - 1)*patchSize+1:i*patchSize, (j - 1)*patchSize+1:j*patchSize, :);
+                    patches{c} = oldValue((i - 1)*patchSize+1:i*patchSize, (j - 1)*patchSize+1:j*patchSize, :);
                 end
             end
         end

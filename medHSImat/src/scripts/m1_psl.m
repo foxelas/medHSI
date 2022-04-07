@@ -27,21 +27,31 @@ readForeground = true;
 targetConditions = {'raw', false};
 hsiUtility.PrepareDataset(baseDataset, dbSelection, readForeground, targetConditions);
 
+%%%%%%%%%%%%%%%%%%%%% Export Dataset %%%%%%%%%%%%%%%%%%%%%
+config.SetSetting('Dataset', baseDataset);
+hsiUtility.ExportH5Dataset();
+
 %%%%%%%%%%%%%%%%%%%%% Prepare 512x512 Dataset %%%%%%%%%%%%%%%%%%%%%
 dataset512 = 'psl512';
 config.SetSetting('HasResizeOptions', true);
 config.SetSetting('ImageDimension', 512);
 config.SetSetting('SplitToPatches', false);
 trainUtility.Resize(baseDataset, dataset512);
+config.SetSetting('Dataset', dataset512);
+hsiUtility.ExportH5Dataset();
+
+%%%%%%%%%%%%%%%%%%%%% Prepare 32x32 Splits %%%%%%%%%%%%%%%%%%%%%%%%
+dataset32 = 'psl32';
+config.SetSetting('HasResizeOptions', true);
+config.SetSetting('ImageDimension', 32);
+config.SetSetting('SplitToPatches', true);
+trainUtility.Resize(baseDataset, dataset32);
+config.SetSetting('Dataset', dataset32);
+hsiUtility.ExportH5Dataset();
 
 %%%%%%%%%%%%%%%%%%%%% Augment Dataset %%%%%%%%%%%%%%%%%%%%%
 augDataset = 'pslCoreAugmented';
 trainUtility.Augment(baseDataset, augDataset, 'set1');
-
-%%%%%%%%%%%%%%%%%%%%% Export Dataset %%%%%%%%%%%%%%%%%%%%%
-config.SetSetting('Dataset', baseDataset);
-hsiUtility.ExportH5Dataset();
-
 config.SetSetting('Dataset', augDataset);
 hsiUtility.ExportH5Dataset();
 
