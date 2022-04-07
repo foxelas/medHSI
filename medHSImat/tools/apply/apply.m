@@ -3,7 +3,7 @@
 %
 %> Functions using apply are applied on the currently selected dataset,
 %> unless mentioned otherwise. The dataset name is recovered from
-%> config.GetSetting('dataset').
+%> config.GetSetting('Dataset').
 %>
 % ======================================================================
 classdef apply
@@ -13,7 +13,7 @@ classdef apply
         %>
         %> The target function should have arguments in the format of (hsIm,
         %> , ...), where hsIm is an instance of class 'hsi'. The targetID
-        %> is saved for figure saving purposes in config::'fileName'.
+        %> is saved for figure saving purposes in config::[FileName].
         %>
         %> @b Usage
         %>
@@ -31,7 +31,7 @@ classdef apply
             %
             % The target function should have arguments in the format of (hsIm,
             % , ...), where hsIm is an instance of class 'hsi'. The targetID
-            % is saved for figure saving purposes in config::'fileName'.
+            % is saved for figure saving purposes in config::[FileName].
             %
             % @b Usage
             %
@@ -55,7 +55,7 @@ classdef apply
                 targetID = targetIDs{i};
                 [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetID);
 
-                config.SetSetting('fileName', targetID);
+                config.SetSetting('FileName', targetID);
 
                 %% Change to Relevant Script
                 if nargout(funcHandle) > 0
@@ -94,11 +94,11 @@ classdef apply
             %
             % @retval varargout [Cell array] | The return values of the target function
             warning('off', 'all');
-            showFigures = config.GetSetting('showFigures');
-            saveImages = config.GetSetting('saveImages');
+            showFigures = config.GetSetting('ShowFigures');
+            saveImages = config.GetSetting('SaveImages');
 
-            config.SetSetting('showFigures', false);
-            config.SetSetting('saveImages', false);
+            config.SetSetting('ShowFigures', false);
+            config.SetSetting('SaveImages', false);
             warning('on', 'all');
 
             if nargout(funcHandle) > 0
@@ -109,8 +109,8 @@ classdef apply
             end
 
             warning('off', 'all');
-            config.SetSetting('saveImages', saveImages);
-            config.SetSetting('showFigures', showFigures);
+            config.SetSetting('SaveImages', saveImages);
+            config.SetSetting('ShowFigures', showFigures);
             warning('on', 'all');
         end
         % ======================================================================
@@ -141,8 +141,8 @@ classdef apply
             %
             % @retval varargout [Cell array] | The return values of the target function
             warning('off', 'all');
-            saveImages = config.GetSetting('saveImages');
-            config.SetSetting('saveImages', false);
+            saveImages = config.GetSetting('SaveImages');
+            config.SetSetting('SaveImages', false);
             warning('on', 'all');
             if nargout(funcHandle) > 0
                 varargout{:} = funcHandle(varargin{:});
@@ -152,7 +152,7 @@ classdef apply
             end
 
             warning('off', 'all');
-            config.SetSetting('saveImages', saveImages);
+            config.SetSetting('SaveImages', saveImages);
             warning('on', 'all');
         end
         % ======================================================================

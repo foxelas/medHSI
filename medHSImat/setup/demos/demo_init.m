@@ -3,7 +3,7 @@
 config.SetOpt();
 
 %%%%%%%%%%%%%%%%%%%% Check Data %%%%%%%%%%%%%%%%%%%%%
-% Files are saved as .h5 files in directory config.GetSetting('dataDir')
+% Files are saved as .h5 files in directory config.GetSetting('DataDir')
 %
 % For each data sample, three HSI images are saved as:
 % xxx_raw.h5 or xxx_fix.h5 (the tissue sample image)
@@ -16,7 +16,7 @@ config.SetOpt();
 
 %%%%%%%%%%%%%%%%%%%%% Export RGB and Read .h5 files %%%%%%%%%%%%%%%%%%%%%
 % Sample information is saved in importDir (input\xxxDBDataInfoTable.xlsx)
-% xxx is the DB name in config.GetSetting('database'), now set as 'demo'
+% xxx is the DB name in config.GetSetting('Database'), now set as 'demo'
 
 % Select entries from the db so that Content = 'tissue' (exact match)
 dbSelection = {'tissue', true};
@@ -24,12 +24,12 @@ dbSelection = {'tissue', true};
 [filenames, targetIDs, outRows] = databaseUtility.Query(dbSelection);
 
 %Set settings for database preparation
-config.SetSetting('isTest', false);
-config.SetSetting('database', 'demo');
-config.SetSetting('normalization', 'byPixel');
+config.SetSetting('IsTest', false);
+config.SetSetting('Database', 'demo');
+config.SetSetting('Normalization', 'byPixel');
 
 % Read all .h5 files according to info in the DB
-% Normalization according to config.GetSetting('normalization') is applied
+% Normalization according to config.GetSetting('Normalization') is applied
 % Consider modifying methods\Preprocessing.m first
 % The dataset name is set according to config (now 'demo')
 experiment = '';
@@ -45,15 +45,15 @@ hsiUtility.ExportH5Dataset();
 
 %%%%%%%%%%%%%%%%%%%%% Read Specific Data %%%%%%%%%%%%%%%%%%%%%
 % Reads file with DB ID = 150 and no preprocessing
-config.SetSetting('normalization', 'raw');
+config.SetSetting('Normalization', 'raw');
 fileNum = 150;
-config.SetSetting('fileName', num2str(fileNum));
+config.SetSetting('FileName', num2str(fileNum));
 hsIm = hsiUtility.LoadHSI(fileNum);
 
 % Reads file with DB ID = 150 and preprocessed with 'byPixel'
-config.SetSetting('normalization', 'byPixel');
+config.SetSetting('Normalization', 'byPixel');
 fileNum = 150;
-config.SetSetting('fileName', num2str(fileNum));
+config.SetSetting('FileName', num2str(fileNum));
 hsIm = hsiUtility.LoadHSI(fileNum, 'dataset');
 
 %%%%%%%%%%%%%%%%%%%%% Get Diagnosis Info %%%%%%%%%%%%%%%%%%%%%
@@ -87,5 +87,5 @@ content = {'tissue', true};
 target = 'fix';
 useCustomMask = true;
 [cvp, X, y, Xtest, ytest, sRGBs, fgMasks] = trainUtility.PrepareSpectralDataset(folds, testingSamples, numSamples, content, target, useCustomMask);
-filename = fullfile(config.GetSetting('output'), config.GetSetting('experiment'), 'cvpInfo.mat');
+filename = fullfile(config.GetSetting('Output'), config.GetSetting('Experiment'), 'cvpInfo.mat');
 save(filename, 'cvp', 'X', 'y', 'Xtest', 'ytest', 'sRGBs', 'fgMasks');

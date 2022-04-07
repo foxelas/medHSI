@@ -2,7 +2,7 @@
 %> @brief Dimred reduces the dimensions of the hyperspectral image.
 %>
 %> Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
-%> Additionally, for pre-trained parameters RFI and Autoencoder are available. 
+%> Additionally, for pre-trained parameters RFI and Autoencoder are available.
 %> For an unknown method, the input data is returned.
 %> For more details check @c function Dimred.
 %>
@@ -40,7 +40,7 @@ function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, 
 % Dimred reduces the dimensions of the hyperspectral image.
 %
 % Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
-% Additionally, for pre-trained parameters RFI and Autoencoder are available. 
+% Additionally, for pre-trained parameters RFI and Autoencoder are available.
 % For an unknown method, the input data is returned.
 % For more details check @c function Dimred.
 %
@@ -90,37 +90,38 @@ end
 rng default % For reproducibility
 
 switch lower(method)
-%% PCA
+
+    %% PCA
     case 'pca'
         [coeff, scores, latent, ~, explained] = pca(X, 'NumComponents', q);
-    
-%% FastICA
+
+        %% FastICA
     case 'ica'
         [scores, ~, coeff] = fastica(X', 'numOfIC', q);
 
-%% RICA
+        %% RICA
     case 'rica'
         Mdl = rica(X, q, 'IterationLimit', 100, 'Lambda', 1);
         coeff = Mdl.TransformWeights;
         scores = X * coeff;
         objective = Mdl.FitInfo.Objective;
 
-%% Discriminant Analysis (LDA / QDA)
+        %% Discriminant Analysis (LDA / QDA)
     case 'lda'
-        if isempty(mask) 
+        if isempty(mask)
             error('A supervised method requires labels as argument');
         end
         Mdl = fitcdiscr(X, mask);
         scores = predict(Mdl, X);
-        
+
     case 'qda'
-        if isempty(mask) 
+        if isempty(mask)
             error('A supervised method requires labels as argument');
         end
         Mdl = fitcdiscr(X, mask, 'DiscrimType', 'quadratic');
         scores = predict(Mdl, X);
 
-%% Wavelength Selection 
+        %% Wavelength Selection
     case 'wavelength-selection'
         wavelengths = hsiUtility.GetWavelengths(311);
         id1 = find(wavelengths == 540);
@@ -128,9 +129,9 @@ switch lower(method)
         scores = X(:, [id1, id2]);
         coeff = zeros(wavelegths);
         coeff(id1) = 1;
-        coeff(id2) = 1; 
-                    
-%% SuperPCA
+        coeff(id2) = 1;
+
+        %% SuperPCA
     case 'superpca'
         if isempty(varargin)
             pixelNum = 20;
@@ -144,7 +145,7 @@ switch lower(method)
         %%SupePCA based DR
         scores = SuperPCA(X, q, superpixels);
 
-%% Multiscale SuperPCA
+        %% Multiscale SuperPCA
     case 'msuperpca'
 
         if isempty(varargin)
@@ -170,14 +171,14 @@ switch lower(method)
         [~, idxOrder] = sort(impOOB, 'descend');
         ido = idxOrder(1:q);
         scores = X(:, ido);
-        
+
     case 'autoencoder'
         autoenc = varargin{1};
         scores = encode(autoenc, X')';
-                            
-    otherwise 
-        scores = X; 
+
+    otherwise
+        scores = X;
 end
 
 
-end 
+end

@@ -91,15 +91,14 @@ for i = 1:n
 
     else
         error('Incorrect data type');
-    end       
-    
+    end
+
     X{i} = xdata;
-    y{i} = ydata;   
+    y{i} = ydata;
     sRGBs{i} = hsIm.GetDisplayRescaledImage();
     fgMasks{i} = fgMask;
     labelImgs{i} = logical(labelInfo.Labels);
-                
-end 
 
-end 
+end
 
+end

@@ -14,7 +14,7 @@
 %>
 %> @param dataset [char] | The target dataset
 %> @param folds [numeric] | The number of folds
-%> @param testTargets [cell array] | The IDs of the test targets 
+%> @param testTargets [cell array] | The IDs of the test targets
 %> @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
 %> @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
 %>
@@ -39,7 +39,7 @@ function [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testT
 %
 % @param dataset [char] | The target dataset
 % @param folds [numeric] | The number of folds
-% @param testTargets [cell array] | The IDs of the test targets 
+% @param testTargets [cell array] | The IDs of the test targets
 % @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
 % @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
 %
@@ -56,7 +56,7 @@ testIds = cell2mat(testIds);
 testIds = testIds(:);
 
 trainIds = true(numel(targetNames), 1);
-trainIds(testIds) = false; 
+trainIds(testIds) = false;
 
 hsiX = hsiList(trainIds);
 labelsX = labelInfoList(trainIds);
@@ -76,7 +76,7 @@ else
     cvp = [];
 end
 
-filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), 'cvpInfo'));
+filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'cvpInfo'));
 save(filename);
 
-end 
+end

@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief GetSolaxSpectra reconstructs values for Solax-IO illumination.
 %>
-%> Either read values from file in config::[importDir] or reconstruct it with spline.
+%> Either read values from file in config::[ImportDir] or reconstruct it with spline.
 %>
 %> @b Usage
 %>
@@ -20,7 +20,7 @@
 function [solaxSpec, wavelengths] = GetSolaxSpectra(method, showImage)
 % GetSolaxSpectra reconstructs values for Solax-IO illumination.
 %
-% Either read values from file in config::[importDir] or reconstruct it with spline.
+% Either read values from file in config::[ImportDir] or reconstruct it with spline.
 %
 % @b Usage
 %
@@ -45,7 +45,7 @@ end
 
 switch method
     case 'real'
-        settingsDir = config.GetSetting('importDir');
+        settingsDir = config.GetSetting('ImportDir');
         inTable = delimread(fullfile(settingsDir, 'LE-9ND55F.csv'), ',', 'num');
         wavelengths = inTable.num(:, 1);
         solaxSpec = inTable.num(:, 2);
@@ -56,7 +56,7 @@ switch method
         end
 
     case 'reconstructed'
-        saveDir = config.GetSetting('outputDir');
+        saveDir = config.GetSetting('OutputDir');
         [solaxSpec, wavelengths] = ReconstructSolaxIoIlluminationSpectrum(saveDir);
     otherwise
         error('Unsupported case for solax-io spectra reconstruction');
@@ -96,7 +96,7 @@ xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Relative Spectrum (%)', 'FontSize', 15)
 title('Using [smoothingspline] fitting', 'FontSize', 15)
 
-config.SetSetting('cropBorders', true);
+config.SetSetting('CropBorders', true);
 plots.SavePlot(fig1, fullfile(saveDir, 'solaxSpectrum_lininterp.png'));
 
 plots.SavePlot(fig2, fullfile(saveDir, 'solaxSpectrum_spline.png'));
@@ -124,7 +124,7 @@ end
 
 function [] = PlotSolaxSpectra(wavelengths, solaxSpec, sunSpec)
 
-saveDir = config.GetSetting('outputDir');
+saveDir = config.GetSetting('OutputDir');
 
 fig4 = figure(4);
 x = wavelengths;

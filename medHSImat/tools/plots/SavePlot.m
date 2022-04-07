@@ -4,7 +4,7 @@
 %> @b Usage
 %>
 %> @code
-%> config.SetSetting('plotPath', '\temp\folder\img');
+%> config.SetSetting('PlotPath', '\temp\folder\img');
 %> SavePlot(fig);
 %> @endcode
 %>
@@ -16,21 +16,21 @@ function [] = SavePlot(fig)
 % @b Usage
 %
 % @code
-% config.SetSetting('plotPath', '\temp\folder\img');
+% config.SetSetting('PlotPath', '\temp\folder\img');
 % SavePlot(fig);
 % @endcode
 %
 % @param fig [int] | The figure handle
 
-saveImages = config.GetSetting('saveImages');
+saveImages = config.GetSetting('SaveImages');
 
 if (saveImages)
     figure(fig);
-    saveInHQ = config.GetSetting('saveInHQ');
-    saveInBW = config.GetSetting('saveInBW');
-    plotPath = config.GetSetting('plotPath');
-    cropBorders = config.GetSetting('cropBorders');
-    saveEps = config.GetSetting('saveEps');
+    saveInHQ = config.GetSetting('SaveInHQ');
+    saveInBW = config.GetSetting('SaveInBW');
+    plotPath = config.GetSetting('PlotPath');
+    cropBorders = config.GetSetting('CropBorders');
+    saveEps = config.GetSetting('SaveEps');
 
     if (~isempty(plotPath))
         filename = strrep(plotPath, '.mat', '');
@@ -43,7 +43,7 @@ if (saveImages)
         if isempty(ext)
             filename = fullfile(filepath, strcat(name, '.png'));
         end
-        
+
         if (cropBorders)
             warning('off');
             export_fig(filename, '-png', '-native', '-transparent');

@@ -2,7 +2,7 @@
 %> @brief CustomKmeans applies kmeans clustering to an hsi and visualizes
 %> the result.
 %>
-%> Need to set config::[saveFolder] for image output.
+%> Need to set config::[SaveFolder] for image output.
 %>
 %> @b Usage
 %>
@@ -22,7 +22,7 @@ function [labels] = CustomKmeans(hsIm, labelInfo, clusterNum)
 % CustomKmeans applies kmeans clustering to an hsi and visualizes
 % the result.
 %
-% Need to set config::[saveFolder] for image output.
+% Need to set config::[SaveFolder] for image output.
 %
 % @b Usage
 %
@@ -49,7 +49,7 @@ Xcol = hsIm.GetMaskedPixels(fgMask);
 
 labels = hsi.RecoverSpatialDimensions(labelsCol, size(fgMask), fgMask);
 
-savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
+savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
 plots.Superpixels(1, fullfile(savedir, 'kmeans-clustering'), srgb, labels, '', 'color', fgMask);
 
 names = cell(clusterNum, 1);
@@ -60,7 +60,7 @@ end
 plots.Spectra(2, fullfile(savedir, 'kmeans-centroids'), C, hsiUtility.GetWavelengths(size(hsIm.Value, 3)), names, 'Kmeans centroids');
 
 img = {srgb, labels};
-names = { labelInfo.Diagnosis , 'Clustering'};
+names = {labelInfo.Diagnosis, 'Clustering'};
 plotPath = fullfile(savedir, 'kmeans');
 plots.MontageWithLabel(3, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 

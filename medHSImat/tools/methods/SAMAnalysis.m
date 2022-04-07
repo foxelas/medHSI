@@ -2,7 +2,7 @@
 %> @brief SAMAnalysis applies SAM-based segmentation to an hsi and visualizes
 %> the result.
 %>
-%> Need to set config::[saveFolder] for image output.
+%> Need to set config::[SaveFolder] for image output.
 %>
 %> @b Usage
 %>
@@ -21,7 +21,7 @@ function [predImg] = SAMAnalysis(hsIm, labelInfo)
 % SAMAnalysis applies SAM-based segmentation to an hsi and visualizes
 % the result.
 %
-% Need to set config::[saveFolder] for image output.
+% Need to set config::[SaveFolder] for image output.
 %
 % @b Usage
 %
@@ -78,17 +78,17 @@ subplot(2, 2, 4);
 imshowpair(predImg, labelInfo.Labels, 'Scaling', 'joint');
 title(sprintf('SSIM: %.5f', ssimval));
 
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, strcat('sam_', hsIm.ID)), 'png');
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, strcat('sam_', hsIm.ID)), 'png');
 plots.SavePlot(1, plotPath);
 
 jac = commonUtility.Jaccard(predImg, labelInfo.Labels);
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'predLabel'), 'png');
-figTitle = {labelInfo.Diagnosis; sprintf('jac:%.2f%%', jac *100)};
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'predLabel'), 'png');
+figTitle = {labelInfo.Diagnosis; sprintf('jac:%.2f%%', jac*100)};
 plots.Pair(2, plotPath, predImg, labelInfo.Labels, figTitle);
 
 img = {hsIm.GetDisplayImage(), double(argminImg) ./ 4};
-names = { strjoin({'SampleID: ', hsIm.SampleID}, {' '}) , 'Argmin SAM'};
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), hsIm.ID, 'sam_grouping'), 'png');
+names = {strjoin({'SampleID: ', hsIm.SampleID}, {' '}), 'Argmin SAM'};
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'sam_grouping'), 'png');
 plots.MontageWithLabel(3, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
 end

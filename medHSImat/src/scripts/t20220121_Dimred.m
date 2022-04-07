@@ -4,11 +4,11 @@ close all;
 
 % Need to copy .mat mask files from output\T20220122-Dimred\ to
 % output\T20220123-Dimred\
-config.SetSetting('experiment', 'T20220123-Dimred');
+config.SetSetting('Experiment', 'T20220123-Dimred');
 
 wavelengths = hsiUtility.GetWavelengths(311);
-labeldir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('labelsName'), '\'));
-imgadedir = config.DirMake(config.GetSetting('matDir'), strcat(config.GetSetting('database'), config.GetSetting('normalizedName'), '\'));
+labeldir = config.DirMake(config.GetSetting('MatDir'), strcat(config.GetSetting('Database'), config.GetSetting('LabelsName'), '\'));
+imgadedir = config.DirMake(config.GetSetting('MatDir'), strcat(config.GetSetting('Database'), config.GetSetting('NormalizedName'), '\'));
 
 %%%%%%%%%%%%%%%%%%%%%%%% Read all %%%%%%%%%%%%%%%%%%%%%%
 
@@ -27,8 +27,8 @@ X = [X; Xtest];
 i = 6;
 id = targetIDs(i);
 targetName = num2str(id);
-I = hsiUtility.LoadHSI(targetName, 'dataset');
-imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
+I = hsiUtility.LoadHSI(targetName, 'Dataset');
+imgFilename = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), strcat(targetName, '.png'));
 load(strrep(imgFilename, '.png', '.mat'), 'fgMask');
 
 Xcol = I.GetMaskedPixels(fgMask);
@@ -64,7 +64,7 @@ PlotEigenvectors(coeff3, wavelengths, q);
 ylim([-0.2, 0.2]);
 title('Training per Suprepixel');
 
-figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '_comparison_pca.png'));
+figName = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), strcat(targetName, '_comparison_pca.png'));
 plots.SavePlot(fig, figName);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Fig 2: Display all Dimred %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,8 +75,8 @@ for i = targets
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    I = hsiUtility.LoadHSI(targetName, 'dataset');
-    imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
+    I = hsiUtility.LoadHSI(targetName, 'Dataset');
+    imgFilename = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), strcat(targetName, '.png'));
     load(strrep(imgFilename, '.png', '.mat'), 'fgMask');
     mask = fgMask;
 
@@ -99,7 +99,7 @@ for i = targets
     imshow(scores2);
     title('RICA');
 
-    figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '_comparison_img.png'));
+    figName = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), strcat(targetName, '_comparison_img.png'));
     plots.SavePlot(fig, figName);
 
     fig2 = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
@@ -118,7 +118,7 @@ for i = targets
     ylim([-0.2, 0.2]);
     title('Transform Vectors (RICA)');
 
-    figName = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '_comparison_pcavsrica.png'));
+    figName = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), strcat(targetName, '_comparison_pcavsrica.png'));
     plots.SavePlot(fig2, figName);
 
 end
@@ -132,8 +132,8 @@ for i = targets
 
     %% load HSI from .mat file
     targetName = num2str(id);
-    I = hsiUtility.LoadHSI(targetName, 'dataset');
-    imgFilename = fullfile(config.GetSetting('outputDir'), config.GetSetting('experiment'), strcat(targetName, '.png'));
+    I = hsiUtility.LoadHSI(targetName, 'Dataset');
+    imgFilename = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), strcat(targetName, '.png'));
     load(strrep(imgFilename, '.png', '.mat'), 'fgMask');
     mask = fgMask;
 
@@ -159,7 +159,7 @@ for i = targets
     subplot(1, 3, 3);
     imshow(scoresFull);
 
-    figName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), targetName, strcat('scores.png'));
+    figName = config.DirMake(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), targetName, strcat('scores.png'));
     plots.SavePlot(2, figName);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fig2
@@ -183,7 +183,7 @@ for i = targets
     ylabel('Projected Axis 2');
     title('Training across Dataset');
 
-    figName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), targetName, strcat('projection.png'));
+    figName = config.DirMake(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), targetName, strcat('projection.png'));
     plots.SavePlot(3, figName);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fig3
@@ -219,7 +219,7 @@ for i = targets
     ylim([-0.1, 0.2]);
     title('Transform Vectors (across Dataset)');
 
-    figName = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('experiment'), targetName, strcat('eigevecs.png'));
+    figName = config.DirMake(config.GetSetting('OutputDir'), config.GetSetting('Experiment'), targetName, strcat('eigevecs.png'));
     plots.SavePlot(4, figName);
 
 end

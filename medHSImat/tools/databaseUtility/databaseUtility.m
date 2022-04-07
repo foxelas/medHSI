@@ -2,7 +2,7 @@
 %> @brief databaseUtility is a class that handles interactions with the
 %> database file.
 %
-%> The database files are saved in config::[importDir]\\.
+%> The database files are saved in config::[ImportDir]\\.
 %> Currently only .xlsx format is supported.
 %>
 % ======================================================================
@@ -13,7 +13,7 @@ classdef databaseUtility
         %> @brief GetDataTable gets the database table.
         %>
         %> The table is recovered from
-        %> config::[importDir]\\[database]\\[dataInfoTableName] file and sheet
+        %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
         %> 'capturedData'.
         %>
         %> @b Usage
@@ -27,7 +27,7 @@ classdef databaseUtility
             % GetDataTable gets the database table.
             %
             % The table is recovered from
-            % config::[importDir]\\[database]\\[dataInfoTableName] file and sheet
+            % config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
             % 'capturedData'.
             %
             % @b Usage
@@ -36,8 +36,8 @@ classdef databaseUtility
             % dataTable = databaseUtility.GetDataTable();
             % @endcode
             %
-            dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
-                config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
+            dataTable = readtable(fullfile(config.GetSetting('ImportDir'), strcat(config.GetSetting('Database'), ...
+                config.GetSetting('DataInfoTableName'))), 'Sheet', 'capturedData');
         end
 
         % ======================================================================
@@ -75,7 +75,7 @@ classdef databaseUtility
         %> @brief Query returns a query result from the database.
         %>
         %> The table is recovered from
-        %> config::[importDir]\\[database]\\[dataInfoTableName] file and sheet
+        %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
         %> 'capturedData'.
         %>
         %> @b Usage
@@ -100,7 +100,7 @@ classdef databaseUtility
             % Query returns a query result from the database.
             %
             % The table is recovered from
-            % config::[importDir]\\[database]\\[dataInfoTableName] file and sheet
+            % config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
             % 'capturedData'.
             %
             % @b Usage
@@ -299,7 +299,7 @@ classdef databaseUtility
             %
             % @retval setId [numeric array] | The currently selected indexes from the database table
 
-            if strcmpi(config.GetSetting('database'), 'psl')
+            if strcmpi(config.GetSetting('Database'), 'psl')
                 setId = setId & ~contains(lower(dataTable.SampleID), 'b');
             end
         end
@@ -345,12 +345,12 @@ classdef databaseUtility
                 id = [];
             end
 
-            if config.GetSetting('isTest')
-                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
-                    config.GetSetting('integrationTime'), target, config.GetSetting('configuration')};
+            if config.GetSetting('IsTest')
+                fileConditions = {content, [], config.GetSetting('DataDate'), id, ...
+                    config.GetSetting('IntegrationTime'), target, config.GetSetting('Configuration')};
             else
-                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
-                    config.GetSetting('integrationTime'), target, []};
+                fileConditions = {content, [], config.GetSetting('DataDate'), id, ...
+                    config.GetSetting('IntegrationTime'), target, []};
             end
         end
 
@@ -358,7 +358,7 @@ classdef databaseUtility
         %> @brief GetDiagnosisTable gets the database table.
         %>
         %> The table is recovered from
-        %> config::[importDir]\\[database]\\[diagnosisInfoTableName] file and sheet
+        %> config::[ImportDir]\\[Database]\\[DiagnosisInfoTableName] file and sheet
         %> 'Sheet1'.
         %>
         %> @b Usage
@@ -372,7 +372,7 @@ classdef databaseUtility
             % GetDiagnosisTable gets the diagnosis table.
             %
             % The table is recovered from
-            % config::[importDir]\\[database]\\[diagnosisInfoTableName] file and sheet
+            % config::[ImportDir]\\[Database]\\[DiagnosisInfoTableName] file and sheet
             % 'Sheet1'.
             %
             % @b Usage
@@ -381,8 +381,8 @@ classdef databaseUtility
             % dataTable = databaseUtility.GetDiagnosisTable();
             % @endcode
             %
-            filename = fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
-                config.GetSetting('diagnosisInfoTableName')));
+            filename = fullfile(config.GetSetting('ImportDir'), strcat(config.GetSetting('Database'), ...
+                config.GetSetting('DiagnosisInfoTableName')));
             if exist(filename, 'file') > 0
                 dataTable = readtable(filename, 'Sheet', 'Sheet1');
             else

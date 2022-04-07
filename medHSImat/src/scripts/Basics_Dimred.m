@@ -3,8 +3,8 @@ function [valTrain, valTest] = Basics_Dimred()
 experiment = strcat('Dimred', date());
 Basics_Init(experiment);
 
-dataset = config.GetSetting('dataset');
-fprintf('Running for dataset %s\n', config.GetSetting('dataset'));
+dataset = config.GetSetting('Dataset');
+fprintf('Running for dataset %s\n', config.GetSetting('Dataset'));
 %%%%%%%%%%%%%%%%%%%%%% Fix %%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Read h5 data

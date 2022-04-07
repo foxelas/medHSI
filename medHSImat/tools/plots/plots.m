@@ -54,7 +54,7 @@ classdef plots
             end
 
             if ~isempty(plotPath)
-                config.SetSetting('plotPath', plotPath);
+                config.SetSetting('PlotPath', plotPath);
             end
 
             newVarargin = varargin;
@@ -75,7 +75,7 @@ classdef plots
         %======================================================================
         %> @brief SavePlot saves a figure plot.
         %>
-        %> The plot name should be set beforehand in config::[plotPath].
+        %> The plot name should be set beforehand in config::[PlotPath].
         %>
         %> @b Usage
         %>
@@ -90,7 +90,7 @@ classdef plots
         function [] = SavePlot(fig, plotPath)
             % SavePlot saves a figure plot.
             %
-            % The plot name should be set beforehand in config::[plotPath].
+            % The plot name should be set beforehand in config::[PlotPath].
             %
             % @b Usage
             %
@@ -103,7 +103,7 @@ classdef plots
             % @param plotPath [char] | The path for saving plot figures
 
             if nargin > 1
-                config.SetSetting('plotPath', plotPath);
+                config.SetSetting('PlotPath', plotPath);
             end
             SavePlot(fig);
         end
@@ -279,7 +279,7 @@ classdef plots
         %======================================================================
         %> @brief AverageSpectrum plots average spectra using a promt for custom mask selection.
         %>
-        %> Need to set config::'saveFolder' for saving purposes.
+        %> Need to set config[SaveFolder] for saving purposes.
         %> For more details check @c function PlotAverageSpectrum .
         %>
         %> @b Usage
@@ -296,7 +296,7 @@ classdef plots
         function [] = AverageSpectrum(fig, plotPath, varargin)
             % AverageSpectrum plots average spectra using a promt for custom mask selection.
             %
-            % Need to set config::'saveFolder' for saving purposes.
+            % Need to set config[SaveFolder] for saving purposes.
             % For more details check @c function PlotAverageSpectrum .
             %
             % @b Usage
@@ -456,8 +456,8 @@ classdef plots
             if nargin > 4
                 title(figTitle);
             end
-            
-            figHandle.Position = [50 50 550 550]; 
+
+            figHandle.Position = [50, 50, 550, 550];
             plots.SavePlot(figHandle, plotPath);
         end
 
@@ -488,7 +488,8 @@ classdef plots
             % @param plotPath [char] | The path for saving plot figures
             % @param img [numeric array] | The left image
             % @param figTitle [char] | The figure title
-            figHandle = figure(fig); clf;
+            figHandle = figure(fig);
+            clf;
             imshow(img);
             if nargin > 3
                 title(figTitle);
@@ -523,7 +524,8 @@ classdef plots
             % @param plotPath [char] | The path for saving plot figures
             % @param img [numeric array] | The left image
             % @param figTitle [char] | The figure title
-            figHandle = figure(fig); clf;
+            figHandle = figure(fig);
+            clf;
             imagesc(img);
             if nargin > 3
                 title(figTitle);
@@ -622,7 +624,7 @@ classdef plots
         %======================================================================
         %> @brief GetMontagetCollection plots a montage of images with a target filename under different subfolders.
         %>
-        %> The base output folder is assumed to be pre-set with config::['saveFolder'].
+        %> The base output folder is assumed to be pre-set with config::[SaveFolder].
         %> Subfolders are assumed to be named with a sample's TargetID.
         %> For more details check @c function PlotMontageFolderContents .
         %>
@@ -638,7 +640,7 @@ classdef plots
         function GetMontagetCollection(fig, target)
             % GetMontagetCollection plots a montage of images with a target filename under different subfolders.
             %
-            % The base output folder is assumed to be pre-set with config::['saveFolder'].
+            % The base output folder is assumed to be pre-set with config::[SaveFolder].
             % Subfolders are assumed to be named with a sample's TargetID.
             % For more details check @c function PlotMontageFolderContents .
             %
@@ -650,7 +652,7 @@ classdef plots
             %
             % @param fig [int] | The figure handle
             % @param target [char] | The target filename
-            plotPath = commonUtility.GetFilename('output', config.GetSetting('saveFolder'), '');
+            plotPath = commonUtility.GetFilename('output', config.GetSetting('SaveFolder'), '');
             fprintf('Montage from path %s.\n', plotPath);
             criteria = struct('TargetDir', 'subfolders', 'TargetName', target);
             plots.Apply(fig, plotPath, @PlotMontageFolderContents, [], criteria, [], [800, 800]);
@@ -661,7 +663,7 @@ classdef plots
         %>
         %> For more details check @c function PlotNormalizationCheck .
         %> The user needs to input a custom mask.
-        %> Disable in config::[disableReflectranceExtremaPlots].
+        %> Disable in config::[DisableReflectranceExtremaPlots].
         %>
         %> @b Usage
         %> plots.NormalizationCheck(fig, plotPath, Iin, Iblack, Iwhite, Inorm);
@@ -679,7 +681,7 @@ classdef plots
             %
             % For more details check @c function PlotNormalizationCheck .
             % The user needs to input a custom mask.
-            % Disable in config::[disableReflectranceExtremaPlots].
+            % Disable in config::[DisableReflectranceExtremaPlots].
             %
             % @b Usage
             % plots.NormalizationCheck(fig, plotPath, Iin, Iblack, Iwhite, Inorm);
@@ -760,38 +762,38 @@ classdef plots
 
             cmapIndex = cell2mat(cellfun(@(x) ndims(x) < 3, img, 'un', 0));
             cmapImg = img(cmapIndex);
-            if nargin < 5 
+            if nargin < 5
                 hasLimits = true;
-            end 
-            
-            if hasLimits 
+            end
+
+            if hasLimits
                 if nargin < 6
                     minval = min(cellfun(@(x) min(x, [], 'all'), cmapImg));
                     maxval = max(cellfun(@(x) max(x, [], 'all'), cmapImg));
-                    
+
                     limitVal = repmat([minval, maxval], numel(img), 1);
                 end
             end
 
             fig = figure(figNum);
             clf;
-            numRow = ceil(numel(img) / 2);
+            numRow = ceil(numel(img)/2);
             numCol = mod(numel(img), 2) + 2;
             tlo = tiledlayout(fig, numRow, numCol, 'TileSpacing', 'None');
             for i = 1:numel(img)
                 ax = nexttile(tlo);
-                if cmapIndex(i) 
+                if cmapIndex(i)
                     if hasLimits
                         imagesc(ax, img{i}, [limitVal(i, 1), limitVal(i, 2)]);
                     else
                         imagesc(ax, img{i});
                     end
-                    ax.Visible = 'off'; 
-                    ax.XTick = []; 
+                    ax.Visible = 'off';
+                    ax.XTick = [];
                     ax.YTick = [];
                     colormap(ax, 'hot');
                     cb = colorbar(ax);
-                    axis square; 
+                    axis square;
                 else
                     imshow(img{i}, 'Parent', ax);
                 end
@@ -815,13 +817,13 @@ classdef plots
 
             fig = figure(figNum);
             clf;
-            numRow = ceil(numel(img) / 2);
+            numRow = ceil(numel(img)/2);
             numCol = mod(numel(img), 2) + 2;
             tlo = tiledlayout(fig, numRow, numCol, 'TileSpacing', 'None');
             for i = 1:numel(img)
                 ax = nexttile(tlo);
 
-                C = insertObjectMask(rescale(img{i}),edge(labelMask),'Color','r');
+                C = insertObjectMask(rescale(img{i}), edge(labelMask), 'Color', 'r');
                 hold on;
                 h = imshow(C, 'Parent', ax);
                 set(h, 'AlphaData', fgMask);
@@ -832,7 +834,7 @@ classdef plots
             plots.SavePlot(fig, plotPath);
         end
 
-    
+
         %======================================================================
         %> @brief ReferenceLibrary  plots the reference spectra in the library.
         %>
@@ -874,15 +876,15 @@ classdef plots
                 end
             end
             figTitle = 'Reference Spectra';
-            plotPath = config.DirMake(config.GetSetting('outputDir'), config.GetSetting('common'), 'samReferenceLibrarySpectra.png');
+            plotPath = config.DirMake(config.GetSetting('OutputDir'), config.GetSetting('Common'), 'samReferenceLibrarySpectra.png');
             plots.Apply(fig, plotPath, @PlotSpectra, spectra, wavelengths, names, figTitle, markers);
         end
 
         %======================================================================
         %> @brief Illumination  plots the illumination spectrum.
         %>
-        %> The name of the illumination source is saved in config::[illuminationSource].
-        %> Illumination information is saved in medHSI\\config::[paramDir]\\displayParam.mat
+        %> The name of the illumination source is saved in config::[IlluminationSource].
+        %> Illumination information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
         %>
         %> @b Usage
         %> plots.Illumination();
@@ -891,8 +893,8 @@ classdef plots
         function [] = Illumination()
             % Illumination  plots the illumination spectrum.
             %
-            % The name of the illumination source is saved in config::[illuminationSource].
-            % Illumination information is saved in medHSI\\config::[paramDir]\\displayParam.mat
+            % The name of the illumination source is saved in config::[IlluminationSource].
+            % Illumination information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
             %
             % @b Usage
             % plots.Illumination();
@@ -904,8 +906,8 @@ classdef plots
             load(filename, 'illumination');
 
             fig = figure();
-            plot(lambdaIn, illumination, 'DisplayName', config.GetSetting('illuminationSource'));
-            plotPath = fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'illumination');
+            plot(lambdaIn, illumination, 'DisplayName', config.GetSetting('IlluminationSource'));
+            plotPath = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Common'), 'illumination');
             title('Illumination');
             xlabel('Wavelength (nm)');
             ylabel('Radiant Intensity (a.u.)');
@@ -916,7 +918,7 @@ classdef plots
         %======================================================================
         %> @brief ColorMatchingFunctions  plots the color matching functions.
         %>
-        %> Information is saved in medHSI\\config::[paramDir]\\displayParam.mat
+        %> Information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
         %>
         %> @b Usage
         %> plots.ColorMatchingFunctions();
@@ -925,7 +927,7 @@ classdef plots
         function [] = ColorMatchingFunctions()
             % ColorMatchingFunctions  plots the color matching functions.
             %
-            % Information is saved in medHSI\\config::[paramDir]\\displayParam.mat
+            % Information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
             %
             % @b Usage
             % plots.ColorMatchingFunctions();
@@ -947,7 +949,7 @@ classdef plots
             title('Interpolated Color Matching Functions');
             xlabel('Wavelength (nm)');
             ylabel('Weight (a.u.)');
-            plotPath = fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'interpColorMatchingFunctions');
+            plotPath = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Common'), 'interpColorMatchingFunctions');
             plots.SavePlot(fig, plotPath);
 
         end
@@ -955,7 +957,7 @@ classdef plots
         %======================================================================
         %> @brief ChromophoreAbsorption  plots the skin chromophore absorption functions.
         %>
-        %> Information is saved in config::[importDir]\\*.csv.
+        %> Information is saved in config::[ImportDir]\\*.csv.
         %> Required .csv files:
         %> - 'pheomelanin_absroption.csv'
         %> - 'eumelanin_absroption.csv'
@@ -970,7 +972,7 @@ classdef plots
         function [extCoeffEumelanin2, extCoeffHbO, extCoeffHbR] = ChromophoreAbsorption()
             % ChromophoreAbsorption  plots the skin chromophore absorption functions.
             %
-            % Information is saved in config::[importDir]\\*.csv.
+            % Information is saved in config::[ImportDir]\\*.csv.
             % Required .csv files:
             % - 'pheomelanin_absroption.csv'
             % - 'eumelanin_absroption.csv'
@@ -982,7 +984,7 @@ classdef plots
             % [extCoeffEumelanin2, extCoeffHbO, extCoeffHbR] = plots.ChromophoreAbsorption();
             % @endcode
 
-            importDir = config.GetSetting('importDir');
+            importDir = config.GetSetting('ImportDir');
             pheomelaninFilename = 'pheomelanin_absroption.csv';
             eumelaninFilename = 'eumelanin_absroption.csv';
             hbFilename = 'hb_absorption_spectra_prahl.csv';
@@ -1029,8 +1031,8 @@ classdef plots
             set(gca, 'yscale', 'log');
             %set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0, 1, 1]);
 
-            % config.SetSetting('saveEps', false);
-            plotPath = fullfile(config.GetSetting('outputDir'), config.GetSetting('common'), 'skinChromophoreExtinctionCoeff');
+            % config.SetSetting('SaveEps', false);
+            plotPath = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Common'), 'skinChromophoreExtinctionCoeff');
             plots.SavePlot(fig, plotPath);
 
             filename = commonUtility.GetFilename('param', 'extinctionCoefficients');

@@ -114,9 +114,9 @@ else
     % cluster1 = Irgb .* double(specimenMask);
 end
 
-if config.GetSetting('showFigures')
-    filepath = commonUtility.GetFilename('output', fullfile(config.GetSetting('backgroundRemovalFolderName'), ...
-        strcat(config.GetSetting('fileName'), '_foreground')), 'jpg');
+if config.GetSetting('ShowFigures')
+    filepath = commonUtility.GetFilename('output', fullfile(config.GetSetting('BackgroundRemovalFolderName'), ...
+        strcat(config.GetSetting('FileName'), '_foreground')), 'jpg');
     plots.Overlay(1, filepath, Irgb, fgMask);
 end
 

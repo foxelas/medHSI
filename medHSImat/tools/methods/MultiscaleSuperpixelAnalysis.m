@@ -4,7 +4,7 @@
 %>
 %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
 %>
-%> Need to set config::[saveFolder] for image output.
+%> Need to set config::[SaveFolder] for image output.
 %>
 %> @b Usage
 %>
@@ -31,7 +31,7 @@ function [scores, labels, validLabels] = MultiscaleSuperpixelAnalysis(hsIm, labe
 %
 % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
 %
-% Need to set config::[saveFolder] for image output.
+% Need to set config::[SaveFolder] for image output.
 %
 % @b Usage
 %
@@ -57,7 +57,7 @@ if nargin < 2
     labelInfo = [];
 end
 
-savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
+savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
 
 %% Preparation
 srgb = hsIm.GetDisplayImage('rgb');

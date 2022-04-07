@@ -1,12 +1,12 @@
 % ======================================================================
 %> @brief NormalizeInternal a given hyperspectral image.
 %>
-%> The setting config::'normalization' needs to be set beforehand.
+%> The setting config::[Normalization] needs to be set beforehand.
 %>
 %> @b Usage
 %>
 %> @code
-%> config.SetSetting('normalization', 'byPixel');
+%> config.SetSetting('Normalization', 'byPixel');
 %> [newI, idxs] = NormalizeInternal(I, Iwhite, Iblack, method);
 %> @endcode
 %>
@@ -20,12 +20,12 @@
 function hsInorm = NormalizeInternal(hsIm, Iwhite, Iblack, method)
 % NormalizeInternal a given hyperspectral image.
 %
-% The setting config::'normalization' needs to be set beforehand.
+% The setting config::[Normalization] needs to be set beforehand.
 %
 % @b Usage
 %
 % @code
-% config.SetSetting('normalization', 'byPixel');
+% config.SetSetting('Normalization', 'byPixel');
 % [newI, idxs] = NormalizeInternal(I, Iwhite, Iblack, method);
 % @endcode
 %
@@ -42,7 +42,7 @@ end
 
 Iin = hsIm.Value;
 [m, n, w] = size(Iin);
-option = config.GetSetting('normalization');
+option = config.GetSetting('Normalization');
 
 switch option
     case 'byPixel'
@@ -79,7 +79,7 @@ end
 hsInorm = hsIm;
 hsInorm.Value = Inorm;
 
-if ~config.GetSetting('disableNormalizationCheck')
+if ~config.GetSetting('DisableNormalizationCheck')
     plots.NormalizationCheck(1, hsIm, Iblack, Iwhite, hsInorm);
 end
 

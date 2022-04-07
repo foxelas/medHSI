@@ -1,14 +1,14 @@
 % ======================================================================
 %> @brief Preprocessing data according to specifications.
 %>
-%> The setting config::'normalization' needs to be set beforehand.
+%> The setting config::[Normalization] needs to be set beforehand.
 %>
 %> YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS.
 %>
 %> @b Usage
 %>
 %> @code
-%> config.SetSetting('normalization', 'byPixel');
+%> config.SetSetting('Normalization', 'byPixel');
 %> [newI, idxs] = Preprocess(hsIm, targetID);
 %> @endcode
 %>
@@ -20,14 +20,14 @@
 function [hsIm] = Preprocessing(hsIm, targetID)
 % Preprocessing data according to specifications.
 %
-% The setting config::'normalization' needs to be set beforehand.
+% The setting config::[Normalization] needs to be set beforehand.
 %
 % YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS.
 %
 % @b Usage
 %
 % @code
-% config.SetSetting('normalization', 'byPixel');
+% config.SetSetting('Normalization', 'byPixel');
 % [newI, idxs] = Preprocess(hsIm, targetID);
 % @endcode
 %
@@ -36,7 +36,7 @@ function [hsIm] = Preprocessing(hsIm, targetID)
 %
 % @return instance of the hsi class
 
-option = config.GetSetting('normalization');
+option = config.GetSetting('Normalization');
 
 if ~strcmp(option, 'raw')
     %%Normalize

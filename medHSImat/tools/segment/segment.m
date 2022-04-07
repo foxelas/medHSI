@@ -34,7 +34,7 @@ classdef segment
             % @param segopt [struct] | The segmentation options
             %
             % @retval labels [numeric array] | The segmented labels
-            config.SetSetting('fileName', hsIm.ID);
+            config.SetSetting('FileName', hsIm.ID);
 
             labels = mainSegFun(hsiIm, segopt);
 
@@ -143,22 +143,22 @@ classdef segment
             icNum = 3;
             apply.ToEach(@DimredAnalysis, 'ica', icNum);
         end
-        
+
         function ByRICA()
             experiment = strcat('RICA');
             Basics_Init(experiment);
             icNum = 3;
             apply.ToEach(@DimredAnalysis, 'rica', icNum);
         end
-        
+
         function ByPCA()
             experiment = strcat('PCA');
             Basics_Init(experiment);
             pcNum = 3;
             apply.ToEach(@DimredAnalysis, 'pca', pcNum);
         end
-        
-        
+
+
         function BySuperPCA()
 
             %% SuperPCA
@@ -173,7 +173,7 @@ classdef segment
             apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
 
             close all;
-            if config.GetSetting('isTest')
+            if config.GetSetting('IsTest')
                 plots.GetMontagetCollection(1, 'eigenvectors');
             end
             plots.GetMontagetCollection(2, 'superpixel_mask');
@@ -189,7 +189,7 @@ classdef segment
             apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
 
             close all;
-            if config.GetSetting('isTest')
+            if config.GetSetting('IsTest')
                 plots.GetMontagetCollection(1, 'eigenvectors');
             end
             plots.GetMontagetCollection(2, 'superpixel_mask');
@@ -207,11 +207,11 @@ classdef segment
             pixelNumArray = floor(50*sqrt(2).^[-2:2]);
             apply.ToEach(@MultiscaleSuperpixelAnalysis, pixelNumArray);
         end
-        
+
         function By_Kmeans()
             experiment = 'Kmeans';
             Basics_Init(experiment);
-            
+
             apply.ToEach(@CustomKmeans, 5);
             plots.GetMontagetCollection(1, 'kmeans-clustering');
             plots.GetMontagetCollection(2, 'kmeans-centroids');

@@ -1,8 +1,8 @@
 %======================================================================
 %> @brief LoadH5Data loads the hyperspectral image from an .h5 file.
 %>
-%> The .h5 data are assumed to be saved in config::[dataDir]\\*.h5
-%> After reading, the image is saved in config::[matDir]\\[database]\\*.mat.
+%> The .h5 data are assumed to be saved in config::[DataDir]\\*.h5
+%> After reading, the image is saved in config::[MatDir]\\[Database]\\*.mat.
 %>
 %> @ Usage
 %>
@@ -19,8 +19,8 @@
 function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
 %> @brief LoadH5Data loads the hyperspectral image from an .h5 file.
 %>
-%> The .h5 data are assumed to be saved in config::[dataDir]\*.h5
-%> After reading, the image is saved in config::[matDir]\[database]\*.mat.
+%> The .h5 data are assumed to be saved in config::[DataDir]\\*.h5
+%> After reading, the image is saved in config::[MatDir]\\[Database]\\*.mat.
 %>
 %> @ Usage
 %> @code
@@ -63,7 +63,7 @@ end
 end
 
 function currentFile = AdjustFilename(filename)
-inDir = fullfile(config.GetSetting('dataDir'), config.GetSetting('dataFolderName'));
+inDir = fullfile(config.GetSetting('DataDir'), config.GetSetting('DataFolderName'));
 
 % filenameParts = strsplit(filename, '_');
 % dataDate = filenameParts{1};

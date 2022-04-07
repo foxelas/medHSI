@@ -2,7 +2,7 @@
 %> @brief PlotNormalizationCheck  plots the values recovered after normalization.
 %>
 %> The user needs to input a custom mask.
-%> Disable in config::[disableReflectranceExtremaPlots].
+%> Disable in config::[DisableReflectranceExtremaPlots].
 %>
 %> @b Usage
 %> plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
@@ -18,7 +18,7 @@ function PlotNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
 % PlotNormalizationCheck  plots the values recovered after normalization.
 %
 % The user needs to input a custom mask.
-% Disable in config::[disableReflectranceExtremaPlots].
+% Disable in config::[DisableReflectranceExtremaPlots].
 %
 % @b Usage
 % plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
@@ -82,17 +82,17 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-baseFolder = commonUtility.GetFilename('output', config.GetSetting('normCheckFolderName'), '');
+baseFolder = commonUtility.GetFilename('output', config.GetSetting('NormCheckFolderName'), '');
 
-plotPath = fullfile(baseFolder, strcat(config.GetSetting('fileName'), '_raw.jpg'));
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_raw.jpg'));
 plots.SavePlot(fig, plotPath);
 
-plotPath = fullfile(baseFolder, strcat(config.GetSetting('fileName'), '_norm.jpg'));
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_norm.jpg'));
 plots.SavePlot(fig2, plotPath);
 
 fig3 = figure();
 rgb = Iin.GetDisplayImage();
-plotPath = fullfile(baseFolder, strcat(config.GetSetting('fileName'), '_mask.jpg'));
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_mask.jpg'));
 plots.Overlay(fig3, plotPath, rgb, mask);
 
 end

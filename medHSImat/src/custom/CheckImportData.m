@@ -1,7 +1,7 @@
 %======================================================================
 %> @brief CheckImportData checks the structure of filenames and file information to be read.
 %>
-%> Reads .h5 files from the directory in config::['dataDir'].
+%> Reads .h5 files from the directory in config::[DataDir].
 %>
 %> @b Usage
 %> @code
@@ -14,7 +14,7 @@
 function [flag, fileS] = CheckImportData()
 % CheckImportData checks the structure of filenames and file information to be read.
 %
-% Reads .h5 files from the directory in config::['dataDir'].
+% Reads .h5 files from the directory in config::[DataDir].
 %
 % @b Usage
 % @code
@@ -24,7 +24,7 @@ function [flag, fileS] = CheckImportData()
 % @retval flag [boolean] | A flag that indicates whether the check passes
 % @retval fileS [struct] | A structure that contains information about files to be read
 
-datadir = fullfile(config.GetSetting('dataDir'), config.GetSetting('dataFolderName'), '*.h5');
+datadir = fullfile(config.GetSetting('DataDir'), config.GetSetting('DataFolderName'), '*.h5');
 v = dir(datadir);
 vname = {v.name};
 k = cellfun(@(x) strrep(x, '.hsm', ''), vname, 'UniformOutput', false);
@@ -110,7 +110,7 @@ if ~flag
     disp('Check failed');
 else
     disp('Check passed');
-    filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('datasetsFolderName'), 'last_import'), 'xlsx');
+    filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('DatasetsFolderName'), 'last_import'), 'xlsx');
     writetable(struct2table(fileS), filename);
     fprintf('File written in %s. \n', filename);
 end

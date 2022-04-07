@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief GetColorchartValues fetches expected values for each color patch in the colorchart.
 %>
-%> The values are saved in config::['importDir'].
+%> The values are saved in config::[ImportDir].
 %>
 %> @b Usage
 %>
@@ -25,7 +25,7 @@
 function [values, valueNames, additionalValues] = GetColorchartValues(name)
 % GetColorchartValues fetches expected values for each color patch in the colorchart.
 %
-% The values are saved in config::['importDir'].
+% The values are saved in config::[ImportDir].
 %
 % @b Usage
 %
@@ -54,7 +54,7 @@ valueNames = [];
 additionalValues = [];
 switch name
     case 'colorchartSpectra'
-        filename = fullfile(config.GetSetting('importDir'), 'ColorChecker_RGB_and_spectra.txt');
+        filename = fullfile(config.GetSetting('ImportDir'), 'ColorChecker_RGB_and_spectra.txt');
         outstruct = delimread(filename, '\t', {'text', 'num'});
         valueNames = outstruct.text;
         valueNames = valueNames(2:length(valueNames));
@@ -62,21 +62,21 @@ switch name
         values = outstruct.num(2:end, :);
 
     case 'colorchartRGB'
-        filename = fullfile(config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_RGB_values.txt');
+        filename = fullfile(config.GetSetting('ImportDir'), 'ColorCheckerMicro_Matte_RGB_values.txt');
         outstruct = delimread(filename, '\t', 'num');
         values = outstruct.num;
 
     case 'colorchartLab'
-        filename = fullfile(config.GetSetting('importDir'), 'ColorCheckerMicro_Matte_Lab_values.txt');
+        filename = fullfile(config.GetSetting('ImportDir'), 'ColorCheckerMicro_Matte_Lab_values.txt');
         outstruct = delimread(filename, '\t', 'num');
         values = outstruct.num;
 
     case 'colorchartOrder'
-        colorPatchOrder = config.GetSetting('colorPatchOrder');
+        colorPatchOrder = config.GetSetting('ColorPatchOrder');
         if isempty(colorPatchOrder)
             colorPatchOrder = 'darkSkinBottom';
         end
-        outstruct = delimread(fullfile(config.GetSetting('importDir'), strcat(colorPatchOrder, 'PatchOrder.txt')), '\t', 'text');
+        outstruct = delimread(fullfile(config.GetSetting('ImportDir'), strcat(colorPatchOrder, 'PatchOrder.txt')), '\t', 'text');
         values = outstruct.text;
 
     otherwise

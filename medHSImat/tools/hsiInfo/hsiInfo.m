@@ -23,7 +23,7 @@ classdef hsiInfo
         %>
         %> If the values are missing, an empty instance is returned.
         %> In order to work properly, the HSI images should be read with the
-        %> hsi class beforehand for the config::[database].
+        %> hsi class beforehand for the config::[Database].
         %>
         %> @b Usage
         %>
@@ -44,7 +44,7 @@ classdef hsiInfo
             %
             % If the values are missing, an empty instance is returned.
             % In order to work properly, the HSI images should be read with the
-            % hsi class beforehand for the config::[database].
+            % hsi class beforehand for the config::[Database].
             %
             % @b Usage
             % @code
@@ -77,11 +77,11 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
-        %> The input data should be saved in folder with config::[labelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
-        %> Diagnostic data should be saved in config::[importDir]\\[database]+[diagnosisInfoTableName]
+        %> Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiagnosisInfoTableName]
         %>
         %> @b Usage
         %>
@@ -97,11 +97,11 @@ classdef hsiInfo
         function [obj] = ReadHsiInfo(targetId, sampleId)
             % ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
             %
-            % The input data should be saved in folder with config::[labelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %
-            % Diagnostic data should be saved in config::[importDir]\\[database]+[diseaseInfoTableName].
+            % Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiagnosisInfoTableName]
             %
             % @b Usage
             %
@@ -122,11 +122,11 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
-        %> The input data should be saved in folder with config::[labelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
-        %> Diagnostic data should be saved in config::[importDir]\\[database]+[diseaseInfoTableName].
+        %> Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiseaseInfoTableName].
         %>
         %> @b Usage
         %>
@@ -141,11 +141,11 @@ classdef hsiInfo
         function [obj] = ReadHsiInfoFromHsi(hsIm)
             % ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
             %
-            % The input data should be saved in folder with config::[labelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %
-            % Diagnostic data should be saved in config::[importDir]\\[database]+[diseaseInfoTableName].
+            % Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiseaseInfoTableName].
             %
             % @b Usage
             %
@@ -166,7 +166,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadLabel reads label information from a label image.
         %>
-        %> The input data should be saved in folder with config::[labelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
@@ -183,7 +183,7 @@ classdef hsiInfo
         function [labelMask] = ReadLabel(targetID)
             % ReadLabel reads label information from a label image.
             %
-            % The input data should be saved in folder with config::[labelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %
@@ -209,7 +209,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadLabelFromHsi reads label information from a label image.
         %>
-        %> The input data should be saved in folder with config::[labelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
@@ -226,7 +226,7 @@ classdef hsiInfo
         function [labelMask] = ReadLabelFromHsi(hsIm)
             % ReadLabelFromHsi reads label information from a label image.
             %
-            % The input data should be saved in folder with config::[labelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %
@@ -243,7 +243,7 @@ classdef hsiInfo
             close all;
 
             targetID = hsIm.ID;
-            filename = fullfile(config.GetSetting('dataDir'), config.GetSetting('labelsFolderName'), hsIm.TissueType, strcat(targetID, '.png')); 
+            filename = fullfile(config.GetSetting('DataDir'), config.GetSetting('LabelsFolderName'), hsIm.TissueType, strcat(targetID, '.png'));
             if exist(filename, 'file') == 2
                 imBase = hsIm.GetDisplayImage();
                 imLab = double(imread(filename));
@@ -253,24 +253,24 @@ classdef hsiInfo
                 %     se = strel('disk',3);
                 %     labelMask = imclose(labelMask, se);
 
-                labelsFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsFolderName'), strcat(targetID)), '');
+                labelsFolder = commonUtility.GetFilename('Output', fullfile(config.GetSetting('LabelsFolderName'), strcat(targetID)), '');
                 plots.Show(1, labelsFolder, labelMask);
-                
+
                 if size(labelMask) ~= size(fgMask)
                     labelMaskOld = labelMask;
                     labelMask = zeros(size(fgMask));
-                    if abs(size(labelMaskOld,1) - size(labelMask,1) ) > 2 || abs(size(labelMaskOld,2) - size(labelMask,2) ) > 2
+                    if abs(size(labelMaskOld, 1)-size(labelMask, 1)) > 2 || abs(size(labelMaskOld, 2)-size(labelMask, 2)) > 2
                         fprintf('The image and label matrixes differ too much in size. Please check ID: % and sample %s.\n', hsIm.ID, hsIm.SampleID);
-                    end 
-                    
-                    if (size(labelMaskOld,1) > size(labelMask,1) ) || (size(labelMaskOld,2) > size(labelMask,2) ) 
-                        labelMask = labelMaskOld(1:size(labelMask,1), 1:size(labelMask,2));
+                    end
+
+                    if (size(labelMaskOld, 1) > size(labelMask, 1)) || (size(labelMaskOld, 2) > size(labelMask, 2))
+                        labelMask = labelMaskOld(1:size(labelMask, 1), 1:size(labelMask, 2));
                     else
-                        labelMask(1:size(labelMaskOld,1), 1:size(labelMaskOld,2)) = labelMaskOld;
+                        labelMask(1:size(labelMaskOld, 1), 1:size(labelMaskOld, 2)) = labelMaskOld;
                     end
                 end
                 labelMask = labelMask & fgMask;
-                labelsAppliedFolder = commonUtility.GetFilename('output', fullfile(config.GetSetting('labelsAppliedFolderName'), strcat(targetID)), '');
+                labelsAppliedFolder = commonUtility.GetFilename('Output', fullfile(config.GetSetting('LabelsAppliedFolderName'), strcat(targetID)), '');
                 plots.Overlay(2, labelsAppliedFolder, imBase, labelMask);
 
                 labelMask = uint8(labelMask);
@@ -285,7 +285,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadDiagnosis reads diagnosis information from an excel file.
         %>
-        %> Diagnostic data should be saved in config::[importDir]\\[database]+[diseaseInfoTableName].
+        %> Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiseaseInfoTableName].
         %>
         %> @b Usage
         %>
@@ -300,7 +300,7 @@ classdef hsiInfo
         function [diagnosis] = ReadDiagnosis(sampleId)
             % ReadDiagnosis reads diagnosis information from an excel file.
             %
-            % Diagnostic data should be saved in config::[importDir]\\[database]+[diseaseInfoTableName].
+            % Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiseaseInfoTableName].
             %
             % @b Usage
             %

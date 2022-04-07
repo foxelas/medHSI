@@ -12,16 +12,16 @@
 %> baseDataset = 'pslData';
 %> hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
 %> augType = 'set1';
-%> augmentedDataset = 'pslDataAug';
-%> AugmentInternal(baseDataset, augmentedDataset, augType);
+%> targetDataset = 'pslDataAug';
+%> AugmentInternal(baseDataset, targetDataset, augType);
 %> @endcode
 %>
 %> @param baseDataset [char] | The base dataset
-%> @param augmentedDataset [char] | The augmented dataset
+%> @param targetDataset [char] | The augmented dataset
 %> @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
 %>
 % ======================================================================
-function [] = AugmentInternal(baseDataset, augmentedDataset, augType)
+function [] = AugmentInternal(baseDataset, targetDataset, augType)
 % AugmentInternal applies augmentation on the dataset
 %
 % The base dataset should be already saved before running augmentation.
@@ -35,12 +35,12 @@ function [] = AugmentInternal(baseDataset, augmentedDataset, augType)
 % baseDataset = 'pslData';
 % hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
 % augType = 'set1';
-% augmentedDataset = 'pslDataAug';
-% AugmentInternal(baseDataset, augmentedDataset, augType);
+% targetDataset = 'pslDataAug';
+% AugmentInternal(baseDataset, targetDataset, augType);
 % @endcode
 %
 % @param baseDataset [char] | The base dataset
-% @param augmentedDataset [char] | The augmented dataset
+% @param targetDataset [char] | The augmented dataset
 % @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
 %
 
@@ -52,7 +52,7 @@ end
 fprintf('Starting augmentation for dataset: %s ...\n', baseDataset);
 
 %% Read h5 data
-config.SetSetting('dataset', baseDataset);
+config.SetSetting('Dataset', baseDataset);
 [datanames, targetNames] = commonUtility.DatasetInfo(true);
 
 if length(datanames) ~= length(targetNames)
@@ -65,10 +65,10 @@ for i = 1:length(targetNames)
 
     %% load HSI from .mat file to verify it is working and to prepare preview images
     targetName = targetNames{i};
-    config.SetSetting('dataset', baseDataset);
+    config.SetSetting('Dataset', baseDataset);
     [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
 
-    config.SetSetting('dataset', augmentedDataset);
+    config.SetSetting('Dataset', targetDataset);
     if ~isempty(labelInfo)
         switch augType
             case 'set0' % No augmentation
@@ -112,12 +112,11 @@ for i = 1:length(targetNames)
 end
 
 %% preview of the entire dataset
-outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'preprocessed'), '');
+outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
 plots.MontageFolderContents(1, outputDir, '*.jpg', 'Augmented Dataset');
 close all;
 
-fprintf('The augmented dataset is saved in folder %s \n', commonUtility.GetFilename('dataset', 'none', ''));
-disp('Finished augmenting.');
+fprintf('Finished. The augmented dataset is saved in folder %s \n', commonUtility.GetFilename('Dataset', 'none', ''));
 end
 
 % ======================================================================
@@ -164,7 +163,7 @@ filename = commonUtility.GetFilename('dataset', strcat(targetName, '_', num2str(
 save(filename, 'spectralData', 'labelInfo', '-v7.3');
 fprintf('Saved new data sample at: %s \n', filename);
 
-outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('snapshotsFolderName'), 'preprocessed'), '');
+outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
 filename = config.DirMake(outputDir, strcat(targetName, '_', num2str(folds), '.jpg'));
 dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 imwrite(dispImageRgb, filename, 'jpg');

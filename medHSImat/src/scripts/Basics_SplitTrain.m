@@ -49,6 +49,6 @@ testTargets = {}; % {'166'};
 dataType = 'hsi';
 hasLabels = true;
 
-[X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('dataset'), testTargets, dataType, hasLabels, folds);
+[X, y, Xtest, ytest, cvp, sRGBs, fgMasks] = trainUtility.SplitTrainTest(config.GetSetting('Dataset'), testTargets, dataType, hasLabels, folds);
 
 end

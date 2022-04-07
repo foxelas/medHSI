@@ -9,12 +9,12 @@
 %>  Data samples are saved in .mat files so that one contains a
 %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 %> hsiInfo) variable.
-%> The save location is config::[matDir]\\[dataset]\\*.mat.
-%> Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\.
+%> The save location is config::[Matdir]\\[Dataset]\\*.mat.
+%> Snapshot images are saved in config::[OutputDir]\\[SnapshotsFolderName]\\[Dataset]\\.
 %>
 %> If it fails during writing in config.mat, consider running MATLAB as administrator.
 %> Alternatively, in Windows 10 go to Settings > Update & Security > Windows Security >
-%> Virus and Threat protection > Manage Ransomware Protection > Allow an app through controlled folder access > Add Matlab. 
+%> Virus and Threat protection > Manage Ransomware Protection > Allow an app through controlled folder access > Add Matlab.
 %>
 %> @b Usage
 %>
@@ -28,8 +28,8 @@
 %>
 %> @param dataset [char] | The dataset
 %> @param contentConditions [cell array] | The content conditions for reading files
-%> @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
-%> @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none
+%> @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true.
+%> @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none.
 %======================================================================
 function [] = ReadDataset(dataset, contentConditions, readForeground, targetConditions)
 % ReadDataset reads the dataset.
@@ -42,12 +42,12 @@ function [] = ReadDataset(dataset, contentConditions, readForeground, targetCond
 %  Data samples are saved in .mat files so that one contains a
 % 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 % hsiInfo) variable.
-% The save location is config::[matDir]\\[dataset]\\*.mat.
-% Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\.
+% The save location is config::[Matdir]\\[Dataset]\\*.mat.
+% Snapshot images are saved in config::[OutputDir]\\[SnapshotsFolderName]\\[Dataset]\\.
 %
 % If it fails during writing in config.mat, consider running MATLAB as administrator.
 % Alternatively, in Windows 10 go to Settings > Update & Security > Windows Security >
-% Virus and Threat protection > Manage Ransomware Protection > Allow an app through controlled folder access > Add Matlab. 
+% Virus and Threat protection > Manage Ransomware Protection > Allow an app through controlled folder access > Add Matlab.
 %
 % @b Usage
 %
@@ -61,8 +61,8 @@ function [] = ReadDataset(dataset, contentConditions, readForeground, targetCond
 %
 % @param dataset [char] | The dataset
 % @param contentConditions [cell array] | The content conditions for reading files
-% @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true
-% @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none
+% @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true.
+% @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none.
 
 if nargin < 3
     readForeground = true;
@@ -72,13 +72,13 @@ end
 disp('');
 disp('Initializing [ReadLabeledDataset]...');
 
-config.SetSetting('dataset', dataset);
+config.SetSetting('Dataset', dataset);
 experiment = dataset;
-config.SetSetting('experiment', experiment);
-config.SetSetting('cropBorders', true);
-isTest = config.GetSetting('isTest');
+config.SetSetting('Experiment', experiment);
+config.SetSetting('CropBorders', true);
+isTest = config.GetSetting('IsTest');
 
-basedir = commonUtility.GetFilename('output', config.GetSetting('snapshotsFolderName'), '');
+basedir = commonUtility.GetFilename('output', config.GetSetting('SnapshotsFolderName'), '');
 
 %% Read h5 data
 if nargin < 4
@@ -100,10 +100,10 @@ for i = 1:length(targetIDs)
     fprintf('\nRunning for data %d. \n', id);
     targetConditions = databaseUtility.GetValueFromTable(outRows, 'Target', i);
     content = databaseUtility.GetValueFromTable(outRows, 'Content', i);
-    config.SetSetting('integrationTime', integrationTimes(i));
-    config.SetSetting('dataDate', num2str(dates(i)));
+    config.SetSetting('IntegrationTime', integrationTimes(i));
+    config.SetSetting('DataDate', num2str(dates(i)));
     if isTest
-        config.SetSetting('configuration', configurations{i});
+        config.SetSetting('Configuration', configurations{i});
     end
     targetID = num2str(id);
     sampleID = databaseUtility.GetValueFromTable(outRows, 'SampleID', i);
@@ -127,14 +127,12 @@ for i = 1:length(targetIDs)
     if ~isempty(rawImg)
 
         %% load HSI from .mat file to verify it is working and to prepare preview images
-        config.SetSetting('fileName', targetID);
+        config.SetSetting('FileName', targetID);
 
         rawIm = hsi(rawImg, readForeground, targetID, sampleID, tissueType);
-        dispImageRaw = rawIm.GetDisplayRescaledImage('rgb');
 
         %% Preprocess HSI and save
         spectralData = Preprocessing(rawIm, targetID);
-        dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 
         %% Read Label
         labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
@@ -144,6 +142,9 @@ for i = 1:length(targetIDs)
         save(filename, 'spectralData', 'labelInfo', '-v7.3');
 
         %% Plot images
+        dispImageRaw = rawIm.GetDisplayRescaledImage('rgb');
+        dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
+
         close all;
 
         dispImageRawPath = config.DirMake(basedir, 'rgb', saveName);

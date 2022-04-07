@@ -1,17 +1,17 @@
 %%%%%%%%%%%%%%%%%%%%% Initialization %%%%%%%%%%%%%%%%%%%%%
 config.SetOpt();
 
-config.SetSetting('normalization', 'byPixel');
-% config.SetSetting('dataDate', 20210706);
-% config.SetSetting('integrationTime', 618);
-config.SetSetting('cropBorders', true);
+config.SetSetting('Normalization', 'byPixel');
+% config.SetSetting('DataDate', 20210706);
+% config.SetSetting('IntegrationTime', 618);
+config.SetSetting('CropBorders', true);
 
 % Pending fix db
 %%%%%%%%%%%%%%%%%%%%% Hands %%%%%%%%%%%%%%%%%%%%%
-config.SetSetting('isTest', true);
-config.SetSetting('database', 'calib');
-config.SetSetting('dataDir', 'D:\elena\mspi\2_saitamaHSI\calib\');
-config.SetSetting('outputDir', fullfile(config.GetSetting('outputDir'), '001-DataTest'));
+config.SetSetting('IsTest', true);
+config.SetSetting('Database', 'calib');
+config.SetSetting('DataDir', 'D:\elena\mspi\2_saitamaHSI\calib\');
+config.SetSetting('OutputDir', fullfile(config.GetSetting('OutputDir'), '001-DataTest'));
 
 readForeground = false;
 hsiUtility.PrepareDataset('handsOnly', {'hand', false}, readForeground);

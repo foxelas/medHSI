@@ -102,13 +102,13 @@ classdef config
         %> @brief DirMake makes a new directory from folder and file parts.
         %>
         %> If the requested directory does not exist, it is created.
-        %> If the directory is not a subdirectory of config::[outputDir], then it
+        %> If the directory is not a subdirectory of config::[OutputDir], then it
         %> is added to the matlab path.
         %>
         %> @b Usage
         %>
         %> @code
-        %> filepath = config.DirMake(config.GetSetting('matDir'), 'database-v10');
+        %> filepath = config.DirMake(config.GetSetting('MatDir'), 'database-v10');
         %> @endcode
         %>
         %> @param varargin [cell array] | The fileparts of the directory
@@ -119,13 +119,13 @@ classdef config
             % DirMake makes a new directory from folder and file parts.
             %
             % If the requested directory does not exist, it is created.
-            % If the directory is not a subdirectory of config::[outputDir], then it
+            % If the directory is not a subdirectory of config::[OutputDir], then it
             % is added to the matlab path.
             %
             % @b Usage
             %
             % @code
-            % filepath = config.DirMake(config.GetSetting('matDir'), 'database-v10');
+            % filepath = config.DirMake(config.GetSetting('MatDir'), 'database-v10');
             % @endcode
             %
             % @param varargin [cell array] | The fileparts of the directory
@@ -139,7 +139,7 @@ classdef config
             fileDir = fileparts(filepath);
             if ~exist(fileDir, 'dir')
                 mkdir(fileDir);
-                if ~contains(fileDir, config.GetSetting('outputDir'))
+                if ~contains(fileDir, config.GetSetting('OutputDir'))
                     addpath(fileDir);
                 end
             end
@@ -177,10 +177,10 @@ classdef config
                 %pcName = char(java.net.InetAddress.getLocalHost.getHostName);
                 %if stcmp(pcName, 'GPU-PC2') == 0
                 if length(ver('parallel')) == 1
-                    config.SetSetting('pcHasGPU', true);
+                    config.SetSetting('PcHasGPU', true);
                 end
             end
-            hasGpu = config.GetSetting('pcHasGPU');
+            hasGpu = config.GetSetting('PcHasGPU');
         end
 
         % ======================================================================
@@ -189,7 +189,7 @@ classdef config
         %> @b Usage
         %>
         %> @code
-        %> value = config.GetSetting('outputDir');
+        %> value = config.GetSetting('OutputDir');
         %> @endcode
         %>
         %> @param parameter [string] | The name of the parameter
@@ -202,7 +202,7 @@ classdef config
             % @b Usage
             %
             % @code
-            % value = config.GetSetting('outputDir');
+            % value = config.GetSetting('OutputDir');
             % @endcode
             %
             % @param parameter [string] | The name of the parameter
@@ -227,7 +227,7 @@ classdef config
         %> @b Usage
         %>
         %> @code
-        %> config.SetSetting('outputDir', 'C:\\tempuser\\Desktop\\');
+        %> config.SetSetting('OutputDir', 'C:\\tempuser\\Desktop\\');
         %> @endcode
         %>
         %> @param parameter [string] | The name of the parameter
@@ -240,7 +240,7 @@ classdef config
             % @b Usage
             %
             % @code
-            % config.SetSetting('outputDir', 'C:\\tempuser\\Desktop\\');
+            % config.SetSetting('OutputDir', 'C:\\tempuser\\Desktop\\');
             % @endcode
             %
             % @param parameter [string] | The name of the parameter

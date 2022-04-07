@@ -2,7 +2,7 @@
 %> @brief SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
 %> the result.
 %>
-%> Need to set config::[saveFolder] for image output.
+%> Need to set config::[SaveFolder] for image output.
 %>
 %> @b Usage
 %>
@@ -28,7 +28,7 @@ function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, labelInfo, var
 % SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
 % the result.
 %
-% Need to set config::[saveFolder] for image output.
+% Need to set config::[SaveFolder] for image output.
 %
 % @b Usage
 %
@@ -53,7 +53,7 @@ function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, labelInfo, var
 if nargin < 2
     labelInfo = [];
 end
-savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('saveFolder'), config.GetSetting('fileName')), '');
+savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
 
 close all;
 
@@ -64,13 +64,13 @@ fgMask = hsIm.FgMask;
 [scores, labels, validLabels] = hsIm.SuperPCA(varargin{:});
 
 img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
-names = { labelInfo.Diagnosis, 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
+names = {labelInfo.Diagnosis, 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
 plotPath = fullfile(savedir, 'spca-cmap');
 plots.MontageCmap(1, plotPath, img, names, false);
 
 
 img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
-names = { labelInfo.Diagnosis , 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
+names = {labelInfo.Diagnosis, 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};
 plotPath = fullfile(savedir, 'spca');
 plots.MontageWithLabel(1, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
@@ -83,7 +83,7 @@ plots.Components(scores, 3, 4, plotBasePath);
 
 pause(0.5);
 
-if config.GetSetting('isTest')
+if config.GetSetting('IsTest')
     pause(0.5);
 
     %% Plot eigenvectors

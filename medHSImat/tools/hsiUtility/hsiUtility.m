@@ -48,7 +48,7 @@ classdef hsiUtility
             end
 
             variableInfo = who('-file', targetFilename);
-            fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('dataset'), config.GetSetting('normalization'));
+            fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('Dataset'), config.GetSetting('Normalization'));
             fprintf('Filename: %s.\n', targetFilename);
             if ismember('labelInfo', variableInfo) % returns true
                 load(targetFilename, 'spectralData', 'labelInfo');
@@ -70,33 +70,33 @@ classdef hsiUtility
         %> [hsiList, labelInfoList] = hsiUtility.LoadDataset();
         %> @endcode
         %>
-        %> @param dataset [char] | Optional: The target datset. Default: config::['dataset'].
+        %> @param dataset [char] | Optional: The target datset. Default: config::[Dataset].
         %>
         %> @retval hsiList [cell array] | The cell array of hsi objects
         %> @retval labelInfoList [cell array] | The cell array of hsiInfo objects
         %======================================================================
         function [hsiList, labelInfoList] = LoadDataset(dataset)
-        % LoadDataset loads both hsi and hsiInfo objects in the dataset.
-        %
-        % The hsi and hsiInfo objects should have been initialized beforehand with
-        % hsiUtility.PrepareDataset().
-        %
-        % @b Usage
-        %
-        % @code
-        % [hsiList, labelInfoList] = hsiUtility.LoadDataset();
-        % @endcode
-        %
-        % @param dataset [char] | Optional: The target datset. Default: config::['dataset'].
-        %
-        % @retval hsiList [cell array] | The cell array of hsi objects
-        % @retval labelInfoList [cell array] | The cell array of hsiInfo objects
+            % LoadDataset loads both hsi and hsiInfo objects in the dataset.
+            %
+            % The hsi and hsiInfo objects should have been initialized beforehand with
+            % hsiUtility.PrepareDataset().
+            %
+            % @b Usage
+            %
+            % @code
+            % [hsiList, labelInfoList] = hsiUtility.LoadDataset();
+            % @endcode
+            %
+            % @param dataset [char] | Optional: The target datset. Default: config::[Dataset].
+            %
+            % @retval hsiList [cell array] | The cell array of hsi objects
+            % @retval labelInfoList [cell array] | The cell array of hsiInfo objects
 
             if nargin < 1
-                dataset = config.GetSetting('dataset');
+                dataset = config.GetSetting('Dataset');
             end
-            config.SetSetting('dataset', dataset);
-            
+            config.SetSetting('Dataset', dataset);
+
             [~, targetIDs] = commonUtility.DatasetInfo(false);
 
             n = length(targetIDs);
@@ -165,7 +165,7 @@ classdef hsiUtility
 
             switch option
                 case 'raw'
-                    splitWavelength = config.GetSetting('splitWavelength');
+                    splitWavelength = config.GetSetting('SplitWavelength');
                     if m == 401
                         x = 380:780;
                     elseif m == 36
@@ -212,8 +212,8 @@ classdef hsiUtility
         %======================================================================
         %> @brief ReadH5 loads the hyperspectral image from an .h5 file.
         %>
-        %> The .h5 data are assumed to be saved in config::[dataDir]\\*.h5.
-        %> After reading, the image is saved in config::[matDir]\\[database]\\*.mat.
+        %> The .h5 data are assumed to be saved in config::[DataDir]\\*.h5.
+        %> After reading, the image is saved in config::[MatDir]\\[Database]\\*.mat.
         %>
         %> @b Usage
         %>
@@ -231,8 +231,8 @@ classdef hsiUtility
             % ReadH5 loads the hyperspectral image from an .h5 file.
             %
             % The .h5 data are assumed to be saved in
-            % config::[dataDir]\*.h5.
-            % After reading, the image is saved in config::[matDir]\[database]\*.mat.
+            % config::[DataDir]\*.h5.
+            % After reading, the image is saved in config::[MatDir]\[Database]\*.mat.
             %
             % @b Usage
             %
@@ -253,10 +253,10 @@ classdef hsiUtility
         %>
         %> The hyperspectral data are saved in .h5 format. The raw, white and black
         %> (if exist) images are read one-by-one for the same target. Each HSI is
-        %> saved in config::[matDir]\\[database]\\[tripletsName]\\*_xxx.mat, where
+        %> saved in config::[MatDir]\\[Database]\\[TripletsName]\\*_xxx.mat, where
         %> xxx is either '_target', '_white' or '_black'.
         %>
-        %> To chose a mask for uni spectrum normalization, set config::['useCustomMask']
+        %> To chose a mask for uni spectrum normalization, set config::[UseCustomMask]
         %>
         %> @b Usage
         %>
@@ -279,10 +279,10 @@ classdef hsiUtility
             %
             % The hyperspectral data are saved in .h5 format. The raw, white and black
             % (if exist) images are read one-by-one for the same target. Each HSI is
-            % saved in config::[matDir]\[database]\[tripletsName]\*_xxx.mat, where
+            % saved in config::[MatDir]\[Database]\[TripletsName]\*_xxx.mat, where
             % xxx is either '_target', '_white' or '_black'.
             %
-            % To chose a mask for uni spectrum normalization, set config::['useCustomMask']
+            % To chose a mask for uni spectrum normalization, set config::[UseCustomMask]
             %
             % @b Usage
             %
@@ -304,7 +304,7 @@ classdef hsiUtility
         %======================================================================
         %> @brief LoadRaw loads the raw hyperspectral image.
         %>
-        %> The raw image is loaded from config::[matDir]\\[tripletsName]\\*_target.mat.
+        %> The raw image is loaded from config::[MatDir]\\[TripletsName]\\*_target.mat.
         %>
         %> @b Usage
         %>
@@ -320,7 +320,7 @@ classdef hsiUtility
         function [spectralData] = LoadRaw(targetID)
             % LoadRaw loads the raw hyperspectral image.
             %
-            % The raw image is loaded from config::[matDir]\\[tripletsName]\\*_target.mat.
+            % The raw image is loaded from config::[MatDir]\\[TripletsName]\\*_target.mat.
             %
             % @b Usage
             %
@@ -341,13 +341,13 @@ classdef hsiUtility
         %> format.
         %>
         %> This function aggregates all small .mat files in a large .hdf5 dataset.
-        %> The dataset is assumed from config::[matDir]\\[dataset]\\*.mat.
-        %> After reading, the image is saved in config::[outputDir]\\[datasets]\\*.h5.
+        %> The dataset is assumed from config::[MatDir]\\[Dataset]\\*.mat.
+        %> After reading, the image is saved in config::[OutputDir]\\[Datasets]\\*.h5.
         %>
         %> @b Usage
         %>
         %> @code
-        %> config.SetSetting('dataset', 'coreDataset');
+        %> config.SetSetting('Dataset', 'coreDataset');
         %> hsiUtility.ExportH5Dataset();
         %> @endcode
         %>
@@ -357,13 +357,13 @@ classdef hsiUtility
             % format.
             %
             % This function aggregates all small .mat files in a large .hdf5 dataset.
-            % The dataset is assumed from config::[matDir]\[dataset].
-            % After reading, the image is saved in config::[outputDir]\[datasets]\*.h5.
+            % The dataset is assumed from config::[MatDir]\\[Dataset]\\*.mat.
+            % After reading, the image is saved in config::[OutputDir]\\[Datasets]\\*.h5.
             %
             % @b Usage
             %
             % @code
-            % config.SetSetting('dataset', 'coreDataset');
+            % config.SetSetting('Dataset', 'coreDataset');
             % hsiUtility.ExportH5Dataset();
             % @endcode
             %
@@ -372,7 +372,7 @@ classdef hsiUtility
             disp('Initializing [ExportH5Dataset]...');
 
             fileName = commonUtility.GetFilename('output', ...
-                fullfile(config.GetSetting('datasetsFolderName'), strcat('hsi_', config.GetSetting('dataset'), '_full')), 'h5');
+                fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_full')), 'h5');
 
             if exist(fileName, 'file') > 0
                 disp('Deleting previously exported .h5 dataset.');
@@ -442,8 +442,8 @@ classdef hsiUtility
         %>  Data samples are saved in .mat files so that one contains a
         %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
         %> hsiInfo) variable.
-        %> The save location is config::[matDir]\\[dataset]\\*.mat.
-        %> Snapshot images are saved in config::[outputDir]\\[snapshotsFolderName]\\[dataset]\\*.jpg.
+        %> The save location is config::[MatDir]\\[Dataset]\\*.mat.
+        %> Snapshot images are saved in config::[OutputDir]\\[SnapshotsFolderName]\\[Dataset]\\*.jpg.
         %>
         %> @b Usage
         %>
@@ -468,8 +468,8 @@ classdef hsiUtility
             %  Data samples are saved in .mat files so that one contains a
             % 'spectralData' (class hsi) and another contains a 'labelInfo' (class
             % hsiInfo) variable.
-            % The save location is config::[matDir]\[dataset]\*.mat.
-            % Snapshot images are saved in config::[outputDir]\[snapshotsFolderName]\[dataset]\.
+            % The save location is config::[MatDir]\[Dataset]\*.mat.
+            % Snapshot images are saved in config::[OutputDir]\[SnapshotsFolderName]\[Dataset]\.
             %
             % @b Usage
             %
@@ -492,7 +492,7 @@ classdef hsiUtility
         %> @brief LoadHSIReference reads the reference hyperspectral image (white or black).
         %>
         %> It is valid for hyperspectral data already saved as .mat files
-        %> in config::[matdir]\\[tripletsName]\\*_white.mat or *_black.mat.
+        %> in config::[MatDir]\\[TripletsName]\\*_white.mat or *_black.mat.
         %> The returned reference image is a 3D array, not an hsi instance.
         %>
         %> @b Usage
@@ -514,7 +514,7 @@ classdef hsiUtility
             % LoadHSIReference reads the reference hyperspectral image (white or black).
             %
             % It is valid for hyperspectral data already saved as .mat files
-            % in config::[matdir]\[tripletsName]\*_white.mat or *_black.mat.
+            % in config::[MatDir]\[TripletsName]\*_white.mat or *_black.mat.
             % The returned reference image is a 3D array, not an hsi instance.
             %
             % @b Usage
@@ -534,13 +534,187 @@ classdef hsiUtility
             [spectralData] = LoadHSIReferenceInternal(targetId, refType);
         end
 
+        %======================================================================
+        %> @brief ResizeArray resizes an irray to a target image size.
+        %>
+        %> Depending on the input array's size and the target size, it will be cropped or zero-padded.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> resizedValue = hsiUtility.ResizeArray(hsIm.Value, 512);
+        %> @endcode
+        %>
+        %> @param oldValue [numeric array] | The input array
+        %> @param imgSize [int] | The target image size
+        %>
+        %> @retval newValue [numeric array] | The resized array
+        %======================================================================
+        function [newValue] = ResizeArray(oldValue, imgSize)
+            % ResizeArray resizes an irray to a target image size.
+            %
+            % Depending on the input array's size and the target size, it will be cropped or zero-padded.
+            %
+            % @b Usage
+            %
+            % @code
+            % resizedValue = hsiUtility.ResizeArray(hsIm.Value, 512);
+            % @endcode
+            %
+            % @param oldValue [numeric array] | The input array
+            % @param imgSize [int] | The target image size
+            %
+            % @retval newValue [numeric array] | The resized array
+            [m, n, s] = size(oldValue);
+            newValue = zeros(imgSize, imgSize, s);
+            if imgSize < m
+                x1 = floor(m/2-imgSize/2);
+                x2 = floor(m/2+imgSize/2);
+                p1 = double(imgSize-length(x1:x2));
+                x2 = x2 + p1;
+            else
+                x1 = floor(imgSize/2-m/2);
+                x2 = floor(imgSize/2+m/2);
+                p1 = double(m - length(x1:x2));
+                x2 = x2 + p1;
+            end
+
+            if imgSize < n
+                y1 = floor(n/2-imgSize/2);
+                y2 = floor(n/2+imgSize/2);
+                p2 = double(imgSize-length(y1:y2));
+                y2 = y2 + p2;
+            else
+                y1 = floor(imgSize/2-n/2);
+                y2 = floor(imgSize/2+n/2);
+                p2 = double(n-length(y1:y2));
+                y2 = y2 + p2;
+            end
+
+            if imgSize < m && imgSize < n
+                newValue(:, :, :) = oldValue(x1:x2, y1:y2, :);
+            elseif imgSize < n
+                newValue(x1:x2, :, :) = oldValue(:, y1:y2, :);
+            elseif imgSize < m
+                newValue(:, y1:y2, :) = oldValue(x1:x2, :, :);
+            else
+                newValue(x1:x2, y1:y2, :) = oldValue(:, :, :);
+            end
+        end
+
+        %======================================================================
+        %> @brief SplitToPatches splits an image into patches.
+        %>
+        %> The patches are saved in a cell array. The number of patches depends on the ratio between the input array size and the target patch size.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> resizedValue = hsiUtility.ResizeArray(hsIm.Value, 512);
+        %> @endcode
+        %>
+        %> @param oldValue [numeric array] | The input array
+        %> @param patchSize [int] | The target patch size
+        %>
+        %> @retval patches [cell array] | The patches
+        %======================================================================
+        function [patches] = SplitToPatches(oldValue, patchSize)
+            % SplitToPatches splits an image into patches.
+            %
+            % The patches are saved in a cell array. The number of patches depends on the ratio between the input array size and the target patch size.
+            %
+            % @b Usage
+            %
+            % @code
+            % resizedValue = hsiUtility.ResizeArray(hsIm.Value, 512);
+            % @endcode
+            %
+            % @param oldValue [numeric array] | The input array
+            % @param patchSize [int] | The target patch size
+            %
+            % @retval patches [cell array] | The patches
+            [m, n, s] = size(oldValue);
+            a = floor(m / patchSize);
+            b = floor(n/patchSize);
+            numPatch = a * b;
+            patches = zeros(numPatch, patchSize, patchSize, s);
+            c = 0;
+
+            for i = 1:a
+                for j = 1:b
+                    c = c + 1;
+                    patches(c, :, :, :) = oldValue((i - 1)*patchSize+1:i*patchSize, (j - 1)*patchSize+1:j*patchSize, :);
+                end
+            end
+        end
+
+        %======================================================================
+        %> @brief Resize resizes or splits in patches the values of an hsi object and the associated hsiInfo object.
+        %>
+        %> Depending on the input array's size and the target size, it will be cropped or zero-padded.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> resizedValue = hsiUtility.Resize(hsIm, labelInfo);
+        %> @endcode
+        %>
+        %> @param obj [hsi] | An instance of the hsi class
+        %> @param objInfo [hsiInfo] | An instance of the hsiInfo class
+        %>
+        %> @retval updObj [hsi] | An instance of the hsi class
+        %> @retval updObjInfo [hsi] | An instance of the hsiInfo class
+        %======================================================================
+        function [updObj, updObjInfo] = Resize(obj, objInfo)
+            % Resize resizes or splits in patches the values of an hsi object and the associated hsiInfo object.
+            %
+            % Depending on the input array's size and the target size, it will be cropped or zero-padded.
+            %
+            % @b Usage
+            %
+            % @code
+            % resizedValue = hsiUtility.Resize(hsIm, labelInfo);
+            % @endcode
+            %
+            % @param obj [hsi] | An instance of the hsi class
+            % @param objInfo [hsiInfo] | An instance of the hsiInfo class
+            %
+            % @retval updObj [hsi] | An instance of the hsi class
+            % @retval updObjInfo [hsi] | An instance of the hsiInfo class
+
+            updObj = obj;
+            updObjInfo = objInfo;
+            if config.GetSetting('HasResizeOptions')
+                if ~config.GetSetting('SplitToPatches')
+                    imgSize = config.GetSetting('ImageDimension');
+                    updObj.Value = hsiUtility.ResizeArray(obj.Value, imgSize);
+                    updObj.FgMask = hsiUtility.ResizeArray(obj.FgMask, imgSize);
+                    updObjInfo.Labels = hsiUtility.ResizeArray(objInfo.Labels, imgSize);
+                else
+                    imgSize = config.GetSetting('PatchDimension');
+                    values = hsiUtility.SplitToPatches(obj.Value, imgSize);
+                    fgMasks = hsiUtility.SplitToPatches(obj.FgMask, imgSize);
+                    labels = hsiUtility.SplitToPatches(objInfo.Labels, imgSize);
+
+                    updObj = cell(1, numel(values));
+                    updObjInfo = cell(1, numel(values));
+                    for i = 1:numel(values)
+                        obj.Value = values{i};
+                        obj.FgMask = fgMasks{i};
+                        objInfo.Labels = labels{i};
+                        updObj{i} = obj;
+                        updObjInfo{i} = obj;
+                    end
+                end
+            end
+        end
 
         %======================================================================
         %> @brief PrepareReferenceLibrary reads and prepares a library of spectral references.
         %>
         %> It can be used for various comparisons, including Spectral Angle
         %> Mapper (SAM) calculation.
-        %> The result is saved in config::[matdir]\\[database]\\[referenceLibraryName]\\[referenceLibraryName].mat.
+        %> The result is saved in config::[MatDir]\\[Database]\\[ReferenceLibraryName]\\[ReferenceLibraryName].mat.
         %> After creating it can be loaded with @c hsiUtility.GetReferenceLibrary.
         %>
         %> @b Usage
@@ -563,7 +737,7 @@ classdef hsiUtility
             %
             % It can be used for various comparisons, including Spectral Angle
             % Mapper (SAM) calculation.
-            % The result is saved in config::[matdir]\[database]\[referenceLibraryName]\[referenceLibraryName].mat.
+            % The result is saved in config::[MatDir]\[Database]\[ReferenceLibraryName]\[ReferenceLibraryName].mat.
             % After creating it can be loaded with @c hsiUtility.GetReferenceLibrary.
             %
             % @b Usage
@@ -604,7 +778,7 @@ classdef hsiUtility
                 refLib(k).Label = 1;
                 refLib(k).Diagnosis = diagnosis;
 
-                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask', num2str(k))), 'jpg');
+                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), strcat('ReferenceMask', num2str(k))), 'jpg');
                 plots.Overlay(1, plotPath, hsiIm.GetDisplayImage(), malLabel);
 
                 %                 benLabel = zeros(size(hsiIm.FgMask));
@@ -617,7 +791,7 @@ classdef hsiUtility
                 refLib(k).Label = 0;
                 refLib(k).Diagnosis = diagnosis;
 
-                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), strcat('referenceMask', num2str(k))), 'jpg');
+                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), strcat('ReferenceMask', num2str(k))), 'jpg');
                 plots.Overlay(2, plotPath, hsiIm.GetDisplayImage(), benLabel);
 
             end
@@ -625,11 +799,11 @@ classdef hsiUtility
             labs = {'Benign', 'Malignant'};
             suffix = cellfun(@(x) labs(x+1), {refLib.Label});
             names = cellfun(@(x, y) strjoin({x, y}, {' '}), {refLib.Diagnosis}, suffix, 'UniformOutput', false);
-            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('referenceLibraryName'), 'references'), 'jpg');
+            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), 'references'), 'jpg');
             plots.Spectra(3, plotPath, cell2mat({refLib.Data}'), hsiUtility.GetWavelengths(numel(refLib(1).Data)), ...
                 names, 'SAM Library Spectra', {'-', ':', '-', ':'});
 
-            saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
+            saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('ReferenceLibraryName'));
             save(saveName, 'refLib');
             fprintf('The reference library is loaded from %s.\n', saveName);
         end
@@ -638,7 +812,7 @@ classdef hsiUtility
         %> @brief GetReferenceLibrary loads a library of spectral references.
         %>
         %> It loads a library created previously by @c function hsiUtility.PrepareReferenceLibrary .
-        %> The result is loaded from config::[matdir]\\[database]\\[referenceLibraryName]\\[referenceLibraryName].mat.
+        %> The result is loaded from config::[MatDir]\\[Database]\\[ReferenceLibraryName]\\[RreferenceLibraryName].mat.
         %> Plot with @c function plots.ReferenceLibrary .
         %>
         %> @b Usage
@@ -657,7 +831,7 @@ classdef hsiUtility
             % GetReferenceLibrary loads a library of spectral references.
             %
             % It loads a library created previously by @c function hsiUtility.PrepareReferenceLibrary .
-            % The result is loaded from config::[matdir]\[database]\[referenceLibraryName]\[referenceLibraryName].mat.
+            % The result is loaded from config::[MatDir]\\[Database]\\[ReferenceLibraryName]\\[RreferenceLibraryName].mat.
             % Plot with @c function plots.ReferenceLibrary .
             %
             % @b Usage
@@ -671,7 +845,7 @@ classdef hsiUtility
             % library. The struct has fields 'Data', 'Label' (Malignant (1) or
             % Benign (0)) and 'Disease'.
             %
-            saveName = commonUtility.GetFilename('referenceLib', config.GetSetting('referenceLibraryName'));
+            saveName = commonUtility.GetFilename('ReferenceLib', config.GetSetting('ReferenceLibraryName'));
             if exist(saveName, 'file') == 2
                 load(saveName, 'refLib');
                 %fprintf('The reference library is loaded from %s.\n', saveName);

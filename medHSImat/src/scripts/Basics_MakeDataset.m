@@ -7,17 +7,17 @@ end
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 
 config.SetOpt();
-config.SetSetting('isTest', false);
-config.SetSetting('database', 'psl');
-config.SetSetting('dataset', baseDataset);
-config.SetSetting('normalization', 'byPixel');
+config.SetSetting('IsTest', false);
+config.SetSetting('Database', 'psl');
+config.SetSetting('Dataset', baseDataset);
+config.SetSetting('Normalization', 'byPixel');
 
 CheckImportData();
 
 %Disable normalization check during data reading
-config.SetSetting('disableNormalizationCheck', true);
+config.SetSetting('DisableNormalizationCheck', true);
 %Do no use mask for unispectrum calculation
-config.SetSetting('useCustomMask', false);
+config.SetSetting('UseCustomMask', false);
 
 if strcmpi(baseDataset, 'pslCore')
     dbSelection = {'tissue', true};

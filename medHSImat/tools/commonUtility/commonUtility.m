@@ -79,57 +79,57 @@ classdef commonUtility
                 extension = 'mat';
             end
 
-            switch directoryType
+            switch lower(directoryType)
                 case 'preprocessed'
-                    if strcmpi(config.GetSetting('normalization'), 'raw')
+                    if strcmpi(config.GetSetting('Normalization'), 'raw')
                         fullPath = commonUtility.GetFilename('target', filename);
                     else
-                        baseDir = config.DirMake(config.GetSetting('matDir'), ...
-                            strcat(config.GetSetting('database'), config.GetSetting('normalizedFolderName')), filename);
-                        fullPath = strcat(baseDir, '_', config.GetSetting('normalization'));
+                        baseDir = config.DirMake(config.GetSetting('MatDir'), ...
+                            strcat(config.GetSetting('Database'), config.GetSetting('NormalizedFolderName')), filename);
+                        fullPath = strcat(baseDir, '_', config.GetSetting('Normalization'));
                     end
 
                 case 'dataset'
-                    fullPath = config.DirMake(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('dataset')), filename);
+                    fullPath = config.DirMake(config.GetSetting('MatDir'), ...
+                        strcat(config.GetSetting('Dataset')), filename);
 
                 case 'target'
-                    baseDir = fullfile(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('tripletsFolderName')), filename);
+                    baseDir = fullfile(config.GetSetting('MatDir'), ...
+                        strcat(config.GetSetting('Database'), config.GetSetting('TripletsFolderName')), filename);
                     fullPath = strcat(baseDir, '_target');
 
                 case 'raw'
                     fullPath = commonUtility.GetFilename('target', filename);
 
                 case 'white'
-                    baseDir = fullfile(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('tripletsFolderName')), filename);
+                    baseDir = fullfile(config.GetSetting('MatDir'), ...
+                        strcat(config.GetSetting('Database'), config.GetSetting('TripletsFolderName')), filename);
                     fullPath = strcat(baseDir, '_white');
 
                 case 'black'
-                    baseDir = fullfile(config.GetSetting('matDir'), ...
-                        strcat(config.GetSetting('database'), config.GetSetting('tripletsFolderName')), filename);
+                    baseDir = fullfile(config.GetSetting('MatDir'), ...
+                        strcat(config.GetSetting('Database'), config.GetSetting('TripletsFolderName')), filename);
                     fullPath = strcat(baseDir, '_black');
 
                 case 'model'
-                    fullPath = config.DirMake(config.GetSetting('outputDir'), ...
-                        config.GetSetting('experiment'), filename);
+                    fullPath = config.DirMake(config.GetSetting('OutputDir'), ...
+                        config.GetSetting('Experiment'), filename);
 
                 case 'param'
-                    fullPath = fullfile(config.GetSetting('paramDir'), filename);
+                    fullPath = fullfile(config.GetSetting('ParamDir'), filename);
 
                 case 'referenceLib'
-                    fullPath = config.DirMake(config.GetSetting('matDir'), ...
-                        fullfile(config.GetSetting('dataset'), config.GetSetting('referenceLibraryName')), ...
+                    fullPath = config.DirMake(config.GetSetting('MatDir'), ...
+                        fullfile(config.GetSetting('Dataset'), config.GetSetting('ReferenceLibraryName')), ...
                         filename);
 
                 case 'h5'
-                    fullPath = config.DirMake(config.GetSetting('matDir'), ...
-                        config.GetSetting('database'), filename);
+                    fullPath = config.DirMake(config.GetSetting('MatDir'), ...
+                        config.GetSetting('Database'), filename);
 
                 case 'output'
-                    fullPath = config.DirMake(config.DirMake(config.GetSetting('outputDir'), ...
-                        config.GetSetting('dataset'), filename));
+                    fullPath = config.DirMake(config.DirMake(config.GetSetting('OutputDir'), ...
+                        config.GetSetting('Dataset'), filename));
 
                 otherwise
                     error('Unsupported dataType.');
@@ -150,7 +150,7 @@ classdef commonUtility
         % ======================================================================
         %> @brief DatasetInfo returns datanames and targetIDs in the current dataset.
         %>
-        %> The dataset is fetched from the directory according config::['dataset'].
+        %> The dataset is fetched from the directory according config::[Dataset].
         %>
         %> @b Usage
         %>
@@ -166,7 +166,7 @@ classdef commonUtility
         function [datanames, targetIDs] = DatasetInfo(bySample)
             % DatasetInfo returns datanames and targetIDs in the current dataset.
             %
-            % The dataset is fetched from the directory according config::['dataset'].
+            % The dataset is fetched from the directory according config::[Dataset].
             %
             % @b Usage
             %
@@ -314,17 +314,17 @@ classdef commonUtility
             errVal = sqrt(((measured - reconstructed) * (measured - reconstructed)')/N);
         end
 
-        function jac = Jaccard(predLabel, realLabel)         
+        function jac = Jaccard(predLabel, realLabel)
             if ismatrix(predLabel) || ismatrix(realLabel)
                 predLabel = predLabel(:);
                 realLabel = realLabel(:);
             end
-            
+
             predLabel = logical(predLabel);
             realLabel = logical(realLabel);
-            
+
             jac = jaccard(predLabel, realLabel);
-        end 
+        end
         % ======================================================================
         %> @brief Evaluations returns performance metrics for classification tasks
         %>

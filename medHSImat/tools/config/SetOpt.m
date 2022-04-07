@@ -63,16 +63,16 @@ for i = 1:length(tmp.raw)
     end
 end
 
-fprintf('Data directory is set to %s.\n', dataDir);
-fprintf('Import directory is set to %s.\n', importDir);
-fprintf('Output directory is set to %s.\n', outputDir);
-fprintf('Parameter directory is set to %s.\n', paramDir);
-fprintf('Matfile directory is set to %s.\n', matDir);
+fprintf('Data directory is set to %s.\n', DataDir);
+fprintf('Import directory is set to %s.\n', ImportDir);
+fprintf('Output directory is set to %s.\n', OutputDir);
+fprintf('Parameter directory is set to %s.\n', ParamDir);
+fprintf('Matfile directory is set to %s.\n', MatDir);
 
 clear parts row varName rawValue varValue i tmp;
 settingsFile = strrep(inputSettingsFile, '.ini', '.mat');
 save(settingsFile);
-fprintf('\nSettings loaded from %s \n and saved in %s.\n\n', inputSettingsFile, settingsFile);
+fprintf('\nSettings loaded from \n%s\nand saved in \n%s.\n\n', inputSettingsFile, settingsFile);
 
 end
 

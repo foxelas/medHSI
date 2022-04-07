@@ -1,12 +1,12 @@
 function Basics_SummaryFigs()
 
-baseDir = fullfile(config.GetSetting('outputDir'), config.GetSetting('dataset'));
+baseDir = fullfile(config.GetSetting('OutputDir'), config.GetSetting('Dataset'));
 
 % Remove last two images from Montage Folder Contents
-plots.MontageFolderContents(1, fullfile(baseDir, config.GetSetting('labelsAppliedFolderName'), '\'), [], 'Labels');
+plots.MontageFolderContents(1, fullfile(baseDir, config.GetSetting('LabelsAppliedFolderName'), '\'), [], 'Labels');
 criteria = struct('TargetDir', 'subfolders', 'TargetName', 'pc1', 'TargetType', 'fix');
 
-plots.MontageFolderContents(3, fullfile(baseDir, config.GetSetting('labelsFolderName'), '\'), [], 'Label Masks');
+plots.MontageFolderContents(3, fullfile(baseDir, config.GetSetting('LabelsFolderName'), '\'), [], 'Label Masks');
 
 pcaFolder = 'SuperPCA28-Feb-2022';
 plots.MontageFolderContents(2, fullfile(baseDir, pcaFolder, '\'), criteria, 'PC1 (fix)');

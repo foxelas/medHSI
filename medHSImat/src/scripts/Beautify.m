@@ -2,7 +2,7 @@ clear all;
 close all;
 
 %% Apply beautifier
-basedir = fullfile(config.GetSetting('executionDir'), 'medHSI\');
+basedir = fullfile(config.GetSetting('ExecutionDir'), 'medHSI\');
 
 subdirName = {'setup', 'tools', 'src'};
 for j = 1:numel(subdirName)

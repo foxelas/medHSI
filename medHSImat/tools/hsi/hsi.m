@@ -359,13 +359,13 @@ classdef hsi
         % ======================================================================
         %> @brief Normalize a given hyperspectral image.
         %>
-        %> The setting config::'normalization' needs to be set beforehand.
+        %> The setting config::[Normalization] needs to be set beforehand.
         %> For more details check @c function NormalizeInternal.
         %>
         %> @b Usage
         %>
         %> @code
-        %> config.SetSetting('normalization', 'byPixel');
+        %> config.SetSetting('Normalization', 'byPixel');
         %> [newI, idxs] = hsIm.Normalize(Iwhite, Iblack, method);
         %> @endcode
         %>
@@ -379,13 +379,13 @@ classdef hsi
         function [obj] = Normalize(obj, varargin)
             % Normalize a given hyperspectral image.
             %
-            % The setting config::'normalization' needs to be set beforehand.
+            % The setting config::[Normalization] needs to be set beforehand.
             % For more details check @c function NormalizeInternal.
             %
             % @b Usage
             %
             % @code
-            % config.SetSetting('normalization', 'byPixel');
+            % config.SetSetting('Normalization', 'byPixel');
             % [newI, idxs] = hsIm.Normalize(Iwhite, Iblack, method);
             % @endcode
             %
@@ -402,7 +402,7 @@ classdef hsi
         % ======================================================================
         %> @brief Preprocess data according to specifications.
         %>
-        %> The setting config::'normalization' needs to be set beforehand.
+        %> The setting config::[Normalization] needs to be set beforehand.
         %> For more details check @c function Preprocessing.
         %>
         %> YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS.
@@ -410,7 +410,7 @@ classdef hsi
         %> @b Usage
         %>
         %> @code
-        %> config.SetSetting('normalization', 'byPixel');
+        %> config.SetSetting('Normalization', 'byPixel');
         %> [newI, idxs] = hsIm.Preprocess(targetID);
         %> @endcode
         %>
@@ -422,7 +422,7 @@ classdef hsi
         function [obj] = Preprocess(obj, targetID)
             % Preprocess data according to specifications.
             %
-            % The setting config::'normalization' needs to be set beforehand.
+            % The setting config::[Normalization] needs to be set beforehand.
             % For more details check @c function Preprocessing.
             %
             % YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS.
@@ -430,7 +430,7 @@ classdef hsi
             % @b Usage
             %
             % @code
-            % config.SetSetting('normalization', 'byPixel');
+            % config.SetSetting('Normalization', 'byPixel');
             % [newI, idxs] = hsIm.Preprocess(targetID);
             % @endcode
             %
@@ -583,12 +583,12 @@ classdef hsi
             %
             % @retval scores [numeric array] | The transformed values
             [~, scores, ~, ~, ~] = obj.Dimred(method, varargin{:});
-            
-            if ndims(scores) > 2 
+
+            if ndims(scores) > 2
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
         end
-        
+
         %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
         %> @brief GetDisplayImage returns an RGB image from the hyperspectral data.
@@ -1135,12 +1135,12 @@ classdef hsi
         %> @b Usage
         %>
         %> @code
-        %>  config.SetSetting('normalization', 'raw');
+        %>  config.SetSetting('Normalization', 'raw');
         %>  spectralData = hsi.Load(targetName);
         %>
         %>  spectralData = hsi.Load(targetName, 'dataset');
         %>
-        %>  config.SetSetting('normalization', 'byPixel');
+        %>  config.SetSetting('Normalization', 'byPixel');
         %>  spectralData = hsi.Load(targetName, 'preprocessed');
         %> @endcode
         %>
@@ -1158,12 +1158,12 @@ classdef hsi
             % @b Usage
             %
             % @code
-            %  config.SetSetting('normalization', 'raw');
+            %  config.SetSetting('Normalization', 'raw');
             %  spectralData = hsi.Load(targetName);
             %
             %  spectralData = hsi.Load(targetName, 'dataset');
             %
-            %  config.SetSetting('normalization', 'byPixel');
+            %  config.SetSetting('Normalization', 'byPixel');
             %  spectralData = hsi.Load(targetName, 'preprocessed');
             % @endcode
             %
@@ -1183,7 +1183,7 @@ classdef hsi
             if strcmp(dataType, 'raw')
                 fprintf('Loads raw HSI.\n');
             else
-                fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('dataset'), config.GetSetting('normalization'));
+                fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('Dataset'), config.GetSetting('Normalization'));
             end
             if exist(targetFilename, 'file')
                 fprintf('Filename: %s.\n', targetFilename);
