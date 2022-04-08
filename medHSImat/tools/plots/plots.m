@@ -823,14 +823,34 @@ classdef plots
             for i = 1:numel(img)
                 ax = nexttile(tlo);
 
-                C = insertObjectMask(rescale(img{i}), edge(labelMask), 'Color', 'r');
+                curImg = img{i};
+                if ndims(curImg) < 3
+                    lb = unique(curImg(:));
+                    colors = parula(numel(lb));
+                    newImg = zeros(size(curImg,1), size(curImg,2), 3);
+                    for k = 1:numel(lb)
+                        mask = curImg == lb(k);
+                        
+                        r = newImg(:,:,1);
+                        g = newImg(:,:,2);
+                        b = newImg(:,:,3);
+                        r(mask) = colors(k,1);
+                        g(mask) = colors(k,2);
+                        b(mask) = colors(k,3);
+                        newImg(:,:,1) = r;
+                        newImg(:,:,2) = g;
+                        newImg(:,:,3) = b;
+                    end
+                    curImg = newImg; 
+                end
+                C = insertObjectMask(curImg, edge(labelMask), 'Color', 'w');
                 hold on;
                 h = imshow(C, 'Parent', ax);
                 set(h, 'AlphaData', fgMask);
 
                 hold off;
                 title(names{i});
-            end
+            end  
             plots.SavePlot(fig, plotPath);
         end
 

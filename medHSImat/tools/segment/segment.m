@@ -216,6 +216,13 @@ classdef segment
             plots.GetMontagetCollection(1, 'kmeans-clustering');
             plots.GetMontagetCollection(2, 'kmeans-centroids');
         end
+        
+        function By_HyperspectralToolbox()
+            experiment = 'HStoolbox';
+            Basics_Init(experiment);
+
+            apply.ToEach(@HypercubeToolboxAnalysis);    
+        end
 
     end
 
