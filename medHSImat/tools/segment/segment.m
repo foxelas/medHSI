@@ -218,10 +218,17 @@ classdef segment
         end
         
         function By_HyperspectralToolbox()
-            experiment = 'HStoolbox';
+            reductionMethod = 'MNF';
+            experiment = strcat('HStoolbox', '-', reductionMethod, '-8');
             Basics_Init(experiment);
 
-            apply.ToEach(@HypercubeToolboxAnalysis);    
+            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod);   
+            
+            reductionMethod = 'PCA';
+            experiment = strcat('HStoolbox', '-', reductionMethod, '-8');
+            Basics_Init(experiment);
+
+            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod);  
         end
 
     end

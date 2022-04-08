@@ -1059,5 +1059,17 @@ classdef plots
             save(filename, 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
 
         end
+        
+        function [h] = WithShadedArea(x, arr, lineName, lineOpt)
+            y = mean(arr, 1);
+            stds = std(arr, 1);
+            curve1 = y + stds;
+            curve2 = y - stds;
+            lineOptPlain = strrep(strrep(lineOpt, ':', '-'), '--', '-');
+            hold on;
+            shade(x, curve1, lineOptPlain, x, curve2, lineOptPlain, 'FillType',[1 2; 2 1], 'FillAlpha', 0.2);
+            h = plot(x, y, lineOpt, 'LineWidth', 3, 'DisplayName', lineName);
+            hold off;
+        end
     end
 end
