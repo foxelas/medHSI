@@ -1043,7 +1043,9 @@ classdef hsi
                 % Use the 1st PCA component for superpixel calculation
                 redImage = rescale(squeeze(scores(:, :, 1)));
                 [labels, ~] = superpixels(redImage, pixelNum);
-
+                
+                scores = SuperPCA(obj.Value, pcNum, labels);
+                
                 % Keep only pixels that belong to the tissue (Superpixel might assign
                 % background pixels also). The last label is background label.
                 [labels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);

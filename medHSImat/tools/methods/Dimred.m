@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief Dimred reduces the dimensions of the hyperspectral image.
 %>
-%> Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
+%> Currently PCA, ICA (FastICA), RICA, SuperRICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
 %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
 %> For an unknown method, the input data is returned.
 %> For more details check @c function Dimred.
@@ -39,7 +39,7 @@
 function [coeff, scores, latent, explained, objective, Mdl] = Dimred(X, method, q, mask, varargin)
 % Dimred reduces the dimensions of the hyperspectral image.
 %
-% Currently PCA, ICA (FastICA), RICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
+% Currently PCA, ICA (FastICA), RICA, SuperRICA, SuperPCA, MSuperPCA, LDA, QDA, Wavelength-Selection are available.
 % Additionally, for pre-trained parameters RFI and Autoencoder are available.
 % For an unknown method, the input data is returned.
 % For more details check @c function Dimred.
@@ -131,6 +131,30 @@ switch lower(method)
         coeff(id1) = 1;
         coeff(id2) = 1;
 
+        %% SuperRICA
+    case 'superrica'
+        if isempty(varargin)
+            pixelNum = 20;
+        else
+            pixelNum = varargin{1};
+        end
+
+        %%super-pixels segmentation
+        superpixelLabels = cubseg(X, pixelNum);
+        
+        % 
+        [M,N,B]=size(X);
+        Results_segment= seg_im_class(X,superpixelLabels);
+        Num=size(Results_segment.Y,2);
+
+        for i=1:Num
+            Mdl = rica(Results_segment.Y{1,i}', q, 'IterationLimit', 100, 'Lambda', 1);
+            P = Mdl.TransformWeights;
+            RIC = Results_segment.Y{1,i}*P;
+            scores(Results_segment.index{1,i},:) = RIC;      
+        end
+        scores = reshape(scores,M,N,q);
+        
         %% SuperPCA
     case 'superpca'
         if isempty(varargin)
@@ -140,10 +164,10 @@ switch lower(method)
         end
 
         %%super-pixels segmentation
-        superpixels = cubseg(X, pixelNum);
+        superpixelLabels = cubseg(X, pixelNum);
 
         %%SupePCA based DR
-        scores = SuperPCA(X, q, superpixels);
+        scores = SuperPCA(X, q, superpixelLabels);
 
         %% Multiscale SuperPCA
     case 'msuperpca'
@@ -160,10 +184,10 @@ switch lower(method)
             pixelNum = pixelNumArray(i);
 
             %%super-pixels segmentation
-            superpixels = cubseg(X, pixelNum);
+            superpixelLabels = cubseg(X, pixelNum);
 
             %%SupePCA based DR
-            scores{i} = SuperPCA(X, q, superpixels);
+            scores{i} = SuperPCA(X, q, superpixelLabels);
         end
 
     case 'rfi'
