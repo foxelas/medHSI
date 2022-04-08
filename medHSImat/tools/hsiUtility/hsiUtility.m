@@ -690,11 +690,14 @@ classdef hsiUtility
                     updObj.Value = hsiUtility.ResizeArray(obj.Value, imgSize);
                     updObj.FgMask = hsiUtility.ResizeArray(obj.FgMask, imgSize);
                     updObjInfo.Labels = hsiUtility.ResizeArray(objInfo.Labels, imgSize);
+                    updObjInfo.MultiClassLabels = hsiUtility.ResizeArray(objInfo.MultiClassLabels, imgSize);
+
                 else
                     imgSize = config.GetSetting('PatchDimension');
                     values = hsiUtility.SplitToPatches(obj.Value, imgSize);
                     fgMasks = hsiUtility.SplitToPatches(obj.FgMask, imgSize);
                     labels = hsiUtility.SplitToPatches(objInfo.Labels, imgSize);
+                    mclabels = hsiUtility.SplitToPatches(objInfo.MultiClassLabels, imgSize);
 
                     updObj = cell(1, numel(values));
                     updObjInfo = cell(1, numel(values));
@@ -702,6 +705,8 @@ classdef hsiUtility
                         obj.Value = values{i};
                         obj.FgMask = fgMasks{i};
                         objInfo.Labels = labels{i};
+                        objInfo.MultiClassLabels = mclabels{i};
+
                         updObj{i} = obj;
                         updObjInfo{i} = obj;
                     end
