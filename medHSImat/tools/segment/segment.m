@@ -7,6 +7,33 @@ classdef segment
 
         % ======================================================================
         %> @brief Apply implements segmentation according to options.
+        % ======================================================================
+        function Apply(fig, hsIm, endmembers, funHandle, labelInfo, saveName)
+            numEndmembers = size(endmembers, 2);
+            colSum = sum(endmembers, 1);
+            n = sum(colSum > 0); 
+            score = zeros(size(hsIm.Value,1),size(hsIm.Value,2), n);
+            k = 0;
+            for i= 1:numEndmembers
+                if colSum(i) > 0
+                    k = k + 1;
+                    score(:,:,k) = funHandle(hsIm.Value,endmembers(:,i));
+                end
+            end
+
+            [~,matchingIndx] = min(score,[],3);
+
+            savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
+            srgb = hsIm.GetDisplayImage();
+            img = {srgb, matchingIndx};
+            names = {labelInfo.Diagnosis, 'Clustering'};
+            plotPath = fullfile(savedir, saveName);
+            plots.MontageWithLabel(fig, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
+        end
+        
+        
+        % ======================================================================
+        %> @brief Apply implements segmentation according to options.
         %>
         %> @b Usage
         %>
@@ -20,7 +47,7 @@ classdef segment
         %>
         %> @retval labels [numeric array] | The segmented labels
         % ======================================================================
-        function [labels] = Apply(hsIm, segopt)
+        function [labels] = ApplyOld(hsIm, segopt)
             % Apply implements segmentation according to options.
             %
             % @b Usage
@@ -221,14 +248,24 @@ classdef segment
             reductionMethod = 'MNF';
             experiment = strcat('HStoolbox', '-', reductionMethod, '-8');
             Basics_Init(experiment);
-
-            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod);   
+            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, 'nfindr');   
             
             reductionMethod = 'PCA';
             experiment = strcat('HStoolbox', '-', reductionMethod, '-8');
             Basics_Init(experiment);
-
-            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod);  
+            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, 'nfindr');  
+            
+            reductionMethod = 'MNF';
+            referenceMethod = 'ppi';
+            experiment = strcat('HStoolbox', '-', reductionMethod, '-', referenceMethod, '-8');
+            Basics_Init(experiment);
+            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, referenceMethod); 
+            
+            reductionMethod = 'MNF';
+            referenceMethod = 'fippi';
+            experiment = strcat('HStoolbox', '-', reductionMethod, '-', referenceMethod, '-8');
+            Basics_Init(experiment);
+            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, referenceMethod); 
         end
 
     end
