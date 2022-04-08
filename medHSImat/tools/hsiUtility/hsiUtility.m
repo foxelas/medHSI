@@ -699,16 +699,18 @@ classdef hsiUtility
                     labels = hsiUtility.SplitToPatches(objInfo.Labels, imgSize);
                     mclabels = hsiUtility.SplitToPatches(objInfo.MultiClassLabels, imgSize);
 
-                    updObj = cell(1, numel(values));
-                    updObjInfo = cell(1, numel(values));
-                    for i = 1:numel(values)
-                        obj.Value = values{i};
-                        obj.FgMask = fgMasks{i};
-                        objInfo.Labels = labels{i};
-                        objInfo.MultiClassLabels = mclabels{i};
+                    if numel(labels) > 0
+                        updObj = cell(1, numel(values));
+                        updObjInfo = cell(1, numel(values));
+                        for i = 1:numel(values)
+                            obj.Value = values{i};
+                            obj.FgMask = fgMasks{i};
+                            objInfo.Labels = labels{i};
+                            objInfo.MultiClassLabels = mclabels{i};
 
-                        updObj{i} = obj;
-                        updObjInfo{i} = obj;
+                            updObj{i} = obj;
+                            updObjInfo{i} = obj;
+                        end
                     end
                 end
             end
