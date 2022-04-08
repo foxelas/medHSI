@@ -31,7 +31,7 @@ else
     %% Similarity using spectral information divergence (SID)
     % Chein-I Chang. “An Information-Theoretic Approach to Spectral Variability, Similarity, and Discrimination for Hyperspectral Image Analysis.” IEEE Transactions on Information Theory 46, no. 5 (August 2000): 1927–32. https://doi.org/10.1109/18.857802.
     segment.Apply(2, hsIm, endmembers, @sid, labelInfo, 'endmember_sid');
-
+    
     %% Similarity using Jeffries Matusita-Spectral Angle Mapper (JMSAM) 
     % Padma, S., and S. Sanjeevi. “Jeffries Matusita Based Mixed-Measure for Improved Spectral Matching in Hyperspectral Image Analysis.” International Journal of Applied Earth Observation and Geoinformation 32 (October 2014): 138–51. https://doi.org/10.1016/j.jag.2014.04.001.
     segment.Apply(3, hsIm, endmembers, @jmsam, labelInfo, 'endmember_jmsam');

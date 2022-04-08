@@ -1122,6 +1122,20 @@ classdef hsi
                 [scores{i}, labels{i}, validLabels{i}] = obj.SuperPCA(false, pixelNum, pcNum);
             end
         end
+        
+        function [corrected] = Denoise(obj, method)
+            if nargin < 2
+                method = 'smile';
+            end
+            corrected = obj;
+            if strcmpi(method, 'smile')
+                corrected.Value = reduceSmile(obj.Value);
+            elseif strcmpi(method, 'smoothen')
+                corrected.Value = denoiseNGMeet(obj.Value);
+            else
+                error('Unsupported method. Choose [smile] or [smoothen].');
+            end
+        end
     end
 
     methods (Static)

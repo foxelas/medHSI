@@ -28,7 +28,15 @@ classdef segment
             img = {srgb, matchingIndx};
             names = {labelInfo.Diagnosis, 'Clustering'};
             plotPath = fullfile(savedir, saveName);
-            plots.MontageWithLabel(fig, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
+            plots.MontageWithLabel(fig, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);        
+            
+            fig2 = figure(fig+1); clf;
+            abundanceMap = estimateAbundanceLS(hsIm.Value,endmembers);
+            montage(abundanceMap,'Size',[2 4],'BorderSize',[10 10]);
+            colormap default
+            title('Abundance Maps for Endmembers');
+            plotPath = fullfile(savedir, strcat(saveName, '_abundance'));
+            plots.SavePlot(fig2, plotPath);
         end
         
         
@@ -268,6 +276,12 @@ classdef segment
             apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, referenceMethod); 
         end
 
+        function By_CustomDistances()
+            reductionMethod = 'MNF';
+            experiment = strcat('CustomDistances', '-', reductionMethod, '-8');
+            Basics_Init(experiment);
+            apply.ToEach(@CustomDistancesSegmentation, reductionMethod, 'nfindr');   
+        end
     end
 
 end
