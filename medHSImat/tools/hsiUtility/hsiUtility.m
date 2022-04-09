@@ -394,6 +394,14 @@ classdef hsiUtility
                     label = labelInfo.Labels;
                     if isempty(label)
                         label = nan;
+                        multiclassLabel = nan;
+                    else
+                        multiclassLabel = labelInfo.MultiClassLabels;
+                    end
+                    if strcmpi(labelInfo.Type, 'Malignant')
+                        diagnosticLabel = 1;
+                    else
+                        diagnosticLabel = 0;
                     end
                     sampleID = str2num(spectralData.SampleID);
                     targetID = str2num(spectralData.ID);
@@ -409,6 +417,14 @@ classdef hsiUtility
                     curName = strcat('/sample', targetName, '/label');
                     h5create(fileName, curName, size(label));
                     h5write(fileName, curName, label);
+                    
+                    curName = strcat('/sample', targetName, '/diagnosticLabel');
+                    h5create(fileName, curName, size(diagnosticLabel));
+                    h5write(fileName, curName, diagnosticLabel);
+                    
+                    curName = strcat('/sample', targetName, '/multiclassLabel');
+                    h5create(fileName, curName, size(multiclassLabel));
+                    h5write(fileName, curName, multiclassLabel);
 
                     curName = strcat('/sample', targetName, '/sampleID');
                     h5create(fileName, curName, size(sampleID));
@@ -709,7 +725,7 @@ classdef hsiUtility
                             objInfo.MultiClassLabels = mclabels{i};
 
                             updObj{i} = obj;
-                            updObjInfo{i} = obj;
+                            updObjInfo{i} = objInfo;
                         end
                     end
                 end
@@ -785,7 +801,7 @@ classdef hsiUtility
                 refLib(k).Label = 1;
                 refLib(k).Diagnosis = diagnosis;
 
-                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), strcat('ReferenceMask', num2str(k))), 'jpg');
+                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), strcat('ReferenceMask', num2str(k))), 'png');
                 plots.Overlay(1, plotPath, hsiIm.GetDisplayImage(), malLabel);
 
                 %                 benLabel = zeros(size(hsiIm.FgMask));
@@ -798,7 +814,7 @@ classdef hsiUtility
                 refLib(k).Label = 0;
                 refLib(k).Diagnosis = diagnosis;
 
-                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), strcat('ReferenceMask', num2str(k))), 'jpg');
+                plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), strcat('ReferenceMask', num2str(k))), 'png');
                 plots.Overlay(2, plotPath, hsiIm.GetDisplayImage(), benLabel);
 
             end
@@ -806,7 +822,7 @@ classdef hsiUtility
             labs = {'Benign', 'Malignant'};
             suffix = cellfun(@(x) labs(x+1), {refLib.Label});
             names = cellfun(@(x, y) strjoin({x, y}, {' '}), {refLib.Diagnosis}, suffix, 'UniformOutput', false);
-            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), 'references'), 'jpg');
+            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('ReferenceLibraryName'), 'references'), 'png');
             plots.Spectra(3, plotPath, cell2mat({refLib.Data}'), hsiUtility.GetWavelengths(numel(refLib(1).Data)), ...
                 names, 'SAM Library Spectra', {'-', ':', '-', ':'});
 

@@ -13,7 +13,7 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> [varargout] = plots.Apply(1, '\temp\folder\name.jpg', @PlotSpectra, spectra);
+        %> [varargout] = plots.Apply(1, '\temp\folder\name.png', @PlotSpectra, spectra);
         %>
         %> [varargout] = plots.Apply(1, [], @PlotSpectra, spectra);
         %> @endcode
@@ -33,7 +33,7 @@ classdef plots
             % @b Usage
             %
             % @code
-            % [varargout] = plots.Apply(1, '\temp\folder\name.jpg', @PlotSpectra, spectra);
+            % [varargout] = plots.Apply(1, '\temp\folder\name.png', @PlotSpectra, spectra);
             %
             % [varargout] = plots.Apply(1, [], @PlotSpectra, spectra);
             % @endcode
@@ -81,7 +81,7 @@ classdef plots
         %>
         %> @code
         %> plots.SavePlot(1);
-        %> plots.SavePlot(1, '\temp\folder\name.jpg');
+        %> plots.SavePlot(1, '\temp\folder\name.png');
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
@@ -96,7 +96,7 @@ classdef plots
             %
             % @code
             % plots.SavePlot(1);
-            % plots.SavePlot(1, '\temp\folder\name.jpg');
+            % plots.SavePlot(1, '\temp\folder\name.png');
             % @endcode
             %
             % @param fig [int] | The figure handle
@@ -196,9 +196,9 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'correlation');
+        %> [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.png', inVectors, 'correlation');
         %>
-        %> [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'covariance');
+        %> [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.png', inVectors, 'covariance');
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
@@ -216,9 +216,9 @@ classdef plots
             % @b Usage
             %
             % @code
-            % [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'correlation');
+            % [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.png', inVectors, 'correlation');
             %
-            % [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.jpg', inVectors, 'covariance');
+            % [imCorr] = plots.BandStatistics(fig, '\temp\folder\name.png', inVectors, 'covariance');
             % @endcode
             %
             % @param fig [int] | The figure handle
@@ -239,9 +239,9 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.Spectra(fig, '\temp\folder\name.jpg', spectra, wavelengths, names, figTitle, markers);
+        %> plots.Spectra(fig, '\temp\folder\name.png', spectra, wavelengths, names, figTitle, markers);
         %>
-        %> plots.Spectra(fig, '\temp\folder\name.jpg', spectra);
+        %> plots.Spectra(fig, '\temp\folder\name.png', spectra);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
@@ -260,9 +260,9 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.Spectra(fig, '\temp\folder\name.jpg', spectra, wavelengths, names, figTitle, markers);
+            % plots.Spectra(fig, '\temp\folder\name.png', spectra, wavelengths, names, figTitle, markers);
             %
-            % plots.Spectra(fig, '\temp\folder\name.jpg', spectra);
+            % plots.Spectra(fig, '\temp\folder\name.png', spectra);
             % @endcode
             %
             % @param fig [int] | The figure handle
@@ -285,7 +285,7 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.AverageSpectrum(fig, '\temp\folder\name.jpg', hsIm, figTitle);
+        %> plots.AverageSpectrum(fig, '\temp\folder\name.png', hsIm, figTitle);
         %> @endcode
         %>
         %> @param fig [int] | The figure handle
@@ -302,7 +302,7 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.AverageSpectrum(fig, '\temp\folder\name.jpg', hsIm, figTitle);
+            % plots.AverageSpectrum(fig, '\temp\folder\name.png', hsIm, figTitle);
             % @endcode
             %
             % @param fig [int] | The figure handle
@@ -321,7 +321,7 @@ classdef plots
         %> @b Usage
         %>
         %> @code
-        %> plots.Components(hsIm, pcNum, figStart, '\temp\folder\name.jpg');
+        %> plots.Components(hsIm, pcNum, figStart, '\temp\folder\name.png');
         %> @endcode
         %>
         %> @param hsIm [hsi] | An instance of the hsi class
@@ -335,7 +335,7 @@ classdef plots
             % @b Usage
             %
             % @code
-            % plots.Components(hsIm, pcNum, figStart, '\temp\folder\name.jpg');
+            % plots.Components(hsIm, pcNum, figStart, '\temp\folder\name.png');
             % @endcode
             %
             % @param hsIm [hsi] | An instance of the hsi class
@@ -586,7 +586,7 @@ classdef plots
         %>
         %> @code
         %>   criteria = struct('TargetDir', 'subfolders', ...
-        %>       'TargetName', strcat(target, '.jpg'), ...
+        %>       'TargetName', strcat(target, '.png'), ...
         %>       'TargetType', 'fix');
         %> plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
         %> @endcode
@@ -607,7 +607,7 @@ classdef plots
             %
             % @code
             %   criteria = struct('TargetDir', 'subfolders', ...
-            %       'TargetName', strcat(target, '.jpg'), ...
+            %       'TargetName', strcat(target, '.png'), ...
             %       'TargetType', 'fix');
             % plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
             % @endcode

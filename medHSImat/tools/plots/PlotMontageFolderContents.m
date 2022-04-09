@@ -7,7 +7,7 @@
 %>
 %> @code
 %>   criteria = struct('TargetDir', 'subfolders', ...
-%>       'TargetName', strcat(target, '.jpg'), ...
+%>       'TargetName', strcat(target, '.png'), ...
 %>       'TargetType', 'fix');
 %> plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
 %> @endcode
@@ -28,7 +28,7 @@ function [] = PlotMontageFolderContents(path, criteria, figTitle, standardDim, i
 %
 % @code
 %   criteria = struct('TargetDir', 'subfolders', ...
-%       'TargetName', strcat(target, '.jpg'), ...
+%       'TargetName', strcat(target, '.png'), ...
 %       'TargetType', 'fix');
 % plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
 % @endcode
@@ -49,7 +49,7 @@ if nargin < 2
 end
 
 if isempty(criteria)
-    criteria = '*.jpg';
+    criteria = '*.png';
 end
 
 if nargin < 3

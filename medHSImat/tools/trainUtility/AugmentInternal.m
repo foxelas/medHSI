@@ -113,7 +113,7 @@ end
 
 %% preview of the entire dataset
 outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
-plots.MontageFolderContents(1, outputDir, '*.jpg', 'Augmented Dataset');
+plots.MontageFolderContents(1, outputDir, '*.png', 'Augmented Dataset');
 close all;
 
 fprintf('Finished. The augmented dataset is saved in folder %s \n', commonUtility.GetFilename('Dataset', 'none', ''));
@@ -164,7 +164,7 @@ save(filename, 'spectralData', 'labelInfo', '-v7.3');
 fprintf('Saved new data sample at: %s \n', filename);
 
 outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
-filename = config.DirMake(outputDir, strcat(targetName, '_', num2str(folds), '.jpg'));
+filename = config.DirMake(outputDir, strcat(targetName, '_', num2str(folds), '.png'));
 dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 imwrite(dispImageRgb, filename, 'jpg');
 fprintf('Saved image preview at: %s \n', filename);

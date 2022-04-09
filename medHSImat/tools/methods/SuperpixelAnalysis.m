@@ -115,7 +115,7 @@ if config.GetSetting('IsTest')
         plots.BandStatistics(8, strcat(basePath, num2str(i)), Xcol, statistic, figTitle);
     end
 
-    criteria = 'eigenvectors*.jpg';
+    criteria = 'eigenvectors*.png';
     plots.MontageFolderContents(9, strcat(savedir, '\'), criteria, 'Eigenvectors for each superpixel', [800, 800]);
 end
 end

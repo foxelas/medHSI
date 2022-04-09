@@ -140,7 +140,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
-        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
@@ -160,7 +160,7 @@ classdef hsiInfo
         function [obj] = ReadHsiInfo(targetId, sampleId)
             % ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
             %
-            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.png.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %
@@ -185,7 +185,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
-        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
@@ -204,7 +204,7 @@ classdef hsiInfo
         function [obj] = ReadHsiInfoFromHsi(hsIm)
             % ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
             %
-            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.png.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %
@@ -229,7 +229,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadLabel reads label information from a label image.
         %>
-        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
@@ -246,7 +246,7 @@ classdef hsiInfo
         function [labelMask] = ReadLabel(targetID)
             % ReadLabel reads label information from a label image.
             %
-            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.png.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %
@@ -272,7 +272,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief ReadLabelFromHsi reads label information from a label image.
         %>
-        %> The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+        %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
         %> two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
         %>
@@ -289,7 +289,7 @@ classdef hsiInfo
         function [labelMask] = ReadLabelFromHsi(hsIm)
             % ReadLabelFromHsi reads label information from a label image.
             %
-            % The input data should be saved in folder with config::[LabelDir]\\*.jpg.
+            % The input data should be saved in folder with config::[LabelDir]\\*.png.
             % The data should be saved in folders according to tissue type, e.g.
             % two folders with names 'Fixed', 'Unfixed' for two tissue conditions.
             %

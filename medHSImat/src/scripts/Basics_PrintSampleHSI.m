@@ -97,6 +97,7 @@ h(3) = plots.WithShadedArea(w, mal2, 'Benign Lesion', ':g');
 h(4) = plots.WithShadedArea(w, ben2, 'Benign Healthy', '--b');
 hold off 
 xlim([420, 730]);
+ylim([0,1]);
 title('Mean(SD) of each Sample Category');
 legend(h, 'Location', 'EastOutside');
 

@@ -118,7 +118,7 @@ classdef commonUtility
                 case 'param'
                     fullPath = fullfile(config.GetSetting('ParamDir'), filename);
 
-                case 'referenceLib'
+                case 'referencelib'
                     fullPath = config.DirMake(config.GetSetting('MatDir'), ...
                         fullfile(config.GetSetting('Dataset'), config.GetSetting('ReferenceLibraryName')), ...
                         filename);

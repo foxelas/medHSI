@@ -117,9 +117,9 @@ for i = 1:length(targetIDs)
     if isTest
         saveName = StrrepAll(filenames{i});
     else
-        saveName = StrrepAll(strcat(sampleID, '_', num2str(((str2double(isUnfixed) + 2 \ 2) - 2)*(-1)), '-', filenames{i}));
+        saveName = targetID;
     end
-    saveName = strcat(saveName, '.jpg');
+    saveName = strcat(saveName, '.png');
 
     %% write triplet HSI in .mat file
     rawImg = hsiUtility.ReadTriplet(content, targetConditions);
@@ -139,6 +139,11 @@ for i = 1:length(targetIDs)
         save(filename, 'spectralData', '-v7.3');
         
         %% Read Label
+        % TO REMOVE 
+        labeldir = fullfile(config.GetSetting('DataDir'), config.GetSetting('LabelsFolderName'), spectralData.TissueType, strcat(spectralData.ID, '.png'));
+        if ~exist(labeldir)
+            Basics_GetLabelFromLabelMe(spectralData);
+        end
         labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
 
         %% Save data info in a file
@@ -165,14 +170,14 @@ end
 %% preview of the entire dataset
 
 path1 = fullfile(basedir, 'preprocessed');
-plots.MontageFolderContents(1, path1, '*.jpg', 'Dataset');
-plots.MontageFolderContents(3, path1, '*raw.jpg', 'Dataset raw');
-plots.MontageFolderContents(4, path1, '*fix.jpg', 'Dataset fix');
+plots.MontageFolderContents(1, path1, '*.png', 'Dataset');
+plots.MontageFolderContents(3, path1, '*raw.png', 'Dataset raw');
+plots.MontageFolderContents(4, path1, '*fix.png', 'Dataset fix');
 
 path2 = fullfile(basedir, 'rgb');
-plots.MontageFolderContents(2, path2, '*.jpg', 'sRGB');
-plots.MontageFolderContents(5, path2, '*raw.jpg', 'sRGB raw');
-plots.MontageFolderContents(6, path2, '*fix.jpg', 'sRGB fix');
+plots.MontageFolderContents(2, path2, '*.png', 'sRGB');
+plots.MontageFolderContents(5, path2, '*raw.png', 'sRGB raw');
+plots.MontageFolderContents(6, path2, '*fix.png', 'sRGB fix');
 
 close all;
 disp('Finish [ReadLabeledDataset].');

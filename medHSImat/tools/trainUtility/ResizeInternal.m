@@ -87,10 +87,10 @@ if config.GetSetting('HasResizeOptions')
         %% load HSI from .mat file to verify it is working and to prepare preview images
         targetName = targetNames{i};
         config.SetSetting('Dataset', baseDataset);
-        [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+        [spectralDataOrig, labelInfoOrig] = hsiUtility.LoadHsiAndLabel(targetName);
 
         %% Resize
-        [spectralData, labelInfo] = hsiUtility.Resize(spectralData, labelInfo);
+        [spectralData, labelInfo] = hsiUtility.Resize(spectralDataOrig, labelInfoOrig);
 
         config.SetSetting('Dataset', targetDataset);
         if ~iscell(spectralData)
@@ -113,7 +113,7 @@ if config.GetSetting('HasResizeOptions')
 
     %% preview of the entire dataset
     outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
-    plots.MontageFolderContents(1, outputDir, '*.jpg', 'Resized Dataset');
+    plots.MontageFolderContents(1, outputDir, '*.png', 'Resized Dataset');
     close all;
 
     fprintf('Finished. The resized dataset is saved in folder %s \n', commonUtility.GetFilename('Dataset', 'none', ''));
@@ -137,9 +137,9 @@ fprintf('Saved new data sample at: %s \n', filename);
 
 outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
 if n > 0
-    filename = config.DirMake(outputDir, strcat(targetName, '_patch', num2str(n), '.jpg'));
+    filename = config.DirMake(outputDir, strcat(targetName, '_patch', num2str(n), '.png'));
 else
-    filename = config.DirMake(outputDir, strcat(targetName, '.jpg'));
+    filename = config.DirMake(outputDir, strcat(targetName, '.png'));
 end
 dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
 imwrite(dispImageRgb, filename, 'jpg');

@@ -84,15 +84,15 @@ ax.YAxis.Exponent = 0;
 
 baseFolder = commonUtility.GetFilename('output', config.GetSetting('NormCheckFolderName'), '');
 
-plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_raw.jpg'));
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_raw.png'));
 plots.SavePlot(fig, plotPath);
 
-plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_norm.jpg'));
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_norm.png'));
 plots.SavePlot(fig2, plotPath);
 
 fig3 = figure();
 rgb = Iin.GetDisplayImage();
-plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_mask.jpg'));
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_mask.png'));
 plots.Overlay(fig3, plotPath, rgb, mask);
 
 end

@@ -79,16 +79,16 @@ for i = 1:N
     pc3{i} = scores{i}(:, :, 3);
 end
 
-plotPath = fullfile(savedir, 'superpixel_segments.jpg');
+plotPath = fullfile(savedir, 'superpixel_segments.png');
 plots.Montage(1, plotPath, labels, names);
 
-plotPath = fullfile(savedir, 'PC1.jpg');
+plotPath = fullfile(savedir, 'PC1.png');
 plots.MontageCmap(2, plotPath, pc1, names);
 
-plotPath = fullfile(savedir, 'PC2.jpg');
+plotPath = fullfile(savedir, 'PC2.png');
 plots.MontageCmap(3, plotPath, pc2, names);
 
-plotPath = fullfile(savedir, 'PC3.jpg');
+plotPath = fullfile(savedir, 'PC3.png');
 plots.MontageCmap(4, plotPath, pc3, names);
 
 pause(0.5);
