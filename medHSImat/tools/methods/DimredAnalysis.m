@@ -30,14 +30,13 @@ end
 
 img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
 names = {labelInfo.Diagnosis, strjoin({subName, '1'}, {' '}), strjoin({subName, '2'}, {' '}), strjoin({subName, '3'}, {' '})};
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ica'), 'png');
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ca'), 'png');
 plots.MontageCmap(1, plotPath, img, names, false, limitVal);
 
 img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
 names = {labelInfo.Diagnosis, strjoin({subName, '1'}, {' '}), strjoin({subName, '2'}, {' '}), strjoin({subName, '3'}, {' '})};
-plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ica_overlay'), 'png');
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ca_overlay'), 'png');
 plots.MontageWithLabel(2, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
 
-pause(0.5);
 end

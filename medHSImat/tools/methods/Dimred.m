@@ -98,7 +98,9 @@ switch lower(method)
         %% FastICA
     case 'ica'
         [scores, ~, coeff] = fastica(X', 'numOfIC', q);
-
+        scores = scores';
+        coeff = coeff';
+        
         %% RICA
     case 'rica'
         Mdl = rica(X, q, 'IterationLimit', 100, 'Lambda', 1);

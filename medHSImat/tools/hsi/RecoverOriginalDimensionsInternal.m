@@ -88,7 +88,7 @@ else
     if isMasked
         recHsi = zeros(m, n, q);
         outHsiFlat = reshape(recHsi, [m * n, q]);
-        maskFlat = reshape(mask, [m * n, 1]);
+        maskFlat = logical(reshape(mask, [m * n, 1]));
         outHsiFlat(maskFlat, :) = redIm;
     else
         outHsiFlat = redIm;

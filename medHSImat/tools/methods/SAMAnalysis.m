@@ -74,7 +74,7 @@ axis off;
 
 % subplot 4
 subplot(2, 2, 4);
-[ssimval, ~] = ssim(predImg, labelInfo.Labels);
+[ssimval, ~] = ssim(predImg, uint8(labelInfo.Labels));
 imshowpair(predImg, labelInfo.Labels, 'Scaling', 'joint');
 title(sprintf('SSIM: %.5f', ssimval));
 

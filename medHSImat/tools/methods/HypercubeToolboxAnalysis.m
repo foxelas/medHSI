@@ -1,15 +1,27 @@
 function [] = HypercubeToolboxAnalysis(hsIm, labelInfo, reductionMethod, referenceMethod)
 
+colHsIm = hsIm.GetMaskedPixels();
+n = size(colHsIm, 1);
+F = factor(n);
+if F(1) > 0 && F(1) ~= n
+    rscolHsIm = reshape(colHsIm, [n / F(1) , F(1), size(colHsIm, 2) ]);
+else
+    colHsIm = colHsIm(1:(n-1), :);
+    n = n-1;
+    F = factor(n);
+    rscolHsIm = reshape(colHsIm, [n / F(1) , F(1), size(colHsIm, 2) ]);
+end
+
 % numEndmembers = countEndmembersHFC(hsIm.Value,'PFA',10^-7);
 if strcmpi(referenceMethod,  'nfindr')
     numEndmembers = 8;
-    endmembers = nfindr(hsIm.Value,numEndmembers, 'ReductionMethod', reductionMethod);
+    endmembers = nfindr(rscolHsIm, numEndmembers, 'ReductionMethod', reductionMethod);
 elseif strcmpi(referenceMethod,  'ppi')
     numEndmembers = 5;
-    endmembers = ppi(hsIm.Value,numEndmembers, 'ReductionMethod', reductionMethod);
+    endmembers = ppi(rscolHsIm, numEndmembers, 'ReductionMethod', reductionMethod);
 elseif strcmpi(referenceMethod,  'fippi')
     numEndmembers = 5;
-    endmembers = fippi(hsIm.Value,numEndmembers, 'ReductionMethod', reductionMethod);
+    endmembers = fippi(rscolHsIm, numEndmembers, 'ReductionMethod', reductionMethod);
 end
 
 w = hsiUtility.GetWavelengths(311);
