@@ -9,14 +9,14 @@ else:
     from . import hsi_utils
 
 # Image size should be multiple of 32
-DEFAULT_HEIGHT = 64
+DEFAULT_HEIGHT = 32 #64
 
 def load_data():
     conf = hsi_utils.parse_config()
-    outputDir = conf['Directories']['outputDir']
-    datasetName = conf['Data Settings']['dataset']
+    outputDir = conf['Directories']['OutputDir']
+    datasetName = conf['Data Settings']['Dataset']
     fileName = 'hsi_'+ datasetName + '_full' +'.h5'
-    folderName = conf['Folder Names']['datasetsFolderName']
+    folderName = conf['Folder Names']['DatasetsFolderName']
     fpath = os.path.join(outputDir, datasetName, folderName, fileName)
     print("Read from ", fpath)
     dataList, keyList, labelImages = hsi_utils.load_dataset(fpath, 'image')
@@ -24,7 +24,7 @@ def load_data():
     # Prepare input data
     croppedData = hsi_utils.center_crop_list(dataList, DEFAULT_HEIGHT, DEFAULT_HEIGHT, True)
 
-    croppedLabels = hsi_utils.center_crop_list(labelImages)
+    croppedLabels = hsi_utils.center_crop_list(labelImages, DEFAULT_HEIGHT, DEFAULT_HEIGHT)
 
     # for (x,y) in zip(croppedData, croppedLabels):
     #     hsi_utils.show_display_image(x)
@@ -61,8 +61,8 @@ def get_model_filename(suffix='', extension='txt', folder = None):
         today = date.today()
         model_name = str(today) + '_'
     
-    savedir = os.path.join(hsi_utils.conf['Directories']['outputDir'],
-        hsi_utils.conf['Data Settings']['dataset'], hsi_utils.conf['Folder Names']['pythonTestFolderName'])
+    savedir = os.path.join(hsi_utils.conf['Directories']['OutputDir'],
+        hsi_utils.conf['Data Settings']['Dataset'], hsi_utils.conf['Folder Names']['PythonTestFolderName'])
     if folder is not None:
         savedir = os.path.join(savedir, folder)
 
@@ -96,11 +96,11 @@ def save_model_info(model, folder = None):
 
 def show_label_montage(): 
     croppedData, croppedLabels = load_data()
-    filename = os.path.join(hsi_utils.conf['Directories']['outputDir'], hsi_utils.conf['Data Settings']['dataset'], 
-        hsi_utils.conf['Folder Names']['pythonTestFolderName'], 'normalized-montage.jpg')        
+    filename = os.path.join(hsi_utils.conf['Directories']['OutputDir'], hsi_utils.conf['Data Settings']['Dataset'], 
+        hsi_utils.conf['Folder Names']['PythonTestFolderName'], 'normalized-montage.jpg')        
     hsi_utils.show_montage(croppedData, filename, 'srgb')
-    filename =os.path.join(hsi_utils.conf['Directories']['outputDir'], hsi_utils.conf['Data Settings']['dataset'], 
-        hsi_utils.conf['Folder Names']['pythonTestFolderName'], 'labels-montage.jpg')
+    filename =os.path.join(hsi_utils.conf['Directories']['OutputDir'], hsi_utils.conf['Data Settings']['Dataset'], 
+        hsi_utils.conf['Folder Names']['PythonTestFolderName'], 'labels-montage.jpg')
     hsi_utils.show_montage(croppedLabels, filename, 'grey')
 
 
@@ -118,7 +118,21 @@ def plot_history(history, folder = None):
     plt.show()
 
 
-def visualize(hsi, gt, pred, folder = None):
+    plt.plot(history.history['iou_score'])
+    plt.plot(history.history['val_iou_score'])
+    plt.title('IOU scores')
+    plt.ylabel('iou score')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+
+    filename = get_model_filename('iou_score', 'png', folder)
+    plt.savefig(filename)
+
+    plt.show()
+
+
+
+def visualize(hsi, gt, pred, folder = None, iou = None):
     plt.subplot(1,3,1)
     plt.title("Original")
     plt.imshow(hsi_utils.get_display_image(hsi))
@@ -128,7 +142,8 @@ def visualize(hsi, gt, pred, folder = None):
     plt.imshow(gt)
 
     plt.subplot(1,3,3)
-    plt.title("Prediction")
+    figTitle = ["Prediction" if iou == None else "Prediction (" + str(iou) + "%)"]
+    plt.title(figTitle)
     plt.imshow(pred)
 
     filename = get_model_filename('visualization', 'png', folder)

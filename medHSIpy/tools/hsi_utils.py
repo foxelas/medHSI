@@ -56,17 +56,17 @@ def parse_config():
     # print("Sections")
     # print(config.sections())
     
-    # config['Data Settings']['dataset'] = 'pslTestAugmented'
+    # config['Data Settings']['Dataset'] = 'pslTestAugmented'
     return config
 
 conf = parse_config()
 
 def get_savedir():
-    dirName = os.path.join(conf['Directories']['outputDir'], conf['Data Settings']['dataset'], conf['Folder Names']['pythonTestFolderName'])
+    dirName = os.path.join(conf['Directories']['PutputDir'], conf['Data Settings']['Dataset'], conf['Folder Names']['PythonTestFolderName'])
     return dirName
 
 def get_tripletdir():
-    dirName = os.path.join(conf['Directories']['matDir'], str.join(conf['Data Settings']['database'], conf['Input Folder Names']['tripletsName'] ))
+    dirName = os.path.join(conf['Directories']['MatDir'], str.join(conf['Data Settings']['Database'], conf['Input Folder Names']['TripletsName'] ))
     return dirName
 
 ######################### Load #########################
@@ -109,12 +109,11 @@ def load_dataset(fpath, sampleType='pixel'):
 
     keyList = list(f.keys())
 
-    keyList = keyList[0:19]
     for keyz in keyList:
         val = f[keyz]['hsi'][:]
         lab = f[keyz]['label'][:]
 
-        if val.shape[2] != 311:
+        if val.shape[2] !=  311 | val.shape[2] != 3:
             val = np.transpose(val, [1, 2, 0])
         hsiList.append(val)
         labelList.append(lab.astype(np.int8))
@@ -245,26 +244,34 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
     recon = []
     if imgType == 'srgb':        
         [m,n,z] = hsi.shape
-        
-        filename = os.path.join(get_base_dir(), conf['Directories']['paramDir'], 'displayParam_311.mat')
+        if z  == 3: 
+            colImage = np.reshape( hsi, (m*n, z) )  
+            maxConst = np.max(colImage)
+            minConst = np.min(colImage)
+            colImage = (colImage - float(minConst))/ (float(maxConst) - float(minConst))
+            recon = np.reshape(colImage, (m, n, 3))
 
-        xyz = load_from_mat(filename, 'xyz')
-        illumination = load_from_mat(filename, 'illumination')
+        else:     
+            filename = os.path.join(get_base_dir(), conf['Directories']['ParamDir'], 'displayParam_311.mat')
 
-        colImage = np.reshape( hsi, (m*n, z) )  
-        normConst = np.amax(colImage)
-        colImage = colImage / float(normConst)
-        colImage =  colImage * illumination
-        colXYZ = np.dot(colImage, np.squeeze(xyz))
+            xyz = load_from_mat(filename, 'xyz')
+            illumination = load_from_mat(filename, 'illumination')
+
+            colImage = np.reshape( hsi, (m*n, z) )  
+            normConst = np.amax(colImage)
+            colImage = colImage / float(normConst)
+            colImage =  colImage * illumination
+            colXYZ = np.dot(colImage, np.squeeze(xyz))
+            
+            imXYZ = np.reshape(colXYZ, (m, n, 3))
+            imXYZ[imXYZ < 0] = 0
+            imXYZ = imXYZ / np.amax(imXYZ)
+            dispImage_ = xyz2rgb(imXYZ)
+            dispImage_[dispImage_ < 0] = 0
+            dispImage_[dispImage_ > 1] = 1
+            dispImage_ = dispImage_**0.4
+            recon =  dispImage_
         
-        imXYZ = np.reshape(colXYZ, (m, n, 3))
-        imXYZ[imXYZ < 0] = 0
-        imXYZ = imXYZ / np.amax(imXYZ)
-        dispImage_ = xyz2rgb(imXYZ)
-        dispImage_[dispImage_ < 0] = 0
-        dispImage_[dispImage_ > 1] = 1
-        dispImage_ = dispImage_**0.4
-        recon =  dispImage_
 
     elif imgType =='channel':
         recon = hsi[:,:, channel]
@@ -308,6 +315,7 @@ def show_image(x, figTitle = None, hasGreyScale = False, fpath = ""):
     
 def show_montage(dataList, filename = None, imgType = 'srgb', channel = 150):
     #Needs to have same number of dimensions for each image, type float single
+
     hsiList = np.array([get_display_image(x, imgType, channel) for x in dataList], dtype='float64')
     if imgType != 'grey':
         m = skimage.util.montage(hsiList, channel_axis = 3)
@@ -316,7 +324,7 @@ def show_montage(dataList, filename = None, imgType = 'srgb', channel = 150):
         m = skimage.util.montage(hsiList)
 
     if filename == None: 
-        filename = os.path.join(conf['Directories']['outputDir'], conf['Data Settings']['dataset'], conf['Folder Names']['pythonTestFolderName'], 'normalized-montage.jpg')
+        filename = os.path.join(conf['Directories']['OutputDir'], conf['Data Settings']['Dataset'], conf['Folder Names']['PythonTestFolderName'], 'normalized-montage.jpg')
     skimage.io.imsave(filename, m)
 
 
