@@ -72,8 +72,15 @@ for j = 1:2
     end
 end
 
-% %% Get Example Values 
-% config.SetSetting('Dataset', 'pslRaw');
-% Basics_PrintSampleHSI();
-% config.SetSetting('Dataset', 'psl32');
-% Basics_PrintSampleHSI();
+%% Get Example Values 
+config.SetSetting('Dataset', 'pslRaw');
+Basics_PrintSampleHSI();
+config.SetSetting('Dataset', 'psl32');
+Basics_PrintSampleHSI();
+
+config.SetSetting('Dataset', 'pslRaw');
+segment.By_HyperspectralToolbox
+segment.ByPCA
+segment.ByRICA
+segment.BySAM
+segment.BySuperPCA

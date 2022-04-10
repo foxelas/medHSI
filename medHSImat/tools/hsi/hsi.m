@@ -557,13 +557,14 @@ classdef hsi
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
+        %> @param flattenFlag [boolean] | The flag for flattening. Default: true.
         %> @param method [string] | The method for dimension reduction
         %> @param q [int] | The number of components to be retained
         %> @param varargin [cell array] | Optional additional arguments for methods that require them
         %>
         %> @retval scores [numeric array] | The transformed values
         % ======================================================================
-        function [scores] = Transform(obj, method, varargin)
+        function [scores] = Transform(obj, flattenFlag, method, varargin)
             % Transform applies a transform to the hyperspectral data.
             %
             % Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
@@ -576,6 +577,7 @@ classdef hsi
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
+            % @param flattenFlag [boolean] | The flag for flattening. Default: true.
             % @param method [string] | The method for dimension reduction
             % @param q [int] | The number of components to be retained
             % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
@@ -583,8 +585,11 @@ classdef hsi
             %
             % @retval scores [numeric array] | The transformed values
             [~, scores, ~, ~, ~] = obj.Dimred(method, varargin{:});
-
-            if ndims(scores) > 2
+            
+            if isempty(flattenFlag)
+                flattenFlag = true;
+            end
+            if ndims(scores) > 2 && flattenFlag
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
         end

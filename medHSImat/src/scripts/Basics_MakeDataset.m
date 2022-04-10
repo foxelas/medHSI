@@ -110,5 +110,48 @@ if strcmpi(targetDataset, '32')
     config.SetSetting('Dataset', targetDataset);
 end
 
+if strcmpi(targetDataset, '32-pca')
+    baseDataset = 'pslRaw32';
+
+    config.SetSetting('Dataset', baseDataset);
+    [~, targetNames] = commonUtility.DatasetInfo(false);
+    targetDataset = strcat(baseDataset, '-pca');
+
+    for i = 1:length(targetNames)
+        targetName = targetNames{i};
+        config.SetSetting('Dataset', baseDataset);
+        [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);    
+        spectralData = hsIm;
+        spectralData.Value = hsIm.Transform(false, 'pca', 3); 
+        if size(spectralData.Value,3) == 3 && ndims(spectralData.Value) == 3
+            config.SetSetting('Dataset', targetDataset);
+            targetFilename = commonUtility.GetFilename('dataset', targetName);
+            save(targetFilename, 'spectralData', 'labelInfo', '-v7.3');
+        end
+    end
+end
+
+if strcmpi(targetDataset, '32-xception')
+    baseDataset = 'pslRaw32';
+
+    config.SetSetting('Dataset', baseDataset);
+    [~, targetNames] = commonUtility.DatasetInfo(false);
+    targetDataset = strcat(baseDataset, '-xception');
+
+    for i = 1:length(targetNames)
+        targetName = targetNames{i};
+        config.SetSetting('Dataset', baseDataset);
+        [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);    
+        spectralData = hsIm;
+        maxVal = max(hsIm.Value, [], 'all');
+        minVal = min(hsIm.Value, [], 'all');
+        spectralData.Value = rescale(hsIm.Value,-1,1);
+        
+        config.SetSetting('Dataset', targetDataset);
+        targetFilename = commonUtility.GetFilename('dataset', targetName);
+        save(targetFilename, 'spectralData', 'labelInfo', '-v7.3');
+    end
+end
+
 hsiUtility.ExportH5Dataset();
 end

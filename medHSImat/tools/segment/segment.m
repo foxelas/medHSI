@@ -197,11 +197,11 @@ classdef segment
         function BySuperPCA()
 
             %% SuperPCA
-            pixelNum = 20;
+            pixelNum = 30;
             pcNum = 5;
 
             %% Manual
-            experiment = 'SuperPCA-Manual';
+            experiment = strcat('SuperPCA-Manual', '-Superpixels', num2str(pixelNum));
             Basics_Init(experiment);
 
             isManual = true;
@@ -217,7 +217,7 @@ classdef segment
             plots.GetMontagetCollection(5, 'pc3');
 
             %% From SuperPCA package
-            experiment = 'SuperPCA';
+            experiment = strcat('SuperPCA', '-Superpixels', num2str(pixelNum));
             Basics_Init(experiment);
 
             isManual = false;

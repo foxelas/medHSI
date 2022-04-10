@@ -149,7 +149,7 @@ predlabels = predict(SVMModel, scores);
 end
 
 function [scores] = transformSPCAFun(x)
-scores = x.Transform('SuperPCA', 100);
+scores = x.Transform(true, 'SuperPCA', 100);
 end
 
 function [scores] = IndexCell(x, i)

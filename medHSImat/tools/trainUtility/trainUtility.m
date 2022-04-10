@@ -575,10 +575,10 @@ classdef trainUtility
             % @retval Xvalid [numeric array] | The dimension-reduced test data
 
             tic;
-            transTrain = cellfun(@(x) x.Transform(method, q, varargin{:}), {trainData.Values}, 'un', 0);
+            transTrain = cellfun(@(x) x.Transform(true, method, q, varargin{:}), {trainData.Values}, 'un', 0);
             tdimred = toc;
             tdimred = tdimred / numel(transTrain);
-            transTest = cellfun(@(x) x.Transform(method, q, varargin{:}), {testData.Values}, 'un', 0);
+            transTest = cellfun(@(x) x.Transform(true, method, q, varargin{:}), {testData.Values}, 'un', 0);
 
             Xtrainscores = trainUtility.Cell2Mat(transTrain);
             transyTrain = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {trainData.Labels}, {trainData.Values}, 'un', 0);
