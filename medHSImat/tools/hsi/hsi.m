@@ -478,10 +478,58 @@ classdef hsi
         end
 
         % ======================================================================
+        %> @brief DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
+        %>
+        %> You can set the spectral distance metric with funcHandle. 
+        %> Common spectral ditance metrics are @@sam, sid, @jmsam, @ns3, @sidsam.
+        %> For more details check @c DistanceScoresInternal.
+        %>
+        %> @b Usage
+        %>
+        %> @code     
+        %> clusterLabels = hsIm.DistanceScores(target, endmembers, @sam);
+        %> @endcode
+        %>
+        %> @param target [numeric array] | An 3D hsi value
+        %> @param references [numeric array] | An array of spectral references
+        %> @param funcHandle [function handle] | Optional: The spectral distance measure. Default: SAM.
+        %>
+        %> @retval clusterLabels [numeric array] | The labels based on minimum distance.
+        % ======================================================================
+        function [clusterLabels] = DistanceScores(obj, varargin)
+        % DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
+        %
+        % You can set the spectral distance metric with funcHandle. 
+        % Common spectral ditance metrics are @@sam, sid, @jmsam, @ns3, @sidsam.
+        % For more details check @c DistanceScoresInternal.
+        %
+        % @b Usage
+        %
+        % @code     
+        % clusterLabels = hsIm.DistanceScores(target, endmembers, @sam);
+        % @endcode
+        %
+        % @param target [numeric array] | An 3D hsi value
+        % @param references [numeric array] | An array of spectral references
+        % @param funcHandle [function handle] | Optional: The spectral distance measure. Default: SAM.
+        %
+        % @retval clusterLabels [numeric array] | The labels based on minimum distance.
+            [clusterLabels] = DistanceScoresInternal(obj.Value, varargin{:});
+        end
+        
+        % ======================================================================
         %> @brief Dimred reduces the dimensions of the hyperspectral image.
         %>
-        %> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
-        %> details check @c function Dimred.
+        %> Currently available methods:
+        %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+        %> ICA (FastICA), RICA, SuperRICA, 
+        %> LDA, QDA, Wavelength-Selection.
+        %> Methods autoencoder and RFI are available only for pre-trained models. 
+        %>
+        %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
+        %> For an unknown method, the input data is returned.
+        %>
+        %> For more details check @c DimredInternal .
         %>
         %> @b Usage
         %>
@@ -510,45 +558,59 @@ classdef hsi
         %> @retval Mdl [model] | The dimension reduction model
         % ======================================================================
         function [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, varargin)
-            % Dimred reduces the dimensions of the hyperspectral image.
-            %
-            % Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
-            % details check @c function Dimred.
-            %
-            % @b Usage
-            %
-            % @code
-            % q = 10;
-            % [coeff, scores, latent, explained, objective] = hsIm.Dimred(
-            % method, q, hsIm.FgMask);
-            %
-            % [coeff, scores, latent, explained, ~] = hsIm.Dimred('pca', 10);
-            %
-            % [coeff, scores, ~, ~, objective] = hsIm.Dimred('rica', 40);
-            % @endcode
-            %
-            % @param obj [hsi] | An instance of the hsi class
-            % @param method [string] | The method for dimension reduction
-            % @param q [int] | The number of components to be retained
-            % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-            % @param varargin [cell array] | Optional additional arguments for methods that require them
-            %
-            % @retval coeff [numeric array] | The transformation coefficients
-            % @retval scores [numeric array] | The transformed values
-            % @retval latent [numeric array] | The latent values
-            % @retval explained [numeric array] | The percentage of explained
-            % variance
-            % @retval objective [numeric array] | The objective function
-            % values
-            % @retval Mdl [model] | The dimension reduction model
-            [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, method, q, obj.FgMask, varargin{:});
+        % Dimred reduces the dimensions of the hyperspectral image.
+        %
+        % Currently available methods:
+        % PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+        % ICA (FastICA), RICA, SuperRICA, 
+        % LDA, QDA, Wavelength-Selection.
+        % Methods autoencoder and RFI are available only for pre-trained models. 
+        %
+        % Additionally, for pre-trained parameters RFI and Autoencoder are available.
+        % For an unknown method, the input data is returned.
+        %
+        % For more details check @c DimredInternal .
+        %
+        % @b Usage
+        %
+        % @code
+        % q = 10;
+        % [coeff, scores, latent, explained, objective] = hsIm.Dimred(
+        % method, q, hsIm.FgMask);
+        %
+        % [coeff, scores, latent, explained, ~] = hsIm.Dimred('pca', 10);
+        %
+        % [coeff, scores, ~, ~, objective] = hsIm.Dimred('rica', 40);
+        % @endcode
+        %
+        % @param obj [hsi] | An instance of the hsi class
+        % @param method [string] | The method for dimension reduction
+        % @param q [int] | The number of components to be retained
+        % @param varargin [cell array] | Optional additional arguments for methods that require them
+        %
+        % @retval coeff [numeric array] | The transformation coefficients
+        % @retval scores [numeric array] | The transformed values
+        % @retval latent [numeric array] | The latent values
+        % @retval explained [numeric array] | The percentage of explained
+        % variance
+        % @retval objective [numeric array] | The objective function
+        % values
+        % @retval Mdl [model] | The dimension reduction model
+           [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, method, q, obj.FgMask, varargin{:});
         end
 
         % ======================================================================
         %> @brief Transform applies a transform to the hyperspectral data.
         %>
-        %> Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
-        %> details check @c function Dimred.
+        %> Currently available methods:
+        %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+        %> ICA (FastICA), RICA, SuperRICA, 
+        %> LDA, QDA, Wavelength-Selection.
+        %> Methods autoencoder and RFI are available only for pre-trained models. 
+        %>
+        %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
+        %> For an unknown method, the input data is returned.
+        %> For more details check @c function DimredInternal.
         %>
         %> @b Usage
         %>
@@ -564,36 +626,76 @@ classdef hsi
         %>
         %> @retval scores [numeric array] | The transformed values
         % ======================================================================
-        function [scores] = Transform(obj, flattenFlag, method, varargin)
-            % Transform applies a transform to the hyperspectral data.
-            %
-            % Currently PCA, RICA, SuperPCA, MSuperPCA, LDA, QDA are available. For more
-            % details check @c function Dimred.
-            %
-            % @b Usage
-            %
-            % @code
-            % scores = hsIm.Transform(superixelNumber);
-            % @endcode
-            %
-            % @param obj [hsi] | An instance of the hsi class
-            % @param flattenFlag [boolean] | The flag for flattening. Default: true.
-            % @param method [string] | The method for dimension reduction
-            % @param q [int] | The number of components to be retained
-            % @param mask [numerical array] | A 2x2 logical array marking pixels to be used in PCA calculation
-            % @param varargin [cell array] | Optional additional arguments for methods that require them
-            %
-            % @retval scores [numeric array] | The transformed values
-            [~, scores, ~, ~, ~] = obj.Dimred(method, varargin{:});
+        function [scores] = Transform(obj, flattenFlag, method, q, varargin)
+        % Transform applies a transform to the hyperspectral data.
+        %
+        % Currently available methods:
+        % PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+        % ICA (FastICA), RICA, SuperRICA, 
+        % LDA, QDA, Wavelength-Selection.
+        % Methods autoencoder and RFI are available only for pre-trained models. 
+        %
+        % Additionally, for pre-trained parameters RFI and Autoencoder are available.
+        % For an unknown method, the input data is returned.
+        % For more details check @c function DimredInternal.
+        %
+        % @b Usage
+        %
+        % @code
+        % scores = hsIm.Transform(superixelNumber);
+        % @endcode
+        %
+        % @param obj [hsi] | An instance of the hsi class
+        % @param flattenFlag [boolean] | The flag for flattening. Default: true.
+        % @param method [string] | The method for dimension reduction
+        % @param q [int] | The number of components to be retained
+        % @param varargin [cell array] | Optional additional arguments for methods that require them
+        %
+        % @retval scores [numeric array] | The transformed value
+              [~, scores, ~, ~, ~] = obj.Dimred(method, q, obj.FgMask, varargin{:});
             
             if isempty(flattenFlag)
                 flattenFlag = true;
             end
-            if ndims(scores) > 2 && flattenFlag
+            if flattenFlag
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
         end
 
+        % ======================================================================
+        %> @brief Nfindr applies the algorithm only on the specimen pixels of the hsi, while ignoring the bakcground.
+        %>
+        %> For more details see @c NfindrInternal.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %>  [endmembers] = hsIm.Nfindr(8);
+        %> @endcode
+        %>
+        %> @param obj [hsi] | An instance of the hsi calss
+        %> @param numEndmembers [int] | The number of endmembers to calculate.
+        %>
+        %> @retval endmembers [numeric array] |The calculated endmembers.
+        % ======================================================================
+        function [endmembers] = Nfindr(obj, numEndmembers)
+        % Nfindr applies the algorithm only on the specimen pixels of the hsi, while ignoring the bakcground.
+        %
+        % For more details see @c NfindrInternal.
+        %
+        % @b Usage
+        %
+        % @code
+        %  [endmembers] = hsIm.Nfindr(8);
+        % @endcode
+        %
+        % @param obj [hsi] | An instance of the hsi calss
+        % @param numEndmembers [int] | The number of endmembers to calculate.
+        %
+        % @retval endmembers [numeric array] |The calculated endmembers.
+            [endmembers] = NfindrInternal(obj.Value, numEndmembers, obj.FgMask);
+        end
+        
         %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
         %> @brief GetDisplayImage returns an RGB image from the hyperspectral data.

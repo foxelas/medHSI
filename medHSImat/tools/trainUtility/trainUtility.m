@@ -299,11 +299,19 @@ classdef trainUtility
             %
             % @retval SVMModel [model] | The trained SVM model
 
+            iterLim = 100000;
+            % TO REMOVE
+            factors = 5;
+            kk = ceil(decimate(1:size(Xtrain, 1), factors));
+            Xtrain = Xtrain(kk, :);
+            ytrain = ytrain(kk, :);
+            % TO REMOVE
+            
             SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'RBF', ...
-                'KernelScale', 'auto', 'IterationLimit', 10000); %'Cost', [0, 1; 3, 0],
+                'KernelScale', 'auto', 'IterationLimit', iterLim); %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000
             numIter = SVMModel.NumIterations;
             % TO REMOVE
-            if numIter == 10000
+            if numIter == iterLim
                 disp('SVM finished because of MaxIter reached.')
             end
             % TO REMOVE
@@ -346,13 +354,6 @@ classdef trainUtility
             % @retval specificity [numeric] | The model specificity
             % @retval st [double] | The train run time
             % @retval SVMModel [model] | The trained SVM model
-
-            % TO REMOVE
-            factors = 5;
-            kk = ceil(decimate(1:size(Xtrain, 1), factors));
-            Xtrain = Xtrain(kk, :);
-            ytrain = ytrain(kk, :);
-            % TO REMOVE
 
             tic;
             SVMModel = trainUtility.SVM(Xtrain, ytrain);
@@ -574,19 +575,23 @@ classdef trainUtility
             % @retval SVMModel [model] | The trained SVM model
             % @retval Xvalid [numeric array] | The dimension-reduced test data
 
+            preTransMethod = method;
+            if strcmpi(method, 'autoencoder') || strcmpi(method, 'rfi')
+                preTransMethod = 'none';
+            end
             tic;
-            transTrain = cellfun(@(x) x.Transform(true, method, q, varargin{:}), {trainData.Values}, 'un', 0);
+            transTrain = cellfun(@(x,y, z) x.Transform(true, preTransMethod, q, y, z, varargin{:}), {trainData.Values}, {trainData.ImageLabels}, {trainData.Masks}, 'un', 0);
             tdimred = toc;
             tdimred = tdimred / numel(transTrain);
-            transTest = cellfun(@(x) x.Transform(true, method, q, varargin{:}), {testData.Values}, 'un', 0);
+            transTest = cellfun(@(x,y,z) x.Transform(true, preTransMethod, q, y, z, varargin{:}), {testData.Values}, {testData.ImageLabels}, {testData.Masks}, 'un', 0);
 
             Xtrainscores = trainUtility.Cell2Mat(transTrain);
-            transyTrain = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {trainData.Labels}, {trainData.Values}, 'un', 0);
+            transyTrain = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {trainData.ImageLabels}, {trainData.Masks}, 'un', 0);
             ytrain = trainUtility.Cell2Mat(transyTrain);
 
             Xvalidscores = trainUtility.Cell2Mat(transTest);
             Xvalid = transTest;
-            transyValid = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData.Labels}, {testData.Values}, 'un', 0);
+            transyValid = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {testData.ImageLabels}, {testData.Masks}, 'un', 0);
             yvalid = trainUtility.Cell2Mat(transyValid);
 
             switch lower(method)
@@ -609,15 +614,49 @@ classdef trainUtility
                     [predlabels, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores);
 
                 case 'autoencoder'
+%                     parallel.gpu.enableCUDAForwardCompatibility(true)
+% % Warning: The CUDA driver must recompile the GPU libraries because your device is more
+% % recent than the libraries. Recompiling can take several minutes. Learn more. 
+%                     gpuDevice(1);
                     tic;
-                    autoenc = trainAutoencoder(Xtrainscores', q, 'MaxEpochs', 400, ...
-                        'UseGPU', true);
+                    autoenc = trainAutoencoder(Xtrainscores', q, 'MaxEpochs', 200);
+%                         'UseGPU', true );
                     tdimred = toc;
-                    Xtrainscores = Dimred(Xtrainscores, 'autoencoder', q, autoenc);
-                    Xvalidscores = Dimred(Xvalidscores, 'autoencoder', q, autoenc);
-                    Xvalid = cellfun(@(x) Dimred(x, 'autoencoder', q, autoenc), Xvalid, 'un', 0);
+                    [~, Xtrainscores, ~, ~, ~] = Dimred(Xtrainscores, 'autoencoder', q, [], autoenc);
+                    [~, Xvalidscores, ~, ~, ~] = Dimred(Xvalidscores, 'autoencoder', q, [], autoenc);
+                    Xvalid = cellfun(@(x) trainUtility.ApplyAutoencoder(x,'autoencoder', q, autoenc), Xvalid, 'un', 0);
                     [predlabels, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores);
 
+                case 'rfi'
+%                     tic; 
+%                     wavelengths = hsiUtility.GetWavelengths(311);
+%                     t = templateTree('NumVariablesToSample', 'all', ...
+%                         'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
+%                     RFMdl = fitrensemble(Xtrainscores, double(ytrain), 'Method', 'Bag', 'NumLearningCycles', 200, ...
+%                          'NumBins', 50, 'Learners', t, 'NPrint', 50);
+%                     yHat = oobPredict(RFMdl);
+%                     R2 = corr(RFMdl.Y, yHat)^2;
+%                     fprintf('Mdl explains %0.1f of the variability around the mean.\n', R2);
+%                     impOOB = oobPermutedPredictorImportance(RFMdl);
+%                     tdimred = toc;
+%                     fprintf('Dimension Reduction Runtime %.5f \n\n', tdimred);
+% 
+%                     figure(1);
+%                     bar(wavelengths, impOOB);
+%                     title('Unbiased Predictor Importance Estimates');
+%                     xlabel('Predictor variable');
+%                     ylabel('Importance');
+%                     plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat('rfimportance', num2str(now()))), '');
+%                     plots.SavePlot(1, plotPath);
+                    plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'rfi'), 'mat');
+                    load(plotPath, 'impOOB');
+                    tdimred = 19722.50930;
+
+                    [~, Xtrainscores, ~, ~, ~] = Dimred(Xtrainscores, 'rfi', q, [], impOOB);
+                    [~, Xvalidscores, ~, ~, ~] = Dimred(Xvalidscores, 'rfi', q, [], impOOB);
+                    Xvalid = cellfun(@(x) trainUtility.ApplyAutoencoder(x, 'rfi', q, impOOB), Xvalid, 'un', 0);
+                    [predlabels, st, Mdl] = trainUtility.RunSVM(Xtrainscores, ytrain, Xvalidscores);
+                    
                 case 'msuperpca'
                     [predlabels, st, Mdl, Xtrainscores, Xvalidscores] = trainUtility.StackMultiscale(@trainUtility.SVM, varargin{1}, varargin{2}, 'voting', Xtrainscores, ytrain, Xvalidscores);
 
@@ -627,6 +666,10 @@ classdef trainUtility
 
             [accuracy, sensitivity, specificity] = commonUtility.Evaluations(yvalid, predlabels);
             jac = commonUtility.Jaccard(yvalid, predlabels);
+        end
+        
+        function [funScores] = ApplyAutoencoder(inScores, method, qNum, trainedObj )
+            [~, funScores, ~, ~, ~] = Dimred(inScores, method, qNum, [], trainedObj);
         end
 
         % ======================================================================
@@ -817,8 +860,8 @@ classdef trainUtility
                 trueMask = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
                 jacsim = commonUtility.Jaccard(predMask, trueMask);
 
-                imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), ...
-                    strcat('pred_', num2str(i), '_', method, '_', num2str(q))), 'png');
+                imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  num2str(i), ...
+                    strcat('pred_', method, '_', num2str(q))), 'png');
                 figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
                 plots.Overlay(4, imgFilePath, sRGBs{i}, predMask, figTitle);
             end

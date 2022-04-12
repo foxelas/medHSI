@@ -50,6 +50,8 @@ function [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testT
 
 [hsiList, labelInfoList] = hsiUtility.LoadDataset(dataset);
 [~, targetNames] = commonUtility.DatasetInfo(false);
+% TO REMOVE 
+targetNames = targetNames(1:end-1);
 
 testIds = cellfun(@(x) find(contains(targetNames, x)), testTargets, 'un', 0);
 testIds = cell2mat(testIds);
@@ -77,6 +79,6 @@ else
 end
 
 filename = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'cvpInfo'));
-save(filename);
+save(filename, '-v7.3');
 
 end
