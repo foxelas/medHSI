@@ -54,8 +54,8 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
         elif 'cnn2d' in framework:
             model = segscratch.get_cnn2d_model(height=HEIGHT, width=WIDTH)
 
-        elif 'simple' in framework: 
-            model =  segscratch.get_simple_model(height=HEIGHT, width=WIDTH)
+        elif 'cnn3d_unbalanced_3' in framework: 
+            model =  segscratch.get_cnn3d_unbalanced_model_3(height=HEIGHT, width=WIDTH)
 
         #adam = Adam(lr=0.001, decay=1e-06)
         model.compile(
@@ -70,7 +70,7 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
         x=xtrain,
         y=ytrain,
         batch_size=12,
-        epochs=20,
+        epochs=200,
         validation_data=(xtest, ytest),
         )
 
@@ -81,10 +81,10 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
 # From scratch: 'cnn3d_unbalanced', 'cnn3d_balanced', 'cnn2d'
 
 #flist = [ 'sm_vgg', 'sm_resnet', 'sm_resnet_pretrained', 
-# 'sm_inception','cnn3d_balanced', 'cnn3d_unbalanced_2',
+# 'sm_inception','cnn3d_balanced', 'cnn3d_unbalanced_2', 'cnn3d_unbalanced_3',
 #'cnn3d_unbalanced', 'sm_efficientnetb7', 'sm_xception']
 backend.clear_session()
-flist = ['cnn3d_unbalanced']
+flist = ['sm_efficientnetb7', 'sm_resnet', 'sm_resnet_pretrained', 'sm_vgg', 'sm_inception']
 for framework in flist: 
     model, history = get_framework(framework, x_train, x_test, y_train, y_test)
 
