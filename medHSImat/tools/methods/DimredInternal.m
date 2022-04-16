@@ -100,7 +100,7 @@ if nargin < 5
     labelMask = [];
 end 
 hasFgMask = ~isempty(fgMask);
-flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster')); 
+flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'autoencoder') || contains(lower(method), 'rfi')); 
 
 if flattenIn
     if hasFgMask 
@@ -231,7 +231,7 @@ switch lower(method)
         impOOB = varargin{1};
         [~, idxOrder] = sort(impOOB, 'descend');
         ido = idxOrder(1:q);
-        scores = Xcol(:, ido);
+        scores = X(:, ido);
 
         %% Autoencoder (AE)
     case 'autoencoder'
@@ -239,7 +239,7 @@ switch lower(method)
             error('Missing autoenc object.Please train it beforehand and pass it as an argument');
         end
         autoenc = varargin{1};
-        scores = encode(autoenc, Xcol')';
+        scores = encode(autoenc, X')';
         
         %% ClusterPCA 
     case 'clusterpca'   

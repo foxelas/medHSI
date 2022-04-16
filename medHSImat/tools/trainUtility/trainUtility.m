@@ -626,9 +626,9 @@ classdef trainUtility
                     autoenc = trainAutoencoder(XTrainscores', q, 'MaxEpochs', 200);
 %                         'UseGPU', true );
                     drTrainTime = toc;
-                    [~, XTrainscores, ~, ~, ~] = Dimred(XTrainscores, 'autoencoder', q, [], autoenc);
-                    [~, XValidscores, ~, ~, ~] = Dimred(XValidscores, 'autoencoder', q, [], autoenc);
-                    XValid = cellfun(@(x) trainUtility.ApplyAutoencoder(x,'autoencoder', q, autoenc), XValid, 'un', 0);
+                    [~, XTrainscores, ~, ~, ~] = DimredInternal(XTrainscores, 'autoencoder', q, [], [], autoenc);
+                    [~, XValidscores, ~, ~, ~] = DimredInternal(XValidscores, 'autoencoder', q, [], [], autoenc);
+                    XValid = cellfun(@(x) trainUtility.ApplyPretrainedDimred(x,'autoencoder', q, autoenc), XValid, 'un', 0);
                     [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
 
                 case 'rfi'
@@ -656,9 +656,9 @@ classdef trainUtility
 %                     load(plotPath, 'impOOB');
 %                     tdimred = 19722.50930;
 
-                    [~, XTrainscores, ~, ~, ~] = Dimred(XTrainscores, 'rfi', q, [], impOOB);
-                    [~, XValidscores, ~, ~, ~] = Dimred(XValidscores, 'rfi', q, [], impOOB);
-                    XValid = cellfun(@(x) trainUtility.ApplyAutoencoder(x, 'rfi', q, impOOB), XValid, 'un', 0);
+                    [~, XTrainscores, ~, ~, ~] = DimredInternal(XTrainscores, 'rfi', q, [], [], impOOB);
+                    [~, XValidscores, ~, ~, ~] = DimredInternal(XValidscores, 'rfi', q, [], [], impOOB);
+                    XValid = cellfun(@(x) trainUtility.ApplyPretrainedDimred(x, 'rfi', q, impOOB), XValid, 'un', 0);
                     [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
                     
                 case 'stacked'
@@ -671,8 +671,8 @@ classdef trainUtility
             [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(yValid, predLabels, yTrain, trainedModel, stackedModels, drTrainTime, modelTrainTime);
         end
         
-        function [funScores] = ApplyAutoencoder(inScores, method, qNum, trainedObj )
-            [~, funScores, ~, ~, ~] = Dimred(inScores, method, qNum, [], trainedObj);
+        function [funScores] = ApplyPretrainedDimred(inScores, method, qNum, trainedObj )
+            [~, funScores, ~, ~, ~] = DimredInternal(inScores, method, qNum, [], [], trainedObj);
         end
         
         function [adjustedVector]= MakeUniquePoints(inVector)

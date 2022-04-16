@@ -115,7 +115,7 @@ for q = qs
     fprintf('MClusterPCA: %d \n\n', q);
     j = j + 1;
     methodName{j} = strcat('MClusterPCA-', num2str(q));
-    [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MClusterPCA', q, pixelNumArray);
+%     [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MClusterPCA', q, pixelNumArray);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 

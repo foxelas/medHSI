@@ -131,8 +131,7 @@ def plot_history(history, folder = None):
     plt.show()
 
 
-
-def visualize(hsi, gt, pred, folder = None, iou = None):
+def visualize(hsi, gt, pred, folder = None, iou = None, suffix = None):
     plt.subplot(1,3,1)
     plt.title("Original")
     plt.imshow(hsi_utils.get_display_image(hsi))
@@ -146,10 +145,44 @@ def visualize(hsi, gt, pred, folder = None, iou = None):
     plt.title(figTitle)
     plt.imshow(pred)
 
-    filename = get_model_filename('visualization', 'png', folder)
+    filename = get_model_filename('visualization'+suffix, 'png', folder)
     plt.savefig(filename)
 
     plt.show()
+
+def plot_roc(fpr, tpr, auc_val, model_name, folder):
+
+    plt.figure(2)
+    plt.clf()
+    plt.plot([0, 1], [0, 1], 'k--')
+    for (fpr_, tpr_, auc_val_, model_name_) in zip(fpr, tpr, auc_val, model_name):
+        plt.plot(fpr_, tpr_, label=model_name_ +' (area = {:.3f})'.format(auc_val_))
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('ROC curve')
+    plt.legend(loc='best')
+    filename = get_model_filename('auc', 'png', folder)
+    plt.savefig(filename)
+    plt.show()
+
+    # Zoom in view of the upper left corner.
+    plt.figure(3)
+    plt.clf()
+    plt.xlim(0, 0.2)
+    plt.ylim(0.8, 1)
+    plt.plot([0, 1], [0, 1], 'k--')
+    for (fpr_, tpr_, auc_val_, model_name_) in zip(fpr, tpr, auc_val, model_name):
+        plt.plot(fpr_, tpr_, label=model_name_ +' (area = {:.3f})'.format(auc_val_))
+    # plt.plot(fpr_rf, tpr_rf, label='RF (area = {:.3f})'.format(auc_rf))
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('ROC curve (zoomed in at top left)')
+    plt.legend(loc='best')
+
+    filename = get_model_filename('auc-zoom', 'png', folder)
+    plt.savefig(filename)
+    plt.show()
+
 
 #### Init 
 show_label_montage()

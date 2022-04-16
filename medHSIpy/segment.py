@@ -9,53 +9,37 @@ import tools.hsi_segment_from_sm as segsm
 import tools.hsi_segment_from_scratch as segscratch
 from keras import backend 
 
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+import numpy as np
+
 WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
+NUMBER_OF_EPOCHS = 200 # 200
 
-x_train, x_test, y_train, y_test = hio.get_train_test()
+X_train, X_test, y_train, y_test = hio.get_train_test()
 
 def get_framework(framework, xtrain, xtest, ytrain, ytest):
     if 'sm' in framework:
-        if 'vgg' in framework:
-            model, x_train_preproc, x_test_preproc = segsm.get_vgg(xtrain, xtest)
-        elif 'inception' in framework:
-            model, x_train_preproc, x_test_preproc = segsm.get_inception(xtrain, xtest)
-        elif 'resnet' in framework:
-            model, x_train_preproc, x_test_preproc = segsm.get_resnet(xtrain, xtest)
-        elif 'resnet-pretrained' in framework:
-            model, x_train_preproc, x_test_preproc = segsm.get_resnet_pretrained(xtrain, xtest)
-        elif 'efficientnet' in framework:
-            model, x_train_preproc, x_test_preproc = segsm.get_efficientnet_pretrained(xtrain, xtest)
-        elif 'xception' in framework: 
-            model, x_train_preproc, x_test_preproc = segsm.get_xception_model(xtrain, xtest,height=HEIGHT, width=WIDTH)
-
-        # fit model
-        history = model.fit(
-        x=x_train_preproc,
-        y=ytrain,
-        batch_size=64,
-        epochs=200,
-        validation_data=(x_test_preproc, ytest),
-        )
+        model, history = segsm.fit_sm_model(framework, xtrain, ytrain, xtest, ytest, 
+            height=HEIGHT, width=WIDTH, numChannels=NUMBER_OF_CHANNELS, 
+            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
 
     else:
         backend.clear_session()
-        if 'cnn3d_unbalanced' in framework:
-            model = segscratch.get_cnn3d_unbalanced_model(height=HEIGHT, width=WIDTH)
+        if 'xception3d_max' in framework:
+            model = segscratch.get_xception3d_max(height=HEIGHT, width=WIDTH)
 
-        elif 'cnn3d_unbalanced_2' in framework: 
-            model = segscratch.get_cnn3d_unbalanced_model_2(height=HEIGHT, width=WIDTH)
+        elif 'xception3d_mean' in framework: 
+            model = segscratch.get_xception3d_mean(height=HEIGHT, width=WIDTH)
 
-        elif 'cnn3d_balanced' in framework:
-            model = segscratch.get_cnn3d_balanced_model(height=HEIGHT, width=WIDTH)
+        elif 'xception3d2_max' in framework:
+            model = segscratch.get_xception3d2_max(height=HEIGHT, width=WIDTH)
 
-        elif 'cnn2d' in framework:
-            model = segscratch.get_cnn2d_model(height=HEIGHT, width=WIDTH)
-
-        elif 'cnn3d_unbalanced_3' in framework: 
-            model =  segscratch.get_cnn3d_unbalanced_model_3(height=HEIGHT, width=WIDTH)
+        elif 'xception3d2_mean' in framework:
+            model = segscratch.get_xception3d2_mean(height=HEIGHT, width=WIDTH)
 
         #adam = Adam(lr=0.001, decay=1e-06)
         model.compile(
@@ -70,23 +54,43 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
         x=xtrain,
         y=ytrain,
         batch_size=12,
-        epochs=200,
+        epochs=NUMBER_OF_EPOCHS,
         validation_data=(xtest, ytest),
         )
 
     return model, history
 
+def calc_plot_roc(model, X_test, y_test, model_name, folder):
+    y_scores = model.predict(X_test).ravel()
+    y_test = np.reshape(y_test.astype(int), (y_scores.shape[0],  1))
+
+    fpr, tpr, thresholds_keras = roc_curve(y_test, y_scores)
+    auc_val = auc(fpr, tpr)
+
+    hio.plot_roc([fpr], [tpr], [auc_val], [model_name], folder)
+
+    return fpr, tpr, auc_val
+
 # Current frameworks:
-# From segmentation_models: 'sm_vgg', 'sm_inception', 'sm_resnet'
+# From segmentation_models: 'sm_vgg', 'sm_inception', 'sm_resnet', 'sm_efficientnet', 'sm_inceptionresnet'
 # From scratch: 'cnn3d_unbalanced', 'cnn3d_balanced', 'cnn2d'
 
-#flist = [ 'sm_vgg', 'sm_resnet', 'sm_resnet_pretrained', 
-# 'sm_inception','cnn3d_balanced', 'cnn3d_unbalanced_2', 'cnn3d_unbalanced_3',
-#'cnn3d_unbalanced', 'sm_efficientnetb7', 'sm_xception']
 backend.clear_session()
-flist = ['sm_efficientnetb7', 'sm_resnet', 'sm_resnet_pretrained', 'sm_vgg', 'sm_inception']
+flist = ['sm_vgg', 'sm_vgg_pretrained', 
+    'sm_resnet', 'sm_resnet_pretrained',
+    'sm_inception', 'sm_inception_pretrained', 
+    'sm_efficientnet', 'sm_efficientnet_pretrained', 
+    'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained', 
+    # 'xception3d_max', 'xception3d_mean', 
+    # 'xception3d2_max', 'xception3d2_mean'
+ ]
+
+fpr = [] 
+tpr = [] 
+auc_val = [] 
+
 for framework in flist: 
-    model, history = get_framework(framework, x_train, x_test, y_train, y_test)
+    model, history = get_framework(framework, X_train, X_test, y_train, y_test)
 
     folder = str(date.today()) + '_' + framework 
     hio.save_model_info(model, folder)
@@ -94,14 +98,19 @@ for framework in flist:
     hio.plot_history(history, folder)
 
     #prepare again in order to avoid pre-processing errors 
-    x_train, x_test, y_train, y_test = hio.get_train_test()
+    X_train, X_test, y_train, y_test = hio.get_train_test()
 
-    preds = model.predict(x_test)
-    for (hsi, gt, pred) in zip(x_test, y_test, preds):
+    [fpr_, tpr_, auc_val_] = calc_plot_roc(model, X_test, y_test, framework, folder)
+    fpr.append(fpr_)
+    tpr.append(tpr_)
+    auc_val.append(auc_val_)
+
+    preds = model.predict(X_test)
+    k = 0
+    for (hsi, gt, pred) in zip(X_test, y_test, preds):
         iou = sm.metrics.iou_score(gt, pred)
-        # m = metrics.MeanIoU(num_classes=NUMBER_OF_CLASSES)
-        # m.update_state(pred, gt)
-        # iou2 = m.result().numpy()
-        # print("By sm ", str(iou), " and by keras ", str(iou2))
-        hio.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2))
-        
+        k += 1 
+        hio.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2), str(k))
+
+# ROC AUC comparison 
+hio.plot_roc(fpr, tpr, auc_val, flist, None)
