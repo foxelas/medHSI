@@ -521,7 +521,7 @@ classdef hsi
         %> @brief Dimred reduces the dimensions of the hyperspectral image.
         %>
         %> Currently available methods:
-        %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+        %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
         %> ICA (FastICA), RICA, SuperRICA, 
         %> LDA, QDA, Wavelength-Selection.
         %> Methods autoencoder and RFI are available only for pre-trained models. 
@@ -561,7 +561,7 @@ classdef hsi
         % Dimred reduces the dimensions of the hyperspectral image.
         %
         % Currently available methods:
-        % PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+        % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
         % ICA (FastICA), RICA, SuperRICA, 
         % LDA, QDA, Wavelength-Selection.
         % Methods autoencoder and RFI are available only for pre-trained models. 
@@ -652,7 +652,7 @@ classdef hsi
         % @param varargin [cell array] | Optional additional arguments for methods that require them
         %
         % @retval scores [numeric array] | The transformed value
-              [~, scores, ~, ~, ~] = obj.Dimred(method, q, obj.FgMask, varargin{:});
+              [~, scores, ~, ~, ~] = obj.Dimred(method, q, varargin{:});
             
             if isempty(flattenFlag)
                 flattenFlag = true;

@@ -2,7 +2,7 @@
 %> @brief DimredInternal reduces the dimensions of the hyperspectral image.
 %>
 %> Currently available methods:
-%> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+%> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA 
 %> ICA (FastICA), RICA, SuperRICA, 
 %> LDA, QDA, Wavelength-Selection.
 %> Methods autoencoder and RFI are available only for pre-trained models. 
@@ -44,7 +44,7 @@ function [coeff, scores, latent, explained, objective, Mdl] = DimredInternal(X, 
 % DimredInternal reduces the dimensions of the hyperspectral image.
 %
 % Currently available methods:
-% PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
+% PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
 % ICA (FastICA), RICA, SuperRICA, 
 % LDA, QDA, Wavelength-Selection.
 % Methods autoencoder and RFI are available only for pre-trained models. 
@@ -100,7 +100,7 @@ if nargin < 5
     labelMask = [];
 end 
 hasFgMask = ~isempty(fgMask);
-flattenIn = ~contains(lower(method), 'super'); 
+flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster')); 
 
 if flattenIn
     if hasFgMask 
@@ -127,25 +127,41 @@ switch lower(method)
         
         %% RICA
     case 'rica'
+        warning('off', 'all');
         Mdl = rica(Xcol, q, 'IterationLimit', 100, 'Lambda', 1);
         coeff = Mdl.TransformWeights;
         scores = Xcol * coeff;
         objective = Mdl.FitInfo.Objective;
+        warning('on', 'all');
 
         %% Discriminant Analysis (LDA)
     case 'lda'
-        if isempty(mask)
+        if isempty(labelMask)
             error('A supervised method requires labels as argument');
         end
-        Mdl = fitcdiscr(Xcol, labelMask);
+        if flattenIn
+            if hasFgMask
+                labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
+            else
+                labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
+            end
+        end
+        Mdl = fitcdiscr(Xcol, labelMaskCol);
         scores = predict(Mdl, Xcol);
         
         %% Discriminant Analysis (QDA)
     case 'qda'
-        if isempty(mask)
+        if isempty(labelMask)
             error('A supervised method requires labels as argument');
         end
-        Mdl = fitcdiscr(Xcol, labelMask, 'DiscrimType', 'quadratic');
+        if flattenIn
+            if hasFgMask
+                labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
+            else
+                labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
+            end
+        end
+        Mdl = fitcdiscr(Xcol, labelMaskCol, 'DiscrimType', 'quadratic');
         scores = predict(Mdl, Xcol);
 
         %% Wavelength Selection
@@ -190,15 +206,15 @@ switch lower(method)
     case 'msuperpca'
 
         if isempty(varargin)
-            pixelNumArray = floor(20*sqrt(2).^[-2:2]);
+            endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
         else
-            pixelNumArray = varargin{1};
+            endmemberNumArray = varargin{1};
         end
 
-        N = numel(pixelNumArray);
+        N = numel(endmemberNumArray);
         scores = cell(N, 1);
         for i = 1:N
-            pixelNum = pixelNumArray(i);
+            pixelNum = endmemberNumArray(i);
 
             %%super-pixels segmentation
             superpixelLabels = cubseg(X, pixelNum);
@@ -226,7 +242,7 @@ switch lower(method)
         scores = encode(autoenc, Xcol')';
         
         %% ClusterPCA 
-    case 'clustersuperpca'   
+    case 'clusterpca'   
         %%Find endmembers
         numEndmembers = 6;
         endmembers = NfindrInternal(X, numEndmembers, fgMask);
@@ -236,9 +252,33 @@ switch lower(method)
         
         scores = SuperPCA(X, q, clusterLabels);
 
-        %% No dimension reduction 
+    %% Multiscale ClusterPCA
+    case 'mclusterpca'
+
+        if isempty(varargin)
+            endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
+        else
+            endmemberNumArray = varargin{1};
+        end
+
+        N = numel(endmemberNumArray);
+        scores = cell(N, 1);
+        for i = 1:N
+            numEndmembers = endmemberNumArray(i);
+
+            %%Find endmembers
+            endmembers = NfindrInternal(X, numEndmembers, fgMask);
+
+            %%Find discrepancy metrics
+            clusterLabels = DistanceScoresInternal(X, endmembers, @sam);
+
+            %%SupePCA based DR
+            scores{i} = SuperPCA(X, q, clusterLabels);
+        end
+        
+    %% No dimension reduction 
     otherwise
-        scores = X;
+        scores = Xcol;
 end
 
 if flattenIn
