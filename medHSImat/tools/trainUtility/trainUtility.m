@@ -307,8 +307,8 @@ classdef trainUtility
             ytrain = ytrain(kk, :);
             % TO REMOVE
             
-            SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'RBF', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                'KernelScale', 'auto', 'IterationLimit', iterLim, 'RemoveDuplicates', true); %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'Standardize', true
+            SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
+                'KernelScale', 'auto', 'IterationLimit', iterLim, 'Cost', [0, 1; 3, 0]); %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'Standardize', true
             numIter = SVMModel.NumIterations;
             % TO REMOVE
             if numIter == iterLim
@@ -634,7 +634,7 @@ classdef trainUtility
                 case 'rfi'
                     tic; 
                     wavelengths = hsiUtility.GetWavelengths(311);
-                    t = templateTree('NumVariablesToSample', 'all', ...
+                    t = templateTree('NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
                         'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
                     RFtrainedModel = fitrensemble(XTrainscores, double(yTrain), 'Method', 'Bag', 'NumLearningCycles', 200, ...
                          'NumBins', 50, 'Learners', t, 'NPrint', 50);

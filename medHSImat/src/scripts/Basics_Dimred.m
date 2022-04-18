@@ -1,12 +1,12 @@
 function [trainPerformance, testPerformance, methodName ] = Basics_Dimred()
-filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
-load(filePath);
-filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
-load(filePath2);
+% filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
+% load(filePath);
+% filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
+% load(filePath2);
 
-% experiment = strcat('Dimred', date(), '-linear-100000-removeduplicates');
-% Basics_Init(experiment);
-% config.SetSetting('Dataset', 'pslRaw');
+experiment = strcat('Dimred', date(), '-rbf-100000-1to3');
+Basics_Init(experiment);
+config.SetSetting('Dataset', 'pslRaw');
 
 diary log.txt
 
@@ -20,16 +20,16 @@ dataType = 'hsi';
 qs = [10, 50, 100];
 j = 0;
 
-% [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-% filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
-% save(filePath, '-v7.3');
+[trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
+filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
+save(filePath, '-v7.3');
 
 %%%%%%%%%%%%%%%%%%%%%% Baseline %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fprintf('Baseline: %d \n\n', 311);
 j = j + 1;
 methodName{j} = 'baseline';
-% [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'none', 311);
+[trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'none', 311);
 save(filePath, 'trainPerformance', 'testPerformance');
 
 %%%%%%%%%%%%%%%%%%%%%% PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -38,7 +38,7 @@ for q = qs
     fprintf('PCA: %d \n\n', q);
     j = j + 1;
     methodName{j} = strcat('pca-', num2str(q));
-%     [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'pca', q);
+    [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'pca', q);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 
@@ -48,7 +48,7 @@ for q = qs
     fprintf('RICA: %d \n\n', q);
     j = j + 1;
     methodName{j} = strcat('rica-', num2str(q));
-%     [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'rica', q);
+    [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'rica', q);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 
@@ -57,16 +57,15 @@ save(filePath, 'trainPerformance', 'testPerformance');
 fprintf('Wavelength Selection: \n\n');
 j = j + 1;
 methodName{j} = strcat('manual-', '2');
-% [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'wavelength-selection', 2);
+[trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'wavelength-selection', 2);
 save(filePath, 'trainPerformance', 'testPerformance');
 
 %%%%%%%%%%%%%%%%%%%%%% LDA/QDA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-j = j + 1;
 fprintf('LDA: \n\n');
 j = j + 1;
 methodName{j} = strcat('lda-', '1');
-% [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'lda', 1);
+[trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'lda', 1);
 save(filePath, 'trainPerformance', 'testPerformance');
 
 % fprintf('QDA: \n\n');
@@ -81,7 +80,7 @@ for q = qs
     fprintf('ClusterPCA: %d \n\n', q);
     j = j + 1;
     methodName{j} = strcat('clusterPCA-', num2str(q));
-%     [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'ClusterPCA', q);
+    [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'ClusterPCA', q);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 
@@ -91,7 +90,7 @@ for q = qs
     fprintf('SuperPCA: %d \n\n', q);
     j = j + 1;
     methodName{j} = strcat('superPCA-', num2str(q));
-%     [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'SuperPCA', q);
+    [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'SuperPCA', q);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 
@@ -103,7 +102,7 @@ for q = qs
     fprintf('MSuperPCA: %d \n\n', q);
     j = j + 1;
     methodName{j} = strcat('MSuperPCA-', num2str(q));
-%     [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MSuperPCA', q, pixelNumArray);
+    [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MSuperPCA', q, pixelNumArray);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 
@@ -115,7 +114,7 @@ for q = qs
     fprintf('MClusterPCA: %d \n\n', q);
     j = j + 1;
     methodName{j} = strcat('MClusterPCA-', num2str(q));
-%     [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MClusterPCA', q, pixelNumArray);
+    [trainPerformance(j), testPerformance(j)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MClusterPCA', q, pixelNumArray);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 

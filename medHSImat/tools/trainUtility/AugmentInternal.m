@@ -53,7 +53,7 @@ fprintf('Starting augmentation for dataset: %s ...\n', baseDataset);
 
 %% Read h5 data
 config.SetSetting('Dataset', baseDataset);
-[datanames, targetNames] = commonUtility.DatasetInfo(true);
+[datanames, targetNames] = commonUtility.DatasetInfo(false);
 
 if length(datanames) ~= length(targetNames)
     disp('Is the target dataset already augmented? You may want to check it.');

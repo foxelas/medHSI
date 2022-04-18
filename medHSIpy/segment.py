@@ -10,14 +10,13 @@ import tools.hsi_segment_from_scratch as segscratch
 from keras import backend 
 
 from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
 import numpy as np
 
 WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 200 # 200
+NUMBER_OF_EPOCHS = 20 # 200
 
 X_train, X_test, y_train, y_test = hio.get_train_test()
 
@@ -26,37 +25,10 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
         model, history = segsm.fit_sm_model(framework, xtrain, ytrain, xtest, ytest, 
             height=HEIGHT, width=WIDTH, numChannels=NUMBER_OF_CHANNELS, 
             numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
-
     else:
-        backend.clear_session()
-        if 'xception3d_max' in framework:
-            model = segscratch.get_xception3d_max(height=HEIGHT, width=WIDTH)
-
-        elif 'xception3d_mean' in framework: 
-            model = segscratch.get_xception3d_mean(height=HEIGHT, width=WIDTH)
-
-        elif 'xception3d2_max' in framework:
-            model = segscratch.get_xception3d2_max(height=HEIGHT, width=WIDTH)
-
-        elif 'xception3d2_mean' in framework:
-            model = segscratch.get_xception3d2_mean(height=HEIGHT, width=WIDTH)
-
-        #adam = Adam(lr=0.001, decay=1e-06)
-        model.compile(
-            'rmsprop', #'rmsprop', 'SGD', 'Adam',
-            #loss='categorical_crossentropy'
-            loss=sm.losses.bce_jaccard_loss,
-            metrics=[sm.metrics.iou_score]
-            )
-
-        # fit model
-        history = model.fit(
-        x=xtrain,
-        y=ytrain,
-        batch_size=12,
-        epochs=NUMBER_OF_EPOCHS,
-        validation_data=(xtest, ytest),
-        )
+        model, history = segscratch.get_model(framework, xtrain, ytrain, xtest, ytest, 
+            height=HEIGHT, width=WIDTH,  numChannels=NUMBER_OF_CHANNELS, 
+            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS, batchSize=16)
 
     return model, history
 
@@ -76,13 +48,14 @@ def calc_plot_roc(model, X_test, y_test, model_name, folder):
 # From scratch: 'cnn3d_unbalanced', 'cnn3d_balanced', 'cnn2d'
 
 backend.clear_session()
-flist = ['sm_vgg', 'sm_vgg_pretrained', 
-    'sm_resnet', 'sm_resnet_pretrained',
-    'sm_inception', 'sm_inception_pretrained', 
-    'sm_efficientnet', 'sm_efficientnet_pretrained', 
-    'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained', 
-    # 'xception3d_max', 'xception3d_mean', 
-    # 'xception3d2_max', 'xception3d2_mean'
+flist = [
+    # 'sm_vgg', 'sm_vgg_pretrained', 
+    # 'sm_resnet', 'sm_resnet_pretrained',
+    # 'sm_inception', 'sm_inception_pretrained', 
+    # 'sm_efficientnet', 'sm_efficientnet_pretrained', 
+    # 'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained', 
+    'xception3d_max', 'xception3d_mean', 
+    'xception3d2_max', 'xception3d2_mean'
  ]
 
 fpr = [] 
