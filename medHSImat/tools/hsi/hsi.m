@@ -523,7 +523,7 @@ classdef hsi
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
         %> ICA (FastICA), RICA, SuperRICA, 
-        %> LDA, QDA, Wavelength-Selection.
+        %> LDA, QDA, MSelect.
         %> Methods autoencoder and RFI are available only for pre-trained models. 
         %>
         %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
@@ -563,7 +563,7 @@ classdef hsi
         % Currently available methods:
         % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
         % ICA (FastICA), RICA, SuperRICA, 
-        % LDA, QDA, Wavelength-Selection.
+        % LDA, QDA, MSelect.
         % Methods autoencoder and RFI are available only for pre-trained models. 
         %
         % Additionally, for pre-trained parameters RFI and Autoencoder are available.
@@ -605,7 +605,7 @@ classdef hsi
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
         %> ICA (FastICA), RICA, SuperRICA, 
-        %> LDA, QDA, Wavelength-Selection.
+        %> LDA, QDA, MSelect.
         %> Methods autoencoder and RFI are available only for pre-trained models. 
         %>
         %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
@@ -632,7 +632,7 @@ classdef hsi
         % Currently available methods:
         % PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
         % ICA (FastICA), RICA, SuperRICA, 
-        % LDA, QDA, Wavelength-Selection.
+        % LDA, QDA, MSelect.
         % Methods autoencoder and RFI are available only for pre-trained models. 
         %
         % Additionally, for pre-trained parameters RFI and Autoencoder are available.

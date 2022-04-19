@@ -4,7 +4,7 @@
 %> Currently available methods:
 %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA 
 %> ICA (FastICA), RICA, SuperRICA, 
-%> LDA, QDA, Wavelength-Selection.
+%> LDA, QDA, MSelect.
 %> Methods autoencoder and RFI are available only for pre-trained models. 
 %>
 %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
@@ -46,7 +46,7 @@ function [coeff, scores, latent, explained, objective, Mdl] = DimredInternal(X, 
 % Currently available methods:
 % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
 % ICA (FastICA), RICA, SuperRICA, 
-% LDA, QDA, Wavelength-Selection.
+% LDA, QDA, MSelect.
 % Methods autoencoder and RFI are available only for pre-trained models. 
 %
 % Additionally, for pre-trained parameters RFI and Autoencoder are available.
@@ -100,7 +100,10 @@ if nargin < 5
     labelMask = [];
 end 
 hasFgMask = ~isempty(fgMask);
-flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'autoencoder') || contains(lower(method), 'rfi')); 
+flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'autoencoder') || contains(lower(method), 'rfi'));
+if ndims(X) < 3 
+    flattenIn = false;
+end 
 
 if flattenIn
     if hasFgMask 
@@ -108,6 +111,8 @@ if flattenIn
     else 
         Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
     end
+else
+    Xcol = X;
 end
 
 
@@ -165,7 +170,7 @@ switch lower(method)
         scores = predict(Mdl, Xcol);
 
         %% Wavelength Selection
-    case 'wavelength-selection'
+    case 'mselect'
         wavelengths = hsiUtility.GetWavelengths(311);
         id1 = find(wavelengths == 540);
         id2 = find(wavelengths == 650);

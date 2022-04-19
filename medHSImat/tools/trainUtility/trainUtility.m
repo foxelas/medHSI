@@ -634,14 +634,15 @@ classdef trainUtility
                 case 'rfi'
                     tic; 
                     wavelengths = hsiUtility.GetWavelengths(311);
-                    t = templateTree('NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
-                        'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
-                    RFtrainedModel = fitrensemble(XTrainscores, double(yTrain), 'Method', 'Bag', 'NumLearningCycles', 200, ...
-                         'NumBins', 50, 'Learners', t, 'NPrint', 50);
+                    t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
+                        %'NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
+                        %'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
+                    RFtrainedModel = fitrensemble(XTrainscores, double(yTrain), 'Method', 'AdaBoostM2', 'Learners', t, 'NPrint', 50,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});
                     yHat = oobPredict(RFtrainedModel);
                     R2 = corr(RFtrainedModel.Y, yHat)^2;
                     fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
-                    impOOB = oobPermutedPredictorImportance(RFtrainedModel);
+                    options = statset('UseParallel',true);
+                    impOOB = oobPermutedPredictorImportance(RFtrainedModel,'Options',options);
                     drTrainTime = toc;
                     fprintf('Dimension Reduction Runtime %.5f \n\n', drTrainTime);
 
@@ -668,7 +669,7 @@ classdef trainUtility
                     [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
             end
 
-            [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(yValid, predLabels, yTrain, trainedModel, stackedModels, drTrainTime, modelTrainTime);
+            [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(preTransMethod, q, yValid, predLabels, yTrain, trainedModel, stackedModels, drTrainTime, modelTrainTime);
         end
         
         function [funScores] = ApplyPretrainedDimred(inScores, method, qNum, trainedObj )
@@ -703,8 +704,8 @@ classdef trainUtility
             end
         end
 
-        function [perfStr, trainedModel] = ModelEvaluation(gtLabels, predLabels, trainLabels, trainedModel, stackedModels, drTrainTime, modelTrainTime)
-            perfStr = struct('Accuracy', [], 'Sensitivity', [], 'Specificity', [], 'JaccardCoeff', [], 'AUC', [], ...
+        function [perfStr, trainedModel] = ModelEvaluation(modelName, featNum, gtLabels, predLabels, trainLabels, trainedModel, stackedModels, drTrainTime, modelTrainTime)
+            perfStr = struct('Name', [], 'Features', [], 'Accuracy', [], 'Sensitivity', [], 'Specificity', [], 'JaccardCoeff', [], 'AUC', [], ...
                                 'AUCX', [], 'AUCY', [], 'DRTrainTime', [], 'ModelTrainTime', []);
             
             %% Results evaluation 
@@ -712,6 +713,8 @@ classdef trainUtility
             perfStr.JaccardCoeff = commonUtility.Jaccard(gtLabels, predLabels);
             perfStr.DRTrainTime = drTrainTime;
             perfStr.ModelTrainTime = modelTrainTime;
+            perfStr.Name = modelName;
+            perfStr.Features = featNum;
             
             % TO REMOVE
             factors = 10;
@@ -779,7 +782,8 @@ classdef trainUtility
             end
             
             [meanAucX, meanAucY] = trainUtility.GetMeanAUC({perfStr.AUCX}, {perfStr.AUCY});
-            peformanceStruct = struct('Accuracy', mean([perfStr.Accuracy]), 'Sensitivity',  mean([perfStr.Sensitivity]), 'Specificity', mean([perfStr.Specificity]),...
+            peformanceStruct = struct('Name', perfStr(1).Name, 'Features', perfStr(1).Features, ...
+                'Accuracy', mean([perfStr.Accuracy]), 'Sensitivity',  mean([perfStr.Sensitivity]), 'Specificity', mean([perfStr.Specificity]),...
                 'JaccardCoeff', mean([perfStr.JaccardCoeff]), 'AUC', mean([perfStr.AUC]),  'AUCX', meanAucX, 'AUCY', meanAucY, ...
                 'DRTrainTime', mean([perfStr.DRTrainTime]), 'ModelTrainTime', mean([perfStr.ModelTrainTime]), ...
                 'AccuracySD', std([perfStr.Accuracy]), 'SensitivitySD', std([perfStr.Sensitivity]), 'SpecificitySD',std([perfStr.Specificity]),...
