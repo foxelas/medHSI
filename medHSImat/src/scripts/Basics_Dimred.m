@@ -1,14 +1,12 @@
-function [trainPerformance, testPerformance, methodName ] = Basics_Dimred()
+function [trainPerformance, testPerformance ] = Basics_Dimred()
 % filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
 % load(filePath);
 % filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
 % load(filePath2);
 
-experiment = strcat('Dimred', date(), '-rbf-100000-1to3');
+experiment = strcat('Dimred', date(), '-rbf-100000-optimizer');
 Basics_Init(experiment);
 config.SetSetting('Dataset', 'pslRaw');
-
-diary log.txt
 
 fprintf('Running for dataset %s\n', config.GetSetting('Dataset'));
 dataset = config.GetSetting('Dataset');
@@ -30,7 +28,8 @@ save(filePath, '-v7.3');
 fprintf('Baseline: %d \n\n', 311);
 j = j + 1;
 [trainPerformance{j}{1}, testPerformance{j}{1}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'Baseline', 311);
-PrepareGraphs_Dimred(trainPerformance, testPerformance);
+save(filePath, 'trainPerformance', 'testPerformance');
+PrepareGraphs_Performance();
 
 %%%%%%%%%%%%%%%%%%%%%% PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -46,8 +45,8 @@ end
 j = j + 1;
 for k = ks
     q = qs(k);
-    fprintf('ICA: %d \n\n', q);
-    [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'ICA', q);
+    fprintf('FastICA: %d \n\n', q);
+    [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'FastICA', q);
 end
 
 %%%%%%%%%%%%%%%%%%%%%% RICA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,7 +105,7 @@ for k = ks
 end
 
 %%%%%%%%%%%%%%%%%%%%% Multiscale Cluster PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pixelNumArray = [2, 5, 8, 10];
+pixelNumArray = [2, 5, 6, 8, 10];
 
 j = j + 1;
 for k = ks
@@ -117,7 +116,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%% Autosave %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 save(filePath, 'trainPerformance', 'testPerformance');
-PrepareGraphs_Dimred(trainPerformance, testPerformance);
+PrepareGraphs_Performance();
 
 %%%%%%%%%%%%%%%%%%%%% Autoencoder %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 j = j + 1;
@@ -127,7 +126,7 @@ for k = ks
     [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'Autoencoder', q);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
-PrepareGraphs_Dimred(trainPerformance, testPerformance);
+PrepareGraphs_Performance();
 
 %%%%%%%%%%%%%%%%%%%%% Random Forest Importance %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf('RFI: \n\n');
@@ -139,7 +138,7 @@ for k = ks
     [trainPerformance{j}{k}, testPerformance{j}{k}] =trainUtility.ValidateTest2(trainData, testData, cvp, 'RFI', q);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
-PrepareGraphs_Dimred(trainPerformance, testPerformance);
+PrepareGraphs_Performance();
 
 % %%%%%%%%%%%%%%%%%%%%% SFS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -169,7 +168,6 @@ PrepareGraphs_Dimred(trainPerformance, testPerformance);
 %     [accuracy, sensitivity, specificity] = RunKfoldValidation(scoresrf, y, cvp, 'rfi', q);
 % end
 
-diary off
 end
 
 %%%%%%%%%%%%%%%%%%%%% Assisting Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,131 +178,4 @@ predlabels = predict(SVMModel, scores);
 [acc, ~, ~] = metrics.Evaluations(labels, predlabels);
 end
 
-function [] = PrepareGraphs_Dimred(trainPerformance, testPerformance)
-    MakeFeatGraphs(trainPerformance, testPerformance);
-    MakeBestGraphs(trainPerformance, testPerformance);
-end
 
-function [] = MakeFeatGraphs(trainPerformance, testPerformance)
-
-targetMetrics = {'Sensitivity', 'JaccardCoeff'};
-targets = {trainPerformance, testPerformance};
-for ii = 1:length(targetMetrics)
-    targetMetric = targetMetrics{ii};
-    for i = 1:length(targets)
-    target = targets{i};
-        for j = 1:length(target)
-            vals = target{j};
-            xx = zeros(length(vals), 1);
-            yy = zeros(length(vals), 1);
-            for k = 1:length(vals)
-                xx(k) = vals{k}.Features;
-                yy(k) = vals{k}.(targetMetric);
-            end
-            xVals{j} = xx;
-            yVals{j} = yy;
-            dispName{j} = vals{1}.Name;
-        end
-
-        close all;
-        fig = figure(1);
-        hold on 
-        for j = 1:length(target)
-            xx = xVals{j};
-            yy = yVals{j};
-            h(j) = plot(xx, yy * 100, '-o', 'DisplayName', dispName{j}, ...
-                'LineWidth',2, 'MarkerSize',10);
-        end 
-        hold off 
-        xlabel('Number of Dimensions', 'FontSize', 15);
-        xlab = strjoin({targetMetric, ' (%)'}, {' '});
-        ylabel(xlab, 'FontSize', 15);
-        if i == 1
-            title('Train Performance', 'FontSize', 15);
-            suffix = 'train';
-        else
-            title('Test Performance', 'FontSize', 15);
-            suffix = 'test'; 
-        end
-        
-        xticks([0:20:320]);
-        yticks([0:20:100]);
-        xlim([0, 315]);
-        ylim([0, 100]);
-        legend(h, 'Location', 'eastoutside', 'FontSize', 15);
-        ax = gca;
-        cutout(ax, 100, 300, 10);
-        hold on;
-        xline(105, '--');
-        hold off;
-        fig.WindowState = 'maximized';
-
-
-        plotPath = commonUtility.GetFilename('output', ...
-            fullfile(config.GetSetting('SaveFolder'),...
-            strcat(targetMetric, '_', suffix) ), 'png');
-        plots.SavePlot(fig, plotPath);
-    end 
-end
-        
-end 
-
-function [] = MakeBestGraphs(trainPerformance, testPerformance)
-
-targetMetrics = {'Sensitivity', 'JaccardCoeff'};
-targets = {trainPerformance, testPerformance};
-for ii = 1:length(targetMetrics)
-    targetMetric = targetMetrics{ii};
-    for i = 1:length(targets)
-    target = targets{i};
-    targetMetric
-    i
-        for j = 1:length(target)
-            vals = target{j};
-            yy = zeros(length(vals), 1);
-            for k = 1:length(vals)
-                yy(k) = vals{k}.(targetMetric);
-            end
-            [~, idx] = max(yy);
-            
-            xVals{j} = vals{idx}.AUCX;
-            yVals{j} = vals{idx}.AUCY;
-            dispName{j} = strjoin({vals{idx}.Name, ... %{strcat(vals{idx}.Name, '-', num2str(vals{idx}.Features)), ...
-                strcat('(AUC:', fprintf('%.3f', vals{idx}.AUC) ,')')}, {' '});
-            fprintf('%s\n', strcat(vals{idx}.Name, '-', num2str(vals{idx}.Features)));
-        end
-
-        close all;
-        fig = figure(1);
-        hold on 
-        for j = 1:length(target)
-            xx = xVals{j};
-            yy = yVals{j};
-            h(j) = plot(xx, yy, 'DisplayName', dispName{j}, ...
-                'LineWidth',2);
-        end 
-        hold off 
-        xlabel('False Positive Rate', 'FontSize', 15);
-        ylabel('True Positive Rate', 'FontSize', 15);
-        if i == 1
-            title('Train Performance', 'FontSize', 15);
-            suffix = 'train';
-        else
-            title('Test Performance', 'FontSize', 15);
-            suffix = 'test'; 
-        end
-        
-        xlim([0, 1]);
-        ylim([0, 1]);
-        legend(h, 'Location', 'eastoutside', 'FontSize', 15);
-        fig.WindowState = 'maximized';
-
-
-        plotPath = commonUtility.GetFilename('output', ...
-            fullfile(config.GetSetting('SaveFolder'),...
-            strcat('auc_', targetMetric, '_', suffix) ), 'png');
-        plots.SavePlot(fig, plotPath);
-    end 
-end
-        
-end 

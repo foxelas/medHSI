@@ -125,7 +125,8 @@ switch lower(method)
         [coeff, scores, latent, ~, explained] = pca(Xcol, 'NumComponents', q);
 
         %% FastICA
-    case 'ica'
+    case 'ica'       
+    case 'fastica'
         [scores, ~, coeff] = fastica(Xcol', 'numOfIC', q);
         scores = scores';
         coeff = coeff';

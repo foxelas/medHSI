@@ -307,8 +307,24 @@ classdef trainUtility
             ytrain = ytrain(kk, :);
             % TO REMOVE
             
-            SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                'KernelScale', 'auto', 'IterationLimit', iterLim, 'Cost', [0, 1; 3, 0]); %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'Standardize', true
+            stack = dbstack();
+            hasOptimization = true; 
+            for k=1:numel(stack)
+                if contains(stack(k).name, 'RunKfoldValidation')
+                    hasOptimization = false;
+                end
+            end
+
+            if hasOptimization 
+                SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, 'OptimizeHyperparameters',{'BoxConstraint','KernelScale', 'KernelFunction', 'Standardize'}, ...
+                    'HyperparameterOptimizationOptions',struct('AcquisitionFunctionName', 'expected-improvement-plus', 'MaxObjectiveEvaluations', 10)); 
+                    %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'Standardize', true
+            else 
+                SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
+                    'KernelScale', 'auto', 'IterationLimit', iterLim, 'OutlierFraction', 0.1); 
+                    %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'Standardize', true
+            end 
+
             numIter = SVMModel.NumIterations;
             % TO REMOVE
             if numIter == iterLim
@@ -574,7 +590,12 @@ classdef trainUtility
             preTransMethod = method;
             if strcmpi(method, 'autoencoder') || strcmpi(method, 'rfi')
                 preTransMethod = 'none';
-            end 
+            end
+            targetMethod = method;
+            if strcmpi(method, 'msuperpca') || strcmpi(method, 'mclusterpca')
+                targetMethod = 'stacked';
+            end
+            
             stackedModels = [];
             trainedModel = [];
                     
@@ -583,10 +604,6 @@ classdef trainUtility
             drTrainTime = toc;
             drTrainTime = drTrainTime / numel(transTrain);
             transTest = cellfun(@(x,y) x.Transform(true, preTransMethod, q, y, varargin{:}), {testData.Values}, {testData.ImageLabels}, 'un', 0);
-
-            if strcmpi(method, 'msuperpca') || strcmpi(method, 'mclusterpca')
-                method = 'stacked';
-            end
             
             %% Convert cell image data to concatenated array data
             XTrainscores = trainUtility.Cell2Mat(transTrain);
@@ -598,7 +615,7 @@ classdef trainUtility
             transyValid = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {testData.ImageLabels}, {testData.Masks}, 'un', 0);
             yValid = trainUtility.Cell2Mat(transyValid);
 
-            switch lower(method)
+            switch lower(targetMethod)
                 case 'pca-all'
                     tic;
                     [coeff, XTrainscores, ~, ~, ~] = Dimred(XTrainscores, 'pca', q);
@@ -634,28 +651,35 @@ classdef trainUtility
                 case 'rfi'
                     tic; 
                     wavelengths = hsiUtility.GetWavelengths(311);
-                    t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
-                        %'NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
-                        %'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
-                    RFtrainedModel = fitrensemble(XTrainscores, double(yTrain), 'Method', 'AdaBoostM2', 'Learners', t, 'NPrint', 50,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});
-                    yHat = oobPredict(RFtrainedModel);
-                    R2 = corr(RFtrainedModel.Y, yHat)^2;
-                    fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
-                    options = statset('UseParallel',true);
-                    impOOB = oobPermutedPredictorImportance(RFtrainedModel,'Options',options);
-                    drTrainTime = toc;
-                    fprintf('Dimension Reduction Runtime %.5f \n\n', drTrainTime);
+                    rfiFile = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'rfi'), 'mat');
+                    if ~exist(rfiFile)                  
+                        t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
+                            %'NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
+                            %'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
+                        RFtrainedModel = fitrensemble(XTrainscores, double(yTrain), 'Method', 'Bag', 'Learners', t, 'NPrint', 50);
+                        %,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});
+                        yHat = oobPredict(RFtrainedModel);
+                        R2 = corr(RFtrainedModel.Y, yHat)^2;
+                        fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
+                        options = statset('UseParallel',true);
+                        impOOB = oobPermutedPredictorImportance(RFtrainedModel,'Options',options);
+                        drTrainTime = toc;
+                        fprintf('Dimension Reduction Runtime %.5f \n\n', drTrainTime);
 
-                    figure(1);
-                    bar(wavelengths, impOOB);
-                    title('Unbiased Predictor Importance Estimates');
-                    xlabel('Predictor variable');
-                    ylabel('Importance');
-                    plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat('rfimportance', num2str(now()))), '');
-                    plots.SavePlot(1, plotPath);
-%                     plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'rfi'), 'mat');
-%                     load(plotPath, 'impOOB');
-%                     tdimred = 19722.50930;
+                        figure(1);
+                        bar(wavelengths, impOOB);
+                        title('Unbiased Predictor Importance Estimates');
+                        xlabel('Predictor variable');
+                        ylabel('Importance');
+                        plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat('rfimportance', num2str(now()))), '');
+                        plots.SavePlot(1, plotPath);
+
+                        save(rfiFile, 'impOOB');
+                        tdimred = 19722.50930;
+                    else
+                        load(rfiFile, 'impOOB');
+                        tdimred = 19722.50930;
+                    end
 
                     [~, XTrainscores, ~, ~, ~] = DimredInternal(XTrainscores, 'rfi', q, [], [], impOOB);
                     [~, XValidscores, ~, ~, ~] = DimredInternal(XValidscores, 'rfi', q, [], [], impOOB);
@@ -669,7 +693,7 @@ classdef trainUtility
                     [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
             end
 
-            [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(preTransMethod, q, yValid, predLabels, yTrain, trainedModel, stackedModels, drTrainTime, modelTrainTime);
+            [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(method, q, yValid, predLabels, yTrain, trainedModel, stackedModels, drTrainTime, modelTrainTime);
         end
         
         function [funScores] = ApplyPretrainedDimred(inScores, method, qNum, trainedObj )
@@ -898,7 +922,6 @@ classdef trainUtility
             fprintf('Test - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
                 testPerformance.JaccardCoeff *100, testPerformance.AUC, testPerformance.Accuracy *100, testPerformance.Sensitivity *100, ....
                 testPerformance.Specificity *100, testPerformance.DRTrainTime , testPerformance.ModelTrainTime);
-            
             ytest = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData.Labels}, {testData.Values}, 'un', 0);
 
             fgMasks = {testData.Masks};
@@ -916,6 +939,7 @@ classdef trainUtility
                 figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
                 plots.Overlay(4, imgFilePath, sRGBs{i}, predMask, figTitle);
             end
+            
         end
     end
 end
