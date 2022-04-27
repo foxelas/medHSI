@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*
-from contextlib import redirect_stdout
+from tensorflow import keras 
 from keras import layers, backend
 from keras.models import Model
 import segmentation_models as sm
@@ -59,6 +59,7 @@ def get_xception3d_1(dropMiddle, height, width, numChannels, numClasses):
         x = layers.add([x, residual])  # Add back residual
         previous_block_activation = x  # Set aside next residual
 
+    x = layers.Activation('relu', name='drop_act')(x)
 
     if 'mean' in dropMiddle:
         x = layers.Lambda(lambda y: backend.mean(y, axis=3), 
@@ -67,21 +68,24 @@ def get_xception3d_1(dropMiddle, height, width, numChannels, numClasses):
         x = layers.Lambda(lambda y: backend.max(y, axis=3), 
             name='drop_spectral_dim')(x)
 
+    x = layers.BatchNormalization(axis=channel_axis, name='drop_bn')(x)
+
     # print("Drop dimm interior after")
     # print(x.shape.dims)
 
     ### [Second half of the network: upsampling inputs] ###
 
     for filters in [728, 256, 128, 64]:
-        x = layers.Activation("relu")(x)
-        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False)(x)
-        x = layers.BatchNormalization()(x)
+        k += 1
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act1')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans1')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn1')(x)
 
-        x = layers.Activation("relu")(x)
-        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False)(x)
-        x = layers.BatchNormalization()(x)
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act2')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans2')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn2')(x)
 
-        x = layers.UpSampling2D(2)(x)
+        x = layers.UpSampling2D(2, name='decoder_block' + str(k)+'_upsampling')(x)
 
         # Project residual
         if filters == 728:
@@ -90,17 +94,17 @@ def get_xception3d_1(dropMiddle, height, width, numChannels, numClasses):
             elif 'max' in dropMiddle:
                 previous_block_activation = layers.Lambda(lambda y: backend.max(y, axis=3), name='resid_drop_spectral_dim')(previous_block_activation)
 
-        residual = layers.UpSampling2D(2)(previous_block_activation)
-        residual = layers.Conv2D(filters, 1, padding="same")(residual)
+        residual = layers.UpSampling2D(2, name='decoder_residual' + str(k)+'_upsampling')(previous_block_activation)
+        residual = layers.Conv2D(filters, 1, padding="same",  name='decoder_residual' + str(k)+'_conv')(residual)
 
-        x = layers.add([x, residual])  # Add back residual
+        x = layers.add([x, residual], name='decoder_block' + str(k)+'add')  # Add back residual
         previous_block_activation = x  # Set aside next residual
 
         print("Second to last x")
         print(x.shape.dims)
 
     # Add a per-pixel classification layer
-    outputs = layers.Conv2D(numClasses, 3, activation="sigmoid", padding="same")(x)
+    outputs = layers.Conv2D(numClasses, 3, activation="sigmoid", padding="same", name ='exit_conv')(x)
 
     # Define the model
     model = Model(inputs, outputs)
@@ -318,9 +322,10 @@ def get_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, 
     elif 'xception3d2_mean' in framework:
         model = get_xception3d2_mean(height, width, numChannels, numClasses)
 
+    sgdOpt = keras.optimizers.SGD(learning_rate=0.001, momentum=0.9)
     #adam = Adam(lr=0.001, decay=1e-06)
     model.compile(
-        'rmsprop', #'rmsprop', 'SGD', 'Adam',
+        sgdOpt, #'rmsprop', 'SGD', 'Adam',
         #loss='categorical_crossentropy'
         loss=sm.losses.bce_jaccard_loss,
         metrics=[sm.metrics.iou_score]

@@ -13,7 +13,7 @@ NUMBER_OF_CHANNELS = 311
 #########################################EXCEPTION SEGMENTATION  ################################
 def get_cnn2d_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
     num_classes = NUMBER_OF_CLASSES
-    inputs = layers.Input((width, height, depth, 1), name='cnn2d')
+    inputs = layers.Input(shape=(width,height,3))
 
     ### [First half of the network: downsampling inputs] ###
 
@@ -27,7 +27,7 @@ def get_cnn2d_model(width=64, height=64, depth=NUMBER_OF_CHANNELS):
     # Blocks 1, 2, 3 are identical apart from the feature depth.
     for filters in [64, 128, 256]:
         x = layers.Activation("relu")(x)
-        x = layers.SeparableConv2D(filters, 3, padding="same")(x) #DepthwiseConv3D
+        x = layers.SeparableConv2D(filters, 3, padding="same")(x)
         x = layers.BatchNormalization()(x)
 
         x = layers.Activation("relu")(x)
@@ -205,7 +205,7 @@ def build_xception_classification_model(width=64, height=64, depth=3):
     x = middle_flow(x)
     output = exit_flow(x)
 
-    model = Model (inputs=input, outputs=output)
+    model = Model(inputs=input, outputs=output)
     return model
 
 def build_xception_segmentation_model(width=64, height=64, depth=3):
