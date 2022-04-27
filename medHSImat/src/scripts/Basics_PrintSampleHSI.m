@@ -11,16 +11,16 @@ for i = 1:length(targetNames)
     % load HSI from .mat file to verify it is working and to prepare preview images
     targetName = targetNames{i};
     config.SetSetting('FileName', targetName);
-    [Inorm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);    
-    
+    [Inorm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+
     plots.AverageSpectrum(1, [], Inorm, labelInfo);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Total Average Curves %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 w = hsiUtility.GetWavelengths(311);
-curves = zeros(length(targetNames) * 2, length(w));
-names = cell(length(targetNames) * 2, 1);
-markers = cell(length(targetNames) * 2, 1);
+curves = zeros(length(targetNames)*2, length(w));
+names = cell(length(targetNames)*2, 1);
+markers = cell(length(targetNames)*2, 1);
 
 k = 0;
 for i = 1:length(targetNames)
@@ -28,25 +28,25 @@ for i = 1:length(targetNames)
     % load HSI from .mat file to verify it is working and to prepare preview images
     targetName = targetNames{i};
     config.SetSetting('FileName', targetName);
-    [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);  
-    
+    [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+
     maskROI = logical(labelInfo.Labels) & hsIm.FgMask;
-    maskNonROI = ~logical(labelInfo.Labels) & hsIm.FgMask; 
+    maskNonROI = ~logical(labelInfo.Labels) & hsIm.FgMask;
     InormROI = hsIm.GetMaskedPixels(maskROI);
-    InormNonROI  = hsIm.GetMaskedPixels(maskNonROI);
+    InormNonROI = hsIm.GetMaskedPixels(maskNonROI);
 
     diag = labelInfo.Diagnosis;
     k = k + 1;
-    curves(k,:) = mean(reshape(InormROI, [size(InormROI, 1), size(InormROI, 2)]));
+    curves(k, :) = mean(reshape(InormROI, [size(InormROI, 1), size(InormROI, 2)]));
     names{k} = strjoin({'Lesion', diag}, {' '});
-    if strcmpi(labelInfo.Type, 'Malignant') 
+    if strcmpi(labelInfo.Type, 'Malignant')
         markers{k} = "--";
     else
         markers{k} = "-";
     end
     k = k + 1;
-    curves(k,:) = mean(reshape(InormNonROI, [size(InormNonROI, 1), size(InormNonROI, 2)]));
-    names{k} = strjoin({'Healthy', diag}, {' '}); 
+    curves(k, :) = mean(reshape(InormNonROI, [size(InormNonROI, 1), size(InormNonROI, 2)]));
+    names{k} = strjoin({'Healthy', diag}, {' '});
     markers{k} = "-";
 end
 plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'average'), 'png');
@@ -61,21 +61,21 @@ for i = 1:length(targetNames)
     %% load HSI from .mat file to verify it is working and to prepare preview images
     targetName = targetNames{i};
     config.SetSetting('FileName', targetName);
-    [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);  
-    
-    maskROI = logical(labelInfo.Labels) & hsIm.FgMask;
-    maskNonROI = ~logical(labelInfo.Labels) & hsIm.FgMask; 
-    InormROI = hsIm.GetMaskedPixels(maskROI);
-    InormNonROI  = hsIm.GetMaskedPixels(maskNonROI);
+    [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
 
-    if strcmpi(labelInfo.Type, 'Malignant') 
+    maskROI = logical(labelInfo.Labels) & hsIm.FgMask;
+    maskNonROI = ~logical(labelInfo.Labels) & hsIm.FgMask;
+    InormROI = hsIm.GetMaskedPixels(maskROI);
+    InormNonROI = hsIm.GetMaskedPixels(maskNonROI);
+
+    if strcmpi(labelInfo.Type, 'Malignant')
         k = k + 1;
-        mal{k} =  mean(reshape(InormROI, [size(InormROI, 1), size(InormROI, 2)]));
-        ben{k} =  mean(reshape(InormNonROI, [size(InormNonROI, 1), size(InormNonROI, 2)]));
+        mal{k} = mean(reshape(InormROI, [size(InormROI, 1), size(InormROI, 2)]));
+        ben{k} = mean(reshape(InormNonROI, [size(InormNonROI, 1), size(InormNonROI, 2)]));
     else
-        l = l + 1; 
-        mal2{l} =  mean(reshape(InormROI, [size(InormROI, 1), size(InormROI, 2)]));
-        ben2{l} =  mean(reshape(InormNonROI, [size(InormNonROI, 1), size(InormNonROI, 2)]));
+        l = l + 1;
+        mal2{l} = mean(reshape(InormROI, [size(InormROI, 1), size(InormROI, 2)]));
+        ben2{l} = mean(reshape(InormNonROI, [size(InormNonROI, 1), size(InormNonROI, 2)]));
     end
 
 end
@@ -89,21 +89,19 @@ R3 = corrcoef(ben, ben2)
 
 w = hsiUtility.GetWavelengths(311);
 
-fig = figure(3); 
+fig = figure(3);
 hold on
 h(1) = plots.WithShadedArea(w, mal, 'Malignant Lesion', ':r');
 h(2) = plots.WithShadedArea(w, ben, 'Malignant Healthy', '--m');
 h(3) = plots.WithShadedArea(w, mal2, 'Benign Lesion', ':g');
 h(4) = plots.WithShadedArea(w, ben2, 'Benign Healthy', '--b');
-hold off 
+hold off
 xlim([420, 730]);
-ylim([0,1]);
+ylim([0, 1]);
 title('Mean(SD) of each Sample Category');
 legend(h, 'Location', 'EastOutside');
 
 plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'total_avarage'), 'png');
-plots.SavePlot(fig, plotPath); 
+plots.SavePlot(fig, plotPath);
 
 end
-
-

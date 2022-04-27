@@ -1,4 +1,4 @@
-function [trainPerformance, testPerformance ] = Basics_Dimred()
+function [trainPerformance, testPerformance] = Basics_Dimred()
 
 % filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
 % load(filePath);
@@ -21,7 +21,7 @@ ks = 1:length(qs);
 j = 0;
 
 [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
+filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'lastrun'), 'mat');
 save(filePath, '-v7.3');
 
 %%%%%%%%%%%%%%%%%%%%%% Baseline %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,7 +73,8 @@ j = j + 1;
 
 % fprintf('QDA: \n\n');
 % j = j + 1;
-%% Fails because of covarance 
+
+%% Fails because of covarance
 % [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'qda', 1);
 % save(filePath, 'trainPerformance', 'testPerformance');
 
@@ -136,7 +137,7 @@ j = j + 1;
 for k = ks
     q = qs(k);
     fprintf('RFI: %d \n\n', q);
-    [trainPerformance{j}{k}, testPerformance{j}{k}] =trainUtility.ValidateTest2(trainData, testData, cvp, 'RFI', q);
+    [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'RFI', q);
 end
 save(filePath, 'trainPerformance', 'testPerformance');
 PrepareGraphs_Performance();
@@ -178,5 +179,3 @@ SVMModel = fitcsvm(scores, labels, 'Standardize', true, 'KernelFunction', 'RBF',
 predlabels = predict(SVMModel, scores);
 [acc, ~, ~] = metrics.Evaluations(labels, predlabels);
 end
-
-

@@ -61,7 +61,7 @@ close all;
 srgb = hsIm.GetDisplayImage();
 fgMask = hsIm.FgMask;
 
-[scores, labels, validLabels] = hsIm.SuperPCA(varargin{:});
+[scores, labels, validLabels] = dimredUtility.SuperPCA(hsIm, varargin{:});
 
 img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
 names = {labelInfo.Diagnosis, 'Principal Component 1', 'Principal Component 2', 'Principal Component 3'};

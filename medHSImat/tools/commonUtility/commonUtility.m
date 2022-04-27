@@ -414,25 +414,25 @@ classdef commonUtility
 
         function [dist] = CalcDistance(target, reference, funHandle)
             vals = reshape(target, [size(target, 1) * size(target, 2), size(target, 3)]);
-            dists = arrayfun(@(rowidxs) funHandle(vals(rowidxs,:)', reference), (1:size(vals,1)).');
+            dists = arrayfun(@(rowidxs) funHandle(vals(rowidxs, :)', reference), (1:size(vals, 1)).');
             dist = reshape(dists, [size(target, 1), size(target, 2)]);
-        end 
-        
+        end
+
         function d = Frechet(target, reference)
             [d, ~] = DiscreteFrechetDist(target, reference);
         end
-        
+
         function d = ProposedDistance1(target, reference)
             d = 1 / (sum(diff(target).^2) / sum(diff(reference).^2));
         end
-        
+
         function d = ProposedDistance2(target, reference)
-            d = 1 / ( (sum(diff(target).^2) / sum(target .^2)) ...
-                / (sum(diff(reference) .^2) / sum(reference .^2)));
+            d = 1 / ((sum(diff(target).^2) / sum(target .^2)) ...
+                / (sum(diff(reference).^2) / sum(reference.^2)));
         end
-        
+
         function d = ProposedDistance3(target, reference)
-            d = ( (sum((target).^2) / (sum((reference) .^2) )));
+            d = ((sum((target).^2) / (sum((reference).^2))));
         end
 
     end

@@ -32,27 +32,27 @@ function [endmembers] = NfindrInternal(target, numEndmembers, fgMask)
 %
 % @retval endmembers [numeric array] |The calculated endmembers.
 
-if ndims(target) < 3 
+if ndims(target) < 3
     error('Needs more than 3 dimensions.');
 end
 
-hasFgMask = nargin > 2; 
+hasFgMask = nargin > 2;
 
 if hasFgMask
     n = sum(fgMask(:));
     F = factor(n);
     fgMask2 = fgMask;
     if ~(F(1) > 0 && F(1) ~= n)
-        %%Add one pixels in the mask to enable a 3D structure so that nfindr can run 
-        fgMask2(1,1) = 1;
+        %%Add one pixels in the mask to enable a 3D structure so that nfindr can run
+        fgMask2(1, 1) = 1;
         n = n + 1;
         F = factor(n);
     end
     colTarget = GetMaskedPixelsInternal(target, fgMask2);
-    rtarget = reshape(colTarget, [n / F(1) , F(1), size(colTarget, 2) ]);
+    rtarget = reshape(colTarget, [n / F(1), F(1), size(colTarget, 2)]);
     endmembers = nfindr(rtarget, numEndmembers);
 else
     endmembers = nfindr(target, numEndmembers);
 end
 
-end 
+end

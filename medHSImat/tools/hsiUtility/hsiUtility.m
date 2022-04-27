@@ -417,11 +417,11 @@ classdef hsiUtility
                     curName = strcat('/sample', targetName, '/label');
                     h5create(fileName, curName, size(label));
                     h5write(fileName, curName, label);
-                    
+
                     curName = strcat('/sample', targetName, '/diagnosticLabel');
                     h5create(fileName, curName, size(diagnosticLabel));
                     h5write(fileName, curName, diagnosticLabel);
-                    
+
                     curName = strcat('/sample', targetName, '/multiclassLabel');
                     h5create(fileName, curName, size(multiclassLabel));
                     h5write(fileName, curName, multiclassLabel);
@@ -877,6 +877,120 @@ classdef hsiUtility
                 refLib = [];
                 disp('The reference library is not created yet. Use hsiUtility.PrepareReferenceLibrary.');
             end
+        end
+
+        % ======================================================================
+        %> @brief AdjustDimensions zero pads to adjust the length of the
+        %> third dimension.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [scores] = hsiUtility.AdjustDimensions(scores, q);
+        %> @endcode
+        %>
+        %> @param scores [numeric array] | The target array
+        %> @param q [int] | The size of the third dimension
+        %>
+        %> @retval scores [numeric array] | The output array
+        % ======================================================================
+        function [scores] = AdjustDimensions(scores, q)
+            % AdjustDimensions zero pads to adjust the length of the
+            % third dimension.
+            %
+            % @b Usage
+            %
+            % @code
+            % [scores] = hsiUtility.AdjustDimensions(scores, q);
+            % @endcode
+            %
+            % @param scores [numeric array] | The target array
+            % @param q [int] | The size of the third dimension
+            %
+            % @retval scores [numeric array] | The output array
+
+            if iscell(scores)
+                for i = 1:numel(scores)
+                    scores{i} = hsiUtility.AdjustDimensions(scores{i}, q);
+                end
+            else
+
+                % Adjust dimensions if it is smaller than expected
+                if ndims(scores) == 3 && size(scores, 3) < q
+                    [m, l, n] = size(scores);
+                    newScores = zeros(m, l, q);
+                    newScores(:, :, 1:n) = scores;
+                    scores = newScores;
+                end
+
+                if ndims(scores) == 2 && size(scores, 2) < q
+                    [m, n] = size(scores);
+                    newScores = zeros(m, q);
+                    newScores(:, 1:n) = scores;
+                    scores = newScores;
+                end
+            end
+        end
+
+        % ======================================================================
+        %> @brief CleanLabels returns superpixel labels that contain tissue pixels.
+        %>
+        %> Keep only pixels that belong to the tissue (Superpixel might assign
+        %> background pixels also). The last label is background label.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [cleanLabels, validLabels] = hsiUtility.CleanLabels(labels, fgMask, pixelNum);
+        %> @endcode
+        %>
+        %> @param labels [numeric array] | The labels of the superpixels
+        %> @param fgMask [numeric array] | The foreground mask
+        %> @param pixelNum [int] | The number of superpixels.
+        %>
+        %> @retval cleanLabels [numeric array] | The labels of the superpixels
+        %> @retval validLabels [numeric array] | The superpixel labels that refer
+        %> to tissue pixels
+        % ======================================================================
+        function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
+            % CleanLabels returns superpixel labels that contain tissue pixels.
+            %
+            % Keep only pixels that belong to the tissue (Superpixel might assign
+            % background pixels also). The last label is background label.
+            %
+            % @b Usage
+            %
+            % @code
+            % [cleanLabels, validLabels] = hsiUtility.CleanLabels(labels, fgMask, pixelNum);
+            % @endcode
+            %
+            % @param labels [numeric array] | The labels of the superpixels
+            % @param fgMask [numeric array] | The foreground mask
+            % @param pixelNum [int] | The number of superpixels.
+            %
+            % @retval cleanLabels [numeric array] | The labels of the superpixels
+            % @retval validLabels [numeric array] | The superpixel labels that refer
+            % to tissue pixels
+
+            labels(~fgMask) = pixelNum;
+
+            pixelLim = 10;
+            labelTags = unique(labels)';
+            labelTags = labelTags(labelTags ~= pixelNum); % Remove last label (background pixels)
+            validLabels = [];
+            k = 0;
+
+            for i = labelTags
+                sumPixel = sum(labels == i, 'all');
+                if sumPixel < pixelLim %Ignore superpixel labels with too few pixels
+                    labels(labels == i) = pixelNum;
+                else
+                    k = k + 1;
+                    validLabels(k) = i;
+                end
+            end
+
+            cleanLabels = labels;
         end
 
     end

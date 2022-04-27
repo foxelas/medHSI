@@ -3,7 +3,7 @@ function Basics_Denoise()
 close all;
 
 [~, targetNames] = commonUtility.DatasetInfo(true);
-methods = { 'smoothen'}; %'smile',
+methods = {'smoothen'}; %'smile',
 for j = 2:2
     config.SetSetting('SaveFolder', strcat('Denoise-', methods{j}));
 
@@ -12,8 +12,8 @@ for j = 2:2
         % load HSI from .mat file to verify it is working and to prepare preview images
         targetName = targetNames{i};
         config.SetSetting('FileName', targetName);
-        [hsIm, ~] = hsiUtility.LoadHsiAndLabel(targetName);    
-        corrIm = hsIm.Denoise(methods{j});
+        [hsIm, ~] = hsiUtility.LoadHsiAndLabel(targetName);
+        corrIm = hsIm.Denoise(methods {j});
         savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
         plotPath = fullfile(savedir, 'denoise_pair');
         figure(1);
@@ -23,29 +23,29 @@ for j = 2:2
         w = hsiUtility.GetWavelengths(311);
 
         numEndmembers = 8;
-        endmembers = nfindr(hsIm.Value,numEndmembers);
+        endmembers = nfindr(hsIm.Value, numEndmembers);
         figure(2);
-        plot(w, endmembers);   
+        plot(w, endmembers);
         xlabel('Band Number')
         ylabel('Data Value')
-        legend('Location','Bestoutside');
+        legend('Location', 'Bestoutside');
         title(sprintf('Endmembers (Num:%d)', numEndmembers));
         xlim([420, 730]);
         plotPath = fullfile(savedir, 'endmembers_before');
         plots.SavePlot(2, plotPath);
 
         numEndmembers = 8;
-        endmembers = nfindr(corrIm.Value,numEndmembers);
+        endmembers = nfindr(corrIm.Value, numEndmembers);
         figure(3);
-        plot(w, endmembers);   
+        plot(w, endmembers);
         xlabel('Band Number')
         ylabel('Data Value')
-        legend('Location','Bestoutside');
+        legend('Location', 'Bestoutside');
         title(sprintf('Endmembers (Num:%d)', numEndmembers));
         xlim([420, 730]);
         plotPath = fullfile(savedir, 'endmembers_after');
         plots.SavePlot(3, plotPath);
     end
-end 
+end
 
 end

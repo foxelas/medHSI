@@ -827,21 +827,14 @@ classdef plots
                 if ndims(curImg) < 3
                     lb = unique(curImg(:));
                     colors = parula(numel(lb));
-                    newImg = zeros(size(curImg,1), size(curImg,2), 3);
+                    [m, n] = size(curImg);
+                    newImg = zeros(m, n, 3);
                     for k = 1:numel(lb)
                         mask = curImg == lb(k);
-                        
-                        r = newImg(:,:,1);
-                        g = newImg(:,:,2);
-                        b = newImg(:,:,3);
-                        r(mask) = colors(k,1);
-                        g(mask) = colors(k,2);
-                        b(mask) = colors(k,3);
-                        newImg(:,:,1) = r;
-                        newImg(:,:,2) = g;
-                        newImg(:,:,3) = b;
+                        maskCol = reshape(mask, [m * n, 1]);
+                        newImg(maskCol, :) = repmat(colors(k, :), sum(maskCol));
                     end
-                    curImg = newImg; 
+                    curImg = newImg;
                 end
                 C = insertObjectMask(curImg, edge(labelMask), 'Color', 'w');
                 hold on;
@@ -850,7 +843,7 @@ classdef plots
 
                 hold off;
                 title(names{i});
-            end  
+            end
             plots.SavePlot(fig, plotPath);
         end
 
@@ -1059,7 +1052,7 @@ classdef plots
             save(filename, 'extCoeffEumelanin2', 'extCoeffHbO', 'extCoeffHbR', 'eumelaninLambda', 'hbLambda');
 
         end
-        
+
         function [h] = WithShadedArea(x, arr, lineName, lineOpt)
             y = mean(arr, 1);
             stds = std(arr, 1);
@@ -1067,7 +1060,7 @@ classdef plots
             curve2 = y - stds;
             lineOptPlain = strrep(strrep(lineOpt, ':', '-'), '--', '-');
             hold on;
-            shade(x, curve1, lineOptPlain, x, curve2, lineOptPlain, 'FillType',[1 2; 2 1], 'FillAlpha', 0.2);
+            shade(x, curve1, lineOptPlain, x, curve2, lineOptPlain, 'FillType', [1, 2; 2, 1], 'FillAlpha', 0.2);
             h = plot(x, y, lineOpt, 'LineWidth', 3, 'DisplayName', lineName);
             hold off;
         end

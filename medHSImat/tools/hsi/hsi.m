@@ -89,6 +89,7 @@ classdef hsi
 
             obj.Value = hsImVal;
             if calcMask
+                disp('Calculating foreground mask.')
                 [~, fgMask] = RemoveBackgroundInternal(hsImVal);
                 obj.FgMask = fgMask;
             end
@@ -480,13 +481,13 @@ classdef hsi
         % ======================================================================
         %> @brief DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
         %>
-        %> You can set the spectral distance metric with funcHandle. 
+        %> You can set the spectral distance metric with funcHandle.
         %> Common spectral ditance metrics are @@sam, sid, @jmsam, @ns3, @sidsam.
         %> For more details check @c DistanceScoresInternal.
         %>
         %> @b Usage
         %>
-        %> @code     
+        %> @code
         %> clusterLabels = hsIm.DistanceScores(target, endmembers, @sam);
         %> @endcode
         %>
@@ -497,39 +498,39 @@ classdef hsi
         %> @retval clusterLabels [numeric array] | The labels based on minimum distance.
         % ======================================================================
         function [clusterLabels] = DistanceScores(obj, varargin)
-        % DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
-        %
-        % You can set the spectral distance metric with funcHandle. 
-        % Common spectral ditance metrics are @@sam, sid, @jmsam, @ns3, @sidsam.
-        % For more details check @c DistanceScoresInternal.
-        %
-        % @b Usage
-        %
-        % @code     
-        % clusterLabels = hsIm.DistanceScores(target, endmembers, @sam);
-        % @endcode
-        %
-        % @param target [numeric array] | An 3D hsi value
-        % @param references [numeric array] | An array of spectral references
-        % @param funcHandle [function handle] | Optional: The spectral distance measure. Default: SAM.
-        %
-        % @retval clusterLabels [numeric array] | The labels based on minimum distance.
+            % DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
+            %
+            % You can set the spectral distance metric with funcHandle.
+            % Common spectral ditance metrics are @@sam, sid, @jmsam, @ns3, @sidsam.
+            % For more details check @c DistanceScoresInternal.
+            %
+            % @b Usage
+            %
+            % @code
+            % clusterLabels = hsIm.DistanceScores(target, endmembers, @sam);
+            % @endcode
+            %
+            % @param target [numeric array] | An 3D hsi value
+            % @param references [numeric array] | An array of spectral references
+            % @param funcHandle [function handle] | Optional: The spectral distance measure. Default: SAM.
+            %
+            % @retval clusterLabels [numeric array] | The labels based on minimum distance.
             [clusterLabels] = DistanceScoresInternal(obj.Value, varargin{:});
         end
-        
+
         % ======================================================================
         %> @brief Dimred reduces the dimensions of the hyperspectral image.
         %>
         %> Currently available methods:
-        %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
-        %> ICA (FastICA), RICA, SuperRICA, 
+        %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA,
+        %> ICA (FastICA), RICA, SuperRICA,
         %> LDA, QDA, MSelect.
-        %> Methods autoencoder and RFI are available only for pre-trained models. 
+        %> Methods autoencoder and RFI are available only for pre-trained models.
         %>
         %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
         %> For an unknown method, the input data is returned.
         %>
-        %> For more details check @c DimredInternal .
+        %> For more details check @c dimredUtility.Apply .
         %>
         %> @b Usage
         %>
@@ -558,59 +559,59 @@ classdef hsi
         %> @retval Mdl [model] | The dimension reduction model
         % ======================================================================
         function [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, varargin)
-        % Dimred reduces the dimensions of the hyperspectral image.
-        %
-        % Currently available methods:
-        % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA, 
-        % ICA (FastICA), RICA, SuperRICA, 
-        % LDA, QDA, MSelect.
-        % Methods autoencoder and RFI are available only for pre-trained models. 
-        %
-        % Additionally, for pre-trained parameters RFI and Autoencoder are available.
-        % For an unknown method, the input data is returned.
-        %
-        % For more details check @c DimredInternal .
-        %
-        % @b Usage
-        %
-        % @code
-        % q = 10;
-        % [coeff, scores, latent, explained, objective] = hsIm.Dimred(
-        % method, q, hsIm.FgMask);
-        %
-        % [coeff, scores, latent, explained, ~] = hsIm.Dimred('pca', 10);
-        %
-        % [coeff, scores, ~, ~, objective] = hsIm.Dimred('rica', 40);
-        % @endcode
-        %
-        % @param obj [hsi] | An instance of the hsi class
-        % @param method [string] | The method for dimension reduction
-        % @param q [int] | The number of components to be retained
-        % @param varargin [cell array] | Optional additional arguments for methods that require them
-        %
-        % @retval coeff [numeric array] | The transformation coefficients
-        % @retval scores [numeric array] | The transformed values
-        % @retval latent [numeric array] | The latent values
-        % @retval explained [numeric array] | The percentage of explained
-        % variance
-        % @retval objective [numeric array] | The objective function
-        % values
-        % @retval Mdl [model] | The dimension reduction model
-           [coeff, scores, latent, explained, objective] = DimredInternal(obj.Value, method, q, obj.FgMask, varargin{:});
+            % Dimred reduces the dimensions of the hyperspectral image.
+            %
+            % Currently available methods:
+            % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA,
+            % ICA (FastICA), RICA, SuperRICA,
+            % LDA, QDA, MSelect.
+            % Methods autoencoder and RFI are available only for pre-trained models.
+            %
+            % Additionally, for pre-trained parameters RFI and Autoencoder are available.
+            % For an unknown method, the input data is returned.
+            %
+            % For more details check @c dimredUtility.Apply .
+            %
+            % @b Usage
+            %
+            % @code
+            % q = 10;
+            % [coeff, scores, latent, explained, objective] = hsIm.Dimred(
+            % method, q, hsIm.FgMask);
+            %
+            % [coeff, scores, latent, explained, ~] = hsIm.Dimred('pca', 10);
+            %
+            % [coeff, scores, ~, ~, objective] = hsIm.Dimred('rica', 40);
+            % @endcode
+            %
+            % @param obj [hsi] | An instance of the hsi class
+            % @param method [string] | The method for dimension reduction
+            % @param q [int] | The number of components to be retained
+            % @param varargin [cell array] | Optional additional arguments for methods that require them
+            %
+            % @retval coeff [numeric array] | The transformation coefficients
+            % @retval scores [numeric array] | The transformed values
+            % @retval latent [numeric array] | The latent values
+            % @retval explained [numeric array] | The percentage of explained
+            % variance
+            % @retval objective [numeric array] | The objective function
+            % values
+            % @retval Mdl [model] | The dimension reduction model
+            [coeff, scores, latent, explained, objective] = dimredUtility.Apply(obj.Value, method, q, obj.FgMask, varargin{:});
         end
 
         % ======================================================================
         %> @brief Transform applies a transform to the hyperspectral data.
         %>
         %> Currently available methods:
-        %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
-        %> ICA (FastICA), RICA, SuperRICA, 
+        %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA,
+        %> ICA (FastICA), RICA, SuperRICA,
         %> LDA, QDA, MSelect.
-        %> Methods autoencoder and RFI are available only for pre-trained models. 
+        %> Methods autoencoder and RFI are available only for pre-trained models.
         %>
         %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
         %> For an unknown method, the input data is returned.
-        %> For more details check @c function DimredInternal.
+        %> For more details check @c function dimredUtility.Apply.
         %>
         %> @b Usage
         %>
@@ -627,44 +628,44 @@ classdef hsi
         %> @retval scores [numeric array] | The transformed values
         % ======================================================================
         function [scores] = Transform(obj, flattenFlag, method, q, varargin)
-        % Transform applies a transform to the hyperspectral data.
-        %
-        % Currently available methods:
-        % PCA, SuperPCA, MSuperPCA, ClusterSuperPCA, 
-        % ICA (FastICA), RICA, SuperRICA, 
-        % LDA, QDA, MSelect.
-        % Methods autoencoder and RFI are available only for pre-trained models. 
-        %
-        % Additionally, for pre-trained parameters RFI and Autoencoder are available.
-        % For an unknown method, the input data is returned.
-        % For more details check @c function DimredInternal.
-        %
-        % @b Usage
-        %
-        % @code
-        % scores = hsIm.Transform(superixelNumber);
-        % @endcode
-        %
-        % @param obj [hsi] | An instance of the hsi class
-        % @param flattenFlag [boolean] | The flag for flattening. Default: true.
-        % @param method [string] | The method for dimension reduction
-        % @param q [int] | The number of components to be retained
-        % @param varargin [cell array] | Optional additional arguments for methods that require them
-        %
-        % @retval scores [numeric array] | The transformed value
-              [~, scores, ~, ~, ~] = obj.Dimred(method, q, varargin{:});
-            
+            % Transform applies a transform to the hyperspectral data.
+            %
+            % Currently available methods:
+            % PCA, SuperPCA, MSuperPCA, ClusterSuperPCA,
+            % ICA (FastICA), RICA, SuperRICA,
+            % LDA, QDA, MSelect.
+            % Methods autoencoder and RFI are available only for pre-trained models.
+            %
+            % Additionally, for pre-trained parameters RFI and Autoencoder are available.
+            % For an unknown method, the input data is returned.
+            % For more details check @c function dimredUtility.Apply.
+            %
+            % @b Usage
+            %
+            % @code
+            % scores = hsIm.Transform(superixelNumber);
+            % @endcode
+            %
+            % @param obj [hsi] | An instance of the hsi class
+            % @param flattenFlag [boolean] | The flag for flattening. Default: true.
+            % @param method [string] | The method for dimension reduction
+            % @param q [int] | The number of components to be retained
+            % @param varargin [cell array] | Optional additional arguments for methods that require them
+            %
+            % @retval scores [numeric array] | The transformed value
+            [~, scores, ~, ~, ~] = obj.Dimred(method, q, varargin{:});
+
             if isempty(flattenFlag)
                 flattenFlag = true;
             end
             if flattenFlag
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
-            
-            scores = hsi.AdjustDimensions(scores, q);
+
+            scores = hsiUtility.AdjustDimensions(scores, q);
 
         end
-        
+
         % ======================================================================
         %> @brief Nfindr applies the algorithm only on the specimen pixels of the hsi, while ignoring the bakcground.
         %>
@@ -682,23 +683,23 @@ classdef hsi
         %> @retval endmembers [numeric array] |The calculated endmembers.
         % ======================================================================
         function [endmembers] = Nfindr(obj, numEndmembers)
-        % Nfindr applies the algorithm only on the specimen pixels of the hsi, while ignoring the bakcground.
-        %
-        % For more details see @c NfindrInternal.
-        %
-        % @b Usage
-        %
-        % @code
-        %  [endmembers] = hsIm.Nfindr(8);
-        % @endcode
-        %
-        % @param obj [hsi] | An instance of the hsi calss
-        % @param numEndmembers [int] | The number of endmembers to calculate.
-        %
-        % @retval endmembers [numeric array] |The calculated endmembers.
+            % Nfindr applies the algorithm only on the specimen pixels of the hsi, while ignoring the bakcground.
+            %
+            % For more details see @c NfindrInternal.
+            %
+            % @b Usage
+            %
+            % @code
+            %  [endmembers] = hsIm.Nfindr(8);
+            % @endcode
+            %
+            % @param obj [hsi] | An instance of the hsi calss
+            % @param numEndmembers [int] | The number of endmembers to calculate.
+            %
+            % @retval endmembers [numeric array] |The calculated endmembers.
             [endmembers] = NfindrInternal(obj.Value, numEndmembers, obj.FgMask);
         end
-        
+
         %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
         %> @brief GetDisplayImage returns an RGB image from the hyperspectral data.
@@ -1083,159 +1084,37 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief SuperPCA applies SuperPCA to an hsi object.
-        %>
-        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+        %> @brief Denoise applies denoising to an hsi object.
         %>
         %> @b Usage
         %>
         %> @code
-        %> [scores, labels, validLabels] = hsi.SuperPCA(hsIm);
+        %> [corrected] = hsIm.Denoise();
         %>
-        %> [scores, labels, validLabels] = hsi.SuperPCA(hsIm, isManual, pixelNum, pcNum);
+        %> [corrected] = hsIm.Denoise('smile');
         %> @endcode
         %>
-        %> @param hsIm [hsi] | An instance of the hsi class
-        %> @param isManual [boolean] | A  flag to show whether is manual (local)
-        %> implementation or by SuperPCA package. Default: false.
-        %> @param pixelNum [int] | The number of superpixels. Default: 20.
-        %> @param pcNum [int] | The number of PCA components. Default: 3.
+        %> @param obj [hsi] | An instance of the hsi class
+        %> @param method [char] | Optional: The denoising method, either 'smile' or 'smoothen'. Default: 'smile'.
         %>
-        %> @retval scores [numeric array] | The PCA scores
-        %> @retval labels [numeric array] | The labels of the superpixels
-        %> @retval validLabels [numeric array] | The superpixel labels that refer
-        %> to tissue pixels
+        %> @retval corrected [hsi] | An instance of the hsi class
         % ======================================================================
-        function [scores, labels, validLabels] = SuperPCA(obj, isManual, pixelNum, pcNum)
-            % SuperPCA applies SuperPCA to an hsi object.
-            %
-            % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
-            %
-            % @b Usage
-            %
-            % @code
-            % [scores, labels, validLabels] = hsi.SuperPCA(hsIm);
-            %
-            % [scores, labels, validLabels] = hsi.SuperPCA(hsIm, isManual, pixelNum, pcNum);
-            % @endcode
-            %
-            % @param hsIm [hsi] | An instance of the hsi class
-            % @param isManual [boolean] | A  flag to show whether is manual (local)
-            % implementation or by SuperPCA package. Default: false.
-            % @param pixelNum [int] | The number of superpixels. Default: 20.
-            % @param pcNum [int] | The number of PCA components. Default: 3.
-            %
-            % @retval scores [numeric array] | The PCA scores
-            % @retval labels [numeric array] | The labels of the superpixels
-            % @retval validLabels [numeric array] | The superpixel labels that refer
-            % to tissue pixels
-            if nargin < 2
-                isManual = false;
-            end
-
-            if nargin < 3
-                pixelNum = 20;
-            end
-
-            if nargin < 4
-                pcNum = 3;
-            end
-
-            fgMask = obj.FgMask;
-
-            %% Calculate superpixels
-            if isManual
-                %%Apply PCA to entire image
-                [~, scores, latent, explained, ~] = obj.Dimred('pca', pcNum, fgMask);
-                %                 explained(1:pcNum);
-                %                 latent(1:pcNum);
-
-                % Use the 1st PCA component for superpixel calculation
-                redImage = rescale(squeeze(scores(:, :, 1)));
-                [labels, ~] = superpixels(redImage, pixelNum);
-                
-                scores = SuperPCA(obj.Value, pcNum, labels);
-                
-                % Keep only pixels that belong to the tissue (Superpixel might assign
-                % background pixels also). The last label is background label.
-                [labels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
-
-            else
-                %%super-pixels segmentation
-                labels = cubseg(obj.Value, pixelNum);
-
-                % Keep only pixels that belong to the tissue (Superpixel might assign
-                % background pixels also). The last label is background label.
-                [labels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
-
-                %%SupePCA based DR
-                scores = SuperPCA(obj.Value, pcNum, labels);
-            end
-
-        end
-
-        % ======================================================================
-        %> @brief MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
-        %>
-        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm);
-        %>
-        %> [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
-        %> @endcode
-        %>
-        %> @param hsIm [hsi] | An instance of the hsi class
-        %> @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
-        %> @param pcNum [int] | Otional: The number of PCA components. Default: 3.
-        %>
-        %> @retval scores [cell array] | The PCA scores
-        %> @retval labels [cell array] | The labels of the superpixels
-        %> @retval validLabels [cell array] | The superpixel labels that refer
-        %> to tissue pixels
-        % ======================================================================
-        function [scores, labels, validLabels] = MultiscaleSuperPCA(obj, pixelNumArray, pcNum)
-            % MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
-            %
-            % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
-            %
-            % @b Usage
-            %
-            % @code
-            % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm);
-            %
-            % [scores, labels, validLabels] = hsi.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
-            % @endcode
-            %
-            % @param hsIm [hsi] | An instance of the hsi class
-            % @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
-            % @param pcNum [int] | Otional: The number of PCA components. Default: 3.
-            %
-            % @retval scores [cell array] | The PCA scores
-            % @retval labels [cell array] | The labels of the superpixels
-            % @retval validLabels [cell array] | The superpixel labels that refer
-            % to tissue pixels
-            if nargin < 2
-                pixelNumArray = floor(20*sqrt(2).^[-2:2]);
-            end
-
-            if nargin < 3
-                pcNum = 3;
-            end
-
-            N = numel(pixelNumArray);
-            scores = cell(N, 1);
-            labels = cell(N, 1);
-            validLabels = cell(N, 1);
-            for i = 1:N
-                pixelNum = pixelNumArray(i);
-                [scores{i}, labels{i}, validLabels{i}] = obj.SuperPCA(false, pixelNum, pcNum);
-            end
-        end
-        
         function [corrected] = Denoise(obj, method)
+            % Denoise applies denoising to an hsi object.
+            %
+            % @b Usage
+            %
+            % @code
+            % [corrected] = hsIm.Denoise();
+            %
+            % [corrected] = hsIm.Denoise('smile');
+            % @endcode
+            %
+            % @param obj [hsi] | An instance of the hsi class
+            % @param method [char] | Optional: The denoising method, either 'smile' or 'smoothen'. Default: 'smile'.
+            %
+            % @retval corrected [hsi] | An instance of the hsi class
+
             if nargin < 2
                 method = 'smile';
             end
@@ -1391,92 +1270,6 @@ classdef hsi
             % @retval flag [boolean] | The flag
 
             flag = isequal(class(obj), 'hsi');
-        end
-
-        % ======================================================================
-        %> @brief CleanLabels returns superpixel labels that contain tissue pixels.
-        %>
-        %> Keep only pixels that belong to the tissue (Superpixel might assign
-        %> background pixels also). The last label is background label.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [cleanLabels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
-        %> @endcode
-        %>
-        %> @param labels [numeric array] | The labels of the superpixels
-        %> @param fgMask [numeric array] | The foreground mask
-        %> @param pixelNum [int] | The number of superpixels.
-        %>
-        %> @retval cleanLabels [numeric array] | The labels of the superpixels
-        %> @retval validLabels [numeric array] | The superpixel labels that refer
-        %> to tissue pixels
-        % ======================================================================
-        function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
-            % CleanLabels returns superpixel labels that contain tissue pixels.
-            %
-            % Keep only pixels that belong to the tissue (Superpixel might assign
-            % background pixels also). The last label is background label.
-            %
-            % @b Usage
-            %
-            % @code
-            % [cleanLabels, validLabels] = hsi.CleanLabels(labels, fgMask, pixelNum);
-            % @endcode
-            %
-            % @param labels [numeric array] | The labels of the superpixels
-            % @param fgMask [numeric array] | The foreground mask
-            % @param pixelNum [int] | The number of superpixels.
-            %
-            % @retval cleanLabels [numeric array] | The labels of the superpixels
-            % @retval validLabels [numeric array] | The superpixel labels that refer
-            % to tissue pixels
-
-            labels(~fgMask) = pixelNum;
-
-            pixelLim = 10;
-            labelTags = unique(labels)';
-            labelTags = labelTags(labelTags ~= pixelNum); % Remove last label (background pixels)
-            validLabels = [];
-            k = 0;
-
-            for i = labelTags
-                sumPixel = sum(labels == i, 'all');
-                if sumPixel < pixelLim %Ignore superpixel labels with too few pixels
-                    labels(labels == i) = pixelNum;
-                else
-                    k = k + 1;
-                    validLabels(k) = i;
-                end
-            end
-
-            cleanLabels = labels;
-        end
-
-        function [scores] = AdjustDimensions(scores, q)
-            
-            if iscell(scores)
-                for i=1:numel(scores)
-                    scores{i} = hsi.AdjustDimensions(scores{i}, q);
-                end
-            else
-            
-                % Adjust dimensions if it is smaller than expected 
-                if ndims(scores) == 3 && size(scores, 3) < q
-                    [m, l, n] = size(scores);
-                    newScores = zeros(m,l,q);
-                    newScores(:, :, 1:n) = scores;
-                    scores = newScores;
-                end
-
-                if ndims(scores) == 2 && size(scores, 2) < q
-                    [m,n] = size(scores);
-                    newScores = zeros(m,q);
-                    newScores(:, 1:n) = scores;
-                    scores = newScores;
-                end
-            end
         end
 
     end

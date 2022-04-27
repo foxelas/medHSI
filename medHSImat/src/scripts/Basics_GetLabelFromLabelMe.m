@@ -3,7 +3,7 @@ function [] = Basics_GetLabelFromLabelMe(hsIm)
 config.SetSetting('SaveFolder', '00-Labelme');
 savedir = commonUtility.GetFilename('output', config.GetSetting('SaveFolder'), '');
 
-if exist(fullfile(savedir, hsIm.ID, 'img.png')) > 0 
+if exist(fullfile(savedir, hsIm.ID, 'img.png')) > 0
     img = imread(fullfile(savedir, hsIm.ID, 'img.png'));
     lab = double(imread(fullfile(savedir, hsIm.ID, 'label.png')));
 

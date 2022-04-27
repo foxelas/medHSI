@@ -31,8 +31,8 @@ function PlotAverageSpectrum(hsIm, hsImInfo, fig)
 % @param figTitle [char] | The figure title
 
 maskROI = logical(hsImInfo.Labels) & hsIm.FgMask;
-maskNonROI = ~logical(hsImInfo.Labels) & hsIm.FgMask; 
-      
+maskNonROI = ~logical(hsImInfo.Labels) & hsIm.FgMask;
+
 InormROI = hsIm.GetMaskedPixels(maskROI);
 x = hsiUtility.GetWavelengths(size(InormROI, 2));
 rgb = hsIm.GetDisplayImage();
@@ -42,7 +42,7 @@ fig = figure('units', 'normalized', 'outerposition', [0, 0, 1, 1]);
 
 subplot(1, 3, 1:2);
 hold on
-InormNonROI  = hsIm.GetMaskedPixels(maskNonROI);
+InormNonROI = hsIm.GetMaskedPixels(maskNonROI);
 for i = 1:size(InormNonROI, 1)
     plot(x, InormNonROI(i, :), 'b');
 end

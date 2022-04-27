@@ -137,9 +137,9 @@ for i = 1:length(targetIDs)
         %% Save data info in a file
         filename = commonUtility.GetFilename('dataset', targetID);
         save(filename, 'spectralData', '-v7.3');
-        
+
         %% Read Label
-        % TO REMOVE 
+        % TO REMOVE
         labeldir = fullfile(config.GetSetting('DataDir'), config.GetSetting('LabelsFolderName'), spectralData.TissueType, strcat(spectralData.ID, '.png'));
         if ~exist(labeldir)
             Basics_GetLabelFromLabelMe(spectralData);

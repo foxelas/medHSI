@@ -19,7 +19,7 @@ classdef hsiInfo
         Diagnosis = ''
         %> A string that shows the benign/malignant type
         Type = ''
-        %> A string that shows the diagnosis comment 
+        %> A string that shows the diagnosis comment
         Comment = ''
     end
 
@@ -70,7 +70,7 @@ classdef hsiInfo
             %
             %
             % @return instance of the hsiInfo class
-            
+
             if nargin < 1
                 obj = hsiInfo('', '', [], '', '', '');
             else
@@ -81,7 +81,7 @@ classdef hsiInfo
                     obj.MultiClassLabels = hsiInfo.GetMultiClassLabels(targetId, labels);
                 end
                 obj.Diagnosis = diagnosis;
-                obj.Type = cancerType; 
+                obj.Type = cancerType;
                 obj.Comment = comment;
             end
         end
@@ -93,7 +93,7 @@ classdef hsiInfo
         % ======================================================================
         %> @brief GetMultiClassLabels prepares multiclass labels.
         %>
-        %> The hsi object should be read beforehand. 
+        %> The hsi object should be read beforehand.
         %> Classes are: background (0), healthy (1), border (2), malignant(3).
         %>
         %> @b Usage
@@ -108,21 +108,21 @@ classdef hsiInfo
         %> @retval mcLabels [numeric array] | The multiclass labels
         % ======================================================================
         function mcLabels = GetMultiClassLabels(targetId, labels)
-        % GetMultiClassLabels prepares multiclass labels.
-        %
-        % The hsi object should be read beforehand. 
-        % Classes are: background (0), healthy (1), border (2), malignant(3).
-        %
-        % @b Usage
-        %
-        % @code
-        % mcLabels = hsiInfo.GetMultiClassLabels(targetId, labels);
-        % @endcode
-        %
-        % @param targetId [char] | The unique ID of the target sample
-        % @param labels [numeric array] | The labels of the target sample
-        %
-        % @retval mcLabels [numeric array] | The multiclass labels
+            % GetMultiClassLabels prepares multiclass labels.
+            %
+            % The hsi object should be read beforehand.
+            % Classes are: background (0), healthy (1), border (2), malignant(3).
+            %
+            % @b Usage
+            %
+            % @code
+            % mcLabels = hsiInfo.GetMultiClassLabels(targetId, labels);
+            % @endcode
+            %
+            % @param targetId [char] | The unique ID of the target sample
+            % @param labels [numeric array] | The labels of the target sample
+            %
+            % @retval mcLabels [numeric array] | The multiclass labels
             [hsIm, ~] = hsiUtility.LoadHsiAndLabel(targetId);
             mcLabels = zeros(size(labels));
             mcLabels(~logical(hsIm.FgMask)) = 0; %% Background
@@ -133,10 +133,10 @@ classdef hsiInfo
             p = 3;
             for i = 1:numel(m)
                 borderMask(m-p:m+p, n-p:n+p) = 1;
-            end   
+            end
             mcLabels(borderMask & hsIm.FgMask) = 2; %% Border
         end
-        
+
         % ======================================================================
         %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
