@@ -56,7 +56,7 @@ config.SetSetting('Normalization', 'byPixel');
 
 %% Change accordingly
 prefix = config.GetSetting('Database');
-baseDataset = 'pslRaw32';
+baseDataset = 'pslRaw';
 readForeground = true;
 
 CheckImportData();

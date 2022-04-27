@@ -284,9 +284,11 @@ switch lower(method)
         
     %% No dimension reduction 
     otherwise
-        scores = Xcol;
+        scores = Xcol;         
 end
 
+explained = CalculateExplained(scores, Xcol, X, fgMask, explained);
+    
 if flattenIn
     if hasFgMask
         scores = hsi.RecoverSpatialDimensions(scores, size(X), fgMask);
@@ -296,6 +298,25 @@ if flattenIn
 end
 
 
+end
+
+function [explained_] = CalculateExplained(scores_, Xcol_, X_, mask_, explainedOrig)
+
+explained_ = explainedOrig;
+if ~iscell(scores_) && ndims(scores_) == 2
+    explained_ = var(scores_) / sum(var(Xcol_));
+    
+elseif ~iscell(scores_) && ndims(scores_) == 3
+    scoresCol = GetMaskedPixelsInternal(scores_, mask_);
+    Xcol_ = GetMaskedPixelsInternal(X_, mask_);
+    explained_ = CalculateExplained(scoresCol, Xcol_, [], [], explainedOrig);
+    
+elseif iscell(scores_)
+    explained_ = cell(numel(scores_), 1);
+    for i = 1:numel(scores_)
+        explained_{i} = CalculateExplained(scores_{i}, Xcol_, X_, mask_, []);
+    end
+end
 end
 
 % ======================================================================

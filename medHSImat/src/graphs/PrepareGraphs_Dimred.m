@@ -2,26 +2,27 @@ folds = 2;
 testTargets = {};
 dataType = 'pixel';
 dataset = config.GetSetting('Dataset');
-% [X, ~, ~] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-% Xscores = trainUtility.Cell2Mat({X.Values});
+[X, ~, ~] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
+Xscores = trainUtility.Cell2Mat({X.Values});
 
+q = 4;
             
-% targetName = '181';
-% [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+targetName = '181';
+[hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
 
-[eigs{1}, ~, ~, ~, ~] = DimredInternal(Xscores, 'PCA', 3);
+[eigs{1}, ~, ~, explained{1}, ~] = DimredInternal(Xscores, 'PCA', q);
 scores{1} = hsIm.GetMaskedPixels() * eigs{1};
 scores{1} =  RecoverOriginalDimensionsInternal(scores{1}, [size(hsIm.FgMask, 1), size(hsIm.FgMask, 2), 3], hsIm.FgMask);
 
-[eigs{2}, scores{2}, ~, ~, ~] = hsIm.Dimred('PCA', 3);
+[eigs{2}, scores{2}, ~, explained{2}, ~] = hsIm.Dimred('PCA', q);
 
 pixelNum = 20;
 superpixelLabels = cubseg(hsIm.Value, pixelNum);
 
 targetLabel = 8; 
 maskSuper = superpixelLabels == targetLabel; 
-[eigs{3}, ~, ~, ~, ~] = DimredInternal(hsIm.GetMaskedPixels(maskSuper), 'PCA', 3);
-[~, scores{3}, ~, ~, ~] = hsIm.Dimred('SuperPCA', 3);
+[eigs{3}, ~, ~, explained{3}, ~] = DimredInternal(hsIm.GetMaskedPixels(maskSuper), 'PCA', q);
+[~, scores{3}, ~, ~, ~] = hsIm.Dimred('SuperPCA', q);
 
 
 numEndmembers = 6;
@@ -29,8 +30,8 @@ endmembers = NfindrInternal(hsIm.Value, numEndmembers, hsIm.FgMask);
 clusterLabels = DistanceScoresInternal(hsIm.Value, endmembers, @sam);
 targetEndmember = 3; 
 maskCluster = clusterLabels == targetEndmember; 
-[eigs{4}, ~, ~, ~, ~] = DimredInternal(hsIm.GetMaskedPixels(maskCluster), 'PCA', 3);
-scores{4} = SuperPCA(hsIm.Value, 3, clusterLabels);
+[eigs{4}, ~, ~, explained{4}, ~] = DimredInternal(hsIm.GetMaskedPixels(maskCluster), 'PCA', q);
+scores{4} = SuperPCA(hsIm.Value, q, clusterLabels);
 
 close all;
 

@@ -3,7 +3,7 @@ function Basics_Denoise()
 close all;
 
 [~, targetNames] = commonUtility.DatasetInfo(true);
-methods = {'smile', 'smoothen'};
+methods = { 'smoothen'}; %'smile',
 for j = 2:2
     config.SetSetting('SaveFolder', strcat('Denoise-', methods{j}));
 
@@ -47,4 +47,5 @@ for j = 2:2
         plots.SavePlot(3, plotPath);
     end
 end 
+
 end

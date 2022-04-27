@@ -1,12 +1,13 @@
 function [trainPerformance, testPerformance ] = Basics_Dimred()
+
 % filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
 % load(filePath);
 % filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
 % load(filePath2);
 
-experiment = strcat('Dimred', date(), '-rbf-100000-optimizer');
+experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,1-boxc2');
 Basics_Init(experiment);
-config.SetSetting('Dataset', 'pslRaw');
+config.SetSetting('Dataset', 'pslRaw-Denoisesmoothen');
 
 fprintf('Running for dataset %s\n', config.GetSetting('Dataset'));
 dataset = config.GetSetting('Dataset');

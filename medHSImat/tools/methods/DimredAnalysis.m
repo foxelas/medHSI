@@ -10,19 +10,19 @@ close all;
 srgb = hsIm.GetDisplayImage('rgb');
 
 if strcmpi(method, 'ica')
-    [~, scores, ~, ~, ~] = hsIm.Dimred('ica', varargin{:});
+    [coeff, scores, ~, explained, ~] = hsIm.Dimred('ica', varargin{:});
     subName = 'Independent Component';
     limitVal = [];
 end
 
 if strcmpi(method, 'rica')
-    [~, scores, ~, ~, ~] = hsIm.Dimred('rica', varargin{:});
+    [coeff, scores, ~, explained, ~] = hsIm.Dimred('rica', varargin{:});
     subName = 'Reconstructed Component';
     limitVal = [[0, 0]; [-3, 3]; [-1, 1]; [-15, 0]];
 end
 
 if strcmpi(method, 'pca')
-    [~, scores, ~, ~, ~] = hsIm.Dimred('pca', varargin{:});
+    [coeff, scores, ~, explained, ~] = hsIm.Dimred('pca', varargin{:});
     subName = 'Principal Component';
     limitVal = [[0, 0]; [-3, 10]; [-3, 3]; [-1, 1]];
 end
@@ -38,5 +38,18 @@ names = {labelInfo.Diagnosis, strjoin({subName, '1'}, {' '}), strjoin({subName, 
 plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ca_overlay'), 'png');
 plots.MontageWithLabel(2, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
-
+fig = figure(3);
+w = hsiUtility.GetWavelengths(311);
+hold on
+for i = 1:3
+    v = explained(i);
+    name = strcat('TransVector', num2str(i), '(', sprintf('%.2f%%', v), ')');
+    plot(w, coeff(:,i), 'DisplayName', name ,'LineWidth', 2);
+end
+hold off 
+xlabel('Wavelength (nm)');
+ylabel('Coefficient (a.u.)');
+legend('Location', 'northwest');
+plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ca_vectors'), 'png');
+plots.SavePlot(fig, plotPath);
 end

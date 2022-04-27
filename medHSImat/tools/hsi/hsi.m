@@ -660,8 +660,11 @@ classdef hsi
             if flattenFlag
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
-        end
+            
+            scores = hsi.AdjustDimensions(scores, q);
 
+        end
+        
         % ======================================================================
         %> @brief Nfindr applies the algorithm only on the specimen pixels of the hsi, while ignoring the bakcground.
         %>
@@ -1449,6 +1452,31 @@ classdef hsi
             end
 
             cleanLabels = labels;
+        end
+
+        function [scores] = AdjustDimensions(scores, q)
+            
+            if iscell(scores)
+                for i=1:numel(scores)
+                    scores{i} = hsi.AdjustDimensions(scores{i}, q);
+                end
+            else
+            
+                % Adjust dimensions if it is smaller than expected 
+                if ndims(scores) == 3 && size(scores, 3) < q
+                    [m, l, n] = size(scores);
+                    newScores = zeros(m,l,q);
+                    newScores(:, :, 1:n) = scores;
+                    scores = newScores;
+                end
+
+                if ndims(scores) == 2 && size(scores, 2) < q
+                    [m,n] = size(scores);
+                    newScores = zeros(m,q);
+                    newScores(:, 1:n) = scores;
+                    scores = newScores;
+                end
+            end
         end
 
     end

@@ -310,7 +310,7 @@ classdef trainUtility
             stack = dbstack();
             hasOptimization = true; 
             for k=1:numel(stack)
-                if contains(stack(k).name, 'RunKfoldValidation')
+                if contains(stack(k).name, 'RunKfoldValidation') || contains(stack(k).name, 'ValidateTest2')
                     hasOptimization = false;
                 end
             end
@@ -321,7 +321,7 @@ classdef trainUtility
                     %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'Standardize', true
             else 
                 SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                    'KernelScale', 'auto', 'IterationLimit', iterLim, 'OutlierFraction', 0.1); 
+                    'BoxConstraint', 2, 'KernelScale', 'auto', 'IterationLimit', iterLim, 'OutlierFraction', 0.1); 
                     %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'Standardize', true
             end 
 
@@ -730,7 +730,7 @@ classdef trainUtility
 
         function [perfStr, trainedModel] = ModelEvaluation(modelName, featNum, gtLabels, predLabels, trainLabels, trainedModel, stackedModels, drTrainTime, modelTrainTime)
             perfStr = struct('Name', [], 'Features', [], 'Accuracy', [], 'Sensitivity', [], 'Specificity', [], 'JaccardCoeff', [], 'AUC', [], ...
-                                'AUCX', [], 'AUCY', [], 'DRTrainTime', [], 'ModelTrainTime', []);
+                                'AUCX', [], 'AUCY', [], 'DRTrainTime', [], 'ModelTrainTime', [], 'Mahalanobis', []);
             
             %% Results evaluation 
             [perfStr.Accuracy, perfStr.Sensitivity, perfStr.Specificity] = commonUtility.Evaluations(gtLabels, predLabels);
@@ -739,6 +739,8 @@ classdef trainUtility
             perfStr.ModelTrainTime = modelTrainTime;
             perfStr.Name = modelName;
             perfStr.Features = featNum;
+            [h, w] = size(gtLabels);
+            perfStr.Mahalanobis = mahal([1]', reshape(predLabels, [h*w, 1] ) );  
             
             % TO REMOVE
             factors = 10;
@@ -811,7 +813,8 @@ classdef trainUtility
                 'JaccardCoeff', mean([perfStr.JaccardCoeff]), 'AUC', mean([perfStr.AUC]),  'AUCX', meanAucX, 'AUCY', meanAucY, ...
                 'DRTrainTime', mean([perfStr.DRTrainTime]), 'ModelTrainTime', mean([perfStr.ModelTrainTime]), ...
                 'AccuracySD', std([perfStr.Accuracy]), 'SensitivitySD', std([perfStr.Sensitivity]), 'SpecificitySD',std([perfStr.Specificity]),...
-                'JaccardCoeffSD',std([perfStr.JaccardCoeff]), 'AUCSD', std([perfStr.AUC]));
+                'JaccardCoeffSD',std([perfStr.JaccardCoeff]), 'AUCSD', std([perfStr.AUC]), ...
+                'Mahalanobis', mean([perfStr.Mahalanobis]) , 'MahalanobisSD',  std([perfStr.Mahalanobis]));
                                          
             fprintf('%d-fold validated - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
                 numValidSets, peformanceStruct.JaccardCoeff *100, peformanceStruct.AUC, peformanceStruct.Accuracy *100, peformanceStruct.Sensitivity *100, ....
@@ -930,6 +933,7 @@ classdef trainUtility
             origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
 
             for i = 1:numel(sRGBs)
+                %% without post-processing
                 predMask = hsi.RecoverSpatialDimensions(predlabels{i}, origSizes{i}, fgMasks{i});
                 trueMask = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
                 jacsim = commonUtility.Jaccard(predMask, trueMask);
@@ -938,6 +942,18 @@ classdef trainUtility
                     strcat('pred_', method, '_', num2str(q))), 'png');
                 figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
                 plots.Overlay(4, imgFilePath, sRGBs{i}, predMask, figTitle);
+               
+                %% with post processing 
+                seClose = strel('disk',3);
+                closeMask = imclose(predMask,seClose);
+                seErode = strel('disk',3);
+                postPredMask = imerode(closeMask,seErode);
+                jacsim = commonUtility.Jaccard(postPredMask, trueMask);
+                
+               imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat(num2str(i), '_post'), ...
+                    strcat('pred_', method, '_', num2str(q))), 'png');
+                figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
+                plots.Overlay(4, imgFilePath, sRGBs{i}, postPredMask, figTitle);
             end
             
         end

@@ -2,7 +2,10 @@ function [] = PrepareGraphs_Performance()
     filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
     load(filePath);
     
-    MakeTable(trainPerformance, filePath);
+    withSME = true;
+    numSamples = 19; 
+    
+    MakeTable(trainPerformance, filePath, withSME, numSamples);
     MakeFeatGraphs(trainPerformance, testPerformance);
     MakeBestGraphs(trainPerformance, testPerformance);
 end
@@ -74,14 +77,12 @@ end
 
 function [] = MakeBestGraphs(trainPerformance, testPerformance)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff'};
+targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis'};
 targets = {trainPerformance, testPerformance};
 for ii = 1:length(targetMetrics)
     targetMetric = targetMetrics{ii};
     for i = 1:length(targets)
     target = targets{i};
-    targetMetric
-    i
         for j = 1:length(target)
             vals = target{j};
             yy = zeros(length(vals), 1);
@@ -131,9 +132,9 @@ end
         
 end 
 
-function [] = MakeTable(trainPerformance, filePath)
+function [] = MakeTable(trainPerformance, filePath, withSME, numSamples)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff'};
+targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis'};
 % logVal = [];
 targets = {trainPerformance};
 for ii = 1:length(targetMetrics)
@@ -155,10 +156,10 @@ for ii = 1:length(targetMetrics)
             selRow = vals{idx};
             c = c + 1;
             resultStruct(c) = struct('Method', selRow.Name, 'N', selRow.Features, ...
-                'JacCoef',  sprintf('%.3f (%.2f)', selRow.JaccardCoeff *100, selRow.JaccardCoeffSD*100), ...
-                'Accuracy', sprintf('%.3f (%.2f)', selRow.Accuracy *100, selRow.AccuracySD*100),  ...
-                'Sensitivity', sprintf('%.3f (%.2f)', selRow.Sensitivity *100, selRow.SensitivitySD*100), ...
-                'Specificity', sprintf('%.3f (%.2f)', selRow.Specificity *100, selRow.SpecificitySD*100), ...
+                'JacCoef',  sprintf('%.3f (%.2f)', selRow.JaccardCoeff *100, ConvertToSME(selRow.JaccardCoeffSD, withSME, numSamples)*100), ...
+                'Accuracy', sprintf('%.3f (%.2f)', selRow.Accuracy *100, ConvertToSME(selRow.AccuracySD, withSME, numSamples)*100),  ...
+                'Sensitivity', sprintf('%.3f (%.2f)', selRow.Sensitivity *100, ConvertToSME(selRow.SensitivitySD, withSME, numSamples)*100), ...
+                'Specificity', sprintf('%.3f (%.2f)', selRow.Specificity *100,ConvertToSME(selRow.SpecificitySD, withSME, numSamples)*100), ...
                 'DR', sprintf('%.3f', selRow.DRTrainTime), 'SVM', sprintf('%.3f', selRow.ModelTrainTime));
    
 %             rowText = sprintf('%s & %d & %.3f (%.2f) & %.3f (%.2f) & %.3f (%.2f) & %.3f (%.2f) & %.3f & %.3f\n', selRow.Name, selRow.Features, ...
@@ -171,17 +172,37 @@ for ii = 1:length(targetMetrics)
     T = struct2table(resultStruct);
    
     T = renamevars(T, [T.Properties.VariableNames], ...
-                 ["Method", "N", "JacCoef* (%%)", "Accuracy* (%%)",  ...
-                    "Sensitivity* (%%)", "Specificity* (%%)", "DR $t_{train}$", "SVM $t_{train}$"]);
+                 ["Method", "N", "JacCoef* (%)", "Accuracy* (%)",  ...
+                    "Sensitivity* (%)", "Specificity* (%)", "DR $t_{train}$", "SVM $t_{train}$"]);
              
-    label = 'tab:validation-results';
+    label = 'tab:validation-results-1';
     caption = 'Classification Performance after 5-fold Validation';
-    notes = {'* Values are reported as MEAN(SD).', 'N denotes the retained number of features. $t_{train}$ denotes the training time.'};
-    Ttex = table2latex(T, [], label, caption, [], false, notes, false);
+    if withSME
+        notes = {'* Values are reported as MEAN(SME). N denotes the number of retained features.'};
+    else
+        notes = {'* Values are reported as MEAN(SD). N denotes the number of retained features.'};
+    end
+    Ttex = table2latex(T, label, caption, 'SelectedColumns', [1,2,3,5,6], 'Notes', notes, 'Style', "minimal");
     
-    filePath2 = strrep(filePath, 'lastrun.mat', strcat('optimal_', targetMetric, '.txt'));
+    filePath2 = strrep(filePath, 'lastrun.mat', strcat('optimal_', targetMetric, '_tab1.txt'));
+    writeToFile(filePath2, Ttex);
+    
+    label = 'tab:validation-results-2';
+    caption = 'Training Duration after 5-fold Validation';
+    notes = {'N denotes the number of retained features. $t_{train}$ denotes the training time.'};
+    Ttex = table2latex(T, label, caption, 'SelectedColumns', [1,2,7,8], 'Notes', notes, 'Style', "minimal");
+    
+    filePath2 = strrep(filePath, 'lastrun.mat', strcat('optimal_', targetMetric, '_tab2.txt'));
     writeToFile(filePath2, Ttex);
 
 end
 
+end
+
+function procVal = ConvertToSME(origVal, withSME, numSamples)
+if withSME 
+    procVal = origVal / sqrt(numSamples);
+else
+    procVal = origVal;
+end
 end
