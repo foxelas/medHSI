@@ -5,11 +5,9 @@ function [trainPerformance, testPerformance] = Basics_Dimred()
 % filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
 % load(filePath2);
 
-experiment = strcat('Dimred', date(), '-rbf-100000');
+experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,05');
 Basics_Init(experiment);
-config.SetSetting('Dataset', 'pslRaw-Denoisesmoothen');
 
-fprintf('Running for dataset %s\n', config.GetSetting('Dataset'));
 dataset = config.GetSetting('Dataset');
 
 %% Read h5 data
