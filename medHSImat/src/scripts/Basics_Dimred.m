@@ -5,7 +5,7 @@ function [trainPerformance, testPerformance] = Basics_Dimred()
 % filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
 % load(filePath2);
 
-experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,1-boxc2');
+experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,051');
 Basics_Init(experiment);
 config.SetSetting('Dataset', 'pslRaw-Denoisesmoothen');
 
@@ -14,7 +14,7 @@ dataset = config.GetSetting('Dataset');
 
 %% Read h5 data
 folds = 5;
-testTargets = {'163', '251', '227'};
+testTargets = {'157', '251', '227'};
 dataType = 'hsi';
 qs = [5, 10, 20, 50, 100];
 ks = 1:length(qs);

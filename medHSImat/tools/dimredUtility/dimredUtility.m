@@ -252,7 +252,7 @@ classdef dimredUtility
                     %% ClusterPCA
                 case 'clusterpca'
                     %%Find endmembers
-                    numEndmembers = 6;
+                    numEndmembers = 5;%6;
                     endmembers = NfindrInternal(X, numEndmembers, fgMask);
 
                     %%Find discrepancy metrics
