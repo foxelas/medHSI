@@ -5,7 +5,7 @@ function [trainPerformance, testPerformance] = Basics_Dimred()
 % filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
 % load(filePath2);
 
-experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,051');
+experiment = strcat('Dimred', date(), '-rbf-100000');
 Basics_Init(experiment);
 config.SetSetting('Dataset', 'pslRaw-Denoisesmoothen');
 
