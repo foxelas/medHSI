@@ -328,11 +328,6 @@ classdef trainUtility
             end
 
             numIter = SVMModel.NumIterations;
-            % TO REMOVE
-            if numIter == iterLim
-                disp('SVM finished because of MaxIter reached.')
-            end
-            % TO REMOVE
 
         end
 
@@ -887,12 +882,8 @@ classdef trainUtility
                 [perfStr(k), ~, ~] = trainUtility.DimredAndTrain(trainDataFold, testDataFold, method, q, varargin{:});
             end
 
-            % TO REMOVE
             [meanAucX, meanAucY] = trainUtility.GetMeanAUC({perfStr.AUCX}, {perfStr.AUCY});
-            % TO REMOVE 
-%             meanAucX = [];
-%             meanAucY = []; 
-            
+ 
             peformanceStruct = struct('Name', perfStr(1).Name, 'Features', perfStr(1).Features, ...
                 'Accuracy', mean([perfStr.Accuracy]), 'Sensitivity', mean([perfStr.Sensitivity]), 'Specificity', mean([perfStr.Specificity]), ...
                 'JaccardCoeff', mean([perfStr.JaccardCoeff]), 'AUC', mean([perfStr.AUC]), 'AUCX', meanAucX, 'AUCY', meanAucY, ...
