@@ -12,7 +12,7 @@ end
 
 function [] = MakeFeatGraphs(trainPerformance, testPerformance)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff'};
+targetMetrics = {'Sensitivity', 'JaccardCoeff', 'JacDensity'};
 targets = {trainPerformance, testPerformance};
 for ii = 1:length(targetMetrics)
     targetMetric = targetMetrics{ii};
@@ -77,7 +77,7 @@ end
 
 function [] = MakeBestGraphs(trainPerformance, testPerformance)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis'};
+targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis', 'JacDensity'};
 targets = {trainPerformance, testPerformance};
 for ii = 1:length(targetMetrics)
     targetMetric = targetMetrics{ii};
@@ -100,12 +100,16 @@ for ii = 1:length(targetMetrics)
 
         close all;
         fig = figure(1);
+        c = 0;
         hold on
         for j = 1:length(target)
-            xx = xVals{j};
-            yy = yVals{j};
-            h(j) = plot(xx, yy, 'DisplayName', dispName{j}, ...
-                'LineWidth', 2);
+            if ~isempty(xVals{j})               
+                xx = xVals{j};
+                yy = yVals{j};
+                c = c + 1;
+                h(c) = plot(xx, yy, 'DisplayName', dispName{j}, ...
+                    'LineWidth', 2);
+            end
         end
         hold off
         xlabel('False Positive Rate', 'FontSize', 15);
@@ -134,7 +138,7 @@ end
 
 function [] = MakeTable(trainPerformance, filePath, withSME, numSamples)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis'};
+targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis', 'JacDensity'};
 % logVal = [];
 targets = {trainPerformance};
 for ii = 1:length(targetMetrics)
@@ -173,23 +177,23 @@ for ii = 1:length(targetMetrics)
 
     T = renamevars(T, [T.Properties.VariableNames], ...
         ["Method", "N", "JacCoef* (%)", "Accuracy* (%)", ...
-        "Sensitivity* (%)", "Specificity* (%)", "DR $t_{train}$", "SVM $t_{train}$"]);
+        "Sensitivity* (%)", "Specificity* (%)", "$t_{DR}$", "$t_{SVM}$"]);
 
-    label = 'tab:validation-results-1';
+    label = 'validation-results-1';
     caption = 'Classification Performance after 5-fold Validation';
     if withSME
-        notes = {'* Values are reported as MEAN(SME). N denotes the number of retained features.'};
+        notes = {'* Values are reported as MEAN(SME). N denotes the reduced dimension.'};
     else
-        notes = {'* Values are reported as MEAN(SD). N denotes the number of retained features.'};
+        notes = {'* Values are reported as MEAN(SD).N denotes the reduced dimension.'};
     end
     Ttex = table2latex(T, label, caption, 'SelectedColumns', [1, 2, 3, 5, 6], 'Notes', notes, 'Style', "minimal");
 
     filePath2 = strrep(filePath, 'lastrun.mat', strcat('optimal_', targetMetric, '_tab1.txt'));
     writeToFile(filePath2, Ttex);
 
-    label = 'tab:validation-results-2';
+    label = 'validation-results-2';
     caption = 'Training Duration after 5-fold Validation';
-    notes = {'N denotes the number of retained features. $t_{train}$ denotes the training time.'};
+    notes = {'N denotes the reduced dimension. $t_{i}$ denotes the training time for process $i$.'};
     Ttex = table2latex(T, label, caption, 'SelectedColumns', [1, 2, 7, 8], 'Notes', notes, 'Style', "minimal");
 
     filePath2 = strrep(filePath, 'lastrun.mat', strcat('optimal_', targetMetric, '_tab2.txt'));

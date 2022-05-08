@@ -519,7 +519,7 @@ classdef dimredUtility
             elseif iscell(scores_)
                 explained = cell(numel(scores_), 1);
                 for i = 1:numel(scores_)
-                    explained{i} = dimredUtility.CalculateExplained(scores_{i}, Xcol_, X_, mask_, []);
+                    explained{i} = dimredUtility.CalculateExplained(scores_{i}, Xcol_, X_, mask_);
                 end
             else
                 explained = [];

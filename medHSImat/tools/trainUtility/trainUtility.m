@@ -322,9 +322,9 @@ classdef trainUtility
                 %'Standardize', true | 'BoxConstraint', 2,
             else
                 SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                     'KernelScale', 'auto', 'IterationLimit', iterLim,'OutlierFraction', 0.05);
+                     'KernelScale', 'auto', 'OutlierFraction', 0.05);
                 %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'OutlierFraction', 0.05
-                %'Standardize', true | 'BoxConstraint', 2,
+                %'Standardize', true | 'BoxConstraint', 2, 'IterationLimit', iterLim,
             end
 
             numIter = SVMModel.NumIterations;
@@ -428,7 +428,7 @@ classdef trainUtility
                 error('Data should be in a cell format');
             end
 
-            numScales = size(Xtrain, 2);
+            numScales = numel(Xtrain);
 
             models = cell(numScales, 1);
             XtrainTrans = cell(numScales, 1);
@@ -488,6 +488,10 @@ classdef trainUtility
                 fusionMethod = 'voting';
             end
 
+            if iscell(trainedModel) && numel(trainedModel) == 1 
+                trainedModel = trainedModel{1};
+            end 
+            
             if iscell(trainedModel)
                 models = trainedModel;
                 numModels = numel(models);
@@ -598,9 +602,6 @@ classdef trainUtility
                 targetMethod = 'stacked';
             end
 
-            stackedModels = [];
-            trainedModel = [];
-
             tic;
             transTrain = cellfun(@(x, y) x.Transform(true, preTransMethod, q, y, varargin{:}), {trainData.Values}, {trainData.ImageLabels}, 'un', 0);
             drTrainTime = toc;
@@ -654,7 +655,7 @@ classdef trainUtility
                     tic;
                     wavelengths = hsiUtility.GetWavelengths(311);
                     rfiFile = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'rfi'), 'mat');
-                    if ~exist(rfiFile)
+%                     if ~exist(rfiFile)
                         t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
                         %'NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
                         %'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
@@ -677,11 +678,10 @@ classdef trainUtility
                         plots.SavePlot(1, plotPath);
 
                         save(rfiFile, 'impOOB');
-                        tdimred = 19722.50930;
-                    else
-                        load(rfiFile, 'impOOB');
-                        tdimred = 19722.50930;
-                    end
+%                     else
+%                         load(rfiFile, 'impOOB');
+%                         drTrainTime = 19722.50930;
+%                     end
 
                     [~, XTrainscores, ~, ~, ~] = dimredUtility.Apply(XTrainscores, 'rfi', q, [], [], impOOB);
                     [~, XValidscores, ~, ~, ~] = dimredUtility.Apply(XValidscores, 'rfi', q, [], [], impOOB);
@@ -689,13 +689,14 @@ classdef trainUtility
                     [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
 
                 case 'stacked'
-                    [predLabels, modelTrainTime, stackedModels, XTrainscores, XValidscores] = trainUtility.StackMultiscale(@trainUtility.SVM, 'voting', XTrainscores, yTrain, XValidscores);
-
+                    [predLabels, modelTrainTime, trainedModel, ~, ~] = trainUtility.StackMultiscale(@trainUtility.SVM, 'voting', XTrainscores, yTrain, XValidscores);
+                    
                 otherwise
                     [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
             end
 
-            [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(method, q, yValid, predLabels, yTrain, trainedModel, stackedModels, drTrainTime, modelTrainTime);
+            [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(method, q, yValid, predLabels, yTrain, trainedModel, ...
+                drTrainTime, modelTrainTime, testData, XValid);
         end
 
         % ======================================================================
@@ -764,7 +765,8 @@ classdef trainUtility
         %> @retval perfStr [struct] | The performance structure
         %> @retval trainedModel [model] | The trained model
         % ======================================================================   
-        function [perfStr, trainedModel] = ModelEvaluation(modelName, featNum, gtLabels, predLabels, trainLabels, trainedModel, stackedModels, drTrainTime, modelTrainTime)
+        function [perfStr, stackedModels] = ModelEvaluation(modelName, featNum, gtLabels, predLabels, trainLabels, ...
+                stackedModels, drTrainTime, modelTrainTime, testData, testScores)
         % ModelEvaluation returns the model evaluation results.
         %
         % @b Usage
@@ -786,29 +788,50 @@ classdef trainUtility
         % @retval trainedModel [model] | The trained model
          
             perfStr = struct('Name', [], 'Features', [], 'Accuracy', [], 'Sensitivity', [], 'Specificity', [], 'JaccardCoeff', [], 'AUC', [], ...
-                'AUCX', [], 'AUCY', [], 'DRTrainTime', [], 'ModelTrainTime', [], 'Mahalanobis', []);
+                'AUCX', [], 'AUCY', [], 'DRTrainTime', [], 'ModelTrainTime', [], 'Mahalanobis', [], 'JacDensity', []);
 
+            if ~iscell(stackedModels)
+                firstModel = stackedModels;
+                clear stackedModels
+                stackedModels{1} = firstModel;
+            end
+            
             %% Results evaluation
             [perfStr.Accuracy, perfStr.Sensitivity, perfStr.Specificity] = commonUtility.Evaluations(gtLabels, predLabels);
-            perfStr.JaccardCoeff = commonUtility.Jaccard(gtLabels, predLabels);
+            
+            fgMasks = {testData.Masks};
+            sRGBs = {testData.RGBs};
+            predLabelsCell = cellfun(@(x) trainUtility.Predict(stackedModels, x, 'voting'), testScores, 'un', 0);
+            origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
+
+            jacsim = 0;
+            jacDensity = 0;
+            mahalDist = 0;
+            for i = 1:numel(sRGBs)
+
+                %% without post-processing
+                predMask = logical(hsi.RecoverSpatialDimensions(predLabelsCell{i}, origSizes{i}, fgMasks{i}));
+                trueMask = testData(i).ImageLabels;
+                jacsim = jacsim + commonUtility.Jaccard(predMask, trueMask);
+                jacDensity = jacDensity + MeasureDensity(predMask, trueMask);
+                [h, w] = size(trueMask);
+                mahalDist = mahalDist + mahal([1]', reshape(predMask, [h * w, 1]));
+            end
+                
+            perfStr.JaccardCoeff = jacsim / numel(sRGBs);
+            perfStr.JacDensity = jacDensity / numel(sRGBs);
+            perfStr.Mahalanobis = mahalDist / numel(sRGBs);
             perfStr.DRTrainTime = drTrainTime;
             perfStr.ModelTrainTime = modelTrainTime;
             perfStr.Name = modelName;
             perfStr.Features = featNum;
-            [h, w] = size(gtLabels);
-            perfStr.Mahalanobis = mahal([1]', reshape(predLabels, [h * w, 1]));
-
+            
             % TO REMOVE
             factors = 10;
             kk = ceil(decimate(1:size(trainLabels, 1), factors));
             ytrainDecim = trainLabels(kk, :);
             % TO REMOVE
 
-            if isempty(stackedModels) %single model
-                stackedModels{1} = trainedModel;
-            else %multiple models
-                trainedModel = stackedModels;
-            end
             for i = 1:numel(stackedModels)
                 singleModel = fitPosterior(stackedModels{i});
                 [~, score_svm] = resubPredict(singleModel);
@@ -818,6 +841,7 @@ classdef trainUtility
             perfStr.AUCX = meanAucX;
             perfStr.AUCY = meanAucY;
             perfStr.AUC = mean(aucVal);
+
 
         end
         % ======================================================================
@@ -863,14 +887,20 @@ classdef trainUtility
                 [perfStr(k), ~, ~] = trainUtility.DimredAndTrain(trainDataFold, testDataFold, method, q, varargin{:});
             end
 
+            % TO REMOVE
             [meanAucX, meanAucY] = trainUtility.GetMeanAUC({perfStr.AUCX}, {perfStr.AUCY});
+            % TO REMOVE 
+%             meanAucX = [];
+%             meanAucY = []; 
+            
             peformanceStruct = struct('Name', perfStr(1).Name, 'Features', perfStr(1).Features, ...
                 'Accuracy', mean([perfStr.Accuracy]), 'Sensitivity', mean([perfStr.Sensitivity]), 'Specificity', mean([perfStr.Specificity]), ...
                 'JaccardCoeff', mean([perfStr.JaccardCoeff]), 'AUC', mean([perfStr.AUC]), 'AUCX', meanAucX, 'AUCY', meanAucY, ...
                 'DRTrainTime', mean([perfStr.DRTrainTime]), 'ModelTrainTime', mean([perfStr.ModelTrainTime]), ...
                 'AccuracySD', std([perfStr.Accuracy]), 'SensitivitySD', std([perfStr.Sensitivity]), 'SpecificitySD', std([perfStr.Specificity]), ...
                 'JaccardCoeffSD', std([perfStr.JaccardCoeff]), 'AUCSD', std([perfStr.AUC]), ...
-                'Mahalanobis', mean([perfStr.Mahalanobis]), 'MahalanobisSD', std([perfStr.Mahalanobis]));
+                'Mahalanobis', mean([perfStr.Mahalanobis]), 'MahalanobisSD', std([perfStr.Mahalanobis]), ...
+                'JacDensity', mean([perfStr.JacDensity]), 'JacDensitySD', std([perfStr.JacDensity]));
 
             fprintf('%d-fold validated - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
                 numValidSets, peformanceStruct.JaccardCoeff*100, peformanceStruct.AUC, peformanceStruct.Accuracy*100, peformanceStruct.Sensitivity*100, ... .
@@ -975,8 +1005,9 @@ classdef trainUtility
             % @retval trainPerformance [numeric array] | The train performance results
             % @retval testPerformance [numeric array] | The test performance results
 
-            [trainPerformance] = trainUtility.RunKfoldValidation(trainData, cvp, method, q, varargin{:});
-
+            %[trainPerformance] = trainUtility.RunKfoldValidation(trainData, cvp, method, q, varargin{:});
+            trainPerformance = [];
+            
             [testPerformance, trainedModel, testscores] = trainUtility.DimredAndTrain(trainData, testData, method, q, varargin{:});
             fprintf('Test - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
                 testPerformance.JaccardCoeff*100, testPerformance.AUC, testPerformance.Accuracy*100, testPerformance.Sensitivity*100, ... .

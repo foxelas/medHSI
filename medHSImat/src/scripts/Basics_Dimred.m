@@ -72,7 +72,7 @@ j = j + 1;
 % fprintf('QDA: \n\n');
 % j = j + 1;
 
-%% Fails because of covarance
+%% Fails because of covariance
 % [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'qda', 1);
 % save(filePath, 'trainPerformance', 'testPerformance');
 
@@ -170,10 +170,10 @@ PrepareGraphs_Performance();
 
 end
 
-%%%%%%%%%%%%%%%%%%%%% Assisting Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [acc] = critfun(scores, labels)
-SVMModel = fitcsvm(scores, labels, 'Standardize', true, 'KernelFunction', 'RBF', ...
-    'KernelScale', 'auto');
-predlabels = predict(SVMModel, scores);
-[acc, ~, ~] = metrics.Evaluations(labels, predlabels);
-end
+% %%%%%%%%%%%%%%%%%%%%% Assisting Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% function [acc] = critfun(scores, labels)
+% SVMModel = fitcsvm(scores, labels, 'Standardize', true, 'KernelFunction', 'RBF', ...
+%     'KernelScale', 'auto');
+% predlabels = predict(SVMModel, scores);
+% [acc, ~, ~] = metrics.Evaluations(labels, predlabels);
+% end
