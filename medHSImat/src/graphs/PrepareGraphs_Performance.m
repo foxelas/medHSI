@@ -103,7 +103,7 @@ for ii = 1:length(targetMetrics)
         c = 0;
         hold on
         for j = 1:length(target)
-            if ~isempty(xVals{j})               
+            if ~isempty(xVals{j})
                 xx = xVals{j};
                 yy = yVals{j};
                 c = c + 1;

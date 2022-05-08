@@ -2,17 +2,17 @@ function submasks = Clustering(mask)
 
 x1 = [];
 x2 = [];
-for i = 1:size(mask,1)
-    for j = 1:size(mask,2)
-        if mask(i,j) ~= 0 
+for i = 1:size(mask, 1)
+    for j = 1:size(mask, 2)
+        if mask(i, j) ~= 0
             x1 = [x1, i];
-            x2  = [x2, j];
+            x2 = [x2, j];
         end
     end
 end
-X = [x1;x2]';
+X = [x1; x2]';
 
-% figure(1); 
+% figure(1);
 % scatter(X(:,1),X(:,2))
 idx = dbscan(X, 5, 10);
 

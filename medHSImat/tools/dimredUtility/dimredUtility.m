@@ -252,7 +252,7 @@ classdef dimredUtility
                     %% ClusterPCA
                 case 'clusterpca'
                     %%Find endmembers
-                    numEndmembers = 5;%6;
+                    numEndmembers = 5; %6;
                     endmembers = NfindrInternal(X, numEndmembers, fgMask);
 
                     %%Find discrepancy metrics
@@ -315,25 +315,25 @@ classdef dimredUtility
         %> @param trainedObj [numeric array] | The trained dimension reduction object
         %>
         %> @retval transScores [numeric array] | The transformed scores
-        % ======================================================================        
+        % ======================================================================
         function [transScores] = Transform(inScores, method, q, trainedObj)
-        % Transform applies a pretrained dimension reduction method.
-        %
-        % @b Usage
-        %
-        % @code
-        % [peformanceStruct] = trainUtility.Transform(inScores, method, qNum, trainedObj);
-        % @endcode
-        %
-        % @param inScores [numeric array] | The target array
-        % @param method [char] | The dimension reduction method
-        % @param q [int] | The reduced dimension
-        % @param trainedObj [numeric array] | The trained dimension reduction object
-        %
-        % @retval transScores [numeric array] | The transformed scores
+            % Transform applies a pretrained dimension reduction method.
+            %
+            % @b Usage
+            %
+            % @code
+            % [peformanceStruct] = trainUtility.Transform(inScores, method, qNum, trainedObj);
+            % @endcode
+            %
+            % @param inScores [numeric array] | The target array
+            % @param method [char] | The dimension reduction method
+            % @param q [int] | The reduced dimension
+            % @param trainedObj [numeric array] | The trained dimension reduction object
+            %
+            % @retval transScores [numeric array] | The transformed scores
             [~, transScores, ~, ~, ~] = dimredUtility.Apply(inScores, method, q, [], [], trainedObj);
         end
-        
+
         % ======================================================================
         %> @brief Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
         %>
