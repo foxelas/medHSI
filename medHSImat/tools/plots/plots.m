@@ -828,13 +828,13 @@ classdef plots
                     lb = unique(curImg(:));
                     colors = parula(numel(lb));
                     [m, n] = size(curImg);
-                    newImg = zeros(m, n, 3);
+                    newImg = zeros(m * n, 3);
                     for k = 1:numel(lb)
                         mask = curImg == lb(k);
                         maskCol = reshape(mask, [m * n, 1]);
-                        newImg(maskCol, :) = repmat(colors(k, :), sum(maskCol));
+                        newImg(maskCol, :) = repmat(colors(k, :), sum(maskCol), 1);
                     end
-                    curImg = newImg;
+                    curImg = reshape(newImg, [m, n, 3]);
                 end
                 C = insertObjectMask(curImg, edge(labelMask), 'Color', 'w');
                 hold on;

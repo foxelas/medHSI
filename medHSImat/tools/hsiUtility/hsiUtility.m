@@ -43,19 +43,22 @@ classdef hsiUtility
             % @retval labelInfo [hsiInfo] | The initialized hsiInfo object
             targetFilename = commonUtility.GetFilename('dataset', targetID);
 
+            spectralData = [];
+            labelInfo = [];
             if ~exist(targetFilename, 'file')
-                error('There are no data for the requested ID = %s.', targetID);
+                warning('There are no data for the requested ID = %s.', targetID);
+            else      
+                variableInfo = who('-file', targetFilename);
+                fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('Dataset'), config.GetSetting('Normalization'));
+                fprintf('Filename: %s.\n', targetFilename);
+                if ismember('labelInfo', variableInfo) % returns true
+                    load(targetFilename, 'spectralData', 'labelInfo');
+                else
+                    load(targetFilename, 'spectralData');
+                    labelInfo = hsiInfo();
+                end
             end
 
-            variableInfo = who('-file', targetFilename);
-            fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('Dataset'), config.GetSetting('Normalization'));
-            fprintf('Filename: %s.\n', targetFilename);
-            if ismember('labelInfo', variableInfo) % returns true
-                load(targetFilename, 'spectralData', 'labelInfo');
-            else
-                load(targetFilename, 'spectralData');
-                labelInfo = hsiInfo();
-            end
         end
 
         %======================================================================
