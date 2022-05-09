@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*
-from tensorflow import keras 
 from keras import layers, backend
 from keras.models import Model
+from tensorflow.keras.optimizers import Adam, RMSprop
 import segmentation_models as sm
 
 if __name__ == "__main__":
@@ -16,7 +16,7 @@ STRIDES_SPECTRUM = 2
 
 ######### From scratch ###########
 
-def get_xception3d_1(dropMiddle, height, width, numChannels, numClasses):
+def get_xception3d_1(dropMiddle, width, height, numChannels, numClasses):
     channel_axis = -1
     depth = numChannels
     inputs = layers.Input((width, height, depth, 1), name='entry')
@@ -127,7 +127,7 @@ def separable_conv_layer(input, fiters, kernel, blockNum, sepConvNum):
 
     return x 
 
-def get_xception3d_2(dropMiddle, height, width, numChannels, numClasses):
+def get_xception3d_2(dropMiddle, width, height, numChannels, numClasses):
     
     depth = numChannels
     channel_axis = -1
@@ -307,9 +307,12 @@ def preproc_data(x_train_raw, x_test_raw):
     x_train_preproc, x_test_preproc = hsi_segment_from_sm.get_sm_preproc_data(x_train_raw, x_test_raw, 'inceptionresnetv2')
     return x_train_preproc, x_test_preproc
 
-def get_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=12):
+def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=12):
     backend.clear_session()
-    x_train_preproc, x_test_preproc = preproc_data(x_train_raw, x_test_raw)
+    
+    # x_train_preproc, x_test_preproc = preproc_data(x_train_raw, x_test_raw)
+    x_train_preproc = x_train_raw
+    x_test_preproc = x_test_raw
     if 'xception3d_max' in framework:
         model = get_xception3d_max(height, width, numChannels, numClasses)
 
@@ -322,13 +325,18 @@ def get_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, 
     elif 'xception3d2_mean' in framework:
         model = get_xception3d2_mean(height, width, numChannels, numClasses)
 
-    sgdOpt = keras.optimizers.SGD(learning_rate=0.001, momentum=0.9)
-    #adam = Adam(lr=0.001, decay=1e-06)
+
+    learing_rate = 0.0001
+    optimizer = RMSprop(learning_rate=learing_rate) # decay=1e-06
+    targetLoss = sm.losses.bce_jaccard_loss #categorical_crossentropy'
+    metrics = [sm.metrics.iou_score, 'accuracy']
+    lossFunName = targetLoss if str(targetLoss) == targetLoss else str(targetLoss._name)
+    optSettings = "Compiled with" + "\n" + "Optimizer" + str(optimizer._name) + "\n" + "Learning Rate" + str(learing_rate) + "\n" +  "Loss Function" + lossFunName
+
     model.compile(
-        sgdOpt, #'rmsprop', 'SGD', 'Adam',
-        #loss='categorical_crossentropy'
-        loss=sm.losses.bce_jaccard_loss,
-        metrics=[sm.metrics.iou_score]
+        optimizer = optimizer,  #'rmsprop', 'SGD', 'Adam',
+        loss=targetLoss,
+        metrics=metrics
         )
 
     # fit model
@@ -340,9 +348,111 @@ def get_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, 
     validation_data=(x_test_preproc, ytest),
     )
 
-    return model, history
+    return model, history, optSettings
 
 #backend.clear_session()
 
+def double_conv_block(x, n_filters, kernel_size):
+   # Conv2D then ReLU activation
+   x = layers.Conv3D(filters=n_filters, kernel_size=kernel_size, padding = "same", activation = "relu", kernel_initializer = "he_normal")(x)
+   # Conv2D then ReLU activation
+   x = layers.Conv3D(filters=n_filters, kernel_size=kernel_size, padding = "same", activation = "relu", kernel_initializer = "he_normal")(x)
+   return x
 
+def downsample_block(x, n_filters, kernel_size):
+   f = double_conv_block(x, n_filters, kernel_size)
+   p = layers.MaxPool3D(2)(f)
+   p = layers.Dropout(0.4)(p)
+   return f, p
 
+def double_conv_block_2D(x, n_filters):
+   # Conv2D then ReLU activation
+   x = layers.Conv2D(filters=n_filters, kernel_size=3, padding = "same", activation = "relu", kernel_initializer = "he_normal")(x)
+   # Conv2D then ReLU activation
+   x = layers.Conv2D(filters=n_filters, kernel_size=3, padding = "same", activation = "relu", kernel_initializer = "he_normal")(x)
+   return x
+
+def upsample_block(x, conv_features, n_filters):
+   # upsample
+   x = layers.Conv2DTranspose(n_filters, 3, 2, padding="same")(x)
+   conv_features = layers.Lambda(lambda y: backend.mean(y, axis=3))(conv_features)
+   # concatenate
+   x = layers.concatenate([x, conv_features])
+   # dropout
+   x = layers.Dropout(0.4)(x)
+   # Conv2D twice with ReLU activation
+   x = double_conv_block_2D(x, n_filters)
+   return x
+
+def cnn3d( width, height, numChannels, numClasses): 
+
+    depth = numChannels
+    channel_axis = -1
+
+    ## Model Structure 
+    ## Input layer
+    input_layer = layers.Input((width, height, depth, 1), name='entry')
+    # encoder: contracting path - downsample
+    # 1 - downsample
+    f1, p1 = downsample_block(input_layer, 4, (3, 3, 50))
+    # 2 - downsample
+    f2, p2 = downsample_block(p1, 8, (3, 3, 50))
+    # 3 - downsample
+    f3, p3 = downsample_block(p2, 8, (3, 3, 30))
+    # 4 - downsample
+    f4, p4 = downsample_block(p3, 16, (3, 3, 20))
+    # 5 - downsample
+    f5, p5 = downsample_block(p4, 16, (3, 3, 20))
+
+    # 6 - bottleneck
+    bottleneck = double_conv_block(p5, 32, (1, 1, 19))
+    bottleneck = layers.Lambda(lambda y: backend.mean(y, axis=3), name='drop_thrid_dim')(bottleneck)
+    
+    # decoder: expanding path - upsample
+    # 6 - upsample
+    u6 = upsample_block(bottleneck, f5, 16)
+    # 7 - upsample
+    u7 = upsample_block(u6, f4, 16)
+    # 8 - upsample
+    u8 = upsample_block(u7, f3, 8)
+    # 9 - upsample
+    u9 = upsample_block(u8, f2, 8)
+    # 9 - upsample
+    u10 = upsample_block(u9, f1, 4)
+    output_layer = layers.Conv2D(numClasses, 3, padding="same", activation = "sigmoid")(u10)
+    #numClasses, 3, activation="sigmoid", padding="same"
+    model = Model(inputs=input_layer, outputs=output_layer)
+
+    return model 
+
+def get_cnn_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=12):
+    backend.clear_session()
+    # x_train_preproc, x_test_preproc = preproc_data(x_train_raw, x_test_raw)
+    x_train_preproc = x_train_raw
+    x_test_preproc = x_test_raw
+    if 'cnn3d' in framework:
+       model = cnn3d(height, width, numChannels, numClasses)
+
+    learing_rate = 0.0001
+    optimizer = RMSprop(learning_rate=learing_rate) #), decay=1e-06)
+    targetLoss = sm.losses.bce_jaccard_loss #categorical_crossentropy'
+    metrics = [sm.metrics.iou_score, 'accuracy']
+    lossFunName = targetLoss if str(targetLoss) == targetLoss else str(targetLoss._name)
+    optSettings = "Compiled with" + "\n" + "Optimizer" + str(optimizer._name) + "\n" + "Learning Rate" + str(learing_rate) + "\n" +  "Loss Function" + lossFunName
+
+    model.compile(
+        optimizer = optimizer,  #'rmsprop', 'SGD', 'Adam',
+        loss=targetLoss,
+        metrics=metrics
+        )
+
+    # fit model
+    history = model.fit(
+    x=x_train_preproc,
+    y=ytrain,
+    batch_size=batchSize,
+    epochs=numEpochs,
+    validation_data=(x_test_preproc, ytest),
+    )
+
+    return model, history, optSettings

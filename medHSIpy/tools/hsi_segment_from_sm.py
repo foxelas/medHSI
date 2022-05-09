@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*
 
 ######### From Segment Models #########
-from turtle import back
 import segmentation_models as sm
 from keras.layers import Input, Conv2D
 from keras.models import Model
@@ -60,17 +59,24 @@ def build_sm_model(backbone, x_train_raw, x_test_raw, height, width, numChannels
     x_train_preproc, x_test_preproc = get_sm_preproc_data(x_train_raw, x_test_raw, target_backbone)
     model = get_sm_model(backbone, height, width, numChannels, numClasses)
 
-    model.compile(
-    'Adam',
-    loss=sm.losses.bce_jaccard_loss,
-    metrics=[sm.metrics.iou_score],
-    )
+    learing_rate = 0.0001
+    optimizer = 'Adam' #RMSprop(learning_rate=learing_rate) # decay=1e-06
+    targetLoss = sm.losses.bce_jaccard_loss #categorical_crossentropy'
+    metrics = [sm.metrics.iou_score, 'accuracy']
+    lossFunName = targetLoss if str(targetLoss) == targetLoss else str(targetLoss._name)
+    optSettings = "Compiled with" + "\n" + "Optimizer" + str(optimizer._name) + "\n" + "Learning Rate" + str(learing_rate) + "\n" +  "Loss Function" + lossFunName
 
-    return model, x_train_preproc, x_test_preproc
+    model.compile(
+        optimizer = optimizer,  #'rmsprop', 'SGD', 'Adam',
+        loss=targetLoss,
+        metrics=metrics
+        )
+
+    return model, x_train_preproc, x_test_preproc, optSettings
 
 def fit_sm_model(backbone, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs):
 
-    model, x_train_prep, x_test_prep = build_sm_model(backbone, x_train_raw, x_test_raw, height, width, numChannels, numClasses)
+    model, x_train_prep, x_test_prep, optSettings = build_sm_model(backbone, x_train_raw, x_test_raw, height, width, numChannels, numClasses)
 
     # fit model
     history = model.fit(
@@ -81,5 +87,4 @@ def fit_sm_model(backbone, x_train_raw, ytrain, x_test_raw, ytest, height, width
     validation_data=(x_test_prep, ytest),
     )
 
-    return model, history 
-
+    return model, history, optSettings

@@ -17,22 +17,28 @@ WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 200 # 200
+NUMBER_OF_EPOCHS = 200
 BATCH_SIZE = 8
 
 X_train, X_test, y_train, y_test = hio.get_train_test()
 
 def get_framework(framework, xtrain, xtest, ytrain, ytest):
     if 'sm' in framework:
-        model, history = segsm.fit_sm_model(framework, xtrain, ytrain, xtest, ytest, 
+        model, history, optSettings = segsm.fit_sm_model(framework, xtrain, ytrain, xtest, ytest, 
             height=HEIGHT, width=WIDTH, numChannels=NUMBER_OF_CHANNELS, 
             numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
+            
+    elif 'cnn3d' == framework:
+        model, history, optSettings = segscratch.get_cnn_model(framework, xtrain, ytrain, xtest, ytest, 
+            height=HEIGHT, width=WIDTH,  numChannels=NUMBER_OF_CHANNELS, 
+            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS, batchSize=64)
+
     else:
-        model, history = segscratch.get_model(framework, xtrain, ytrain, xtest, ytest, 
+        model, history, optSettings = segscratch.get_xception_model(framework, xtrain, ytrain, xtest, ytest, 
             height=HEIGHT, width=WIDTH,  numChannels=NUMBER_OF_CHANNELS, 
             numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS, batchSize=BATCH_SIZE)
 
-    return model, history
+    return model, history, optSettings
 
 def calc_plot_roc(model, X_test, y_test, model_name, folder):
     y_scores = model.predict(X_test).ravel()
@@ -64,13 +70,14 @@ def calc_plot_roc(model, X_test, y_test, model_name, folder):
 # hio.save_model_info(model, folder)
 
 flist = [
-    'sm_vgg', 'sm_vgg_pretrained', 
+    #'sm_vgg', 'sm_vgg_pretrained', 
     # 'sm_resnet', 'sm_resnet_pretrained',
     # 'sm_inception', 'sm_inception_pretrained', 
     # 'sm_efficientnet', 'sm_efficientnet_pretrained', 
     # 'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained', 
-    # 'xception3d_max', 'xception3d_mean', 
-#     'xception3d2_max', 'xception3d2_mean'
+    
+    'xception3d_max', 'cnn3d', 'xception3d_mean', 
+    #'xception3d2_max', 'xception3d2_mean'
  ]
 
 fpr = [] 
@@ -78,11 +85,10 @@ tpr = []
 auc_val = [] 
 
 for framework in flist: 
-    backend.clear_session()
-    model, history = get_framework(framework, X_train, X_test, y_train, y_test)
+    model, history, optSettings = get_framework(framework, X_train, X_test, y_train, y_test)
 
     folder = str(date.today()) + '_' + framework 
-    hio.save_model_info(model, folder)
+    hio.save_model_info(model, folder, optSettings)
 
     hio.plot_history(history, folder)
 

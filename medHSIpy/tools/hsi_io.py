@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
+import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
+import pickle
 
 if __name__ == "__main__":
     import hsi_utils
@@ -90,10 +92,20 @@ def save_model_graph(model, folder = None):
         print("Saved at: ", filename)
     plot_model(model, to_file=filename, show_shapes=True, show_layer_names=True)
 
-def save_model_info(model, folder = None):
+def save_model_info(model, folder = None, optSettings = None):
     save_model_summary(model, folder)
     save_model_graph(model, folder)
+    if (optSettings != None): 
+        filename = get_model_filename('optimizationSettings', 'txt', folder)
+        with open(filename, 'w', encoding='utf-8') as f:
+            with redirect_stdout(f):
+                print(optSettings)
 
+    filename = get_model_filename('model', 'pkl', folder)
+    abspath = pathlib.Path(filename).absolute()
+    with open(str(abspath), 'wb') as f:
+        pickle.dump(abspath, f)
+        
 def show_label_montage(): 
     croppedData, croppedLabels = load_data()
     filename = os.path.join(hsi_utils.conf['Directories']['OutputDir'], hsi_utils.conf['Data Settings']['Dataset'], 
