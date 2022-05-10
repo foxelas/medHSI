@@ -590,99 +590,65 @@ classdef trainUtility
 
             preTransMethod = method;
             if strcmpi(method, 'autoencoder') || strcmpi(method, 'rfi')
-                preTransMethod = 'none';
+                preTransMethod = method; %'none'
+                scope = 'all';
+            elseif contains(lower(method), '-all')
+                preTransMethod = strrept(method, '-all');
+                scope = 'all';
+            else
+                scope = 'perSample';
             end
-            targetMethod = method;
+                 
             if strcmpi(method, 'msuperpca') || strcmpi(method, 'mclusterpca')
-                targetMethod = 'stacked';
+                scope = 'stacked';
             end
 
-            tic;
-            transTrain = cellfun(@(x, y) x.Transform(true, preTransMethod, q, y, varargin{:}), {trainData.Values}, {trainData.ImageLabels}, 'un', 0);
-            drTrainTime = toc;
-            drTrainTime = drTrainTime / numel(transTrain);
-            transTest = cellfun(@(x, y) x.Transform(true, preTransMethod, q, y, varargin{:}), {testData.Values}, {testData.ImageLabels}, 'un', 0);
+            if strcmpi(scope, 'perSample')
+                tic;
+                transTrain = cellfun(@(x, y) x.Transform(true, preTransMethod, q, y, varargin{:}), {trainData.Values}, {trainData.ImageLabels}, 'un', 0);
+                drTrainTime = toc;
+                drTrainTime = drTrainTime / numel(transTrain);
+                XValid = cellfun(@(x, y) x.Transform(true, preTransMethod, q, y, varargin{:}), {testData.Values}, {testData.ImageLabels}, 'un', 0);
+                
+                %Convert cell image data to concatenated array data
+                XTrainscores = trainUtility.Cell2Mat(transTrain);
+                XValidscores = trainUtility.Cell2Mat(XValid);
+            end
+            
+            if strcmpi(scope, 'all')
+                tic; 
+                dataCell  = cellfun(@(x) x.GetMaskedPixels(), {trainData.Values}, 'un', 0);
+                dataArray = cell2mat(dataCell');
+                dataCell  = cellfun(@(x, y) GetMaskedPixelsInternal(y, x), {trainData.Masks}, {trainData.ImageLabels}, 'un', 0);
+                dataLabels = cell2mat(dataCell');
+                [coeff, XTrainscores, ~, ~, ~] = dimredUtility.Apply(dataArray, preTransMethod, q, [], dataLabels, varargin{:});
+                drTrainTime = toc;
+                drTrainTime = drTrainTime / numel(trainData);
+            
+                dataCell  = cellfun(@(x) x.GetMaskedPixels(), {testData.Values}, 'un', 0);
+                dataArray = cell2mat(dataCell');
+                if ~isempty(coeff) && ~isobject(coeff) 
 
-            %% Convert cell image data to concatenated array data
-            XTrainscores = trainUtility.Cell2Mat(transTrain);
+                    XValidscores = dataArray * coeff;
+                    XValid = cellfun(@(x) x.Transform(true, 'pretrained', q, [], coeff), {testData.Values}, 'un', 0);
+                    
+                elseif isobject(coeff)
+                    dimredStruct = coeff;
+                    XValidscores = dimredUtility.Transform(dataArray, preTransMethod, q, dimredStruct);
+                    XValid = cellfun(@(x) x.Transform(true, preTransMethod, q, [], dimredStruct), {testData.Values}, 'un', 0);
+
+                else 
+                    error('Incomplete arguments. Dimension reduction failed.')
+                end
+
+            end 
+            
             transyTrain = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {trainData.ImageLabels}, {trainData.Masks}, 'un', 0);
             yTrain = trainUtility.Cell2Mat(transyTrain);
-
-            XValidscores = trainUtility.Cell2Mat(transTest);
-            XValid = transTest;
             transyValid = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {testData.ImageLabels}, {testData.Masks}, 'un', 0);
             yValid = trainUtility.Cell2Mat(transyValid);
-
-            switch lower(targetMethod)
-                case 'pca-all'
-                    tic;
-                    [coeff, XTrainscores, ~, ~, ~] = Dimred(XTrainscores, 'pca', q);
-                    drTrainTime = toc;
-                    XValidscores = XValidscores * coeff;
-                    XValid = cellfun(@(x) x*coeff, XValid, 'un', 0);
-                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
-
-                case 'rica-all'
-                    tic;
-                    warning('off', 'all');
-                    [coeff, XTrainscores, ~, ~, ~] = Dimred(XTrainscores, 'rica', q);
-                    warning('on', 'all');
-                    drTrainTime = toc;
-                    XValidscores = XValidscores * coeff;
-                    XValid = cellfun(@(x) x*coeff, XValid, 'un', 0);
-                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
-
-                case 'autoencoder'
-                    %                     parallel.gpu.enableCUDAForwardCompatibility(true)
-                    % % Warning: The CUDA driver must recompile the GPU libraries because your device is more
-                    % % recent than the libraries. Recompiling can take several minutes. Learn more.
-                    %                     gpuDevice(1);
-                    tic;
-                    autoenc = trainAutoencoder(XTrainscores', q, 'MaxEpochs', 200);
-                    %                         'UseGPU', true );
-                    drTrainTime = toc;
-                    [~, XTrainscores, ~, ~, ~] = dimredUtility.Apply(XTrainscores, 'autoencoder', q, [], [], autoenc);
-                    [~, XValidscores, ~, ~, ~] = dimredUtility.Apply(XValidscores, 'autoencoder', q, [], [], autoenc);
-                    XValid = cellfun(@(x) dimredUtility.Transform(x, 'autoencoder', q, autoenc), XValid, 'un', 0);
-                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
-
-                case 'rfi'
-                    tic;
-                    wavelengths = hsiUtility.GetWavelengths(311);
-                    rfiFile = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'rfi'), 'mat');
-                    %                     if ~exist(rfiFile)
-                    t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
-                    %'NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
-                    %'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
-                    RFtrainedModel = fitrensemble(XTrainscores, double(yTrain), 'Method', 'Bag', 'Learners', t, 'NPrint', 50);
-                    %,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});
-                    yHat = oobPredict(RFtrainedModel);
-                    R2 = corr(RFtrainedModel.Y, yHat)^2;
-                    fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
-                    options = statset('UseParallel', true);
-                    impOOB = oobPermutedPredictorImportance(RFtrainedModel, 'Options', options);
-                    drTrainTime = toc;
-                    fprintf('Dimension Reduction Runtime %.5f \n\n', drTrainTime);
-
-                    figure(1);
-                    bar(wavelengths, impOOB);
-                    title('Unbiased Predictor Importance Estimates');
-                    xlabel('Predictor variable');
-                    ylabel('Importance');
-                    plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), strcat('rfimportance', num2str(now()))), '');
-                    plots.SavePlot(1, plotPath);
-
-                    save(rfiFile, 'impOOB');
-                    %                     else
-                    %                         load(rfiFile, 'impOOB');
-                    %                         drTrainTime = 19722.50930;
-                    %                     end
-
-                    [~, XTrainscores, ~, ~, ~] = dimredUtility.Apply(XTrainscores, 'rfi', q, [], [], impOOB);
-                    [~, XValidscores, ~, ~, ~] = dimredUtility.Apply(XValidscores, 'rfi', q, [], [], impOOB);
-                    XValid = cellfun(@(x) dimredUtility.Transform(x, 'rfi', q, impOOB), XValid, 'un', 0);
-                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
-
+            
+            switch lower(scope)
                 case 'stacked'
                     [predLabels, modelTrainTime, trainedModel, ~, ~] = trainUtility.StackMultiscale(@trainUtility.SVM, 'voting', XTrainscores, yTrain, XValidscores);
 
@@ -996,8 +962,7 @@ classdef trainUtility
             % @retval trainPerformance [numeric array] | The train performance results
             % @retval testPerformance [numeric array] | The test performance results
 
-            %[trainPerformance] = trainUtility.RunKfoldValidation(trainData, cvp, method, q, varargin{:});
-            trainPerformance = [];
+            [trainPerformance] = trainUtility.RunKfoldValidation(trainData, cvp, method, q, varargin{:});
 
             [testPerformance, trainedModel, testscores] = trainUtility.DimredAndTrain(trainData, testData, method, q, varargin{:});
             fprintf('Test - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...

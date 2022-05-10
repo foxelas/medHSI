@@ -661,9 +661,6 @@ classdef hsi
             if flattenFlag
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
-
-            scores = hsiUtility.AdjustDimensions(scores, q);
-
         end
 
         % ======================================================================
