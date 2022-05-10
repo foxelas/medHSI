@@ -8,7 +8,7 @@ import segmentation_models as sm
 import tools.hsi_segment_from_sm as segsm
 import tools.hsi_segment_from_scratch as segscratch
 import tools.from_the_internet as fi
-from keras import backend 
+
 
 from sklearn.metrics import roc_curve, auc
 import numpy as np
@@ -17,8 +17,9 @@ WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 200
-BATCH_SIZE = 8
+NUMBER_OF_EPOCHS = 20 # 200
+VALIDATION_FOLDS = 5
+
 
 X_train, X_test, y_train, y_test = hio.get_train_test()
 
@@ -50,19 +51,6 @@ def calc_plot_roc(model, X_test, y_test, model_name, folder):
     hio.plot_roc([fpr], [tpr], [auc_val], [model_name], folder)
 
     return fpr, tpr, auc_val
-
-# Current frameworks:
-# From segmentation_models: 'sm_vgg', 'sm_inception', 'sm_resnet', 'sm_efficientnet', 'sm_inceptionresnet'
-# From scratch: 'cnn3d_unbalanced', 'cnn3d_balanced', 'cnn2d'
-
-# model = fi.get_cnn2d_model(128, 128, 3)
-# folder = str(date.today()) + '_' + 'cnn2d_seg_base' 
-# hio.save_model_info(model, folder)
-
-# model = fi.build_xception_classification_model(128, 128, 3)
-# folder = str(date.today()) + '_' + 'xception_class_base' 
-# hio.save_model_info(model, folder)
-
 
 
 # model = fi.build_xception_segmentation_model(32, 32, 3)
