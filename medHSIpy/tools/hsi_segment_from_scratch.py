@@ -350,8 +350,13 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
 
     return model, history, optSettings
 
-#backend.clear_session()
 
+
+
+
+
+
+############################ CNN ###################################
 def double_conv_block(x, n_filters, kernel_size):
    # Conv2D then ReLU activation
    x = layers.Conv3D(filters=n_filters, kernel_size=kernel_size, padding = "same", activation = "relu", kernel_initializer = "he_normal")(x)

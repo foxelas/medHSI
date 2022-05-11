@@ -17,11 +17,18 @@ WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 20 # 200
+NUMBER_OF_EPOCHS = 10 # 200
 VALIDATION_FOLDS = 5
+BATCH_SIZE = 8
 
 
-X_train, X_test, y_train, y_test = hio.get_train_test()
+# #### Init 
+# hio.show_label_montage('train')
+# hio.show_label_montage('test')
+# hio.show_label_montage('full')
+
+
+X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()
 
 def get_framework(framework, xtrain, xtest, ytrain, ytest):
     if 'sm' in framework:
@@ -58,14 +65,13 @@ def calc_plot_roc(model, X_test, y_test, model_name, folder):
 # hio.save_model_info(model, folder)
 
 flist = [
-    #'sm_vgg', 'sm_vgg_pretrained', 
-    # 'sm_resnet', 'sm_resnet_pretrained',
-    # 'sm_inception', 'sm_inception_pretrained', 
-    # 'sm_efficientnet', 'sm_efficientnet_pretrained', 
-    # 'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained', 
-    
-    'xception3d_max', 'cnn3d', 'xception3d_mean', 
-    #'xception3d2_max', 'xception3d2_mean'
+    'sm_vgg', 'sm_vgg_pretrained', 
+    'sm_resnet', 'sm_resnet_pretrained',
+    'sm_inception', 'sm_inception_pretrained', 
+    'sm_efficientnet', 'sm_efficientnet_pretrained', 
+    'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained'
+    #, 
+    #'xception3d_max', 'cnn3d', 'xception3d_mean', 'xception3d2_max', 'xception3d2_mean'
  ]
 
 fpr = [] 
@@ -81,7 +87,7 @@ for framework in flist:
     hio.plot_history(history, folder)
 
     #prepare again in order to avoid pre-processing errors 
-    X_train, X_test, y_train, y_test = hio.get_train_test()
+    X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()
 
     [fpr_, tpr_, auc_val_] = calc_plot_roc(model, X_test, y_test, framework, folder)
     fpr.append(fpr_)
@@ -90,10 +96,10 @@ for framework in flist:
 
     preds = model.predict(X_test)
     k = 0
-    for (hsi, gt, pred) in zip(X_test, y_test, preds):
+    for (hsi, gt, id, pred) in zip(X_test, y_test, names_test, preds):
         iou = sm.metrics.iou_score(gt, pred)
         k += 1 
-        hio.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2), str(k))
+        hio.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2), id)
 
 # ROC AUC comparison 
 hio.plot_roc(fpr, tpr, auc_val, flist, None)

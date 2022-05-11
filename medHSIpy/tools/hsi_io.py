@@ -13,11 +13,15 @@ else:
 # Image size should be multiple of 32
 DEFAULT_HEIGHT = 32 #64
 
-def load_data():
+def load_data(name = None):
+    # name options: 'full', 'test', 'train'
+    if name == None:
+        name = 'full'
+
     conf = hsi_utils.parse_config()
     outputDir = conf['Directories']['OutputDir']
     datasetName = conf['Data Settings']['Dataset']
-    fileName = 'hsi_'+ datasetName + '_full' +'.h5'
+    fileName = 'hsi_'+ datasetName + '_' + name +'.h5'
     folderName = conf['Folder Names']['DatasetsFolderName']
     fpath = os.path.join(outputDir, datasetName, folderName, fileName)
     print("Read from ", fpath)
@@ -28,29 +32,28 @@ def load_data():
 
     croppedLabels = hsi_utils.center_crop_list(labelImages, DEFAULT_HEIGHT, DEFAULT_HEIGHT)
 
-    # for (x,y) in zip(croppedData, croppedLabels):
-    #     hsi_utils.show_display_image(x)
-    #     print(np.max(y), np.min(y))
-    #     plt.imshow(y, cmap='gray')
-    #     plt.show()
+    return croppedData, croppedLabels, keyList
 
-    return croppedData, croppedLabels
+def make_data_and_labels(name = None):
+    croppedData, croppedLabels, dataNames = load_data(name)
+    x_raw = np.array(croppedData, dtype=np.float32)
+    y = np.array(croppedLabels, dtype=np.float32)
+
+    return x_raw, y, dataNames 
 
 def get_train_test(): 
-    from sklearn.model_selection import train_test_split
+    x_train_raw, y_train, names_train = make_data_and_labels('train')
+    x_test_raw, y_test, names_test = make_data_and_labels('test')
 
-    croppedData, croppedLabels = load_data()
-
-    croppedData = np.array(croppedData, dtype=np.float32)
-    croppedLabels = np.array(croppedLabels, dtype=np.float32)
-    x_train_raw, x_test_raw, y_train, y_test = train_test_split(croppedData,  croppedLabels, test_size=0.1, random_state=42)
-    print('xtrain: ', len(x_train_raw),', xtest: ', len(x_test_raw))
+    #from sklearn.model_selection import train_test_split
+    #x_train_raw, x_test_raw, y_train, y_test = train_test_split(croppedData,  croppedLabels, test_size=0.1, random_state=42)
+    #print('xtrain: ', len(x_train_raw),', xtest: ', len(x_test_raw))
 
     # for (x,y) in zip(x_train_raw, y_train_raw):
     #     hsi_utils.show_display_image(x)
     #     hsi_utils.show_image(y)
 
-    return x_train_raw, x_test_raw, y_train, y_test
+    return x_train_raw, x_test_raw, y_train, y_test, names_train, names_test 
 
 
 from contextlib import redirect_stdout
@@ -106,13 +109,13 @@ def save_model_info(model, folder = None, optSettings = None):
     with open(str(abspath), 'wb') as f:
         pickle.dump(abspath, f)
         
-def show_label_montage(): 
-    croppedData, croppedLabels = load_data()
+def show_label_montage(name = None): 
+    croppedData, croppedLabels, keyList = load_data(name)
     filename = os.path.join(hsi_utils.conf['Directories']['OutputDir'], hsi_utils.conf['Data Settings']['Dataset'], 
-        hsi_utils.conf['Folder Names']['PythonTestFolderName'], 'normalized-montage.jpg')        
+        hsi_utils.conf['Folder Names']['PythonTestFolderName'], name +'-normalized-montage.jpg')        
     hsi_utils.show_montage(croppedData, filename, 'srgb')
     filename =os.path.join(hsi_utils.conf['Directories']['OutputDir'], hsi_utils.conf['Data Settings']['Dataset'], 
-        hsi_utils.conf['Folder Names']['PythonTestFolderName'], 'labels-montage.jpg')
+        hsi_utils.conf['Folder Names']['PythonTestFolderName'], name +'-labels-montage.jpg')
     hsi_utils.show_montage(croppedLabels, filename, 'grey')
 
 
@@ -157,7 +160,7 @@ def visualize(hsi, gt, pred, folder = None, iou = None, suffix = None):
     plt.title(figTitle)
     plt.imshow(pred)
 
-    filename = get_model_filename('visualization'+suffix, 'png', folder)
+    filename = get_model_filename('v_' + suffix, 'png', folder)
     plt.savefig(filename)
 
     #plt.show()
@@ -202,5 +205,3 @@ def plot_roc(fpr, tpr, auc_val, model_name, folder):
     plt.show()
 
 
-#### Init 
-show_label_montage()
