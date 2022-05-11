@@ -90,7 +90,7 @@ if config.GetSetting('HasResizeOptions')
         [spectralDataOrig, labelInfoOrig] = hsiUtility.LoadHsiAndLabel(targetName);
 
         %% Resize
-        [spectralData, labelInfo] = hsiUtility.Resize(spectralDataOrig, labelInfoOrig);
+        [spectralData, labelInfo, patchSubs] = hsiUtility.Resize(spectralDataOrig, labelInfoOrig);
 
         config.SetSetting('Dataset', targetDataset);
         if ~iscell(spectralData)
@@ -104,7 +104,7 @@ if config.GetSetting('HasResizeOptions')
                 if sum(spectralData.FgMask(:)) > 0
                     labelInfo = labelInfos{j};
                     k = k + 1;
-                    SaveResizedData(spectralData, labelInfo, targetName, k);
+                    SaveResizedData(spectralData, labelInfo, targetName, k, patchSubs{j});
                 end
             end
         end
@@ -122,15 +122,22 @@ else
 end
 end
 
-function [] = SaveResizedData(spectralData, labelInfo, targetName, n)
+function [] = SaveResizedData(spectralData, labelInfo, targetName, n, patchSubs)
 
 if nargin < 4
     n = -1;
 end
 
+if nargin < 5
+    patchSubs = [];
+end
+
 filename = commonUtility.GetFilename('dataset', targetName);
 if n > 0
     filename = commonUtility.GetFilename('dataset', strcat(targetName, '_patch', num2str(n)));
+end
+if ~isempty(patchSubs)
+    labelInfo.Comment = patchSubs;
 end
 save(filename, 'spectralData', 'labelInfo', '-v7.3');
 fprintf('Saved new data sample at: %s \n', filename);

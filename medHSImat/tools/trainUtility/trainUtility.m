@@ -5,6 +5,30 @@
 classdef trainUtility
     methods (Static)
 
+        function [] = ExportTrainTest(baseDataset, testIds)
+            
+            if nargin < 1 
+                baseDataset = config.GetSetting('Dataset');
+            end
+            
+            if nargin < 2
+                testIds = {'157', '251', '227'};
+            end
+
+            config.SetSetting('Dataset', baseDataset);
+            [~, targetIDs] = commonUtility.DatasetInfo();
+
+            fileName = commonUtility.GetFilename('output', ...
+                fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_train')), 'h5');
+            trainTargetIDs = targetIDs(~contains(targetIDs, testIds));
+            hsiUtility.SaveToH5(trainTargetIDs, fileName);
+
+            fileName = commonUtility.GetFilename('output', ...
+                fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_test')), 'h5');
+            testTargetIDs = targetIDs(contains(targetIDs, testIds));
+            hsiUtility.SaveToH5(testTargetIDs, fileName);
+        end
+        
         % ======================================================================
         %> @brief Augment applies augmentation on the dataset
         %>
