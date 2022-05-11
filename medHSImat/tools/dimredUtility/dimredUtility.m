@@ -6,7 +6,7 @@ classdef dimredUtility
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
         %> ICA (FastICA), RICA, SuperRICA,
-        %> LDA, QDA, MSelect.
+        %> LDA, QDA, PCA-LDA, MSelect, pretrained.
         %> Methods autoencoder and RFI are available only for pre-trained models.
         %>
         %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
@@ -48,7 +48,7 @@ classdef dimredUtility
             % Currently available methods:
             % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA,
             % ICA (FastICA), RICA, SuperRICA,
-            % LDA, QDA, MSelect.
+            % LDA, QDA, PCA-LDA, MSelect, pretrained.
             % Methods autoencoder and RFI are available only for pre-trained models.
             %
             % Additionally, for pre-trained parameters RFI and Autoencoder are available.
@@ -101,7 +101,7 @@ classdef dimredUtility
                 labelMask = [];
             end
             hasFgMask = ~isempty(fgMask);
-            flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'autoencoder') || contains(lower(method), 'rfi'));
+            flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster'));
             if ndims(X) < 3
                 flattenIn = false;
             end
@@ -141,6 +141,28 @@ classdef dimredUtility
                     objective = Mdl.FitInfo.Objective;
                     warning('on', 'all');
 
+                case 'pca-lda'
+                    [coeff, scores1, latent, ~, ~] = pca(Xcol, 'NumComponents', q);
+                    if isempty(labelMask)
+                        error('A supervised method requires labels as argument');
+                    end
+                    if flattenIn
+                        if hasFgMask
+                            labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
+                        else
+                            labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
+                        end
+                    end
+                    Mdl = fitcdiscr(scores1, labelMaskCol);
+                    scores = predict(Mdl, scores1);
+                    q = numel(Mdl.ClassNames) - 1;
+                    
+%                     [W, LAMBDA] = eig(Mdl.BetweenSigma, Mdl.Sigma); %Must be in the right order! 
+%                     lambda = diag(LAMBDA);
+%                     [lambda, SortOrder] = sort(lambda, 'descend');
+%                     W = W(:, SortOrder);
+                    coeff = coeff *  Mdl.Coeffs(1,2).Linear ;
+                    
                     %% Discriminant Analysis (LDA)
                 case 'lda'
                     if isempty(labelMask)
@@ -233,26 +255,54 @@ classdef dimredUtility
 
                     %% Random Forest Importance (RFI)
                 case 'rfi'
-                    if isempty(varargin)
-                        error('Missing imOOB object.Please train it beforehand and pass it as an argument');
+                    if ~isempty(varargin)
+                        % Apply pretrained
+                        impOOB = varargin{1};
+                        [~, idxOrder] = sort(impOOB, 'descend');
+                        ido = idxOrder(1:q);
+                        scores = Xcol(:, ido);
+                    else
+                        % Train 
+
+                        t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
+                        %'NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
+                        %'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
+                        RFtrainedModel = fitrensemble(Xcol, double(labelMask), 'Method', 'Bag', 'Learners', t, 'NPrint', 50);
+                        %,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});
+                        yHat = oobPredict(RFtrainedModel);
+                        R2 = corr(RFtrainedModel.Y, yHat)^2;
+                        fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
+                        options = statset('UseParallel', true);
+                        impOOB = oobPermutedPredictorImportance(RFtrainedModel, 'Options', options);
+                    
+                        scores = dimredUtility.Transform(Xcol, method, q, impOOB);
+                        coeff = impOOB;
                     end
-                    impOOB = varargin{1};
-                    [~, idxOrder] = sort(impOOB, 'descend');
-                    ido = idxOrder(1:q);
-                    scores = X(:, ido);
+
 
                     %% Autoencoder (AE)
                 case 'autoencoder'
-                    if isempty(varargin)
-                        error('Missing autoenc object.Please train it beforehand and pass it as an argument');
-                    end
-                    autoenc = varargin{1};
-                    scores = encode(autoenc, X')';
-
+                    if ~isempty(varargin)
+                        % Apply Pre-trained
+                        autoenc = varargin{1};
+                        scores = encode(autoenc, Xcol')';
+                    else
+                        % Train 
+                        
+                        %                     parallel.gpu.enableCUDAForwardCompatibility(true)
+                        % % Warning: The CUDA driver must recompile the GPU libraries because your device is more
+                        % % recent than the libraries. Recompiling can take several minutes. Learn more.
+                        %                     gpuDevice(1);
+                        autoenc = trainAutoencoder(Xcol', q, 'MaxEpochs', 200);
+                        scores = dimredUtility.Transform(Xcol, method, q, autoenc);
+                        coeff = autoenc;
+                    end                
+                    
+                
                     %% ClusterPCA
                 case 'clusterpca'
                     %%Find endmembers
-                    numEndmembers = 6;
+                    numEndmembers = 5; %6;
                     endmembers = NfindrInternal(X, numEndmembers, fgMask);
 
                     %%Find discrepancy metrics
@@ -283,10 +333,18 @@ classdef dimredUtility
                         %%SupePCA based DR
                         scores{i} = SuperPCA(X, q, clusterLabels);
                     end
+                    
+                case 'pretrained'
+                    if isempty(varargin)
+                        error('The pretrained transformation matrix is missing.');
+                    end 
+                    coeff = varargin{1};
+                    scores = Xcol * coeff;    
 
                     %% No dimension reduction
                 otherwise
                     scores = Xcol;
+                    q = size(Xcol, 1);
             end
 
             explained = dimredUtility.CalculateExplained(scores, Xcol, X, fgMask);
@@ -298,6 +356,8 @@ classdef dimredUtility
                     scores = reshape(scores, [size(X, 1), size(X, 2), q]);
                 end
             end
+            
+            scores = hsiUtility.AdjustDimensions(scores, q);
         end
 
         % ======================================================================
@@ -315,25 +375,25 @@ classdef dimredUtility
         %> @param trainedObj [numeric array] | The trained dimension reduction object
         %>
         %> @retval transScores [numeric array] | The transformed scores
-        % ======================================================================        
+        % ======================================================================
         function [transScores] = Transform(inScores, method, q, trainedObj)
-        % Transform applies a pretrained dimension reduction method.
-        %
-        % @b Usage
-        %
-        % @code
-        % [peformanceStruct] = trainUtility.Transform(inScores, method, qNum, trainedObj);
-        % @endcode
-        %
-        % @param inScores [numeric array] | The target array
-        % @param method [char] | The dimension reduction method
-        % @param q [int] | The reduced dimension
-        % @param trainedObj [numeric array] | The trained dimension reduction object
-        %
-        % @retval transScores [numeric array] | The transformed scores
+            % Transform applies a pretrained dimension reduction method.
+            %
+            % @b Usage
+            %
+            % @code
+            % [peformanceStruct] = trainUtility.Transform(inScores, method, qNum, trainedObj);
+            % @endcode
+            %
+            % @param inScores [numeric array] | The target array
+            % @param method [char] | The dimension reduction method
+            % @param q [int] | The reduced dimension
+            % @param trainedObj [numeric array] | The trained dimension reduction object
+            %
+            % @retval transScores [numeric array] | The transformed scores
             [~, transScores, ~, ~, ~] = dimredUtility.Apply(inScores, method, q, [], [], trainedObj);
         end
-        
+
         % ======================================================================
         %> @brief Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
         %>
@@ -519,7 +579,7 @@ classdef dimredUtility
             elseif iscell(scores_)
                 explained = cell(numel(scores_), 1);
                 for i = 1:numel(scores_)
-                    explained{i} = dimredUtility.CalculateExplained(scores_{i}, Xcol_, X_, mask_, []);
+                    explained{i} = dimredUtility.CalculateExplained(scores_{i}, Xcol_, X_, mask_);
                 end
             else
                 explained = [];

@@ -7,7 +7,7 @@
 %> -Raw: the raw dataset
 %> -Fix: the fix dataset
 %> -512: the resized 512x512 dataset (based on base dataset)
-%> -l32: the 32x32 patch dataset (based on base dataset)
+%> -32: the 32x32 patch dataset (based on base dataset)
 %> Currently the base dataset is 'pslRaw'
 %>
 %> @b Usage
@@ -56,7 +56,7 @@ config.SetSetting('Normalization', 'byPixel');
 
 %% Change accordingly
 prefix = config.GetSetting('Database');
-baseDataset = 'pslRaw';
+baseDataset = 'pslRaw32';
 readForeground = true;
 
 CheckImportData();

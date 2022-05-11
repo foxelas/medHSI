@@ -5,16 +5,14 @@ function [trainPerformance, testPerformance] = Basics_Dimred()
 % filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
 % load(filePath2);
 
-experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,1-boxc2');
+experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,05');
 Basics_Init(experiment);
-config.SetSetting('Dataset', 'pslRaw-Denoisesmoothen');
 
-fprintf('Running for dataset %s\n', config.GetSetting('Dataset'));
 dataset = config.GetSetting('Dataset');
 
 %% Read h5 data
 folds = 5;
-testTargets = {'163', '251', '227'};
+testTargets = {'157', '251', '227'};
 dataType = 'hsi';
 qs = [5, 10, 20, 50, 100];
 ks = 1:length(qs);
@@ -29,8 +27,6 @@ save(filePath, '-v7.3');
 fprintf('Baseline: %d \n\n', 311);
 j = j + 1;
 [trainPerformance{j}{1}, testPerformance{j}{1}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'Baseline', 311);
-save(filePath, 'trainPerformance', 'testPerformance');
-PrepareGraphs_Performance();
 
 %%%%%%%%%%%%%%%%%%%%%% PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -73,10 +69,8 @@ j = j + 1;
 
 % fprintf('QDA: \n\n');
 % j = j + 1;
-
-%% Fails because of covarance
+% %% Fails because of covariance
 % [valTrain(j, :), valTest(j, :)] = trainUtility.ValidateTest2(trainData, testData, cvp, 'qda', 1);
-% save(filePath, 'trainPerformance', 'testPerformance');
 
 %%%%%%%%%%%%%%%%%%%%% Cluster PCA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -116,10 +110,6 @@ for k = ks
     [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'MClusterPCA', q, pixelNumArray);
 end
 
-%%%%%%%%%%%%%%%%%%%%% Autosave %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-save(filePath, 'trainPerformance', 'testPerformance');
-PrepareGraphs_Performance();
-
 %%%%%%%%%%%%%%%%%%%%% Autoencoder %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 j = j + 1;
 for k = ks
@@ -127,8 +117,6 @@ for k = ks
     fprintf('Autoencoder: %d \n\n', q);
     [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'Autoencoder', q);
 end
-save(filePath, 'trainPerformance', 'testPerformance');
-PrepareGraphs_Performance();
 
 %%%%%%%%%%%%%%%%%%%%% Random Forest Importance %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf('RFI: \n\n');
@@ -139,12 +127,22 @@ for k = ks
     fprintf('RFI: %d \n\n', q);
     [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'RFI', q);
 end
+
+j = j + 1; 
+fprintf('PCA-LDA: \n\n');
+[trainPerformance{j}{1}, testPerformance{j}{1}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'PCA-LDA', 20);
+
+%%%%%%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Save performance 
 save(filePath, 'trainPerformance', 'testPerformance');
 PrepareGraphs_Performance();
+
+end
 
 % %%%%%%%%%%%%%%%%%%%%% SFS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % fprintf('SFS: \n\n');
+
 %
 % for q = qs
 %     fprintf('SFS: %d \n\n', q);
@@ -170,12 +168,11 @@ PrepareGraphs_Performance();
 %     [accuracy, sensitivity, specificity] = RunKfoldValidation(scoresrf, y, cvp, 'rfi', q);
 % end
 
-end
 
-%%%%%%%%%%%%%%%%%%%%% Assisting Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [acc] = critfun(scores, labels)
-SVMModel = fitcsvm(scores, labels, 'Standardize', true, 'KernelFunction', 'RBF', ...
-    'KernelScale', 'auto');
-predlabels = predict(SVMModel, scores);
-[acc, ~, ~] = metrics.Evaluations(labels, predlabels);
-end
+% %%%%%%%%%%%%%%%%%%%%% Assisting Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% function [acc] = critfun(scores, labels)
+% SVMModel = fitcsvm(scores, labels, 'Standardize', true, 'KernelFunction', 'RBF', ...
+%     'KernelScale', 'auto');
+% predlabels = predict(SVMModel, scores);
+% [acc, ~, ~] = metrics.Evaluations(labels, predlabels);
+% end

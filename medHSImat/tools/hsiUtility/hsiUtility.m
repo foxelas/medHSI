@@ -43,19 +43,22 @@ classdef hsiUtility
             % @retval labelInfo [hsiInfo] | The initialized hsiInfo object
             targetFilename = commonUtility.GetFilename('dataset', targetID);
 
+            spectralData = [];
+            labelInfo = [];
             if ~exist(targetFilename, 'file')
-                error('There are no data for the requested ID = %s.', targetID);
+                warning('There are no data for the requested ID = %s.', targetID);
+            else      
+                variableInfo = who('-file', targetFilename);
+                fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('Dataset'), config.GetSetting('Normalization'));
+                fprintf('Filename: %s.\n', targetFilename);
+                if ismember('labelInfo', variableInfo) % returns true
+                    load(targetFilename, 'spectralData', 'labelInfo');
+                else
+                    load(targetFilename, 'spectralData');
+                    labelInfo = hsiInfo();
+                end
             end
 
-            variableInfo = who('-file', targetFilename);
-            fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('Dataset'), config.GetSetting('Normalization'));
-            fprintf('Filename: %s.\n', targetFilename);
-            if ismember('labelInfo', variableInfo) % returns true
-                load(targetFilename, 'spectralData', 'labelInfo');
-            else
-                load(targetFilename, 'spectralData');
-                labelInfo = hsiInfo();
-            end
         end
 
         %======================================================================
@@ -381,6 +384,12 @@ classdef hsiUtility
 
             [~, targetIDs] = commonUtility.DatasetInfo();
 
+            hsiUtility.SaveToH5(targetIDs, fileName);
+
+        end
+
+        function SaveToH5(targetIDs, fileName)
+                        
             for i = 1:length(targetIDs)
                 targetName = num2str(targetIDs{i});
 
@@ -444,9 +453,9 @@ classdef hsiUtility
 
             % h5disp(fileName);
             fprintf('Saved .h5 dataset at %s.\n\n', fileName);
-
         end
-
+        
+        
         %======================================================================
         %> @brief ReadDataset reads the dataset.
         %>
@@ -633,8 +642,9 @@ classdef hsiUtility
         %> @param patchSize [int] | The target patch size
         %>
         %> @retval patches [cell array] | The patches
+        %> @retval patchesIdx [cell array] | The subscripts of each patch 
         %======================================================================
-        function [patches] = SplitToPatches(oldValue, patchSize)
+        function [patches, patchesIdx] = SplitToPatches(oldValue, patchSize)
             % SplitToPatches splits an image into patches.
             %
             % The patches are saved in a cell array. The number of patches depends on the ratio between the input array size and the target patch size.
@@ -649,16 +659,20 @@ classdef hsiUtility
             % @param patchSize [int] | The target patch size
             %
             % @retval patches [cell array] | The patches
+            % @retval patchesIdx [cell array] | The subscripts of each patch 
+
             [m, n, ~] = size(oldValue);
             a = floor(m / patchSize);
             b = floor(n/patchSize);
             numPatch = a * b;
             patches = cell(numPatch, 1);
+            patchesIdx = cell(numPatch, 1);
             c = 0;
 
             for i = 1:a
                 for j = 1:b
                     c = c + 1;
+                    patchesIdx{c} = [i, j];
                     patches{c} = oldValue((i - 1)*patchSize+1:i*patchSize, (j - 1)*patchSize+1:j*patchSize, :);
                 end
             end
@@ -672,7 +686,7 @@ classdef hsiUtility
         %> @b Usage
         %>
         %> @code
-        %> resizedValue = hsiUtility.Resize(hsIm, labelInfo);
+        %> [updObj, updObjInfo, patchSubs] = hsiUtility.Resize(hsIm, labelInfo);
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class
@@ -680,8 +694,9 @@ classdef hsiUtility
         %>
         %> @retval updObj [hsi] | An instance of the hsi class
         %> @retval updObjInfo [hsi] | An instance of the hsiInfo class
+        %> @retval patchSubs [cell array] | The subscripts of each image patch
         %======================================================================
-        function [updObj, updObjInfo] = Resize(obj, objInfo)
+        function [updObj, updObjInfo, patchSubs] = Resize(obj, objInfo)
             % Resize resizes or splits in patches the values of an hsi object and the associated hsiInfo object.
             %
             % Depending on the input array's size and the target size, it will be cropped or zero-padded.
@@ -689,7 +704,7 @@ classdef hsiUtility
             % @b Usage
             %
             % @code
-            % resizedValue = hsiUtility.Resize(hsIm, labelInfo);
+            % [updObj, updObjInfo, patchSubs] = hsiUtility.Resize(hsIm, labelInfo);
             % @endcode
             %
             % @param obj [hsi] | An instance of the hsi class
@@ -697,6 +712,7 @@ classdef hsiUtility
             %
             % @retval updObj [hsi] | An instance of the hsi class
             % @retval updObjInfo [hsi] | An instance of the hsiInfo class
+            % @retval patchSubs [cell array] | The subscripts of each image patch
 
             updObj = obj;
             updObjInfo = objInfo;
@@ -707,17 +723,20 @@ classdef hsiUtility
                     updObj.FgMask = hsiUtility.ResizeArray(obj.FgMask, imgSize);
                     updObjInfo.Labels = hsiUtility.ResizeArray(objInfo.Labels, imgSize);
                     updObjInfo.MultiClassLabels = hsiUtility.ResizeArray(objInfo.MultiClassLabels, imgSize);
+                    patchSubs{1} = [1, 1];
 
                 else
                     imgSize = config.GetSetting('PatchDimension');
-                    values = hsiUtility.SplitToPatches(obj.Value, imgSize);
-                    fgMasks = hsiUtility.SplitToPatches(obj.FgMask, imgSize);
-                    labels = hsiUtility.SplitToPatches(objInfo.Labels, imgSize);
-                    mclabels = hsiUtility.SplitToPatches(objInfo.MultiClassLabels, imgSize);
+                    [values, patchesIdx] = hsiUtility.SplitToPatches(obj.Value, imgSize);
+                    [fgMasks, ~] = hsiUtility.SplitToPatches(obj.FgMask, imgSize);
+                    [labels, ~] = hsiUtility.SplitToPatches(objInfo.Labels, imgSize);
+                    [mclabels, ~] = hsiUtility.SplitToPatches(objInfo.MultiClassLabels, imgSize);
 
                     if numel(labels) > 0
                         updObj = cell(1, numel(values));
                         updObjInfo = cell(1, numel(values));
+                        patchSubs = cell(1, numel(values));
+
                         for i = 1:numel(values)
                             obj.Value = values{i};
                             obj.FgMask = fgMasks{i};
@@ -726,6 +745,7 @@ classdef hsiUtility
 
                             updObj{i} = obj;
                             updObjInfo{i} = objInfo;
+                            patchSubs{i} = patchesIdx{i};
                         end
                     end
                 end

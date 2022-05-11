@@ -661,9 +661,6 @@ classdef hsi
             if flattenFlag
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
-
-            scores = hsiUtility.AdjustDimensions(scores, q);
-
         end
 
         % ======================================================================
@@ -1036,12 +1033,49 @@ classdef hsi
         end
 
         %======================================================================
-        %> @brief SAMscore returns SAM scores for a target hsi image.
+        %> @brief SAMscore returns SAM scores in degrees for a target hsi image.
         %>
         %> @b Usage
         %>
         %> @code
-        %> [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
+        %> scoreImg = hsi.SAMscore(hsIm);
+        %> @endcode
+        %>
+        %> @param obj [hsi] | An hsi instance
+        %>
+        %> @retval scoreImg [array] | The SAM score
+        %======================================================================
+        function [scoreImg] = SAMscore(obj)
+            % SAMscore returns SAM scores in degrees for a target hsi image.
+            %
+            % @b Usage
+            %
+            % @code
+            % scoreImg = hsi.SAMscore(hsIm);
+            % @endcode
+            %
+            % @param obj [hsi] | An hsi instance
+            %
+            % @retval scoreImg [array] | The SAM score
+            refLib = hsiUtility.GetReferenceLibrary();
+            xCol = obj.GetMaskedPixels();
+            pixelN = size(xCol, 1);
+
+            disp('SAM calculated only against a healthy skin signature.');
+            reference = refLib(5).Data;
+            samVals = sam(permute(xCol, [3, 1, 2]), reference);         
+            samVals = rad2deg(samVals);       
+
+            scoreImg = hsi.RecoverSpatialDimensions(samVals', size(obj.FgMask), obj.FgMask);
+        end
+
+        %======================================================================
+        %> @brief ArgminSAM returns SAM scores for a target hsi image.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [scoreImg, labelImg, argminImg] = hsi.ArgminSAM(hsIm);
         %> @endcode
         %>
         %> @param obj [hsi] | An hsi instance
@@ -1050,13 +1084,13 @@ classdef hsi
         %> @retval labelImg [array] | The labels of minimum SAM score
         %> @retval argminImg [array] | The argmin of minimum SAM score
         %======================================================================
-        function [scoreImg, labelImg, argminImg] = SAMscore(obj)
-            % SAMscore returns SAM scores for a target hsi image.
+        function [scoreImg, labelImg, argminImg] = ArgminSAM(obj)
+            % ArgminSAM returns SAM scores for a target hsi image.
             %
             % @b Usage
             %
             % @code
-            % [scoreImg, labelImg, argminImg] = hsi.SAMscore(hsIm);
+            % [scoreImg, labelImg, argminImg] = hsi.ArgminSAM(hsIm);
             % @endcode
             %
             % @param obj [hsi] | An hsi instance
@@ -1069,7 +1103,7 @@ classdef hsi
             pixelN = size(xCol, 1);
 
             samVals = zeros(numel(refLib), pixelN);
-            for jj = 1:numel(refLib)
+            for jj = 5 
                 samVals(jj, :) = sam(permute(xCol, [3, 1, 2]), refLib(jj).Data);
             end
             [scoreImg, argminImg] = min(samVals, [], 1);
@@ -1082,7 +1116,7 @@ classdef hsi
             labelImg = uint8(labelImg);
             argminImg = uint8(argminImg);
         end
-
+        
         % ======================================================================
         %> @brief Denoise applies denoising to an hsi object.
         %>

@@ -105,10 +105,29 @@ classdef segment
             % segment.BySAM();
             % @endcode
 
-            experiment = strcat('SAM segmentation-BCC&MCC');
+            experiment = strcat('segmentation-BCC&MCC');
             Basics_Init(experiment);
 
             apply.ToEach(@SAMAnalysis);
+            plots.GetMontagetCollection(1, 'predLabel');
+        end
+        
+        function BySAM2()
+            % BySAM2 applies SAM-based clustering.
+            %
+            % The method is applied on each image in the dataset. The results are saved in the output folder.
+            %
+            % @b Usage
+            %
+            % @code
+            % segment.BySAM2();
+            % @endcode
+
+            experiment = strcat('SAM segmentation-Healthy');
+            Basics_Init(experiment);
+
+            threshold = 13;
+            apply.ToEach(@SAMAnalysis, 'healthy', threshold);
             plots.GetMontagetCollection(1, 'predLabel');
         end
 
