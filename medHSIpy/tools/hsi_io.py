@@ -4,6 +4,8 @@ import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
+from scipy.io import savemat
+
 
 if __name__ == "__main__":
     import hsi_utils
@@ -147,6 +149,8 @@ def plot_history(history, folder = None):
 
 
 def visualize(hsi, gt, pred, folder = None, iou = None, suffix = None):
+    fig = plt.figure(1)
+    plt.clf()
     plt.subplot(1,3,1)
     plt.title("Original")
     plt.imshow(hsi_utils.get_display_image(hsi))
@@ -156,19 +160,28 @@ def visualize(hsi, gt, pred, folder = None, iou = None, suffix = None):
     plt.imshow(gt)
 
     plt.subplot(1,3,3)
-    figTitle = ["Prediction" if iou == None else "Prediction (" + str(iou) + "%)"]
+    figTitle = "Prediction" if iou == None else "Prediction (" + str(iou) + "%)"
     plt.title(figTitle)
     plt.imshow(pred)
 
     filename = get_model_filename('v_' + suffix, 'png', folder)
     plt.savefig(filename)
-
     #plt.show()
+
+    # plt.figure(2)
+    # plt.clf()
+    # plt.imshow(pred)
+    # plt.axis('off')
+    # plt.savefig(filename)
+
+    filename = get_model_filename('p_' + suffix, 'mat', folder)
+    savemat(filename,{"prediction": pred })
+
 
 def plot_roc(fpr, tpr, auc_val, model_name, folder):
 
-    fig = plt.figure(2)
-    
+    fig = plt.figure(3)
+
     plt.clf()
     plt.plot([0, 1], [0, 1], 'k--')
     for (fpr_, tpr_, auc_val_, model_name_) in zip(fpr, tpr, auc_val, model_name):
@@ -182,11 +195,11 @@ def plot_roc(fpr, tpr, auc_val, model_name, folder):
 
 
     filename = get_model_filename('auc', 'png', folder)
-    plt.savefig(filename)
+    plt.savefig(filename, bbox_inches = 'tight')
     plt.show()
 
     # Zoom in view of the upper left corner.
-    fig = plt.figure(3)
+    fig = plt.figure(4)
 
     plt.clf()
     plt.xlim(0, 0.2)
@@ -201,7 +214,7 @@ def plot_roc(fpr, tpr, auc_val, model_name, folder):
     plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
 
     filename = get_model_filename('auc-zoom', 'png', folder)
-    plt.savefig(filename)
+    plt.savefig(filename, bbox_inches = 'tight')
     plt.show()
 
 

@@ -17,7 +17,7 @@ WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 10 # 200
+NUMBER_OF_EPOCHS = 200 # 200
 VALIDATION_FOLDS = 5
 BATCH_SIZE = 8
 
@@ -26,7 +26,6 @@ BATCH_SIZE = 8
 # hio.show_label_montage('train')
 # hio.show_label_montage('test')
 # hio.show_label_montage('full')
-
 
 X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()
 
