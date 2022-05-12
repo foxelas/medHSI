@@ -617,7 +617,7 @@ classdef trainUtility
                 preTransMethod = method; %'none'
                 scope = 'all';
             elseif contains(lower(method), '-all')
-                preTransMethod = strrept(method, '-all');
+                preTransMethod = strrep(method, '-all', '');
                 scope = 'all';
             else
                 scope = 'perSample';
