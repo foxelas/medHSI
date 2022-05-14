@@ -17,7 +17,7 @@ WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 200 # 200
+NUMBER_OF_EPOCHS = 400 # 200
 VALIDATION_FOLDS = 5
 BATCH_SIZE = 8
 
@@ -64,13 +64,17 @@ def calc_plot_roc(model, X_test, y_test, model_name, folder):
 # hio.save_model_info(model, folder)
 
 flist = [
-    'sm_vgg', 'sm_vgg_pretrained', 
-    'sm_resnet', 'sm_resnet_pretrained',
-    'sm_inception', 'sm_inception_pretrained', 
-    'sm_efficientnet', 'sm_efficientnet_pretrained', 
-    'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained'
-    #, 
-    #'xception3d_max', 'cnn3d', 'xception3d_mean', 'xception3d2_max', 'xception3d2_mean'
+    # # failing 
+    # 'sm_vgg', 'sm_vgg_pretrained', 
+    # 'sm_inception', 'sm_inception_pretrained', 
+    # 'sm_efficientnet', 'sm_efficientnet_pretrained', 
+    # 'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained'
+
+    # #successful 
+    # 'sm_resnet', 'sm_resnet_pretrained',
+
+    # 'cnn3d', 
+    'xception3d_max', 'xception3d_mean', 'xception3d2_max', 'xception3d2_mean'
  ]
 
 fpr = [] 

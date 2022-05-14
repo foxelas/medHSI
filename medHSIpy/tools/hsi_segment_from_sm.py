@@ -61,7 +61,8 @@ def build_sm_model(backbone, x_train_raw, x_test_raw, height, width, numChannels
     model = get_sm_model(backbone, height, width, numChannels, numClasses)
 
     learing_rate = 0.0001
-    optimizer = Adam() #RMSprop(learning_rate=learing_rate) # decay=1e-06
+    # optimizer = Adam() 
+    optimizer = RMSprop(learning_rate=learing_rate) # decay=1e-06
     targetLoss = sm.losses.bce_jaccard_loss #categorical_crossentropy'
     metrics = [sm.metrics.iou_score, 'accuracy']
     lossFunName = targetLoss if str(targetLoss) == targetLoss else str(targetLoss._name)

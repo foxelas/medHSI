@@ -326,7 +326,7 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
         model = get_xception3d2_mean(height, width, numChannels, numClasses)
 
 
-    learing_rate = 0.0001
+    learing_rate = 0.00001 #0.0001, 0.001
     optimizer = RMSprop(learning_rate=learing_rate) # decay=1e-06
     targetLoss = sm.losses.bce_jaccard_loss #categorical_crossentropy'
     metrics = [sm.metrics.iou_score, 'accuracy']
