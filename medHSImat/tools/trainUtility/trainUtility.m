@@ -613,7 +613,7 @@ classdef trainUtility
             % @retval Xvalid [numeric array] | The dimension-reduced test data
 
             preTransMethod = method;
-            if strcmpi(method, 'autoencoder') || strcmpi(method, 'rfi')
+            if strcmpi(method, 'autoencoder') || strcmpi(method, 'rfi')  
                 preTransMethod = method; %'none'
                 scope = 'all';
             elseif contains(lower(method), '-all')

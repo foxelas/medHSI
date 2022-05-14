@@ -344,7 +344,7 @@ classdef dimredUtility
                     %% No dimension reduction
                 otherwise
                     scores = Xcol;
-                    q = size(Xcol, 1);
+                    q = size(Xcol, 2);
             end
 
             explained = dimredUtility.CalculateExplained(scores, Xcol, X, fgMask);
