@@ -1,25 +1,18 @@
 from random import seed
 from datetime import date
-from matplotlib.pyplot import title
+from keras import backend
 
 
-from tools import hio
+from tools import hio, train_utils, cmdl, xmdl, segsm
 import segmentation_models as sm
-import tools.hsi_segment_from_sm as segsm
-import tools.hsi_segment_from_scratch as segscratch
-import tools.from_the_internet as fi
-
-
-from sklearn.metrics import roc_curve, auc
-import numpy as np
 
 WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 400 # 200
+NUMBER_OF_EPOCHS = 300 # 200
 VALIDATION_FOLDS = 5
-BATCH_SIZE = 8
+BATCH_SIZE = 4 #8
 
 
 # #### Init 
@@ -31,37 +24,21 @@ X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()
 
 def get_framework(framework, xtrain, xtest, ytrain, ytest):
     if 'sm' in framework:
-        model, history, optSettings = segsm.fit_sm_model(framework, xtrain, ytrain, xtest, ytest, 
+        model, history = segsm.fit_sm_model(framework, xtrain, ytrain, xtest, ytest, 
             height=HEIGHT, width=WIDTH, numChannels=NUMBER_OF_CHANNELS, 
             numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
             
-    elif 'cnn3d' == framework:
-        model, history, optSettings = segscratch.get_cnn_model(framework, xtrain, ytrain, xtest, ytest, 
+    elif 'cnn3d' in framework:
+        model, history = cmdl.get_cnn_model(framework, xtrain, ytrain, xtest, ytest, 
             height=HEIGHT, width=WIDTH,  numChannels=NUMBER_OF_CHANNELS, 
-            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS, batchSize=64)
+            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
 
     else:
-        model, history, optSettings = segscratch.get_xception_model(framework, xtrain, ytrain, xtest, ytest, 
+        model, history = xmdl.get_xception_model(framework, xtrain, ytrain, xtest, ytest, 
             height=HEIGHT, width=WIDTH,  numChannels=NUMBER_OF_CHANNELS, 
-            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS, batchSize=BATCH_SIZE)
+            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
 
-    return model, history, optSettings
-
-def calc_plot_roc(model, X_test, y_test, model_name, folder):
-    y_scores = model.predict(X_test).ravel()
-    y_test = np.reshape(y_test.astype(int), (y_scores.shape[0],  1))
-
-    fpr, tpr, thresholds_keras = roc_curve(y_test, y_scores)
-    auc_val = auc(fpr, tpr)
-
-    hio.plot_roc([fpr], [tpr], [auc_val], [model_name], folder)
-
-    return fpr, tpr, auc_val
-
-
-# model = fi.build_xception_segmentation_model(32, 32, 3)
-# folder = str(date.today()) + '_' + 'xception_base' 
-# hio.save_model_info(model, folder)
+    return model, history
 
 flist = [
     # # failing 
@@ -71,10 +48,18 @@ flist = [
     # 'sm_inceptionresnet' , 'sm_inceptionresnet_pretrained'
 
     # #successful 
-    # 'sm_resnet', 'sm_resnet_pretrained',
+    #'sm_resnet', 
+    
+    #'sm_resnet_pretrained',
 
-    # 'cnn3d', 
-    'xception3d_max', 'xception3d_mean', 'xception3d2_max', 'xception3d2_mean'
+    #'cnn3d', 
+    #'cnn3d2'
+    #'xception3d5_max', 'xception3d5_mean',
+    #'xception3d4_max', 'xception3d4_mean',
+    #'xception3d3_max', 'xception3d3_mean',
+    #'xception3d_max', 
+    'xception3d_mean', 
+    # 'xception3d2_max', 'xception3d2_mean'
  ]
 
 fpr = [] 
@@ -82,17 +67,16 @@ tpr = []
 auc_val = [] 
 
 for framework in flist: 
-    model, history, optSettings = get_framework(framework, X_train, X_test, y_train, y_test)
+    backend.clear_session()
+
+    print("Running for framework:" + framework)
+    model, history = get_framework(framework, X_train, X_test, y_train, y_test)
 
     folder = str(date.today()) + '_' + framework 
-    hio.save_model_info(model, folder, optSettings)
-
-    hio.plot_history(history, folder)
 
     #prepare again in order to avoid pre-processing errors 
     X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()
-
-    [fpr_, tpr_, auc_val_] = calc_plot_roc(model, X_test, y_test, framework, folder)
+    [fpr_, tpr_, auc_val_]  = train_utils.evaluate_model(model, history, framework, folder, X_test, y_test)
     fpr.append(fpr_)
     tpr.append(tpr_)
     auc_val.append(auc_val_)
@@ -102,8 +86,9 @@ for framework in flist:
     for (hsi, gt, id, pred) in zip(X_test, y_test, names_test, preds):
         iou = sm.metrics.iou_score(gt, pred)
         k += 1 
-        hio.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2), id)
+        train_utils.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2), id)
 
+    from scipy.io import savemat
 # ROC AUC comparison 
-hio.plot_roc(fpr, tpr, auc_val, flist, None)
+train_utils.plot_roc(fpr, tpr, auc_val, flist, None)
 

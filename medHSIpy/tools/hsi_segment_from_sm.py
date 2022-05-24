@@ -6,6 +6,11 @@ from keras.layers import Input, Conv2D
 from tensorflow.keras.optimizers import Adam, RMSprop
 from keras.models import Model
 
+if __name__ == "__main__":
+    import train_utils
+else:
+    from . import train_utils
+
 RESNET_BACKBONE = 'resnet34'
 INCEPTION_BACKBONE = 'inceptionv3'
 INCEPTION_RESNET_BACKBONE = 'inceptionresnetv2'
@@ -55,38 +60,15 @@ def get_sm_model(backbone, height, width, numChannels, numClasses):
         model = sm.Unet(target_backbone, input_shape=(None, None, numChannels), encoder_weights=None, classes=numClasses)
     return model
 
-def build_sm_model(backbone, x_train_raw, x_test_raw, height, width, numChannels, numClasses):
-    target_backbone = get_target_backbone(backbone)
+def build_sm_model(framework, x_train_raw, x_test_raw, height, width, numChannels, numClasses):
+    target_backbone = get_target_backbone(framework)
     x_train_preproc, x_test_preproc = get_sm_preproc_data(x_train_raw, x_test_raw, target_backbone)
-    model = get_sm_model(backbone, height, width, numChannels, numClasses)
+    model = get_sm_model(framework, height, width, numChannels, numClasses)
+    model = train_utils.compile_Adam(framework, model, learning_rate =  0.0001)
+    return model, x_train_preproc, x_test_preproc
 
-    learing_rate = 0.0001
-    # optimizer = Adam() 
-    optimizer = RMSprop(learning_rate=learing_rate) # decay=1e-06
-    targetLoss = sm.losses.bce_jaccard_loss #categorical_crossentropy'
-    metrics = [sm.metrics.iou_score, 'accuracy']
-    lossFunName = targetLoss if str(targetLoss) == targetLoss else str(targetLoss._name)
-    optSettings = "Compiled with" + "\n" + "Optimizer" + str(optimizer._name) + "\n" + "Learning Rate" + str(learing_rate) + "\n" +  "Loss Function" + lossFunName
+def fit_sm_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs):
+    model, x_train_prep, x_test_prep = build_sm_model(framework, x_train_raw, x_test_raw, height, width, numChannels, numClasses)
+    model, history = train_utils.fit_model(framework, model, x_train_prep, ytrain, x_test_prep, ytest, numEpochs, batchSize = 64)
 
-    model.compile(
-        optimizer = optimizer,  #'rmsprop', 'SGD', 'Adam',
-        loss=targetLoss,
-        metrics=metrics
-        )
-
-    return model, x_train_preproc, x_test_preproc, optSettings
-
-def fit_sm_model(backbone, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs):
-
-    model, x_train_prep, x_test_prep, optSettings = build_sm_model(backbone, x_train_raw, x_test_raw, height, width, numChannels, numClasses)
-
-    # fit model
-    history = model.fit(
-    x=x_train_prep,
-    y=ytrain,
-    batch_size=64,
-    epochs=numEpochs,
-    validation_data=(x_test_prep, ytest),
-    )
-
-    return model, history, optSettings
+    return model, history
