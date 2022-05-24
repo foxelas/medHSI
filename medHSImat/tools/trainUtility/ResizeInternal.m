@@ -101,7 +101,7 @@ if config.GetSetting('HasResizeOptions')
             k = 0;
             for j = 1:numel(spectralData)
                 spectralData = spectralDatas{j};
-                if sum(spectralData.FgMask(:)) > 0
+                if sum(spectralData.FgMask(:)) > 10
                     labelInfo = labelInfos{j};
                     k = k + 1;
                     SaveResizedData(spectralData, labelInfo, targetName, k, patchSubs{j});

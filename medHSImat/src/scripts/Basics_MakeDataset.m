@@ -19,7 +19,7 @@
 %>
 %> @param targetDataset [char] | Optional: The target dataset. Default: 'Core'.
 %======================================================================
-function [] = Basics_MakeDataset(targetDataset)
+function [] = Basics_MakeDataset(targetDataset, baseDataset)
 % Basics_MakeDataset prepares the target dataset.
 %
 % You can choose among:
@@ -46,17 +46,20 @@ if nargin < 1
     targetDataset = 'Core';
 end
 
+if nargin < 2 
+    baseDataset = 'psl';
+end 
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 
 config.SetOpt();
 config.SetSetting('IsTest', false);
-config.SetSetting('Database', 'psl');
+config.SetSetting('Database', baseDataset);
 config.SetSetting('Dataset', targetDataset);
 config.SetSetting('Normalization', 'byPixel');
 
 %% Change accordingly
+
 prefix = config.GetSetting('Database');
-baseDataset = 'pslRaw32';
 readForeground = true;
 
 CheckImportData();
@@ -110,8 +113,7 @@ if strcmpi(targetDataset, '32')
     config.SetSetting('Dataset', targetDataset);
 end
 
-if strcmpi(targetDataset, '32-pca')
-    baseDataset = 'pslRaw32';
+if strcmpi(targetDataset, 'pca')
 
     config.SetSetting('Dataset', baseDataset);
     [~, targetNames] = commonUtility.DatasetInfo(false);
@@ -122,7 +124,13 @@ if strcmpi(targetDataset, '32-pca')
         config.SetSetting('Dataset', baseDataset);
         [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
         spectralData = hsIm;
-        spectralData.Value = hsIm.Transform(false, 'pca', 3);
+        rescaledPCA = hsIm.Transform(false, 'pca', 3);
+        [m, n, ~] = size(rescaledPCA);
+        for j = 1:3
+            colImg = reshape(rescaledPCA(:,:,j), [m*n,1]);
+            rescaledPCA(:,:,j) = reshape(rescale(colImg), [m, n]); 
+        end
+        spectralData.Value = rescaledPCA;
         if size(spectralData.Value, 3) == 3 && ndims(spectralData.Value) == 3
             config.SetSetting('Dataset', targetDataset);
             targetFilename = commonUtility.GetFilename('dataset', targetName);

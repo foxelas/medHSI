@@ -12,7 +12,7 @@ end
 
 function [] = MakeFeatGraphs(trainPerformance, testPerformance)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff', 'JacDensity'};
+targetMetrics = {'Sensitivity', 'Specificity', 'JaccardCoeff', 'JacDensity'};
 targets = {trainPerformance, testPerformance};
 for ii = 1:length(targetMetrics)
     targetMetric = targetMetrics{ii};
@@ -77,7 +77,7 @@ end
 
 function [] = MakeBestGraphs(trainPerformance, testPerformance)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis', 'JacDensity'};
+targetMetrics = {'Sensitivity', 'Specificity', 'JaccardCoeff', 'Mahalanobis', 'JacDensity'};
 targets = {trainPerformance, testPerformance};
 for ii = 1:length(targetMetrics)
     targetMetric = targetMetrics{ii};
@@ -138,7 +138,7 @@ end
 
 function [] = MakeTable(trainPerformance, filePath, withSME, numSamples)
 
-targetMetrics = {'Sensitivity', 'JaccardCoeff', 'Mahalanobis', 'JacDensity'};
+targetMetrics = {'Sensitivity', 'Specificity', 'JaccardCoeff', 'Mahalanobis', 'JacDensity'};
 % logVal = [];
 targets = {trainPerformance};
 for ii = 1:length(targetMetrics)

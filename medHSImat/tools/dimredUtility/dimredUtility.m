@@ -101,7 +101,7 @@ classdef dimredUtility
                 labelMask = [];
             end
             hasFgMask = ~isempty(fgMask);
-            flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster'));
+            flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'abundance'));
             if ndims(X) < 3
                 flattenIn = false;
             end
@@ -152,9 +152,12 @@ classdef dimredUtility
                         else
                             labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
                         end
+                    else
+                        labelMaskCol = labelMask;
                     end
                     Mdl = fitcdiscr(scores1, labelMaskCol);
-                    scores = predict(Mdl, scores1);
+                    % scores = predict(Mdl, scores1);
+                    scores = scores1 * Mdl.Coeffs(1,2).Linear; 
                     q = numel(Mdl.ClassNames) - 1;
                     
 %                     [W, LAMBDA] = eig(Mdl.BetweenSigma, Mdl.Sigma); %Must be in the right order! 
@@ -174,10 +177,16 @@ classdef dimredUtility
                         else
                             labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
                         end
+                    else
+                        labelMaskCol = labelMask;
                     end
+                    
                     Mdl = fitcdiscr(Xcol, labelMaskCol);
-                    scores = predict(Mdl, Xcol);
-
+                    %scores = predict(Mdl, Xcol);
+                    scores = Xcol *  Mdl.Coeffs(1,2).Linear;
+                    coeff = Mdl.Coeffs(1,2).Linear ;
+                    
+                    
                     %% Discriminant Analysis (QDA)
                 case 'qda'
                     if isempty(labelMask)
@@ -258,9 +267,9 @@ classdef dimredUtility
                     if ~isempty(varargin)
                         % Apply pretrained
                         impOOB = varargin{1};
-                        [~, idxOrder] = sort(impOOB, 'descend');
-                        ido = idxOrder(1:q);
-                        scores = Xcol(:, ido);
+                        %[~, idxOrder] = sort(impOOB, 'descend');
+                        %ido = idxOrder(1:q);
+                        %scores = Xcol(:, ido);
                     else
                         % Train 
 
@@ -274,12 +283,17 @@ classdef dimredUtility
                         fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
                         options = statset('UseParallel', true);
                         impOOB = oobPermutedPredictorImportance(RFtrainedModel, 'Options', options);
-                    
-                        scores = dimredUtility.Transform(Xcol, method, q, impOOB);
-                        coeff = impOOB;
                     end
 
+                    featImp = impOOB';
+                    [~, idx] = sort(featImp, 'descend');
+                    dropIdx = idx(q+1:end);
+                    featImp(dropIdx) = 0; 
+                    coeff = diag(featImp);
+                    coeff( :, ~any(coeff,1) ) = [];  %drop zero columns
 
+                    scores = dimredUtility.Transform(Xcol, 'pretrained', q, coeff);
+                    
                     %% Autoencoder (AE)
                 case 'autoencoder'
                     if ~isempty(varargin)
@@ -302,14 +316,93 @@ classdef dimredUtility
                     %% ClusterPCA
                 case 'clusterpca'
                     %%Find endmembers
-                    numEndmembers = 5; %6;
+                    
+                     if isempty(varargin)
+                        numEndmembers = 5;
+                    else
+                        numEndmembers = varargin{1};
+                     end
+                    
                     endmembers = NfindrInternal(X, numEndmembers, fgMask);
 
                     %%Find discrepancy metrics
                     clusterLabels = DistanceScoresInternal(X, endmembers, @sam);
 
                     scores = SuperPCA(X, q, clusterLabels);
+                
+                    %% ClusterPCA2
+                case 'cluster2pca'
+                    %%Find endmembers
+                    
+                     if isempty(varargin)
+                        numEndmembers = 5;
+                    else
+                        numEndmembers = varargin{1};
+                     end
+                    
+                    endmembers = NfindrInternal(X, numEndmembers, fgMask);
 
+                    %%Find discrepancy metrics
+                    clusterLabels = DistanceScoresInternal(X, endmembers, @ns3);
+
+                    scores = SuperPCA(X, q, clusterLabels);
+
+                case 'abundance'
+                    %%Find endmembers
+                    
+%                      if isempty(varargin)
+%                         numEndmembers = 5;
+%                     else
+%                         numEndmembers = varargin{1};
+%                      end
+                    numEndmembers = q;
+                    endmembers = NfindrInternal(X, numEndmembers, fgMask);
+                    scores = estimateAbundanceLS(X, endmembers);
+
+                case 'abundance-lbp'
+                    
+                    
+                case 'cluster3pca'
+                    %%Find numClusters
+                    
+                     if isempty(varargin)
+                        numClusters = 5;
+                    else
+                        numClusters = varargin{1};
+                     end
+                    
+                    refLib = hsiUtility.GetReferenceLibrary();
+                    healthy = refLib(5).Data;
+            
+                    %%Find discrepancy metrics
+                    angles = ns3(X, healthy);         
+                    %angles = rad2deg(DistanceScoresInternal(X, healthy, @ns3));
+                    angles = rad2deg(angles);
+                    [m, n] = size(angles);
+                    clusterLabels = kmeans(reshape(angles, [m*n, 1]), numClusters);
+                    clusterLabels = reshape(clusterLabels, [m, n]);
+                    scores = SuperPCA(X, q, clusterLabels);
+
+                case 'cluster4pca'
+                    %%Find numClusters
+                    
+                     if isempty(varargin)
+                        numClusters = 5;
+                    else
+                        numClusters = varargin{1};
+                     end
+                    
+                    refLib = hsiUtility.GetReferenceLibrary();
+                    healthy = refLib(5).Data;
+            
+                    %%Find discrepancy metrics
+                    angles = ns3(X, healthy);         
+                    %angles = rad2deg(DistanceScoresInternal(X, healthy, @ns3));
+                    angles = rad2deg(angles);
+                    scores = angles;
+                    q = 1;
+                    
+                    
                     %% Multiscale ClusterPCA
                 case 'mclusterpca'
 
@@ -340,7 +433,8 @@ classdef dimredUtility
                     end 
                     coeff = varargin{1};
                     scores = Xcol * coeff;    
-
+                    q = size(coeff, 2);
+                    
                     %% No dimension reduction
                 otherwise
                     scores = Xcol;
@@ -533,7 +627,7 @@ classdef dimredUtility
             % @param Xcol_ [numeric array] | The original data in a 2D format
             %
             % @retval explained [numeric array] | The explained values.
-            explained = var(transData) / sum(var(originalData));
+            explained = var(transData) ./ sum(var(originalData));
         end
 
         % ======================================================================

@@ -14,7 +14,8 @@ if sum(mask(:)) > 0
     end
 
     jc = jaccard(mask, gt);
-    joint = 0.8 * jc + 0.2 * d;
+    ratio= 0.7;
+    joint = ratio * jc + (1- ratio) * d;
 else
     joint = 0;
 end

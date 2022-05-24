@@ -43,8 +43,11 @@ function [] = AugmentInternal(baseDataset, targetDataset, augType)
 % @param targetDataset [char] | The augmented dataset
 % @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
 %
+if nargin < 2 
+    targetDataset = strcat(baseDataset, 'Augmented');
+end 
 
-if nargin < 2
+if nargin < 3
     augType = 'set1';
 end
 
@@ -163,10 +166,12 @@ filename = commonUtility.GetFilename('dataset', strcat(targetName, '_', num2str(
 save(filename, 'spectralData', 'labelInfo', '-v7.3');
 fprintf('Saved new data sample at: %s \n', filename);
 
-outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
-filename = config.DirMake(outputDir, strcat(targetName, '_', num2str(folds), '.png'));
-dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
-imwrite(dispImageRgb, filename, 'jpg');
-fprintf('Saved image preview at: %s \n', filename);
+if (size(spectralData.Value, 3) > 3)
+    outputDir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed'), '');
+    filename = config.DirMake(outputDir, strcat(targetName, '_', num2str(folds), '.png'));
+    dispImageRgb = spectralData.GetDisplayRescaledImage('rgb');
+    imwrite(dispImageRgb, filename, 'jpg');
+    fprintf('Saved image preview at: %s \n', filename);
+end
 
 end

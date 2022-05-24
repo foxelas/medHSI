@@ -49,15 +49,17 @@ n = 32;
          baseImg = hsIm.GetDisplayImage();
          labelImg = rescale(labelInfo.Labels);
          
-         [d1, d2, d3] = size(baseImg); 
+         [d1, d2] = size(labelImg); 
          predImg = zeros(d1, d2);
          predImg(1:size(pred,1), 1:size(pred,2) ) = pred;
          jacCoeff = jaccard(labelImg, round(predImg));
 
+         rgbImg = zeros(d1, d2, 311);
+         rgbImg(1:size(pred,1), 1:size(pred,2), :) = img;
          
          fig = figure(1); clf; 
          subplot(1, 3, 1);
-         imshow(GetDisplayImageInternal(img));
+         imshow(GetDisplayImageInternal(rgbImg));
          title('Input Image', 'FontSize', 12); 
 %          axis square;
          
