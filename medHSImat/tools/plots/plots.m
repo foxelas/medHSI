@@ -847,6 +847,51 @@ classdef plots
             plots.SavePlot(fig, plotPath);
         end
 
+        function [] = GroundTruthComparison(figNum, plotPath, rgbImg, labelImg, predImg)
+             
+             jacCoeff = jaccard(labelImg, round(predImg));
+             
+             fig = figure(figNum); clf; 
+             
+             subplot(1, 3, 1);
+             imshow(rgbImg);
+             title('Input Image', 'FontSize', 12); 
+
+             subplot(1, 3, 2);
+             imshow(labelImg);
+             title('Ground Truth', 'FontSize', 12); 
+
+             subplot(1, 3, 3);
+             imshow(predImg);
+             title( sprintf('Prediction %.2f%%', jacCoeff * 100), 'FontSize', 12); 
+
+             plots.SavePlot(fig, plotPath);
+        end
+        
+        function [] = PredictionValues(figNum, plotPath, predImg, borderImg)
+             fig = figure(figNum); clf; 
+
+             subplot(1,2,1);       
+             imshow(predImg);
+             green = cat(3, zeros(size(borderImg)), borderImg, zeros(size(borderImg))); 
+             hold on;
+             h = imshow(green); 
+             hold off 
+             h.AlphaData = 0.4;
+             title('Patch borders');
+
+             subplot(1,2,2);       
+             imagesc(predImg, [0, 1]);
+             colormap('hot');
+             axis('off');
+             axis equal
+             axis tight;
+             %c = colorbar('Location', 'southoutside');
+             title('Output values');
+
+             plots.SavePlot(fig, plotPath);
+
+        end
 
         %======================================================================
         %> @brief ReferenceLibrary  plots the reference spectra in the library.

@@ -1,95 +1,111 @@
-% filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
-% load(filePath);
-% filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
-% load(filePath2);
+experiment = strcat('Dimred', '28-Apr-2022', '-rbf-100000-outlier0,05');
+config.SetSetting('Dataset', 'pslRaw');
 
-% experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,05');
-% config.SetSetting('Dataset', 'pslRaw-Denoisesmoothen');
+Basics_Init(experiment);
+dataset = config.GetSetting('Dataset');
+
+%% Read h5 data
+folds = 5;
+testTargets = {'157', '251', '227'};
+dataType = 'hsi';
+
+% hasLoad = true;
+% if hasLoad
+%     filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
+%     load(filePath);
+%     filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
+%     load(filePath2);
+% else
 % 
-% Basics_Init(experiment);
-% 
-% dataset = config.GetSetting('Dataset');
-% 
-% %% Read h5 data
-% folds = 5;
-% testTargets = {'157', '251', '227'};
-% dataType = 'hsi';
-% qs = [5, 10, 20, 50, 100];
-% ks = 1:length(qs);
-% j = 0;
-% 
-% [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-% filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'lastrun'), 'mat');
-% save(filePath, '-v7.3');
+%     [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
+%     filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'lastrun'), 'mat');
+%     save(filePath, '-v7.3');
+% end
 
+%%%%% PCA-20
+name = 'PCA-20';
+[testPerformance{1}, performanceRow(1,:)] = TrainClassifier(name, trainData, testData, 'pca', 20); 
 
+%%%% Abundance-8
+name = 'Abundance-8';
+[testPerformance{2}, performanceRow(2,:)] = TrainClassifier(name, trainData, testData, 'abundance', 8); 
 
-q = 100;
-method = 'clusterPCA';
-% method = 'pretrained';
-% featImp =impOOB';
-% [~, idx] = sort(featImp, 'descend');
-% dropIdx = idx(q+1:end);
-% dropIdx = [dropIdx; 311; 1];
-% featImp(dropIdx) = 0; 
-% coeff = diag(featImp);
-% coeff( :, ~any(coeff,1) ) = [];  %drop zero columns
+%%%% ClusterPCA-100
+name = 'ClusterPCA-100';
+[testPerformance{3}, performanceRow(3,:)] = TrainClassifier(name, trainData, testData, 'clusterpca', 100); 
 
-[testPerformance, trainedModel, testscores] = trainUtility.DimredAndTrain(trainData, testData, method, q); %, coeff);
-fprintf('Test - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
-    testPerformance.JaccardCoeff*100, testPerformance.AUC, testPerformance.Accuracy*100, testPerformance.Sensitivity*100, ... .
-    testPerformance.Specificity*100, testPerformance.DRTrainTime, testPerformance.ModelTrainTime);
-ytest = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData.Labels}, {testData.Values}, 'un', 0);
-b = [testPerformance.JaccardCoeff*100, ...
-testPerformance.JacDensity*100, ...
-testPerformance.Accuracy*100, ...
-testPerformance.Sensitivity*100 , ...
-testPerformance.Specificity*100]
+%%%%% RF-100
+name = 'RFI-100';
+q = 102;
+filePath3 = strrep(filePath, 'lastrun', 'rfi');
+load(filePath3, 'impOOB');
+method = 'pretrained';
+featImp =impOOB';
+[~, idx] = sort(featImp, 'descend');
+dropIdx = idx(q+1:end);
+dropIdx = [dropIdx; 311; 1];
+featImp(dropIdx) = 0; 
+coeff = diag(featImp);
+coeff( :, ~any(coeff,1) ) = [];  %drop zero columns
+[testPerformance{4}, performanceRow(4,:)] = TrainClassifier(name, trainData, testData, method, 100, coeff); 
+testPerformance{4}.Name = 'RFI-100';
 
-fgMasks = {testData.Masks};
-sRGBs = {testData.RGBs};
-predlabels = cellfun(@(x) trainUtility.Predict(trainedModel, x, 'voting'), testscores, 'un', 0);
-origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
+function [testPerformance, performanceRow] = TrainClassifier(name_, trainData_, testData_, method_, q_, coeff_) 
 
-for i = 1:numel(sRGBs)
-
-    %% without post-processing
-    predMask = hsi.RecoverSpatialDimensions(predlabels{i}, origSizes{i}, fgMasks{i});
-    trueMask = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
-    jacsim = commonUtility.Jaccard(predMask, trueMask);
-
-    imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), num2str(i), ...
-        strcat('pred_', method, '_', num2str(q))), 'png');
-    figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
-    plots.Overlay(4, imgFilePath, sRGBs{i}, predMask, figTitle);
-
-    figure(5);  imshow(predMask);
-    imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), num2str(i), ...
-        strcat('mask_pred_', method, '_', num2str(q))), 'png');
-    plots.SavePlot(5, imgFilePath); 
+    if nargin < 6
+        [testPerformance, trainedModel, testscores] = trainUtility.DimredAndTrain(trainData_, testData_, method_, q_); %, coeff);
+    else
+        [testPerformance, trainedModel, testscores] = trainUtility.DimredAndTrain(trainData_, testData_, method_, q_, coeff_);
+    end 
     
+    testPerformance.Name = name_;
+    fprintf('Test: %s - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
+        name_, testPerformance.JaccardCoeff*100, testPerformance.AUC, testPerformance.Accuracy*100, testPerformance.Sensitivity*100, ... .
+        testPerformance.Specificity*100, testPerformance.DRTrainTime, testPerformance.ModelTrainTime);
     
-    %% with post processing
-    seClose = strel('disk', 3);
-    closeMask = imclose(predMask, seClose);
-    seErode = strel('disk', 3);
-    postPredMask = imerode(closeMask, seErode);
-    jacsim = commonUtility.Jaccard(postPredMask, trueMask);
+    ytest = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData_.Labels}, {testData_.Values}, 'un', 0);
+    
+    performanceRow = [testPerformance.JaccardCoeff*100, ...
+            testPerformance.JacDensity*100, ...
+            testPerformance.Accuracy*100, ...
+            testPerformance.Sensitivity*100 , ...
+            testPerformance.Specificity*100, ...
+            testPerformance.AUC*100];
 
-    imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), strcat(num2str(i), '_post'), ...
-        strcat('pred_', method, '_', num2str(q))), 'png');
-    figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
-    plots.Overlay(4, imgFilePath, sRGBs{i}, postPredMask, figTitle);
-    
-    
-    figure(6);  imshow(postPredMask);
-    imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), strcat(num2str(i), '_post'), ...
-        strcat('mask_pred_', method, '_', num2str(q))), 'png');
-    plots.SavePlot(6, imgFilePath); 
+    fgMasks = {testData_.Masks};
+    sRGBs = {testData_.RGBs};
+   
+    predlabels = cellfun(@(x) trainUtility.Predict(trainedModel, x, 'voting', true), testscores, 'un', 0);
+    origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
+
+    for i = 1:numel(sRGBs)
+
+        %% without post-processing
+        baseImg = sRGBs{i};
+        predImg = hsi.RecoverSpatialDimensions(predlabels{i}{1}, origSizes{i}, fgMasks{i});
+        postProbImg = hsi.RecoverSpatialDimensions(predlabels{i}{2}, origSizes{i}, fgMasks{i});
+        labelImg = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
+        
+        targetSample = testData_(i).Labels.ID;
+        plotPath1 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat(targetSample, '_', name_)), 'png');
+        plots.GroundTruthComparison(1, plotPath1, baseImg, labelImg, predImg);
+
+        borderImg = zeros(size(predImg));
+        plotPath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat('check_', targetSample, '_', name_)), 'png');
+        plots.PredictionValues(2, plotPath2, rescale(postProbImg(:,:,2)), borderImg);
+        
+
+        %% with post processing
+        seClose = strel('disk', 3);
+        closeMask = imclose(predImg, seClose);
+        seErode = strel('disk', 3);
+        postPredMask = imerode(closeMask, seErode);
+        
+        plotPath1 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'post-process', strcat(targetSample, '_', name_)), 'png');
+        plots.GroundTruthComparison(3, plotPath1, baseImg, labelImg, postPredMask);
+    end
 
 end
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % baseDir = 'D:\elena\mspi\output\pslRaw32Augmented\python-test\';

@@ -435,5 +435,16 @@ classdef commonUtility
             d = ((sum((target).^2) / (sum((reference).^2))));
         end
 
+        function isChild = IsChild(targetParents)
+            stack = dbstack();
+            isChild = false;
+            for k = 1:numel(stack)
+                for i = 1:numel(targetParents)
+                    if contains(stack(k).name, targetParents{i})
+                        isChild = true;
+                    end
+                end
+            end
+        end
     end
 end

@@ -331,13 +331,8 @@ classdef trainUtility
             ytrain = ytrain(kk, :);
             % TO REMOVE
 
-            stack = dbstack();
-            hasOptimization = false;
-            for k = 1:numel(stack)
-                if contains(stack(k).name, 'RunKfoldValidation') || contains(stack(k).name, 'ValidateTest2')
-                    hasOptimization = false;
-                end
-            end
+            
+            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
 
             if hasOptimization
                 SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, 'OptimizeHyperparameters', {'BoxConstraint', 'KernelScale', 'KernelFunction', 'Standardize'}, ...
@@ -350,8 +345,6 @@ classdef trainUtility
                 %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'OutlierFraction', 0.05
                 %'Standardize', true | 'BoxConstraint', 2, 'IterationLimit', iterLim,
             end
-
-            numIter = SVMModel.NumIterations;
 
         end
 
@@ -486,7 +479,7 @@ classdef trainUtility
         %>
         %> @retval predLabels [numeric array] | The predicted labels
         % ======================================================================
-        function predLabels = Predict(trainedModel, Xtest, fusionMethod)
+        function predLabels = Predict(trainedModel, Xtest, fusionMethod, hasPosterior)
             % Predict returns the predicted labels from the model.
             %
             % @b Usage
@@ -507,6 +500,10 @@ classdef trainUtility
                 fusionMethod = 'voting';
             end
 
+            if nargin < 4 
+                hasPosterior = false; 
+            end 
+            
             if iscell(trainedModel) && numel(trainedModel) == 1
                 trainedModel = trainedModel{1};
             end
@@ -515,20 +512,28 @@ classdef trainUtility
                 models = trainedModel;
                 numModels = numel(models);
                 preds = zeros(size(Xtest{1}, 1), numModels);
+                postProbs = zeros(size(Xtest{1}, 1), numModels);
+
                 for i = 1:numModels
                     trainedModel = models{i};
                     scores = Xtest{i};
-                    preds(:, i) = predict(trainedModel, scores);
+                    [preds(:, i), postProbs(:,i)] = predict(trainedModel, scores);
                 end
 
                 if strcmpi(fusionMethod, 'voting')
                     predLabels = round(sum(preds./size(preds, 2), 2));
+                    postProbs = mean(postProbs, 2);
+
                 else
                     error('Not supported fusion method.')
                 end
 
             else
-                predLabels = predict(trainedModel, Xtest);
+                [predLabels, postProbs] = predict(trainedModel, Xtest);
+            end
+            
+            if hasPosterior 
+                predLabels = {predLabels, postProbs};
             end
         end
 
@@ -825,19 +830,27 @@ classdef trainUtility
             ytrainDecim = trainLabels(kk, :);
             % TO REMOVE
 
-%             for i = 1:numel(stackedModels)
-%                 singleModel = fitPosterior(stackedModels{i});
-%                 [~, score_svm] = resubPredict(singleModel);
-%                 [aucX{i}, aucY{i}, ~, aucVal(i)] = perfcurve(ytrainDecim, score_svm(:, stackedModels{i}.ClassNames), 1);
-%             end
-%             [meanAucX, meanAucY] = trainUtility.GetMeanAUC(aucX, aucY);
-%             perfStr.AUCX = meanAucX;
-%             perfStr.AUCY = meanAucY;
-%             perfStr.AUC = mean(aucVal);
-            perfStr.AUCX = [];
-            perfStr.AUCY = [];
-            perfStr.AUC = 0;
-
+            isTesting = ~commonUtility.IsChild({'RunKfoldValidation'});
+            if isTesting
+                modN = numel(stackedModels);
+                aucX = cell(modN,1);
+                aucY = cell(modN,1);
+                aucVal = zeros(modN,1);
+                for i = 1:modN
+                    singleModel = fitPosterior(stackedModels{i});
+                    [~, score_svm] = resubPredict(singleModel);
+                    [aucX{i}, aucY{i}, ~, aucVal(i)] = perfcurve(ytrainDecim, score_svm(:, stackedModels{i}.ClassNames), 1);
+                end
+                [meanAucX, meanAucY] = trainUtility.GetMeanAUC(aucX, aucY);
+                perfStr.AUCX = meanAucX;
+                perfStr.AUCY = meanAucY;
+                perfStr.AUC = mean(aucVal);
+            else
+                perfStr.AUCX = [];
+                perfStr.AUCY = [];
+                perfStr.AUC = 0;
+            end
+            
         end
         % ======================================================================
         %> @brief RunKfoldValidation trains and tests an classifier with cross validation.
@@ -874,24 +887,13 @@ classdef trainUtility
             % @retval peformanceStruct [struct] | The model's performance
 
             numValidSets = cvp.NumTestSets;
-
+            perfStr = cell(numValidSets,1);
             for k = 1:numValidSets
                 trainDataFold = trainData(cvp.training(k));
                 testDataFold = trainData(cvp.test(k));
 
                 [perfStr(k), ~, ~] = trainUtility.DimredAndTrain(trainDataFold, testDataFold, method, q, varargin{:});
             end
-
-            %[meanAucX, meanAucY] = trainUtility.GetMeanAUC({perfStr.AUCX}, {perfStr.AUCY});
-
-%             peformanceStruct = struct('Name', perfStr(1).Name, 'Features', perfStr(1).Features, ...
-%                 'Accuracy', mean([perfStr.Accuracy]), 'Sensitivity', mean([perfStr.Sensitivity]), 'Specificity', mean([perfStr.Specificity]), ...
-%                 'JaccardCoeff', mean([perfStr.JaccardCoeff]), 'AUC', mean([perfStr.AUC]), 'AUCX', meanAucX, 'AUCY', meanAucY, ...
-%                 'DRTrainTime', mean([perfStr.DRTrainTime]), 'ModelTrainTime', mean([perfStr.ModelTrainTime]), ...
-%                 'AccuracySD', std([perfStr.Accuracy]), 'SensitivitySD', std([perfStr.Sensitivity]), 'SpecificitySD', std([perfStr.Specificity]), ...
-%                 'JaccardCoeffSD', std([perfStr.JaccardCoeff]), 'AUCSD', std([perfStr.AUC]), ...
-%                 'Mahalanobis', mean([perfStr.Mahalanobis]), 'MahalanobisSD', std([perfStr.Mahalanobis]), ...
-%                 'JacDensity', mean([perfStr.JacDensity]), 'JacDensitySD', std([perfStr.JacDensity]));
 
             peformanceStruct = struct('Name', perfStr(1).Name, 'Features', perfStr(1).Features, ...
                 'Accuracy', mean([perfStr.Accuracy]), 'Sensitivity', mean([perfStr.Sensitivity]), 'Specificity', mean([perfStr.Specificity]), ...
@@ -902,8 +904,8 @@ classdef trainUtility
                 'Mahalanobis', mean([perfStr.Mahalanobis]), 'MahalanobisSD', std([perfStr.Mahalanobis]), ...
                 'JacDensity', mean([perfStr.JacDensity]), 'JacDensitySD', std([perfStr.JacDensity]));
             
-            fprintf('%d-fold validated - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
-                numValidSets, peformanceStruct.JaccardCoeff*100, peformanceStruct.AUC, peformanceStruct.Accuracy*100, peformanceStruct.Sensitivity*100, ... .
+            fprintf('%d-fold validated - Jaccard: %.3f %%, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
+                numValidSets, peformanceStruct.JaccardCoeff*100, peformanceStruct.Accuracy*100, peformanceStruct.Sensitivity*100, ... .
                 peformanceStruct.Specificity*100, peformanceStruct.DRTrainTime, peformanceStruct.ModelTrainTime);
         end
 
@@ -1045,45 +1047,5 @@ classdef trainUtility
 
         end
         
-        function [testPerformance] = ValidateTest3(trainData, testData, method, q, varargin)
-
-
-            [testPerformance, trainedModel, testscores] = trainUtility.DimredAndTrain(trainData, testData, method, q, varargin{:});
-            fprintf('Test - Jaccard: %.3f %%, AUC: %.3f, Accuracy: %.3f %%, Sensitivity: %.3f %%, Specificity: %.3f %%, DR Train time: %.5f, SVM Train time: %.5f \n\n', ...
-                testPerformance.JaccardCoeff*100, testPerformance.AUC, testPerformance.Accuracy*100, testPerformance.Sensitivity*100, ... .
-                testPerformance.Specificity*100, testPerformance.DRTrainTime, testPerformance.ModelTrainTime);
-            ytest = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData.Labels}, {testData.Values}, 'un', 0);
-
-            fgMasks = {testData.Masks};
-            sRGBs = {testData.RGBs};
-            predlabels = cellfun(@(x) trainUtility.Predict(trainedModel, x, 'voting'), testscores, 'un', 0);
-            origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
-
-            for i = 1:numel(sRGBs)
-
-                %% without post-processing
-                predMask = hsi.RecoverSpatialDimensions(predlabels{i}, origSizes{i}, fgMasks{i});
-                trueMask = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
-                jacsim = commonUtility.Jaccard(predMask, trueMask);
-
-                imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), num2str(i), ...
-                    strcat('pred_', method, '_', num2str(q))), 'png');
-                figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
-                plots.Overlay(4, imgFilePath, sRGBs{i}, predMask, figTitle);
-
-                %% with post processing
-                seClose = strel('disk', 3);
-                closeMask = imclose(predMask, seClose);
-                seErode = strel('disk', 3);
-                postPredMask = imerode(closeMask, seErode);
-                jacsim = commonUtility.Jaccard(postPredMask, trueMask);
-
-                imgFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), strcat(num2str(i), '_post'), ...
-                    strcat('pred_', method, '_', num2str(q))), 'png');
-                figTitle = sprintf('%s', strcat(method, '-', num2str(q), ' (', sprintf('%.2f', jacsim*100), '%)'));
-                plots.Overlay(4, imgFilePath, sRGBs{i}, postPredMask, figTitle);
-            end
-
-        end
     end
 end
