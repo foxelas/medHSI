@@ -78,7 +78,7 @@ def save_model_info(model, folder = None, optSettings = None):
         
 
 ########################################## COMPILE 
-def get_compile_settings(learning_rate, optimizer, targetLoss):
+def get_compile_settings(learning_rate, optimizer, targetLoss, decay):
     
     lossFunName = "" 
     if type(targetLoss) == type(categorical_crossentropy):
@@ -88,12 +88,12 @@ def get_compile_settings(learning_rate, optimizer, targetLoss):
     else:
         lossFunName = str(targetLoss._name)
         
-    optSettings = "Compiled with" + "\n" + "Optimizer" + str(optimizer._name) + "\n" + "Learning Rate" + str(learning_rate) + "\n" +  "Loss Function" + lossFunName
+    optSettings = "Compiled with" + "\n" + "Optimizer" + str(optimizer._name) + "\n" + "Learning Rate" + str(learning_rate) + "\n" + "Decay" + str(decay) + "\n" +  "Loss Function" + lossFunName
     return optSettings
 
-def compile_and_save_structure(framework, model, optimizer, learning_rate, targetLoss):
+def compile_and_save_structure(framework, model, optimizer, learning_rate, targetLoss, decay = 0):
      
-    optSettings = get_compile_settings(learning_rate, optimizer, targetLoss)
+    optSettings = get_compile_settings(learning_rate, optimizer, targetLoss, decay)
     metrics = [sm.metrics.iou_score, 'accuracy', Recall(), Precision(), FalseNegatives(), FalsePositives(), TrueNegatives(), TruePositives()]
 
     model.compile(
@@ -110,10 +110,10 @@ def compile_and_save_structure(framework, model, optimizer, learning_rate, targe
 
 
 def compile_RMSprop(framework, model, learning_rate = 0.0001, decay=1e-06):
-    optimizer = RMSprop(learning_rate=learning_rate) #), decay=1e-06)
-    targetLoss = sm.losses.jaccard_loss #sm.losses.bce_jaccard_loss #binary_crossentropy  #categorical_crossentropy
+    optimizer = RMSprop(learning_rate=learning_rate, decay=decay) 
+    targetLoss = sm.losses.bce_jaccard_loss #sm.losses.bce_jaccard_loss #binary_crossentropy  #categorical_crossentropy　sm.losses.jaccard_loss
 
-    model = compile_and_save_structure(framework, model, optimizer, learning_rate, targetLoss)
+    model = compile_and_save_structure(framework, model, optimizer, learning_rate, targetLoss, decay)
     return model 
 
 def compile_Adam(framework, model, learning_rate = 0.0001, decay=1e-06):

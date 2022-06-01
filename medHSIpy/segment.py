@@ -10,7 +10,7 @@ WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1
 NUMBER_OF_CHANNELS = 311
-NUMBER_OF_EPOCHS = 300 # 200
+NUMBER_OF_EPOCHS = 200 # 200
 VALIDATION_FOLDS = 5
 BATCH_SIZE = 4 #8
 
@@ -88,7 +88,6 @@ for framework in flist:
         k += 1 
         train_utils.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2), id)
 
-    from scipy.io import savemat
 # ROC AUC comparison 
 train_utils.plot_roc(fpr, tpr, auc_val, flist, None)
 

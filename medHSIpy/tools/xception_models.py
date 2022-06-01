@@ -10,7 +10,7 @@ else:
 N_SPACE = 3
 STRIDES_SPACE = 2 
 STRIDES_SPECTRUM = 2
-DROPOUT_RATE = 0.5
+DROPOUT_RATE = 0.4
 
 ## With filters 128, 256, 728  and spectral_step =15
 def get_xception3d_1(dropMiddle, width, height, numChannels, numClasses):
@@ -655,12 +655,12 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
     if 'xception3d_max' in framework:
         model = get_xception3d_max(height, width, numChannels, numClasses)
         batchSize = 4
-        learning_rate = 0.000005
+        learning_rate = 0.00001
 
     elif 'xception3d_mean' in framework: 
         model = get_xception3d_mean(height, width, numChannels, numClasses)
         batchSize = 4
-        learning_rate = 0.000005
+        learning_rate = 0.00001
 
     elif 'xception3d2_max' in framework:
         model = get_xception3d2_max(height, width, numChannels, numClasses)
