@@ -868,6 +868,29 @@ classdef plots
              plots.SavePlot(fig, plotPath);
         end
         
+        function [] = PostProcessingComparison(figNum, plotPath, labelImg, predImg, postPredImg)
+             
+             jacCoeff1 = jaccard(labelImg, round(predImg));
+             jacCoeff2 = jaccard(labelImg, round(postPredImg));
+
+             fig = figure(figNum); clf; 
+             
+             subplot(1, 3, 1);
+             imshow(labelImg);
+             title('Ground Truth', 'FontSize', 12); 
+
+             subplot(1, 3, 2);
+             imshow(predImg);
+             title('Prediction', 'FontSize', 12); 
+             text(min(xlim) + 5, min(ylim) + 5, sprintf('JC: %.2f%%', jacCoeff1 * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
+
+             subplot(1, 3, 3);
+             imshow(postPredImg);
+             title( sprintf('(Post) Prediction %.2f%%', jacCoeff2 * 100), 'FontSize', 12); 
+
+             plots.SavePlot(fig, plotPath);
+        end
+        
         function [] = PredictionValues(figNum, plotPath, predImg, borderImg)
              fig = figure(figNum); clf; 
 

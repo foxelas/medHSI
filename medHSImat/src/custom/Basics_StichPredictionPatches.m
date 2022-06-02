@@ -4,7 +4,7 @@ fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-baseDir = commonUtility.GetFilename('output', 'python-test\v6 - difference catentropy iou', '');
+baseDir = commonUtility.GetFilename('output', 'python-test', '');
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};
 folderNames = folderNames(3:end);

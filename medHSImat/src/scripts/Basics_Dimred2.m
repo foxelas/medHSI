@@ -9,17 +9,17 @@ folds = 5;
 testTargets = {'157', '251', '227'};
 dataType = 'hsi';
 
-% hasLoad = true;
+hasLoad = true;
 % if hasLoad
-%     filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
-%     load(filePath);
+%     foldDataFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
+%     load(foldDataFilePath);
 %     filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
 %     load(filePath2);
 % else
 % 
 %     [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-%     filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'lastrun'), 'mat');
-%     save(filePath, '-v7.3');
+%     foldDataFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'lastrun'), 'mat');
+%     save(foldDataFilePath, '-v7.3');
 % end
 
 %%%%% PCA-20
@@ -37,7 +37,7 @@ name = 'ClusterPCA-100';
 %%%%% RF-100
 name = 'RFI-100';
 q = 102;
-filePath3 = strrep(filePath, 'lastrun', 'rfi');
+filePath3 = strrep(foldDataFilePath, 'lastrun', 'rfi');
 load(filePath3, 'impOOB');
 method = 'pretrained';
 featImp =impOOB';
@@ -51,7 +51,8 @@ coeff( :, ~any(coeff,1) ) = [];  %drop zero columns
 testPerformance{4}.Name = 'RFI-100';
 
 function [testPerformance, performanceRow] = TrainClassifier(name_, trainData_, testData_, method_, q_, coeff_) 
-
+    config.SetSetting('SaveFolder', fullfile('FrameworkTesting', name_));
+    
     if nargin < 6
         [testPerformance, trainedModel, testscores] = trainUtility.DimredAndTrain(trainData_, testData_, method_, q_); %, coeff);
     else
@@ -85,13 +86,16 @@ function [testPerformance, performanceRow] = TrainClassifier(name_, trainData_, 
         predImg = hsi.RecoverSpatialDimensions(predlabels{i}{1}, origSizes{i}, fgMasks{i});
         postProbImg = hsi.RecoverSpatialDimensions(predlabels{i}{2}, origSizes{i}, fgMasks{i});
         labelImg = hsi.RecoverSpatialDimensions(ytest{i}, origSizes{i}, fgMasks{i});
-        
         targetSample = testData_(i).Labels.ID;
-        plotPath1 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat(targetSample, '_', name_)), 'png');
+
+        savePredPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),   strcat('pred', targetSample)), 'mat');
+        save(savePredPath, 'predImg');
+        
+        plotPath1 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  targetSample), 'png');
         plots.GroundTruthComparison(1, plotPath1, baseImg, labelImg, predImg);
 
         borderImg = zeros(size(predImg));
-        plotPath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat('check_', targetSample, '_', name_)), 'png');
+        plotPath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  strcat('check_', targetSample)), 'png');
         plots.PredictionValues(2, plotPath2, rescale(postProbImg(:,:,2)), borderImg);
         
 
@@ -101,10 +105,16 @@ function [testPerformance, performanceRow] = TrainClassifier(name_, trainData_, 
         seErode = strel('disk', 3);
         postPredMask = imerode(closeMask, seErode);
         
-        plotPath1 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'post-process', strcat(targetSample, '_', name_)), 'png');
-        plots.GroundTruthComparison(3, plotPath1, baseImg, labelImg, postPredMask);
+        plotPath1 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'post-process', targetSample), 'png');
+        plots.PostProcessingComparison(3, plotPath1, labelImg, predImg, postPredMask);
+        
+        savePredPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'post-process', strcat('pred', targetSample)), 'mat');
+        predImg = postPredMask;
+        save(savePredPath, 'predImg');
     end
 
+    saveResultPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),'result'), 'mat');
+    save(saveResultPath, 'testPerformance', 'performanceRow');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

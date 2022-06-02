@@ -1,4 +1,7 @@
 
+baseDir = commonUtility.GetFilename('output', 'python-test', '');
+
+
 n = numel(testPerformance); 
 target = cell(n,1); 
 targetAUC = cell(n,1);

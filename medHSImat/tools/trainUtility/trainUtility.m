@@ -341,7 +341,7 @@ classdef trainUtility
                 %'Standardize', true | 'BoxConstraint', 2,
             else
                 SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                    'KernelScale', 'auto', 'OutlierFraction', 0.05);
+                    'KernelScale', 'auto', 'OutlierFraction', 0.05, 'IterationLimit', 10);
                 %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'OutlierFraction', 0.05
                 %'Standardize', true | 'BoxConstraint', 2, 'IterationLimit', iterLim,
             end
