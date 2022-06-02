@@ -10,17 +10,17 @@ testTargets = {'157', '251', '227'};
 dataType = 'hsi';
 
 hasLoad = true;
-% if hasLoad
-%     foldDataFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
-%     load(foldDataFilePath);
-%     filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
-%     load(filePath2);
-% else
-% 
-%     [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-%     foldDataFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'lastrun'), 'mat');
-%     save(foldDataFilePath, '-v7.3');
-% end
+if hasLoad
+    foldDataFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'lastrun'), 'mat');
+    load(foldDataFilePath);
+    filePath2 = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),  'cvpInfo'), 'mat');
+    load(filePath2);
+else
+
+    [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
+    foldDataFilePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'lastrun'), 'mat');
+    save(foldDataFilePath, '-v7.3');
+end
 
 % %%%%% PCA-20
 % name = 'PCA-20';

@@ -355,7 +355,7 @@ classdef hsiUtility
         %> @endcode
         %>
         %======================================================================
-        function [] = ExportH5Dataset()
+        function [] = ExportH5Dataset(fileName, targetIDs)
             % ExportH5Dataset exports the entire selected dataset in .hdf5
             % format.
             %
@@ -374,15 +374,14 @@ classdef hsiUtility
             %% Setup
             disp('Initializing [ExportH5Dataset]...');
 
-            fileName = commonUtility.GetFilename('output', ...
-                fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_full')), 'h5');
-
-            if exist(fileName, 'file') > 0
-                disp('Deleting previously exported .h5 dataset.');
-                delete(fileName);
+            if nargin < 1
+                fileName = commonUtility.GetFilename('output', ...
+                    fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_full')), 'h5');
+            end 
+            
+            if nargin < 2
+                [~, targetIDs] = commonUtility.DatasetInfo();
             end
-
-            [~, targetIDs] = commonUtility.DatasetInfo();
 
             hsiUtility.SaveToH5(targetIDs, fileName);
 
@@ -390,6 +389,11 @@ classdef hsiUtility
 
         function SaveToH5(targetIDs, fileName)
                         
+            if exist(fileName, 'file') > 0
+                disp('Deleting previously exported .h5 dataset.');
+                delete(fileName);
+            end
+                   
             for i = 1:length(targetIDs)
                 targetName = num2str(targetIDs{i});
 

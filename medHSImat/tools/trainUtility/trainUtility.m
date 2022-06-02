@@ -29,6 +29,67 @@ classdef trainUtility
             hsiUtility.SaveToH5(testTargetIDs, fileName);
         end
         
+        function [] = ExportPatientFolds(baseDataset)
+            targetDataset =  strcat(baseDataset, 'PatientValidation');
+
+            foldSampleIds = {{'001'}; {'002', '003', '004'}; {'005'}; {'006'}; {'007'}; {'008', '009'}; {'010'}; {'011'}; {'012'}; {'013'}; {'014'}; {'015', '016', '017', '018'}; {'019'}};
+            
+            discardedPatches = {'187_patch32', '187_patch33',  '199_patch24', '199_patch29', '199_patch30', '199_patch31', '199_patch32', '205_patch16', '205_patch22', ...
+                '205_patch23', '205_patch24', '205_patch29', '205_patch30', '205_patch31', '205_patch32', '205_patch33', '205_patch34', '205_patch35', '205_patch37', ...
+                '205_patch38', '205_patch39', '205_patch40', '205_patch41', '205_patch42', '205_patch43', '205_patch44', '205_patch47', '205_patch48', '205_patch49', ...
+                '205_patch51', '205_patch52', '205_patch53', '205_patch54', '205_patch57', '205_patch58', '205_patch61', '205_patch62', '205_patch63', '205_patch66', ...
+                '205_patch67', '205_patch71', '205_patch72', '205_patch73', '205_patch74', '205_patch75', '205_patch76', '205_patch77', '205_patch78', '205_patch81', ...
+                '205_patch82', '205_patch83', '205_patch84', '205_patch85', '205_patch86', '205_patch87', '205_patch88', '205_patch91', '205_patch92', '205_patch93', ...
+                '205_patch94', '205_patch95', '205_patch96', '205_patch97', '205_patch98', '205_patch99', '205_patch100', '205_patch101', '205_patch102', '205_patch103', ...
+                '205_patch104', '205_patch105', '205_patch106', '205_patch107', '205_patch108', '205_patch109', '205_patch110', '205_patch111', '205_patch112', ...
+                '205_patch113', '205_patch114', '205_patch117', '205_patch118', '205_patch119', '212_patch7', '251_patch41', '230_patch27', '227_patch1',...
+                '193_patch8', '181_patch64', '187_patch1', '160_patch8', '157_patch3', '150_patch4'};
+            
+            config.SetSetting('Dataset', targetDataset);
+            baseDir = commonUtility.GetFilename('dataset', '', '');
+
+            config.SetSetting('Dataset', baseDataset);
+            [~, targetIDs] = commonUtility.DatasetInfo();
+            
+            targetIDs = targetIDs(~contains(targetIDs, discardedPatches));
+            
+            folds = numel(foldSampleIds); 
+            foldTargets = cell(folds, 1);
+
+            for k = 1:folds                
+                targetSampleIds = foldSampleIds{k};
+                foldDir = config.DirMake(baseDir, num2str(k), '\');
+                testIds = {};
+                
+                c = 0; 
+                for i = 1:length(targetIDs)
+                    
+                    targetName = num2str(targetIDs{i});
+                    [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+
+                    if any(contains(targetSampleIds, labelInfo.SampleID))
+                        saveDir = fullfile(foldDir, strcat(targetName, '.mat'));
+                        save(saveDir, 'spectralData', 'labelInfo');
+                        c = c+1; 
+                        testIds{c} = targetName;
+                    end
+                end
+                
+                foldTargets{k} = testIds; 
+                
+                fileName = commonUtility.GetFilename('output', ...
+                    fullfile(config.GetSetting('DatasetsFolderName'), num2str(k), strcat('hsi_', config.GetSetting('Dataset'), '_train')), 'h5');
+                trainTargetIDs = targetIDs(~contains(targetIDs, testIds));
+                hsiUtility.SaveToH5(trainTargetIDs, fileName);
+
+                fileName = commonUtility.GetFilename('output', ...
+                    fullfile(config.GetSetting('DatasetsFolderName'), num2str(k),strcat('hsi_', config.GetSetting('Dataset'), '_test')), 'h5');
+                testTargetIDs = targetIDs(contains(targetIDs, testIds));
+                hsiUtility.SaveToH5(testTargetIDs, fileName);
+            end  
+
+        end
+        
         % ======================================================================
         %> @brief Augment applies augmentation on the dataset
         %>
@@ -342,7 +403,7 @@ classdef trainUtility
 
 %                 optimParams = {'BoxConstraint', 'KernelScale', 'Standardize', 'KernelFunction'};
                 optimParams = 'auto';
-                optimOptions =  struct('AcquisitionFunctionName', 'expected-improvement-plus', 'MaxObjectiveEvaluations', 10);
+                optimOptions =  struct('AcquisitionFunctionName', 'expected-improvement-plus', 'MaxObjectiveEvaluations', 200);
                 
                 SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, ...
                     'OptimizeHyperparameters', optimParams, 'HyperparameterOptimizationOptions',optimOptions); 

@@ -57,8 +57,7 @@ flist = [
     #'xception3d5_max', 'xception3d5_mean',
     #'xception3d4_max', 'xception3d4_mean',
     #'xception3d3_max', 'xception3d3_mean',
-    #'xception3d_max', 
-    'xception3d_mean', 
+    #'xception3d_max',  'xception3d_mean', 
     # 'xception3d2_max', 'xception3d2_mean'
  ]
 
@@ -76,7 +75,7 @@ for framework in flist:
 
     #prepare again in order to avoid pre-processing errors 
     X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()
-    [fpr_, tpr_, auc_val_]  = train_utils.evaluate_model(model, history, framework, folder, X_test, y_test)
+    [fpr_, tpr_, auc_val_]  = train_utils.save_evaluate_model(model, history, framework, folder, X_test, y_test)
     fpr.append(fpr_)
     tpr.append(tpr_)
     auc_val.append(auc_val_)

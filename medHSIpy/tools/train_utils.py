@@ -263,14 +263,28 @@ def evaluate_model(model, history, framework, folder, x_test, y_test):
     trainEval = get_eval_metrics(history)
     testEval = get_eval_metrics(history, True)
 
+    [fpr_, tpr_, auc_val_] = calc_plot_roc(model, x_test, y_test, framework, folder)
+
+    return fpr_, tpr_, auc_val_, trainEval, testEval
+
+from scipy.io import savemat
+
+def save_evaluate_model(model, history, framework, folder, x_test, y_test):
+    fpr_, tpr_, auc_val_, trainEval, testEval = evaluate_model(model, history, framework, folder, x_test, y_test)
+
     save_text(trainEval, 'results_train', folder)
     save_text(testEval, 'results_test', folder)
-
-    [fpr_, tpr_, auc_val_] = calc_plot_roc(model, x_test, y_test, framework, folder)
     
-    filename = get_model_filename('auc', 'mat', folder)
-    from scipy.io import savemat
-    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history.history}
+    filename = get_model_filename('0_performance', 'mat', folder)
+    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history, "trainEval": trainEval, "testEval": testEval}
     savemat(filename, mdic)
 
     return fpr_, tpr_, auc_val_
+
+
+def save_evaluate_model_folds(folder, fpr_, tpr_, auc_val_, trainEval, testEval, history):   
+    filename = get_model_filename('0_performance', 'mat', folder)
+    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history, "trainEval": trainEval, "testEval": testEval}
+    savemat(filename, mdic)
+
+    return
