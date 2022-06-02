@@ -863,7 +863,8 @@ classdef plots
 
              subplot(1, 3, 3);
              imshow(predImg);
-             title( sprintf('Prediction %.2f%%', jacCoeff * 100), 'FontSize', 12); 
+             title('Prediction', 'FontSize', 12); 
+             text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
 
              plots.SavePlot(fig, plotPath);
         end
@@ -881,12 +882,13 @@ classdef plots
 
              subplot(1, 3, 2);
              imshow(predImg);
+             text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff1 * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
              title('Prediction', 'FontSize', 12); 
-             text(min(xlim) + 5, min(ylim) + 5, sprintf('JC: %.2f%%', jacCoeff1 * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
 
              subplot(1, 3, 3);
              imshow(postPredImg);
-             title( sprintf('(Post) Prediction %.2f%%', jacCoeff2 * 100), 'FontSize', 12); 
+             title('Post-Processed', 'FontSize', 12); 
+             text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff2 * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
 
              plots.SavePlot(fig, plotPath);
         end

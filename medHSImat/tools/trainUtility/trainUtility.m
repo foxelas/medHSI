@@ -323,29 +323,45 @@ classdef trainUtility
             %
             % @retval SVMModel [model] | The trained SVM model
 
-            iterLim = 100000;
+            iterLim = 10000;
             % TO REMOVE
             factors = 10;
             kk = ceil(decimate(1:size(Xtrain, 1), factors));
             Xtrain = Xtrain(kk, :);
             ytrain = ytrain(kk, :);
             % TO REMOVE
-
+        
+            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2'});
+%             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
+            filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'SVMModel'), 'mat');
             
-            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
+            if hasOptimization %Use Bayesian optimization
+                close all; 
+                textPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationStruct'), 'txt');
+                diary(textPath);
 
-            if hasOptimization
-                SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, 'OptimizeHyperparameters', {'BoxConstraint', 'KernelScale', 'KernelFunction', 'Standardize'}, ...
-                    'HyperparameterOptimizationOptions', struct('AcquisitionFunctionName', 'expected-improvement-plus', 'MaxObjectiveEvaluations', 10));
-                %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 |
-                %'Standardize', true | 'BoxConstraint', 2,
+%                 optimParams = {'BoxConstraint', 'KernelScale', 'Standardize', 'KernelFunction'};
+                optimParams = 'auto';
+                optimOptions =  struct('AcquisitionFunctionName', 'expected-improvement-plus', 'MaxObjectiveEvaluations', 10);
+                
+                SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, ...
+                    'OptimizeHyperparameters', optimParams, 'HyperparameterOptimizationOptions',optimOptions); 
+                
+                diary off 
+
+                imgPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationObjective'), 'png');
+                plots.SavePlot(1, imgPath);
+                imgPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationParams'), 'png');
+                plots.SavePlot(2, imgPath);              
+
             else
                 SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                    'KernelScale', 'auto', 'OutlierFraction', 0.05, 'IterationLimit', 10);
+                    'KernelScale', 'auto', 'OutlierFraction', 0.05);
                 %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'OutlierFraction', 0.05
                 %'Standardize', true | 'BoxConstraint', 2, 'IterationLimit', iterLim,
             end
-
+            
+            save(filePath, 'SVMModel');
         end
 
         % ======================================================================

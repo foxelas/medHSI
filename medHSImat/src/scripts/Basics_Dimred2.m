@@ -22,17 +22,20 @@ hasLoad = true;
 %     save(foldDataFilePath, '-v7.3');
 % end
 
-%%%%% PCA-20
-name = 'PCA-20';
-[testPerformance{1}, performanceRow(1,:)] = TrainClassifier(name, trainData, testData, 'pca', 20); 
+% %%%%% PCA-20
+% name = 'PCA-20';
+% [testPerformance{1}, performanceRow(1,:)] = TrainClassifier(name, trainData, testData, 'pca', 20); 
+% 
+% %%%% Abundance-8
+% name = 'Abundance-8';
+% [testPerformance{2}, performanceRow(2,:)] = TrainClassifier(name, trainData, testData, 'abundance', 8); 
+% 
+% %%%% ClusterPCA-100
+% name = 'ClusterPCA-100';
+% [testPerformance{3}, performanceRow(3,:)] = TrainClassifier(name, trainData, testData, 'clusterpca', 100); 
 
-%%%% Abundance-8
-name = 'Abundance-8';
-[testPerformance{2}, performanceRow(2,:)] = TrainClassifier(name, trainData, testData, 'abundance', 8); 
-
-%%%% ClusterPCA-100
-name = 'ClusterPCA-100';
-[testPerformance{3}, performanceRow(3,:)] = TrainClassifier(name, trainData, testData, 'clusterpca', 100); 
+name = 'Signature';
+[testPerformance{1}, performanceRow(1,:)] = TrainClassifier(name, trainData, testData, 'none', 311);
 
 %%%%% RF-100
 name = 'RFI-100';
