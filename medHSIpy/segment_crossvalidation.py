@@ -24,8 +24,9 @@ BATCH_SIZE = 4 #8
 def get_framework(framework, xtrain, xtest, ytrain, ytest):
     if 'sm' in framework:
         model, history = segsm.fit_sm_model(framework, xtrain, ytrain, xtest, ytest, 
-            height=HEIGHT, width=WIDTH, numChannels=NUMBER_OF_CHANNELS, 
-            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
+            HEIGHT, WIDTH, NUMBER_OF_CHANNELS, NUMBER_OF_CLASSES, NUMBER_OF_EPOCHS, 
+            "RMSProp", 0.0001, 0, "BCE+JC")
+            
             
     elif 'cnn3d' in framework:
         model, history = cmdl.get_cnn_model(framework, xtrain, ytrain, xtest, ytest, 
@@ -98,3 +99,4 @@ for framework in flist:
     # ROC AUC comparison 
     train_utils.plot_roc(fpr, tpr, auc_val, foldNames, None)
 
+print("Finished")
