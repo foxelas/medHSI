@@ -108,21 +108,33 @@ def compile_and_save_structure(framework, model, optimizer, learning_rate, targe
 
     return model
 
+def compile_custom(framework, model, optimizerName = "Adam", learning_rate = 0.0001, decay=1e-06, lossFunction = "BCE+JC"):
+    if optimizerName == "Adam":
+        print('mpike1')
+        if decay == 0:
+            optimizer = Adam(learning_rate=learning_rate, decay = decay)
+        else:
+            optimizer = Adam(learning_rate=learning_rate)
+    elif optimizerName == "RMSProp":
+        print('mpike2')
+        if decay == 0:
+            print('mpike 3')
+            optimizer = RMSprop(learning_rate=learning_rate, decay=decay) 
+        else:
+            optimizer = RMSprop(learning_rate=learning_rate)
+    else: 
+        optimizer = Adam(learning_rate=learning_rate)
 
-def compile_RMSprop(framework, model, learning_rate = 0.0001, decay=1e-06):
-    optimizer = RMSprop(learning_rate=learning_rate, decay=decay) 
-    targetLoss = sm.losses.bce_jaccard_loss #sm.losses.bce_jaccard_loss #binary_crossentropy  #categorical_crossentropy　sm.losses.jaccard_loss
-
+    if lossFunction == "BCE+JC":
+        targetLoss = sm.losses.bce_jaccard_loss
+    elif lossFunction == "BCE":
+        targetLoss = binary_crossentropy
+    else: 
+        targetLoss = sm.losses.bce_jaccard_loss
+        
     model = compile_and_save_structure(framework, model, optimizer, learning_rate, targetLoss, decay)
+
     return model 
-
-def compile_Adam(framework, model, learning_rate = 0.0001, decay=1e-06):
-    optimizer = Adam(learning_rate=learning_rate) #), decay=1e-06)
-    targetLoss =sm.losses.bce_jaccard_loss  #binary_crossentropy #categorical_crossentropy'
-
-    model = compile_and_save_structure(framework, model, optimizer, learning_rate, targetLoss)
-    return model
-
 
 def fit_model(framework, model, x_train, y_train, x_test, y_test, numEpochs = 200, batchSize = 64):
 
@@ -259,6 +271,20 @@ def get_eval_metrics(history, isValidation = False):
     evalDict =  {x: history.history[x][-1] for x in target}
     return evalDict 
 
+def get_eval_metrics_and_settings(history, isValidation, optz, lr, ed, lossFun):
+    target = ['accuracy', 'iou_score', 'precision', 'recall', 'false_positives', 'false_negatives', 'true_positives', 'true_negatives']
+    if isValidation:
+        target = [str('val_') + x for x in target]
+    
+    #print(history.history.keys())
+    evalDict =  {x: history.history[x][-1] for x in target}
+    evalDict["optimizer"] = optz
+    evalDict["learningRate"] = lr
+    evalDict["decay"] = ed
+    evalDict["lossFunction"] = lossFun
+
+    return evalDict 
+
 def evaluate_model(model, history, framework, folder, x_test, y_test):
     trainEval = get_eval_metrics(history)
     testEval = get_eval_metrics(history, True)
@@ -285,6 +311,13 @@ def save_evaluate_model(model, history, framework, folder, x_test, y_test):
 def save_evaluate_model_folds(folder, fpr_, tpr_, auc_val_, trainEval, testEval, history):   
     filename = get_model_filename('0_performance', 'mat', folder)
     mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history, "trainEval": trainEval, "testEval": testEval}
+    savemat(filename, mdic)
+
+    return
+
+def save_performance(folder, testEval):   
+    filename = get_model_filename('0_performance', 'mat', folder)
+    mdic = { "testEval": testEval}
     savemat(filename, mdic)
 
     return

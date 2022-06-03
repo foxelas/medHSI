@@ -20,7 +20,6 @@ BATCH_SIZE = 4 #8
 # hio.show_label_montage('test')
 # hio.show_label_montage('full')
 
-X_train_, X_test_, y_train_, y_test_, names_train_, names_test_ = hio.get_train_test_folds()
 
 def get_framework(framework, xtrain, xtest, ytrain, ytest):
     if 'sm' in framework:
@@ -64,23 +63,18 @@ for framework in flist:
     for fold in range(1, folds+1):
         backend.clear_session()
         
+        X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test(fold)
+
         dictVal = "Fold" + str(fold)
 
         foldNames.append(dictVal) 
-        X_train = X_train_[dictVal]
-        X_test = X_test_[dictVal]
-        y_train = y_train_[dictVal]
-        y_test = y_test_[dictVal]
+
         model, history_ = get_framework(framework, X_train, X_test, y_train, y_test)
 
         folder = str(date.today()) + '_' + framework + '_' + str(fold)
 
         #prepare again in order to avoid pre-processing errors 
-        X_train = X_train_[dictVal]
-        X_test = X_test_[dictVal]
-        y_train = y_train_[dictVal]
-        y_test = y_test_[dictVal]
-        names_test = names_test_[dictVal]
+        X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test(fold)
 
         [fpr_, tpr_, auc_val_, trainEval_, testEval_]  = train_utils.evaluate_model(model, history_, framework, folder, X_test, y_test)
         fpr.append(fpr_)

@@ -133,8 +133,11 @@ def cnn3d2( width, height, numChannels, numClasses):
 
 ############################ TRAIN ###################################
 
-def get_cnn_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=64):
+def get_cnn_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=64,
+   optimizerName = "RMSProp", learning_rate = 0.0001, decay = 0, lossFunction = "BCE+JC"):
+
    backend.clear_session()
+
    # x_train_preproc, x_test_preproc = preproc_data(x_train_raw, x_test_raw)
    x_train_preproc = x_train_raw
    x_test_preproc = x_test_raw
@@ -145,7 +148,8 @@ def get_cnn_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, wid
    elif 'cnn3d' in framework:
       model = cnn3d(height, width, numChannels, numClasses)
 
-   model = train_utils.compile_RMSprop(framework, model, learning_rate = 0.0001)
+   model = train_utils.ompile_custom(framework, model, optimizerName, learning_rate, decay, lossFunction)
+
    model, history = train_utils.fit_model(framework, model, x_train_preproc, ytrain, x_test_preproc, ytest, numEpochs, batchSize)
 
    return model, history

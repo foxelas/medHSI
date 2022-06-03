@@ -640,14 +640,13 @@ def get_xception3d5_max(height, width, numChannels, numClasses):
 #     x_train_preproc, x_test_preproc = hsi_segment_from_sm.get_sm_preproc_data(x_train_raw, x_test_raw, 'inceptionresnetv2')
 #     return x_train_preproc, x_test_preproc
 
-def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=12):
+def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=8, 
+    optimizerName = "RMSProp", learning_rate = 0.00001, decay = 0, lossFunction = "BCE+JC"):
+
     backend.clear_session()
     
     ## already preprocessed from 0 to 1
     # x_train_preproc, x_test_preproc = preproc_data(x_train_raw, x_test_raw)
-
-    batchSize = 8
-    learning_rate = 0.00001
 
     x_train_preproc = x_train_raw
     x_test_preproc = x_test_raw
@@ -655,12 +654,12 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
     if 'xception3d_max' in framework:
         model = get_xception3d_max(height, width, numChannels, numClasses)
         batchSize = 4
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d_mean' in framework: 
         model = get_xception3d_mean(height, width, numChannels, numClasses)
         batchSize = 4
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d2_max' in framework:
         model = get_xception3d2_max(height, width, numChannels, numClasses)
@@ -679,27 +678,27 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
     elif 'xception3d4_max' in framework:
         model = get_xception3d4_max(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d4_mean' in framework:
         model = get_xception3d4_mean(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d5_max' in framework:
         model = get_xception3d5_max(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.0000005 #0.0000001
+        # learning_rate = 0.0000005 #0.0000001
 
     elif 'xception3d5_mean' in framework:
         model = get_xception3d5_mean(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.0000005 #0.0000001
+        # learning_rate = 0.0000005 #0.0000001
 
     else: 
         print("Model:" + framework + " is not supported")
 
-    model = train_utils.compile_RMSprop(framework, model, learning_rate)
+    model = train_utils.ompile_custom(framework, model, optimizerName, learning_rate, decay, lossFunction)
     model, history = train_utils.fit_model(framework, model, x_train_preproc, ytrain, x_test_preproc, ytest, numEpochs, batchSize)
 
     return model, history
