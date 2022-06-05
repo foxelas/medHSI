@@ -30,7 +30,7 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest, optimizerName, learni
     elif 'cnn3d' in framework:
         model, history = cmdl.get_cnn_model(framework, xtrain, ytrain, xtest, ytest, 
             HEIGHT, WIDTH, NUMBER_OF_CHANNELS, NUMBER_OF_CLASSES, NUMBER_OF_EPOCHS, 
-            optimizerName, learning_rate, decay, lossFunction)
+            64, optimizerName, learning_rate, decay, lossFunction)
 
     else:
         model, history = xmdl.get_xception_model(framework, xtrain, ytrain, xtest, ytest, 
@@ -41,8 +41,9 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest, optimizerName, learni
 
 flist = [
     #successful 
-    'sm_resnet',  
+    #'sm_resnet',  
     #'sm_resnet_pretrained',
+    'cnn3d'
  ]
 
 
@@ -52,7 +53,7 @@ for framework in flist:
 
     learningRates = [0.001, 0.0001, 0.00001, 0.000001]
     exponentialDecay = [0, 1e-5, 1e-6] 
-    optimizers = ["RMSProp", "Adam"]
+    optimizers = ["RMSProp"] #"Adam"
     lossFunctions = ["BCE", "BCE+JC"]
 
     X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()

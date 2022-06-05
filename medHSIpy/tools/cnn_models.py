@@ -148,7 +148,7 @@ def get_cnn_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, wid
    elif 'cnn3d' in framework:
       model = cnn3d(height, width, numChannels, numClasses)
 
-   model = train_utils.ompile_custom(framework, model, optimizerName, learning_rate, decay, lossFunction)
+   model = train_utils.compile_custom(framework, model, optimizerName, learning_rate, decay, lossFunction)
 
    model, history = train_utils.fit_model(framework, model, x_train_preproc, ytrain, x_test_preproc, ytest, numEpochs, batchSize)
 

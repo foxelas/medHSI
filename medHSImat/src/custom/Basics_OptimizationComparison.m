@@ -1,4 +1,4 @@
-load('D:\elena\mspi\output\pslRaw32Augmented\python-test\optimization\sm_resnet\0_performance.mat');
+load('D:\elena\mspi\output\pslRaw32Augmented\python-test\optimization\cnn3d\0_performance.mat');
 v = cell2mat(testEval);
 
 % Adam, BCE, no decay
