@@ -358,6 +358,12 @@ classdef dimredUtility
                     numEndmembers = q;
                     endmembers = NfindrInternal(X, numEndmembers, fgMask);
                     scores = estimateAbundanceLS(X, endmembers);
+                    
+                case 'abundance2'
+                    pathName = commonUtility.GetFilename('dataset', 'EndMembers\endmembers-8');
+                    load(pathName, 'endmembers');
+                    numEndmembers = 8;
+                    scores = estimateAbundanceLS(X, endmembers);
 
                 case 'abundance-lbp'
                     
