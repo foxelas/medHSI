@@ -34,7 +34,7 @@ dirSep = '\\'
 
 def get_base_dir():
     cwd = os.getcwd()
-    parts = cwd.split("\\")
+    parts = cwd.split("/")
     parts = parts[0: parts.index('medHSI')+1]
     parts.insert(1, os.sep)
     base_dir = os.path.join(*parts)
@@ -252,7 +252,7 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
             recon = np.reshape(colImage, (m, n, 3))
 
         else:     
-            filename = os.path.join(get_base_dir(), conf['Directories']['ParamDir'], 'displayParam_311.mat')
+            filename = os.path.join(get_base_dir(), "parameters", 'displayParam_311.mat')
 
             xyz = load_from_mat(filename, 'xyz')
             illumination = load_from_mat(filename, 'illumination')
@@ -324,7 +324,7 @@ def show_montage(dataList, filename = None, imgType = 'srgb', channel = 150):
         m = skimage.util.montage(hsiList)
 
     if filename == None: 
-        filename = os.path.join(conf['Directories']['OutputDir'], conf['Data Settings']['Dataset'], conf['Folder Names']['PythonTestFolderName'], 'normalized-montage.jpg')
+        filename = os.path.join("/home/nfs/ealoupogianni/mspi/output/", conf['Data Settings']['Dataset'], conf['Folder Names']['PythonTestFolderName'], 'normalized-montage.jpg')
     skimage.io.imsave(filename, m)
 
 
