@@ -396,24 +396,57 @@ classdef trainUtility
 %             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
             filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'SVMModel'), 'mat');
             
-            if hasOptimization %Use Bayesian optimization
-                close all; 
+            if hasOptimization
+                optim = 'Bayesian'; %'Bayesian' 
                 textPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationStruct'), 'txt');
                 diary(textPath);
+                close all;
 
-%                 optimParams = {'BoxConstraint', 'KernelScale', 'Standardize', 'KernelFunction'};
-                optimParams = 'auto';
-                optimOptions =  struct('AcquisitionFunctionName', 'expected-improvement-plus', 'MaxObjectiveEvaluations', 200);
-                
-                SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, ...
-                    'OptimizeHyperparameters', optimParams, 'HyperparameterOptimizationOptions',optimOptions); 
-                
+                if strcmpi(optim, 'Bayesian') %Use Bayesian optimization
+    
+    %                 optimParams = {'BoxConstraint', 'KernelScale', 'Standardize', 'KernelFunction'};
+                    optimParams = 'auto';
+                    optimOptions =  struct('AcquisitionFunctionName', 'expected-improvement-plus', 'MaxObjectiveEvaluations', 200);
+                    
+                    SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, ...
+                         'Standardize', true, 'KernelFunction', 'rbf', ...
+                         'OptimizeHyperparameters', optimParams, 'HyperparameterOptimizationOptions',optimOptions); 
+                    
+    
+                    imgPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationObjective'), 'png');
+                    plots.SavePlot(1, imgPath);
+                    imgPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationParams'), 'png');
+                    plots.SavePlot(2, imgPath);     
+                end
+
+                if strcmpi(optim, 'Grid')
+
+                    boxConstraints =linspace(1, 1000, 10);
+                    kernelScales = linspace(1, 50, 10);
+                    
+                    SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, ...
+                               'Standardize', true, 'KernelFunction', 'rbf', 'KernelScale', 'auto');
+
+                    bestModel = SVMModel; 
+                    bestPerf = bestModel.ConvergenceInfo.Objective;
+                    fprintf('First: BoxC %.5f, KernelScale %.5f\n', bestModel.BoxConstraints(1), bestModel.KernelParameters.Scale);
+
+                    for boxVal = boxConstraints
+                        for kernelVal = kernelScales
+                            SVMModel = fitcsvm(Xtrain, ytrain, 'IterationLimit', iterLim, ...
+                               'Standardize', true, 'KernelFunction', 'rbf', 'BoxConstraint', boxVal, 'KernelScale', kernelVal);
+                            perf = SVMModel.ConvergenceInfo.Objective;
+                            if (perf < bestPerf)
+                                bestModel = SVMModel;
+                                bestPerf = bestModel.ConvergenceInfo.Objective;
+                                fprintf('Best: BoxC %.5f, KernelScale %.5f\n', bestModel.BoxConstraints(1), bestModel.KernelParameters.Scale);
+                            end
+                        end
+                    end
+                    fprintf('\nFinal: BoxC %.5f, KernelScale %.5f\n', bestModel.BoxConstraints(1), bestModel.KernelParameters.Scale);
+                    SVMModel = bestModel;
+                end
                 diary off 
-
-                imgPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationObjective'), 'png');
-                plots.SavePlot(1, imgPath);
-                imgPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationParams'), 'png');
-                plots.SavePlot(2, imgPath);              
 
             else
                 SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
