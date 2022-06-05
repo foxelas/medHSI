@@ -10,7 +10,7 @@ else:
 # Image size should be multiple of 32
 DEFAULT_HEIGHT = 32 #64
 
-def load_data(name = None):
+def load_data(name = None, fold = None):
     # name options: 'full', 'test', 'train'
     if name == None:
         name = 'full'
@@ -21,7 +21,12 @@ def load_data(name = None):
     #datasetName = 'pslRaw-Denoisesmoothen32Augmented'
     fileName = 'hsi_'+ datasetName + '_' + name +'.h5'
     folderName = conf['Folder Names']['DatasetsFolderName']
-    fpath = os.path.join(outputDir, datasetName, folderName, fileName)
+
+    if fold is None:
+        fpath = os.path.join(outputDir, datasetName, folderName, fileName)
+    else: 
+        fpath = os.path.join(outputDir, datasetName, folderName, str(fold),  fileName)
+
     print("Read from ", fpath)
     dataList, keyList, labelImages = hsi_utils.load_dataset(fpath, 'image')
 
@@ -30,18 +35,19 @@ def load_data(name = None):
 
     croppedLabels = hsi_utils.center_crop_list(labelImages, DEFAULT_HEIGHT, DEFAULT_HEIGHT)
 
-    return croppedData, croppedLabels, keyList
-
-def make_data_and_labels(name = None):
-    croppedData, croppedLabels, dataNames = load_data(name)
     x_raw = np.array(croppedData, dtype=np.float32)
     y = np.array(croppedLabels, dtype=np.float32)
 
-    return x_raw, y, dataNames 
+    return x_raw, y, keyList
 
-def get_train_test(): 
-    x_train_raw, y_train, names_train = make_data_and_labels('train')
-    x_test_raw, y_test, names_test = make_data_and_labels('test')
+
+def get_train_test(fold = None): 
+    if fold is None:
+        x_train_raw, y_train, names_train = load_data('train')
+        x_test_raw, y_test, names_test = load_data('test')
+    else:
+        x_train_raw, y_train, names_train = load_data('train', fold)
+        x_test_raw, y_test, names_test = load_data('test', fold)
 
     #from sklearn.model_selection import train_test_split
     #x_train_raw, x_test_raw, y_train, y_test = train_test_split(croppedData,  croppedLabels, test_size=0.1, random_state=42)
@@ -52,46 +58,6 @@ def get_train_test():
     #     hsi_utils.show_image(y)
 
     return x_train_raw, x_test_raw, y_train, y_test, names_train, names_test 
-
-def load_data_folds(name = None, folds = 13):
-    # name options: 'full', 'test', 'train'
-    if name == None:
-        name = 'full'
-
-    conf = hsi_utils.parse_config()
-    outputDir = conf['Directories']['OutputDir']
-    datasetName = conf['Data Settings']['Dataset']
-    fileName = 'hsi_'+ datasetName + '_' + name +'.h5'
-    folderName = conf['Folder Names']['DatasetsFolderName']
-
-    croppedData = {}
-    croppedLabels = {}
-    keyList = {}
-    for fold in range(1, folds + 1):
-        fpath = os.path.join(outputDir, datasetName, folderName, str(fold), fileName)
-        print("Read from ", fpath)
-        dataList, keyList_, labelImages = hsi_utils.load_dataset(fpath, 'image')
-
-        # Prepare input data
-        croppedData_ = hsi_utils.center_crop_list(dataList, DEFAULT_HEIGHT, DEFAULT_HEIGHT, True)
-        croppedLabels_ = hsi_utils.center_crop_list(labelImages, DEFAULT_HEIGHT, DEFAULT_HEIGHT)
-        
-        x_raw = np.array(croppedData_, dtype=np.float32)
-        y = np.array(croppedLabels_, dtype=np.float32)
-
-        dictVal = "Fold" + str(fold)
-        croppedData[dictVal] = x_raw
-        croppedLabels[dictVal] = y
-        keyList[dictVal] = keyList_
-
-    return croppedData, croppedLabels, keyList
-
-def get_train_test_folds(): 
-    x_train_raw, y_train, names_train = load_data_folds('train')
-    x_test_raw, y_test, names_test = load_data_folds('test')
-
-    return x_train_raw, x_test_raw, y_train, y_test, names_train, names_test 
-
 
 def show_label_montage(name = None): 
     croppedData, croppedLabels, keyList = load_data(name)

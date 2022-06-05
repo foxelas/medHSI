@@ -415,9 +415,312 @@ def get_xception3d_5(dropMiddle, width, height, numChannels, numClasses):
     # Define the model
     model = Model(inputs, outputs, name = "xception3D_5")
     return model
+######################################################################
 
+def get_xception3d_10(dropMiddle, width, height, numChannels, numClasses):
+    dr = 0.5
+    
+    channel_axis = -1
+    depth = numChannels
+    inputs = layers.Input((width, height, depth, 1), name='entry')
+    spectral_step = 10
 
+    ### [First half of the network: downsampling inputs] ###
 
+    # Entry block
+    x = layers.Conv3D(32, (N_SPACE, N_SPACE, spectral_step), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), use_bias=False, padding="same", name='block1_conv1')(inputs)
+    x = layers.BatchNormalization(axis=channel_axis, name='block1_conv1_bn')(x)
+    x = layers.Activation("relu", name='block1_conv1_act')(x)
+    x = layers.Dropout(dr)(x)
+
+    x = layers.Conv3D(64, (N_SPACE, N_SPACE, spectral_step), use_bias=False, name='block1_conv2')(x)
+    x = layers.BatchNormalization(axis=channel_axis, name='block1_conv2_bn')(x)
+    x = layers.Activation('relu', name='block1_conv2_act')(x)
+    x = layers.Dropout(dr)(x)
+
+    previous_block_activation = x  # Set aside residual
+
+    # Blocks 1, 2, 3 are identical apart from the feature depth.
+    k = 1
+    for filters in  [128, 256]:
+        k += 1
+        if k > 2:
+            x = layers.Activation("relu", name='block'+str(k-1)+'_conv2_act')(x)
+
+        x = layers.Conv3D(filters, (N_SPACE, N_SPACE, spectral_step), padding="same", groups=1, use_bias=False, name='block'+str(k)+'_DepthConv1_a')(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same", use_bias=False, name='block'+str(k)+'_DepthConv1_b')(x)
+        x = layers.BatchNormalization(axis=channel_axis, name='block'+str(k)+'_DepthConv1_bn')(x)
+
+        x = layers.Activation("relu", name='block'+str(k)+'_conv2_act_mid')(x)
+        x = layers.Conv3D(filters, (N_SPACE, N_SPACE, spectral_step), padding="same", groups=1, use_bias=False, name='block'+str(k)+'_DepthConv2_a')(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same", use_bias=False, name='block'+str(k)+'_DepthConv2_b')(x)
+        x = layers.BatchNormalization(axis=channel_axis, name='block'+str(k)+'_DepthConv2_bn')(x)
+
+        x = layers.MaxPooling3D((N_SPACE, N_SPACE, spectral_step), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), 
+            padding="same", name='block'+str(k)+'_pool')(x)
+        x = layers.Dropout(dr)(x)
+
+        # Project residual
+        residual = layers.Conv3D(filters, (1,1,1), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), padding="same", use_bias=False)(
+            previous_block_activation
+        )
+        x = layers.add([x, residual])  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+    x = layers.Activation('relu', name='drop_act')(x)
+
+    if 'mean' in dropMiddle:
+        x = layers.Lambda(lambda y: backend.mean(y, axis=3), 
+            name='drop_spectral_dim')(x)
+    elif 'max' in dropMiddle: 
+        x = layers.Lambda(lambda y: backend.max(y, axis=3), 
+            name='drop_spectral_dim')(x)
+
+    x = layers.BatchNormalization(axis=channel_axis, name='drop_bn')(x)
+
+    # print("Drop dimm interior after")
+    # print(x.shape.dims)
+
+    ### [Second half of the network: upsampling inputs] ###
+
+    for filters in [256, 128, 64]:
+        k += 1
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act1')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans1')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn1')(x)
+
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act2')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans2')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn2')(x)
+
+        x = layers.UpSampling2D(2, name='decoder_block' + str(k)+'_upsampling')(x)
+
+        # Project residuals
+        if filters == 256:
+            if 'mean' in dropMiddle:
+                previous_block_activation = layers.Lambda(lambda y: backend.mean(y, axis=3), name='resid_drop_spectral_dim')(previous_block_activation)
+            elif 'max' in dropMiddle:
+                previous_block_activation = layers.Lambda(lambda y: backend.max(y, axis=3), name='resid_drop_spectral_dim')(previous_block_activation)
+
+        residual = layers.UpSampling2D(2, name='decoder_residual' + str(k)+'_upsampling')(previous_block_activation)
+        residual = layers.Conv2D(filters, 1, padding="same",  name='decoder_residual' + str(k)+'_conv')(residual)
+
+        x = layers.add([x, residual], name='decoder_block' + str(k)+'add')  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+        print("Second to last x")
+        print(x.shape.dims)
+
+    # Add a per-pixel classification layer
+    outputs = layers.Conv2D(numClasses, 3, activation="sigmoid", padding="same", name ='exit_conv')(x)
+
+    # Define the model
+    model = Model(inputs, outputs, name = "xception3D_10")
+    return model
+
+def get_xception3d_20(dropMiddle, width, height, numChannels, numClasses):
+    dr = 0.5
+    
+    channel_axis = -1
+    depth = numChannels
+    inputs = layers.Input((width, height, depth, 1), name='entry')
+    spectral_step = 20
+
+    ### [First half of the network: downsampling inputs] ###
+
+    # Entry block
+    x = layers.Conv3D(32, (N_SPACE, N_SPACE, spectral_step), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), use_bias=False, padding="same", name='block1_conv1')(inputs)
+    x = layers.BatchNormalization(axis=channel_axis, name='block1_conv1_bn')(x)
+    x = layers.Activation("relu", name='block1_conv1_act')(x)
+    x = layers.Dropout(dr)(x)
+
+    x = layers.Conv3D(64, (N_SPACE, N_SPACE, spectral_step), use_bias=False, name='block1_conv2')(x)
+    x = layers.BatchNormalization(axis=channel_axis, name='block1_conv2_bn')(x)
+    x = layers.Activation('relu', name='block1_conv2_act')(x)
+    x = layers.Dropout(dr)(x)
+
+    previous_block_activation = x  # Set aside residual
+
+    # Blocks 1, 2, 3 are identical apart from the feature depth.
+    k = 1
+    for filters in  [128, 256]:
+        k += 1
+        if k > 2:
+            x = layers.Activation("relu", name='block'+str(k-1)+'_conv2_act')(x)
+
+        x = layers.Conv3D(filters, (N_SPACE, N_SPACE, spectral_step), padding="same", groups=1, use_bias=False, name='block'+str(k)+'_DepthConv1_a')(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same", use_bias=False, name='block'+str(k)+'_DepthConv1_b')(x)
+        x = layers.BatchNormalization(axis=channel_axis, name='block'+str(k)+'_DepthConv1_bn')(x)
+
+        x = layers.Activation("relu", name='block'+str(k)+'_conv2_act_mid')(x)
+        x = layers.Conv3D(filters, (N_SPACE, N_SPACE, spectral_step), padding="same", groups=1, use_bias=False, name='block'+str(k)+'_DepthConv2_a')(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same", use_bias=False, name='block'+str(k)+'_DepthConv2_b')(x)
+        x = layers.BatchNormalization(axis=channel_axis, name='block'+str(k)+'_DepthConv2_bn')(x)
+
+        x = layers.MaxPooling3D((N_SPACE, N_SPACE, spectral_step), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), 
+            padding="same", name='block'+str(k)+'_pool')(x)
+        x = layers.Dropout(dr)(x)
+
+        # Project residual
+        residual = layers.Conv3D(filters, (1,1,1), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), padding="same", use_bias=False)(
+            previous_block_activation
+        )
+        x = layers.add([x, residual])  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+    x = layers.Activation('relu', name='drop_act')(x)
+
+    if 'mean' in dropMiddle:
+        x = layers.Lambda(lambda y: backend.mean(y, axis=3), 
+            name='drop_spectral_dim')(x)
+    elif 'max' in dropMiddle: 
+        x = layers.Lambda(lambda y: backend.max(y, axis=3), 
+            name='drop_spectral_dim')(x)
+
+    x = layers.BatchNormalization(axis=channel_axis, name='drop_bn')(x)
+
+    # print("Drop dimm interior after")
+    # print(x.shape.dims)
+
+    ### [Second half of the network: upsampling inputs] ###
+
+    for filters in [256, 128, 64]:
+        k += 1
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act1')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans1')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn1')(x)
+
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act2')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans2')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn2')(x)
+
+        x = layers.UpSampling2D(2, name='decoder_block' + str(k)+'_upsampling')(x)
+
+        # Project residuals
+        if filters == 256:
+            if 'mean' in dropMiddle:
+                previous_block_activation = layers.Lambda(lambda y: backend.mean(y, axis=3), name='resid_drop_spectral_dim')(previous_block_activation)
+            elif 'max' in dropMiddle:
+                previous_block_activation = layers.Lambda(lambda y: backend.max(y, axis=3), name='resid_drop_spectral_dim')(previous_block_activation)
+
+        residual = layers.UpSampling2D(2, name='decoder_residual' + str(k)+'_upsampling')(previous_block_activation)
+        residual = layers.Conv2D(filters, 1, padding="same",  name='decoder_residual' + str(k)+'_conv')(residual)
+
+        x = layers.add([x, residual], name='decoder_block' + str(k)+'add')  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+        print("Second to last x")
+        print(x.shape.dims)
+
+    # Add a per-pixel classification layer
+    outputs = layers.Conv2D(numClasses, 3, activation="sigmoid", padding="same", name ='exit_conv')(x)
+
+    # Define the model
+    model = Model(inputs, outputs, name = "xception3D_20")
+    return model
+
+def get_xception3d_30(dropMiddle, width, height, numChannels, numClasses):
+    dr = 0.5
+    
+    channel_axis = -1
+    depth = numChannels
+    inputs = layers.Input((width, height, depth, 1), name='entry')
+    spectral_step = 30
+
+    ### [First half of the network: downsampling inputs] ###
+
+    # Entry block
+    x = layers.Conv3D(32, (N_SPACE, N_SPACE, spectral_step), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), use_bias=False, padding="same", name='block1_conv1')(inputs)
+    x = layers.BatchNormalization(axis=channel_axis, name='block1_conv1_bn')(x)
+    x = layers.Activation("relu", name='block1_conv1_act')(x)
+    x = layers.Dropout(dr)(x)
+
+    x = layers.Conv3D(64, (N_SPACE, N_SPACE, spectral_step), use_bias=False, name='block1_conv2')(x)
+    x = layers.BatchNormalization(axis=channel_axis, name='block1_conv2_bn')(x)
+    x = layers.Activation('relu', name='block1_conv2_act')(x)
+    x = layers.Dropout(dr)(x)
+
+    previous_block_activation = x  # Set aside residual
+
+    # Blocks 1, 2, 3 are identical apart from the feature depth.
+    k = 1
+    for filters in  [128, 256]:
+        k += 1
+        if k > 2:
+            x = layers.Activation("relu", name='block'+str(k-1)+'_conv2_act')(x)
+
+        x = layers.Conv3D(filters, (N_SPACE, N_SPACE, spectral_step), padding="same", groups=1, use_bias=False, name='block'+str(k)+'_DepthConv1_a')(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same", use_bias=False, name='block'+str(k)+'_DepthConv1_b')(x)
+        x = layers.BatchNormalization(axis=channel_axis, name='block'+str(k)+'_DepthConv1_bn')(x)
+
+        x = layers.Activation("relu", name='block'+str(k)+'_conv2_act_mid')(x)
+        x = layers.Conv3D(filters, (N_SPACE, N_SPACE, spectral_step), padding="same", groups=1, use_bias=False, name='block'+str(k)+'_DepthConv2_a')(x) #DepthwiseConv3D
+        x = layers.Conv3D(filters, (1,1,1), padding="same", use_bias=False, name='block'+str(k)+'_DepthConv2_b')(x)
+        x = layers.BatchNormalization(axis=channel_axis, name='block'+str(k)+'_DepthConv2_bn')(x)
+
+        x = layers.MaxPooling3D((N_SPACE, N_SPACE, spectral_step), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), 
+            padding="same", name='block'+str(k)+'_pool')(x)
+        x = layers.Dropout(dr)(x)
+
+        # Project residual
+        residual = layers.Conv3D(filters, (1,1,1), strides=(STRIDES_SPACE, STRIDES_SPACE, STRIDES_SPECTRUM), padding="same", use_bias=False)(
+            previous_block_activation
+        )
+        x = layers.add([x, residual])  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+    x = layers.Activation('relu', name='drop_act')(x)
+
+    if 'mean' in dropMiddle:
+        x = layers.Lambda(lambda y: backend.mean(y, axis=3), 
+            name='drop_spectral_dim')(x)
+    elif 'max' in dropMiddle: 
+        x = layers.Lambda(lambda y: backend.max(y, axis=3), 
+            name='drop_spectral_dim')(x)
+
+    x = layers.BatchNormalization(axis=channel_axis, name='drop_bn')(x)
+
+    # print("Drop dimm interior after")
+    # print(x.shape.dims)
+
+    ### [Second half of the network: upsampling inputs] ###
+
+    for filters in [256, 128, 64]:
+        k += 1
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act1')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans1')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn1')(x)
+
+        x = layers.Activation("relu", name='decoder_block' + str(k)+'_act2')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding="same", use_bias=False, name='decoder_block' + str(k)+'_convtrans2')(x)
+        x = layers.BatchNormalization(name='decoder_block' + str(k)+'_bn2')(x)
+
+        x = layers.UpSampling2D(2, name='decoder_block' + str(k)+'_upsampling')(x)
+
+        # Project residuals
+        if filters == 256:
+            if 'mean' in dropMiddle:
+                previous_block_activation = layers.Lambda(lambda y: backend.mean(y, axis=3), name='resid_drop_spectral_dim')(previous_block_activation)
+            elif 'max' in dropMiddle:
+                previous_block_activation = layers.Lambda(lambda y: backend.max(y, axis=3), name='resid_drop_spectral_dim')(previous_block_activation)
+
+        residual = layers.UpSampling2D(2, name='decoder_residual' + str(k)+'_upsampling')(previous_block_activation)
+        residual = layers.Conv2D(filters, 1, padding="same",  name='decoder_residual' + str(k)+'_conv')(residual)
+
+        x = layers.add([x, residual], name='decoder_block' + str(k)+'add')  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+        print("Second to last x")
+        print(x.shape.dims)
+
+    # Add a per-pixel classification layer
+    outputs = layers.Conv2D(numClasses, 3, activation="sigmoid", padding="same", name ='exit_conv')(x)
+
+    # Define the model
+    model = Model(inputs, outputs, name = "xception3D_30")
+    return model
+
+########################################################################
 def separable_conv_layer(input, fiters, kernel, blockNum, sepConvNum):
     prefix = 'block' + str(blockNum) + '_sepconv' + str(sepConvNum) 
     x = layers.SeparableConv2D(fiters, kernel,
@@ -640,14 +943,13 @@ def get_xception3d5_max(height, width, numChannels, numClasses):
 #     x_train_preproc, x_test_preproc = hsi_segment_from_sm.get_sm_preproc_data(x_train_raw, x_test_raw, 'inceptionresnetv2')
 #     return x_train_preproc, x_test_preproc
 
-def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=12):
+def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs=200, batchSize=8, 
+    optimizerName = "RMSProp", learning_rate = 0.00001, decay = 0, lossFunction = "BCE+JC"):
+
     backend.clear_session()
     
     ## already preprocessed from 0 to 1
     # x_train_preproc, x_test_preproc = preproc_data(x_train_raw, x_test_raw)
-
-    batchSize = 8
-    learning_rate = 0.00001
 
     x_train_preproc = x_train_raw
     x_test_preproc = x_test_raw
@@ -655,12 +957,12 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
     if 'xception3d_max' in framework:
         model = get_xception3d_max(height, width, numChannels, numClasses)
         batchSize = 4
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d_mean' in framework: 
         model = get_xception3d_mean(height, width, numChannels, numClasses)
         batchSize = 4
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d2_max' in framework:
         model = get_xception3d2_max(height, width, numChannels, numClasses)
@@ -679,27 +981,42 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
     elif 'xception3d4_max' in framework:
         model = get_xception3d4_max(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d4_mean' in framework:
         model = get_xception3d4_mean(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.00001
+        # learning_rate = 0.00001
 
     elif 'xception3d5_max' in framework:
         model = get_xception3d5_max(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.0000005 #0.0000001
+        # learning_rate = 0.0000005 #0.0000001
 
     elif 'xception3d5_mean' in framework:
         model = get_xception3d5_mean(height, width, numChannels, numClasses)
         batchSize = 16
-        learning_rate = 0.0000005 #0.0000001
+        # learning_rate = 0.0000005 #0.0000001
+
+    elif 'xception3d_10n' in framework:
+        model = get_xception3d_20('max', width, height, numChannels, numClasses)
+        batchSize = 16
+        learning_rate = 0.000001 #0.0000001
+
+    elif 'xception3d_20n' in framework:
+        model = get_xception3d_20('max', width, height, numChannels, numClasses)
+        batchSize = 16
+        learning_rate = 0.000001 #0.0000001
+
+    elif 'xception3d_30n' in framework:
+        model = get_xception3d_30('max', width, height, numChannels, numClasses)
+        batchSize = 16
+        learning_rate = 0.000001 #0.0000001
 
     else: 
         print("Model:" + framework + " is not supported")
 
-    model = train_utils.compile_RMSprop(framework, model, learning_rate)
+    model = train_utils.compile_custom(framework, model, optimizerName, learning_rate, decay, lossFunction)
     model, history = train_utils.fit_model(framework, model, x_train_preproc, ytrain, x_test_preproc, ytest, numEpochs, batchSize)
 
     return model, history

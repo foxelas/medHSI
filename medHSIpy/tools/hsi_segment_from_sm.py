@@ -60,15 +60,22 @@ def get_sm_model(backbone, height, width, numChannels, numClasses):
         model = sm.Unet(target_backbone, input_shape=(None, None, numChannels), encoder_weights=None, classes=numClasses)
     return model
 
-def build_sm_model(framework, x_train_raw, x_test_raw, height, width, numChannels, numClasses):
+def build_sm_model(framework, x_train_raw, x_test_raw, height, width, numChannels, numClasses, 
+        optimizerName = "Adam", learning_rate =  0.0001, decay = 0, lossFunction = "BCE+JC"):
+
     target_backbone = get_target_backbone(framework)
     x_train_preproc, x_test_preproc = get_sm_preproc_data(x_train_raw, x_test_raw, target_backbone)
     model = get_sm_model(framework, height, width, numChannels, numClasses)
-    model = train_utils.compile_Adam(framework, model, learning_rate =  0.0001)
+    model = train_utils.compile_custom(framework, model, optimizerName, learning_rate, decay, lossFunction)
+
     return model, x_train_preproc, x_test_preproc
 
-def fit_sm_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs):
-    model, x_train_prep, x_test_prep = build_sm_model(framework, x_train_raw, x_test_raw, height, width, numChannels, numClasses)
+def fit_sm_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height, width, numChannels, numClasses, numEpochs, 
+    optimizerName = "Adam", learning_rate =  0.0001, decay = 0, lossFunction = "BCE+JC"):
+
+    model, x_train_prep, x_test_prep = build_sm_model(framework, x_train_raw, x_test_raw, height, width, numChannels, 
+        numClasses,  optimizerName, learning_rate, decay, lossFunction)
+        
     model, history = train_utils.fit_model(framework, model, x_train_prep, ytrain, x_test_prep, ytest, numEpochs, batchSize = 64)
 
     return model, history
