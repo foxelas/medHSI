@@ -927,6 +927,7 @@ classdef trainUtility
                 %% without post-processing
                 predMask = logical(hsi.RecoverSpatialDimensions(predLabelsCell{i}, origSizes{i}, fgMasks{i}));
                 trueMask = testData(i).ImageLabels;
+                
                 jacsim = jacsim + commonUtility.Jaccard(predMask, trueMask);
                 jacDensity = jacDensity + 0; % MeasureDensity(predMask, trueMask);
                 [h, w] = size(trueMask);
@@ -947,15 +948,15 @@ classdef trainUtility
             ytrainDecim = trainLabels(kk, :);
             % TO REMOVE
 
-            isTesting = ~commonUtility.IsChild({'RunKfoldValidation'});
-            if isTesting
+            isTesting = true; % ~commonUtility.IsChild({'RunKfoldValidation'});
+            if ~isTesting
                 modN = numel(stackedModels);
                 aucX = cell(modN,1);
                 aucY = cell(modN,1);
                 aucVal = zeros(modN,1);
                 for i = 1:modN
                     singleModel = fitPosterior(stackedModels{i});
-                    [~, score_svm] = resubPredict(singleModel);
+                    [~,score_svm] = resubPredict(singleModel);
                     [aucX{i}, aucY{i}, ~, aucVal(i)] = perfcurve(ytrainDecim, score_svm(:, stackedModels{i}.ClassNames), 1);
                 end
                 [meanAucX, meanAucY] = trainUtility.GetMeanAUC(aucX, aucY);

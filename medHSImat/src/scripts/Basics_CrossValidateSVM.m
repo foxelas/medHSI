@@ -3,7 +3,7 @@ folds = 13;
 config.SetSetting('Dataset', 'pslRaw32AugmentedPatientValidation\');
 loadData = true;
 
-if loadData
+if ~loadData
     trainData = cell(folds, 1);
     for i = 1:folds
       config.SetSetting('Dataset', strcat('pslRaw32AugmentedPatientValidation\', num2str(i)));
@@ -36,7 +36,8 @@ end
 
 foldInds = 1:folds;
 
-methods = {'abundance', 'signature'};
+% methods = {'abundance', 'signature'};
+methods = {'signature'};
 
 for k = 1:2
     method = methods{k}; 
@@ -45,9 +46,11 @@ for k = 1:2
        trainDataSet =  []; %struct('Values', [], 'Labels', [], 'RGBs', [], 'Masks', [], 'ImageLabels', []);
        for kk = 1:folds
            if kk ~= i 
-                trainDataSet = [trainDataSet, trainData{foldInds == k} ];
+                trainDataSet = [trainDataSet, trainData{foldInds == kk} ];
            end
        end
+       
+       fprintf('Fold %d\n', i);
        
        switch method
            case 'abundance'
@@ -64,10 +67,15 @@ for k = 1:2
        end
     end
     
+    v = cell2mat(testPerformance);
+    fprintf('%s & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.3f\n', ...
+        method, mean([v.Accuracy] *100), std([v.Accuracy] * 100), mean([v.Sensitivity] *100), std([v.Sensitivity] *100),mean([v.Specificity] *100), std([v.Specificity] *100),mean([v.JaccardCoeff] *100, 'omitnan'), std([v.JaccardCoeff] *100, 'omitnan'),mean([v.AUC]))
+
     if strcmpi(method, 'abundance')
         resultAbundance = testPerformance; 
         resultRowAbundance = performanceRow;
-    else 
+        
+    elseif strcmpi(method, 'signature')
         resultSignature = testPerformance; 
         resultRowSignature = performanceRow;
     end
@@ -98,12 +106,11 @@ function [testPerformance, performanceRow] = TrainClassifier(name_, trainData_, 
     
 %     ytest = cellfun(@(x, y) GetMaskedPixelsInternal(x.Labels, y.FgMask), {testData_.Labels}, {testData_.Values}, 'un', 0);
 %     
-%     performanceRow = [testPerformance.JaccardCoeff*100, ...
-%             testPerformance.JacDensity*100, ...
-%             testPerformance.Accuracy*100, ...
-%             testPerformance.Sensitivity*100 , ...
-%             testPerformance.Specificity*100, ...
-%             testPerformance.AUC*100];
+    performanceRow = [testPerformance.Accuracy*100, ...
+            testPerformance.Sensitivity*100 , ...
+            testPerformance.Specificity*100, ...
+            testPerformance.JaccardCoeff*100, ...
+            testPerformance.AUC*100];
 % 
 %     fgMasks = {testData_.Masks};
 %     sRGBs = {testData_.RGBs};

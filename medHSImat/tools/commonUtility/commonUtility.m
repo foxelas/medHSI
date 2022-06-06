@@ -324,6 +324,9 @@ classdef commonUtility
             realLabel = logical(realLabel);
 
             jac = jaccard(predLabel, realLabel);
+            if isempty(jac) %% both predicted and real are zeros 
+                jac = 1;
+            end
         end
         % ======================================================================
         %> @brief Evaluations returns performance metrics for classification tasks

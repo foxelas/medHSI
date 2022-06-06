@@ -1,9 +1,9 @@
 
-dirs = {'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\2022-06-02_sm_resnet\0_performance.mat'; 
-    'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\2022-06-04_cnn3d_optimized\0_performance.mat';
-    'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\2022-06-05_sm_resnet_pretrained_optimized\0_performance.mat'};
+dirs = {'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\2022-06-05_sm_resnet_pretrained_optimized\0_performance.mat';
+       'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\2022-06-02_sm_resnet\0_performance.mat'; 
+        'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\2022-06-04_cnn3d_optimized\0_performance.mat';};
 
-names = {'Resnet', 'Pretrained Resnet', '3D CNN'};
+names = { 'Pretrained Resnet','Resnet', '3D CNN'};
 close all;
 figure(1);
 
@@ -32,12 +32,12 @@ for i = 1:numel(dirs)
     
     if ~hasSens
         fprintf('%s & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.3f\n', ...
-            names{i}, mean([v.val_accuracy]) * 100, std([v.val_accuracy]) * 100 / folds, mean(sensitivities) * 100, std(sensitivities) * 100 / folds, ...
-            mean(specificities) * 100, std(specificities) * 100 / folds, mean([v.val_iou_score]) * 100, std([v.val_iou_score]) * 100 / folds, auc);
+            names{i}, mean([v.val_accuracy]) * 100, std([v.val_accuracy]) * 100 , mean(sensitivities) * 100, std(sensitivities) * 100 , ...
+            mean(specificities) * 100, std(specificities) * 100 , mean([v.val_iou_score]) * 100, std([v.val_iou_score]) * 100 , auc);
     else
         fprintf('%s & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.3f\n', ...
-            names{i}, mean([v.val_accuracy]) * 100, std([v.val_accuracy]) * 100 / folds, mean([v.val_precision]) * 100, std([v.val_precision]) * 100 / folds, ...
-            mean([v.val_recall]) * 100, std([v.val_recall]) * 100 / folds, mean([v.val_iou_score]) * 100, std([v.val_iou_score]) * 100 / folds, auc);
+            names{i}, mean([v.val_accuracy]) * 100, std([v.val_accuracy]) * 100 , mean([v.val_precision]) * 100, std([v.val_precision]) * 100 , ...
+            mean([v.val_recall]) * 100, std([v.val_recall]) * 100 , mean([v.val_iou_score]) * 100, std([v.val_iou_score]) * 100 , auc);
     end
     
     result = struct('Accuracy', mean([v.val_accuracy]) * 100, 'Precision', mean([v.val_precision]) * 100, ...
