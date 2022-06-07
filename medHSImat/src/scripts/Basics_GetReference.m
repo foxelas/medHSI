@@ -1,32 +1,32 @@
-% % load('D:\temp\uni\mspi\output\pslRaw\Dimred28-Apr-2022-rbf-100000-outlier0,05\cvpInfo.mat');
-% 
-% all = [trainData',testData']';
-% for i = 1:19
-%     value(i,:) = mean(all(i).Values.GetMaskedPixels(all(i).ImageLabels));
-%     names{i} = all(i).Labels.Diagnosis;
-%     label(i) = strcmpi(all(i).Labels.Type,'Malignant'); 
-% end
-% 
-% unnames = unique(names);
-% for i=1:length(unnames)
-%     ids = strcmpi(names, unnames{i});
-%     if sum(ids) > 1
-%         limValue(i,:) = mean(value(ids, :));
-%     else
-%         limValue(i,:) = value(ids,:);
-%     end
-% end
-% 
-% 
-% figure(1);
-% hold on
-% for i=1:8
-% plot(hsiUtility.GetWavelengths(311), limValue(i,:), 'DisplayName', unnames{i}, 'LineWidth', 2);
-% end
-% legend('FontSize', 15);
-% xlabel('Wavelength (nm)', 'FontSize', 15);
-% ylabel('Reflectance (a.u.)', 'FontSize', 15);
-% legend('FontSize', 15, 'Location', 'Eastoutside');
+load('D:\temp\uni\mspi\output\pslRaw\Dimred28-Apr-2022-rbf-100000-outlier0,05\cvpInfo.mat');
+
+all = [trainData',testData']';
+for i = 1:19
+    value(i,:) = mean(all(i).Values.GetMaskedPixels(all(i).ImageLabels));
+    names{i} = all(i).Labels.Diagnosis;
+    label(i) = strcmpi(all(i).Labels.Type,'Malignant'); 
+end
+
+unnames = unique(names);
+for i=1:length(unnames)
+    ids = strcmpi(names, unnames{i});
+    if sum(ids) > 1
+        limValue(i,:) = mean(value(ids, :));
+    else
+        limValue(i,:) = value(ids,:);
+    end
+end
+
+
+figure(1);
+hold on
+for i=1:8
+plot(hsiUtility.GetWavelengths(311), limValue(i,:), 'DisplayName', unnames{i}, 'LineWidth', 2);
+end
+legend('FontSize', 15);
+xlabel('Wavelength (nm)', 'FontSize', 15);
+ylabel('Reflectance (a.u.)', 'FontSize', 15);
+legend('FontSize', 15, 'Location', 'Eastoutside');
 
 
 ids = strcmpi(unnames, 'Basal Cell Carcinoma');
