@@ -35,9 +35,7 @@ else
 end
 
 foldInds = 1:folds;
-
-% methods = {'abundance', 'signature'};
-methods = {'signature'};
+methods = {'abundance', 'signature'};
 
 for k = 1:2
     method = methods{k}; 
