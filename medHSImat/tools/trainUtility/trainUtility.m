@@ -368,7 +368,7 @@ classdef trainUtility
         %>
         %> @retval SVMModel [model] | The trained SVM model
         % ======================================================================
-        function [SVMModel] = SVM(Xtrain, ytrain)
+        function [SVMModel] = SVM(Xtrain, ytrain, svmSettings)
             % SVM trains an RBF SVM classifier.
             %
             % You can alter the settings of the SVM classifier according to your specifications.
@@ -392,12 +392,12 @@ classdef trainUtility
             ytrain = ytrain(kk, :);
             % TO REMOVE
         
-            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2'});
-%             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
+%             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2'});
+            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2', 'Basics_CrossValidateSVM'});
             filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'SVMModel'), 'mat');
             
             if hasOptimization
-                optim = 'Bayesian'; %'Bayesian' 
+                optim = 'Bayesian'; %'Grid' 
                 textPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationStruct'), 'txt');
                 diary(textPath);
                 close all;
@@ -449,8 +449,15 @@ classdef trainUtility
                 diary off 
 
             else
-                SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                    'KernelScale', 'auto', 'OutlierFraction', 0.05);
+                if ~isempty(svmSettings)
+                    SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
+                        'BoxConstraint', svmSettings(1), 'KernelScale', svmSettings(2));
+                else
+                    SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
+                        'KernelScale', 'auto');
+                end
+                
+                %, 'OutlierFraction', 0.05);
                 %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'OutlierFraction', 0.05
                 %'Standardize', true | 'BoxConstraint', 2, 'IterationLimit', iterLim,
             end
@@ -477,7 +484,7 @@ classdef trainUtility
         %> @retval st [double] | The train run time
         %> @retval SVMModel [model] | The trained SVM model
         % ======================================================================
-        function [predlabels, st, SVMModel] = RunSVM(Xtrain, ytrain, Xvalid)
+        function [predlabels, st, SVMModel] = RunSVM(Xtrain, ytrain, Xvalid, svmSettings)
             % RunSVM trains and test an SVM classifier.
             %
             % @b Usage
@@ -497,7 +504,7 @@ classdef trainUtility
             % @retval SVMModel [model] | The trained SVM model
 
             tic;
-            SVMModel = trainUtility.SVM(Xtrain, ytrain);
+            SVMModel = trainUtility.SVM(Xtrain, ytrain,svmSettings);
             st = toc;
             predlabels = predict(SVMModel, Xvalid);
         end
@@ -708,7 +715,7 @@ classdef trainUtility
         %> @retval trainedModel [model] | The trained SVM model
         %> @retval Xvalid [numeric array] | The dimension-reduced test data
         % ======================================================================
-        function [performanceStruct, trainedModel, XValid] = DimredAndTrain(trainData, testData, method, q, varargin)
+        function [performanceStruct, trainedModel, XValid] = DimredAndTrain(trainData, testData, method, q, svmSettings, varargin)
             % DimredAndTrain trains and test an SVM classifier after dimension reduction.
             %
             % @b Usage
@@ -800,7 +807,7 @@ classdef trainUtility
                     [predLabels, modelTrainTime, trainedModel, ~, ~] = trainUtility.StackMultiscale(@trainUtility.SVM, 'voting', XTrainscores, yTrain, XValidscores);
 
                 otherwise
-                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
+                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores, svmSettings);
             end
 
             [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(method, q, yValid, predLabels, yTrain, trainedModel, ...
@@ -920,8 +927,9 @@ classdef trainUtility
                 %% without post-processing
                 predMask = logical(hsi.RecoverSpatialDimensions(predLabelsCell{i}, origSizes{i}, fgMasks{i}));
                 trueMask = testData(i).ImageLabels;
+                
                 jacsim = jacsim + commonUtility.Jaccard(predMask, trueMask);
-                jacDensity = jacDensity + MeasureDensity(predMask, trueMask);
+                jacDensity = jacDensity + 0; % MeasureDensity(predMask, trueMask);
                 [h, w] = size(trueMask);
                 mahalDist = mahalDist + mahal([1]', reshape(predMask, [h * w, 1]));
             end
@@ -940,15 +948,15 @@ classdef trainUtility
             ytrainDecim = trainLabels(kk, :);
             % TO REMOVE
 
-            isTesting = ~commonUtility.IsChild({'RunKfoldValidation'});
-            if isTesting
+            isTesting = true; % ~commonUtility.IsChild({'RunKfoldValidation'});
+            if ~isTesting
                 modN = numel(stackedModels);
                 aucX = cell(modN,1);
                 aucY = cell(modN,1);
                 aucVal = zeros(modN,1);
                 for i = 1:modN
                     singleModel = fitPosterior(stackedModels{i});
-                    [~, score_svm] = resubPredict(singleModel);
+                    [~,score_svm] = resubPredict(singleModel);
                     [aucX{i}, aucY{i}, ~, aucVal(i)] = perfcurve(ytrainDecim, score_svm(:, stackedModels{i}.ClassNames), 1);
                 end
                 [meanAucX, meanAucY] = trainUtility.GetMeanAUC(aucX, aucY);
