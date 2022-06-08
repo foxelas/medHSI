@@ -29,11 +29,27 @@ classdef trainUtility
             hsiUtility.SaveToH5(testTargetIDs, fileName);
         end
         
-        function [] = ExportPatientFolds(baseDataset)
-            targetDataset =  strcat(baseDataset, 'PatientValidation');
 
-            foldSampleIds = {{'001'}; {'002', '003', '004'}; {'005'}; {'006'}; {'007'}; {'008', '009'}; {'010'}; {'011'}; {'012'}; {'013'}; {'014'}; {'015', '016', '017', '018'}; {'019'}};
-            
+        function [] = ExportFolds(baseDataset)
+        %Usage: trainUtility.ExportFolds('pslRaw-Denoisesmoothen32Augmented')
+        % trainUtility.ExportFolds('pslRaw-Denoisesmoothen32')
+
+            targetDataset =  strcat(baseDataset, 'LOOCValidation');
+
+            config.SetSetting('Dataset', targetDataset);
+            baseDir = commonUtility.GetFilename('dataset', '', '');
+
+            config.SetSetting('Dataset', baseDataset);
+            [~, targetIDs] = commonUtility.DatasetInfo();
+
+            isPatiendBased = false;
+            if isPatiendBased
+                foldSampleIds = {{'001'}; {'002', '003', '004'}; {'005'}; {'006'}; {'007'}; {'008', '009'}; {'010'}; {'011'}; {'012'}; {'013'}; {'014'}; {'015', '016', '017', '018'}; {'019'}};
+            else
+                foldSampleIds = {{'001'}; {'002'}; {'003'}; {'004'}; {'005'}; {'006'}; {'007'}; {'008'}; {'009'}; {'010'}; {'011'}; {'012'}; {'013'}; {'014'}; {'015'}; ...
+                    {'016'}; {'017'}; {'018'}; {'019'}}; 
+            end
+
             discardedPatches = {'187_patch32', '187_patch33',  '199_patch24', '199_patch29', '199_patch30', '199_patch31', '199_patch32', '205_patch16', '205_patch22', ...
                 '205_patch23', '205_patch24', '205_patch29', '205_patch30', '205_patch31', '205_patch32', '205_patch33', '205_patch34', '205_patch35', '205_patch37', ...
                 '205_patch38', '205_patch39', '205_patch40', '205_patch41', '205_patch42', '205_patch43', '205_patch44', '205_patch47', '205_patch48', '205_patch49', ...
@@ -45,13 +61,19 @@ classdef trainUtility
                 '205_patch113', '205_patch114', '205_patch117', '205_patch118', '205_patch119', '212_patch7', '251_patch41', '230_patch27', '227_patch1',...
                 '193_patch8', '181_patch64', '187_patch1', '160_patch8', '157_patch3', '150_patch4'};
             
-            config.SetSetting('Dataset', targetDataset);
-            baseDir = commonUtility.GetFilename('dataset', '', '');
-
-            config.SetSetting('Dataset', baseDataset);
-            [~, targetIDs] = commonUtility.DatasetInfo();
-            
-            targetIDs = targetIDs(~contains(targetIDs, discardedPatches));
+            if contains(baseDataset, 'Augmented')
+                targetIDs = targetIDs(~contains(targetIDs, strcat(discardedPatches, '_')));
+            else
+                targetIDs = targetIDs(~contains(strcat(targetIDs, '.'), strcat(discardedPatches, '.')));
+            end
+                            
+            n = length(targetIDs);
+            dataStruct = struct('SpectralData', [], 'LabelInfo', [], 'TargetID', []);
+            for i = 1:n
+                targetName = num2str(targetIDs{i});
+                dataStruct(i).TargetID = targetName; 
+                [dataStruct(i).SpectralData, dataStruct(i).LabelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+            end
             
             folds = numel(foldSampleIds); 
             foldTargets = cell(folds, 1);
@@ -62,13 +84,12 @@ classdef trainUtility
                 testIds = {};
                 
                 c = 0; 
-                for i = 1:length(targetIDs)
-                    
-                    targetName = num2str(targetIDs{i});
-                    [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
-
-                    if any(contains(targetSampleIds, labelInfo.SampleID))
+                for i = 1:n                  
+                    if any(contains(targetSampleIds, dataStruct(i).LabelInfo.SampleID))
+                        targetName = dataStruct(i).TargetID;
                         saveDir = fullfile(foldDir, strcat(targetName, '.mat'));
+                        spectralData = dataStruct(i).SpectralData;
+                        labelInfo = dataStruct(i).LabelInfo;
                         save(saveDir, 'spectralData', 'labelInfo');
                         c = c+1; 
                         testIds{c} = targetName;
@@ -79,13 +100,13 @@ classdef trainUtility
                 
                 fileName = commonUtility.GetFilename('output', ...
                     fullfile(config.GetSetting('DatasetsFolderName'), num2str(k), strcat('hsi_', config.GetSetting('Dataset'), '_train')), 'h5');
-                trainTargetIDs = targetIDs(~contains(targetIDs, testIds));
-                hsiUtility.SaveToH5(trainTargetIDs, fileName);
+                trainTargetIDs = ~contains(targetIDs, testIds);
+                hsiUtility.SaveToH5(dataStruct(trainTargetIDs), fileName);
 
                 fileName = commonUtility.GetFilename('output', ...
                     fullfile(config.GetSetting('DatasetsFolderName'), num2str(k),strcat('hsi_', config.GetSetting('Dataset'), '_test')), 'h5');
-                testTargetIDs = targetIDs(contains(targetIDs, testIds));
-                hsiUtility.SaveToH5(testTargetIDs, fileName);
+                testTargetIDs = contains(targetIDs, testIds);
+                hsiUtility.SaveToH5(dataStruct(testTargetIDs), fileName);
             end  
 
         end

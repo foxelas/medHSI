@@ -11,7 +11,6 @@ from tensorflow.keras.optimizers import Adam, RMSprop
 from tensorflow.keras.losses import categorical_crossentropy, binary_crossentropy
 from tensorflow.keras.metrics import Recall, Precision, FalseNegatives, FalsePositives, TrueNegatives, TruePositives
 import segmentation_models as sm
-from datetime import date
 from sklearn.metrics import roc_curve, auc
 from scipy.io import savemat
 from keras.utils.vis_utils import plot_model
@@ -28,9 +27,9 @@ else:
 def get_model_filename(suffix='', extension='txt', folder = None):
     model_name = ''
 
-    if folder is None:
-        today = date.today()
-        model_name = str(today) + '_'
+    # if folder is None:
+    #     today = date.today()
+    #     model_name = str(today) + '_'
     
     savedir = join(hsi_utils.conf['Directories']['OutputDir'],
         hsi_utils.conf['Data Settings']['Dataset'], hsi_utils.conf['Folder Names']['PythonTestFolderName'])
@@ -102,7 +101,7 @@ def compile_and_save_structure(framework, model, optimizer, learning_rate, targe
         metrics=metrics
         )
 
-    folder = str(date.today()) + '_' + framework 
+    folder = framework 
 
     save_model_info(model, folder, optSettings)
 
@@ -147,7 +146,7 @@ def fit_model(framework, model, x_train, y_train, x_test, y_test, numEpochs = 20
         )
 
 
-    folder = str(date.today()) + '_' + framework
+    folder = framework
     plot_history(history, folder)
 
     return model, history
@@ -302,7 +301,7 @@ def save_evaluate_model(model, history, framework, folder, x_test, y_test):
     save_text(testEval, 'results_test', folder)
     
     filename = get_model_filename('0_performance', 'mat', folder)
-    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history.history, "trainEval": trainEval, "testEval": testEval}
+    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history, "trainEval": trainEval, "testEval": testEval}
     savemat(filename, mdic)
 
     return fpr_, tpr_, auc_val_
@@ -310,7 +309,7 @@ def save_evaluate_model(model, history, framework, folder, x_test, y_test):
 
 def save_evaluate_model_folds(folder, fpr_, tpr_, auc_val_, trainEval, testEval, history):   
     filename = get_model_filename('0_performance', 'mat', folder)
-    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history.history, "trainEval": trainEval, "testEval": testEval}
+    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history, "trainEval": trainEval, "testEval": testEval}
     savemat(filename, mdic)
 
     return

@@ -42,7 +42,7 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
 
 flist = [
     #successful 
-    #'sm_resnet',  
+    'sm_resnet',  
     'sm_resnet_pretrained',
     #'cnn3d'
  ]
@@ -60,8 +60,9 @@ for framework in flist:
 
     print("Running for framework:" + framework)
 
-    folds = 13
+    folds = 19
 
+    baseDate = str(date.today())
     for fold in range(1, folds+1):
         backend.clear_session()
         
@@ -71,9 +72,10 @@ for framework in flist:
 
         foldNames.append(dictVal) 
 
-        model, history_ = get_framework(framework, X_train, X_test, y_train, y_test)
+        foldFramework = framework + '_' + str(fold) +  '_' + baseDate 
+        model, history_ = get_framework(foldFramework, X_train, X_test, y_train, y_test)
 
-        folder = str(date.today()) + '_' + framework + '_' + str(fold)
+        folder = foldFramework
 
         #prepare again in order to avoid pre-processing errors 
         X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test(fold)
@@ -93,11 +95,10 @@ for framework in flist:
             k += 1 
             train_utils.visualize(hsi, gt, pred, folder, round(iou.numpy() * 100,2), id)
     
-    folder = str(date.today()) + '_' + framework 
+    folder = framework + '_' + baseDate 
     train_utils.save_evaluate_model_folds(folder, fpr, tpr, auc_val, trainEval, testEval, history)
 
-
     # ROC AUC comparison 
-    train_utils.plot_roc(fpr, tpr, auc_val, foldNames, None)
+    train_utils.plot_roc(fpr, tpr, auc_val, foldNames, folder)
 
 print("Finished")
