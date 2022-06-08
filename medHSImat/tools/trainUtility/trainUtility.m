@@ -368,7 +368,7 @@ classdef trainUtility
         %>
         %> @retval SVMModel [model] | The trained SVM model
         % ======================================================================
-        function [SVMModel] = SVM(Xtrain, ytrain)
+        function [SVMModel] = SVM(Xtrain, ytrain, svmSettings)
             % SVM trains an RBF SVM classifier.
             %
             % You can alter the settings of the SVM classifier according to your specifications.
@@ -394,10 +394,11 @@ classdef trainUtility
         
             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_LOOCV'});
 %             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
+
             filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'SVMModel'), 'mat');
             
             if hasOptimization
-                optim = 'Bayesian'; %'Bayesian' 
+                optim = 'Bayesian'; %'Grid' 
                 textPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'optimizationStruct'), 'txt');
                 diary(textPath);
                 close all;
@@ -449,8 +450,15 @@ classdef trainUtility
                 diary off 
 
             else
-                SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
-                    'KernelScale', 'auto', 'OutlierFraction', 0.05);
+                if ~isempty(svmSettings)
+                    SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
+                        'BoxConstraint', svmSettings(1), 'KernelScale', svmSettings(2));
+                else
+                    SVMModel = fitcsvm(Xtrain, ytrain, 'Standardize', true, 'KernelFunction', 'rbf', ... %'RBF', 'linear', 'polynomial' |   'OutlierFraction', 0.1, | 'PolynomialOrder', 5
+                        'KernelScale', 'auto');
+                end
+                
+                %, 'OutlierFraction', 0.05);
                 %'Cost', [0, 1; 3, 0], 'IterationLimit', 10000 | 'OutlierFraction', 0.05
                 %'Standardize', true | 'BoxConstraint', 2, 'IterationLimit', iterLim,
             end
@@ -477,7 +485,7 @@ classdef trainUtility
         %> @retval st [double] | The train run time
         %> @retval SVMModel [model] | The trained SVM model
         % ======================================================================
-        function [predlabels, st, SVMModel] = RunSVM(Xtrain, ytrain, Xvalid)
+        function [predlabels, st, SVMModel] = RunSVM(Xtrain, ytrain, Xvalid, svmSettings)
             % RunSVM trains and test an SVM classifier.
             %
             % @b Usage
@@ -497,7 +505,7 @@ classdef trainUtility
             % @retval SVMModel [model] | The trained SVM model
 
             tic;
-            SVMModel = trainUtility.SVM(Xtrain, ytrain);
+            SVMModel = trainUtility.SVM(Xtrain, ytrain,svmSettings);
             st = toc;
             predlabels = predict(SVMModel, Xvalid);
         end
@@ -708,7 +716,7 @@ classdef trainUtility
         %> @retval trainedModel [model] | The trained SVM model
         %> @retval Xvalid [numeric array] | The dimension-reduced test data
         % ======================================================================
-        function [performanceStruct, trainedModel, XValid] = DimredAndTrain(trainData, testData, method, q, varargin)
+        function [performanceStruct, trainedModel, XValid] = DimredAndTrain(trainData, testData, method, q, svmSettings, varargin)
             % DimredAndTrain trains and test an SVM classifier after dimension reduction.
             %
             % @b Usage
@@ -800,7 +808,7 @@ classdef trainUtility
                     [predLabels, modelTrainTime, trainedModel, ~, ~] = trainUtility.StackMultiscale(@trainUtility.SVM, 'voting', XTrainscores, yTrain, XValidscores);
 
                 otherwise
-                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores);
+                    [predLabels, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainscores, yTrain, XValidscores, svmSettings);
             end
 
             [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(method, q, yValid, predLabels, yTrain, trainedModel, ...
@@ -984,15 +992,15 @@ classdef trainUtility
             predMasks = cell(numel(sRGBs), 1);
             trueMasks = cell(numel(sRGBs), 1);
             for i = 1:numel(sRGBs)
-                predMasks{i} = logical(hsi.RecoverSpatialDimensions(predLabelsCell{i}, origSizes{i}, fgMasks{i}));
+				predMasks{i} = logical(hsi.RecoverSpatialDimensions(predLabelsCell{i}, origSizes{i}, fgMasks{i}));
                 trueMasks{i} = testData(i).ImageLabels;
             end
 
             [perfStr] = trainUtility.Evaluation(modelName, featNum, predLabels, gtLabels, predMasks, trueMasks, stackedModels, trainLabels);
             perfStr.DRTrainTime = drTrainTime;
-            perfStr.ModelTrainTime = modelTrainTime;
-            
+            perfStr.ModelTrainTime = modelTrainTime;            
         end
+		
         % ======================================================================
         %> @brief RunKfoldValidation trains and tests an classifier with cross validation.
         %>

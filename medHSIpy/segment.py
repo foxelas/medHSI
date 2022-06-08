@@ -30,8 +30,8 @@ def get_framework(framework, xtrain, xtest, ytrain, ytest):
             
     elif 'cnn3d' in framework:
         model, history = cmdl.get_cnn_model(framework, xtrain, ytrain, xtest, ytest, 
-            height=HEIGHT, width=WIDTH,  numChannels=NUMBER_OF_CHANNELS, 
-            numClasses=NUMBER_OF_CLASSES, numEpochs=NUMBER_OF_EPOCHS)
+            HEIGHT, WIDTH, NUMBER_OF_CHANNELS, NUMBER_OF_CLASSES, NUMBER_OF_EPOCHS, 
+            64, "RMSProp", 0.0001, 0, "BCE+JC")
 
     else:
         model, history = xmdl.get_xception_model(framework, xtrain, ytrain, xtest, ytest, 
@@ -52,7 +52,7 @@ flist = [
     
     #'sm_resnet_pretrained',
 
-    #'cnn3d', 
+    'cnn3d', 
     #'cnn3d2'
     #'xception3d5_max', 'xception3d5_mean',
     #'xception3d4_max', 'xception3d4_mean',

@@ -331,6 +331,10 @@ classdef commonUtility
 
             if isnan(jac)
                 v = 1;
+			end
+			
+            if isempty(jac) %% both predicted and real are zeros 
+                jac = 1;
             end
         end
         % ======================================================================
