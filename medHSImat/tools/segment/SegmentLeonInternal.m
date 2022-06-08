@@ -1,7 +1,8 @@
 function [segmentMask] = SegmentLeonInternal(hsIm)
 
-    filePath = 'D:\temp\uni\mspi\matfiles\hsi\pslRaw\LeonReferences\LeonReferences.mat';
-
+    oldDs = config.GetSetting('Dataset');
+    filePath = commonUtility.GetFilename('dataset', fullfile('LeonReferences', 'LeonReferences'), 'mat');
+    
     load(filePath, 'references');
     r = numel(references);
 
@@ -31,5 +32,5 @@ function [segmentMask] = SegmentLeonInternal(hsIm)
 %     imagesc(clusterLabelsImg)
 %     subplot(1,2,2);
 %     imagesc(segmentMask);
-%    
+   
 end

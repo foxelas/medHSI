@@ -1,40 +1,39 @@
-% folds = 19;
-% 
-% saveTarget = 'Framework-LOOCV';
-% 
-% targetDataset = strcat('pslRaw-Denoisesmoothen32', 'LOOCValidation');
-% config.SetSetting('Dataset', targetDataset);
-% loadData = true;
-% 
-% if ~loadData
-%     trainData = cell(folds, 1);
-%     for i = 1:folds
-%       config.SetSetting('Dataset', fullfile(targetDataset, num2str(i)));
-%       [~, targetIDs] = commonUtility.DatasetInfo();
-% 
-%        trainDataFold = struct('Values', [], 'Labels', [], 'RGBs', [], 'Masks', [], 'ImageLabels', []);
-% 
-%       for j = 1:numel(targetIDs)
-%          [spectrumData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{j});
-%          trainDataFold(j).Values = spectrumData;
-%          trainDataFold(j).Labels = labelInfo;
-%          trainDataFold(j).RGBs = spectrumData.GetDisplayImage();
-%          trainDataFold(j).Masks = spectrumData.FgMask;
-%          trainDataFold(j).ImageLabels = logical(labelInfo.Labels);
-%          trainDataFold(j).TargetName = targetIDs{j};
-%       end
-% 
-%       trainData{i} = trainDataFold;
-%     end
-% 
-%     config.SetSetting('Dataset', targetDataset);
-%     fileName = commonUtility.GetFilename('output', fullfile(saveTarget,'foldData'));
-%     save(fileName, 'trainData', '-v7.3');
-% else
-%     config.SetSetting('Dataset', targetDataset);
-%     fileName = commonUtility.GetFilename('output', fullfile(saveTarget,'foldData'));
-%     load(fileName, 'trainData');
-% end
+folds = 19;
+
+saveTarget = 'Framework-LOOCV';
+
+targetDataset = 'pslRaw-Denoisesmoothen';
+config.SetSetting('Dataset', targetDataset);
+[~, targetIDs] = commonUtility.DatasetInfo();
+
+loadData = true;
+      
+if ~loadData
+    trainData = cell(folds, 1);
+    for i = 1:folds
+        trainDataFold = struct('Values', [], 'Labels', [], 'RGBs', [], 'Masks', [], 'ImageLabels', []);
+
+        [spectrumData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{i});
+         j = 1;
+         trainDataFold(j).Values = spectrumData;
+         trainDataFold(j).Labels = labelInfo;
+         trainDataFold(j).RGBs = spectrumData.GetDisplayImage();
+         trainDataFold(j).Masks = spectrumData.FgMask;
+         trainDataFold(j).ImageLabels = logical(labelInfo.Labels);
+         trainDataFold(j).TargetName = targetIDs{j};
+
+        trainData{i} = trainDataFold;
+    end
+
+    config.SetSetting('Dataset', targetDataset);
+    fileName = commonUtility.GetFilename('output', fullfile(saveTarget,'foldData'));
+    save(fileName, 'trainData', '-v7.3');
+else
+    config.SetSetting('Dataset', targetDataset);
+    fileName = commonUtility.GetFilename('output', fullfile(saveTarget,'foldData'));
+    load(fileName, 'trainData');
+end
+
 rng default; % For reproducibility
 
 foldInds = 1:folds;
@@ -57,8 +56,15 @@ for k = 1:3
        switch method
            case 'abundance'
                 name = 'Abundance-8';
+                %observed 
+                boxConstraint = 44.184;
+                kernelScale = 4.0136;
+%                 %estimated 
+%                 boxConstraint = 38.64;
+%                 kernelScale = 4.1023;
+                       
                 config.SetSetting('SaveFolder', fullfile(saveTarget, name, num2str(i)));
-                [testPerformance{i}, performanceRow(i,:)] = TrainClassifier(name, trainDataSet, testDataSet, 'abundance2', 8, [], []); 
+                [testPerformance{i}, performanceRow(i,:)] = TrainClassifier(name, trainDataSet, testDataSet, 'abundance2', 8, [], [boxConstraint, kernelScale]); 
 
            case 'signature'
                name = 'Signature';
@@ -68,6 +74,7 @@ for k = 1:3
                % boxConstraint = 9.862;
                % kernelScale = 2.799; 
                 [testPerformance{i}, performanceRow(i,:)] = TrainClassifier(name, trainDataSet, testDataSet, 'none', 311, [], [boxConstraint, kernelScale]);
+                
            case 'kmeans'
                name = 'KMeans+SAM';
                config.SetSetting('SaveFolder', fullfile(saveTarget, name, num2str(i)));
@@ -121,10 +128,10 @@ function [testPerformance, performanceRow] = TrainClassifier(name_, trainData_, 
     origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
 
     for i = 1:numel(sRGBs)
-        prediction = hsi.RecoverSpatialDimensions(predlabels{i}{1}, origSizes{i}, fgMasks{i});
+        predImg = hsi.RecoverSpatialDimensions(predlabels{i}{1}, origSizes{i}, fgMasks{i});
         targetSample = testData_(i).TargetName;
-        savePredPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),   strcat('p_sample', targetSample)), 'mat');
-        save(savePredPath, 'prediction');
+        savePredPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),   strcat('pred', targetSample)), 'mat');                 
+        save(savePredPath, 'predImg');
     end
 
     saveResultPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),'0_performance'), 'mat');
@@ -159,10 +166,10 @@ function [testPerformance, performanceRow] = TrainSegmentation(name_, testData_)
     sRGBs = {testData_.RGBs};
 
     for i = 1:numel(sRGBs)
-        prediction = predMasks{i};
+        predImg = predMasks{i};
         targetSample = testData_(i).TargetName;
-        savePredPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),   strcat('p_sample', targetSample)), 'mat');
-        save(savePredPath, 'prediction');
+        savePredPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),   strcat('pred', targetSample)), 'mat');                 
+        save(savePredPath, 'predImg');
     end
 
     saveResultPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'),'0_performance'), 'mat');

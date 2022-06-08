@@ -393,12 +393,25 @@ classdef hsiUtility
                 disp('Deleting previously exported .h5 dataset.');
                 delete(fileName);
             end
+            
+            n = length(targetIDs); 
+            
+            needsToLoad = ~isstruct(targetIDs);
+            if ~needsToLoad
+                sp = [targetIDs.SpectralData];
+                lb = [targetIDs.LabelInfo];
+                targetIDs = {targetIDs.TargetID};
+            end
                    
-            for i = 1:length(targetIDs)
+            for i = 1:n
                 targetName = num2str(targetIDs{i});
-
-                %% load HSI from .mat file
-                [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+                if needsToLoad
+                    %% load HSI from .mat file
+                    [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
+                else
+                    spectralData = sp(i);
+                    labelInfo = lb(i);
+                end
 
                 if (hsi.IsHsi(spectralData))
 
