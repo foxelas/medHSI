@@ -46,10 +46,13 @@ flist = [
     'cnn3d'
  ]
 
+baseDate = str(date.today())
 
 for framework in flist: 
     testEval = []
     print("Running for framework:" + framework)
+
+    framework = framework + '_' + baseDate 
 
     learningRates = [0.001, 0.0001, 0.00001, 0.000001]
     exponentialDecay = [0, 1e-5, 1e-6] 
@@ -68,7 +71,7 @@ for framework in flist:
                     counter = counter + 1    
 
                     model, history_ = get_framework(framework, X_train, X_test, y_train, y_test, optz, lr, ed, lossFun)
-                    testEval_ = train_utils.get_eval_metrics_and_settings(history_, True, optz, lr, ed, lossFun)
+                    testEval_ = train_utils.get_eval_metrics_and_settings(history_.history, True, optz, lr, ed, lossFun)
 
                     testEval.append(testEval_)
 

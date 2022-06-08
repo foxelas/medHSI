@@ -65,17 +65,20 @@ fpr = []
 tpr = [] 
 auc_val = [] 
 
+baseDate = str(date.today())
 for framework in flist: 
     backend.clear_session()
+
+    framework = framework + '_' + baseDate 
 
     print("Running for framework:" + framework)
     model, history = get_framework(framework, X_train, X_test, y_train, y_test)
 
-    folder = str(date.today()) + '_' + framework 
+    folder = framework
 
     #prepare again in order to avoid pre-processing errors 
     X_train, X_test, y_train, y_test, names_train, names_test = hio.get_train_test()
-    [fpr_, tpr_, auc_val_]  = train_utils.save_evaluate_model(model, history, framework, folder, X_test, y_test)
+    [fpr_, tpr_, auc_val_]  = train_utils.save_evaluate_model(model, history.history, framework, folder, X_test, y_test)
     fpr.append(fpr_)
     tpr.append(tpr_)
     auc_val.append(auc_val_)

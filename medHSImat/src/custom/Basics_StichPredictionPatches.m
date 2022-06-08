@@ -1,9 +1,10 @@
-database = 'pslRaw-Denoisesmoothen32';
+database = 'pslRaw-Denoisesmoothen32Augmented'; %'pslRaw32Augmented';
+
 fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-dirName = strcat('python-test\', 'validation\2022-06-04_cnn3d_optimized\');
+dirName = strcat('python-test\', '');
 baseDir = commonUtility.GetFilename('output', dirName, '');
 
 %%%
