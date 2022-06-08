@@ -413,8 +413,9 @@ classdef trainUtility
             ytrain = ytrain(kk, :);
             % TO REMOVE
         
-%             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2'});
-            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2', 'Basics_CrossValidateSVM'});
+            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_LOOCV'});
+%             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
+
             filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'SVMModel'), 'mat');
             
             if hasOptimization
@@ -880,6 +881,81 @@ classdef trainUtility
             end
         end
 
+        function [perfStr] = Evaluation(modelName, featNum, predLabels, gtLabels, predMasks, trueMasks, stackedModels, trainLabels, scoresVal) 
+            
+            if nargin < 9
+                scoresVal = [];
+            end 
+
+            perfStr = struct('Name', [], 'Features', [], 'Accuracy', [], 'Sensitivity', [], 'Specificity', [], 'JaccardCoeff', [], 'AUC', [], ...
+                'AUCX', [], 'AUCY', [], 'DRTrainTime', [], 'ModelTrainTime', [], 'Mahalanobis', [], 'JacDensity', []);
+
+            %% Results evaluation
+            [perfStr.Accuracy, perfStr.Sensitivity, perfStr.Specificity] = commonUtility.Evaluations(gtLabels, predLabels);
+
+            n = numel(predMasks);
+            jacsim = 0;
+            %jacDensity = 0;
+            mahalDist = 0;
+            for i = 1:n
+                predMask = predMasks{i};
+                trueMask = trueMasks{i};
+                jacsim = jacsim + commonUtility.Jaccard(predMask, trueMask);
+                %jacDensity = jacDensity + MeasureDensity(predMask, trueMask);
+                [h, w] = size(trueMask);
+                mahalDist = mahalDist + mahal([1]', reshape(predMask, [h * w, 1]));
+            end
+
+            perfStr.JaccardCoeff = jacsim / n;
+            %perfStr.JacDensity = jacDensity / n;
+            perfStr.Mahalanobis = mahalDist / n;
+
+            perfStr.Name = modelName;
+            perfStr.Features = featNum;
+
+            [perfStr.AUCX, perfStr.AUCY, perfStr.AUC] = trainUtility.GetAUC(stackedModels, trainLabels, scoresVal);
+        end
+
+
+
+        function [meanAucX, meanAucY, meanAucVal] = GetAUC(stackedModels, trainLabels, scoresVal)
+
+            isTesting = commonUtility.IsChild({'RunKfoldValidation'}) || isempty(stackedModels);
+
+            if nargin < 3 
+                scoresVal = [];
+            end 
+            if isempty(stackedModels) && ~isempty(scoresVal)
+
+                [aucX{1}, aucY{1}, ~, aucVal(1)] = perfcurve(trainLabels, scoresVal, 1);
+
+                [meanAucX, meanAucY] = trainUtility.GetMeanAUC(aucX, aucY);
+                meanAucVal = mean(aucVal);
+            elseif ~isTesting
+                % TO REMOVE
+                factors = 10;
+                kk = ceil(decimate(1:size(trainLabels, 1), factors));
+                ytrainDecim = trainLabels(kk, :);
+                % TO REMOVE
+
+                modN = numel(stackedModels);
+                aucX = cell(modN,1);
+                aucY = cell(modN,1);
+                aucVal = zeros(modN,1);
+                for i = 1:modN
+                    singleModel = fitPosterior(stackedModels{i});
+                    [~, score_svm] = resubPredict(singleModel);
+                    [aucX{i}, aucY{i}, ~, aucVal(i)] = perfcurve(ytrainDecim, score_svm(:, stackedModels{i}.ClassNames), 1);
+                end
+                [meanAucX, meanAucY] = trainUtility.GetMeanAUC(aucX, aucY);
+                meanAucVal = mean(aucVal);
+            
+            else
+                meanAucX = [];
+                meanAucY = [];
+                meanAucVal = 0;
+            end
+        end
         % ======================================================================
         %> @brief ModelEvaluation returns the model evaluation results.
         %>
@@ -923,74 +999,29 @@ classdef trainUtility
             % @retval perfStr [struct] | The performance structure
             % @retval trainedModel [model] | The trained model
 
-            perfStr = struct('Name', [], 'Features', [], 'Accuracy', [], 'Sensitivity', [], 'Specificity', [], 'JaccardCoeff', [], 'AUC', [], ...
-                'AUCX', [], 'AUCY', [], 'DRTrainTime', [], 'ModelTrainTime', [], 'Mahalanobis', [], 'JacDensity', []);
-
             if ~iscell(stackedModels)
                 firstModel = stackedModels;
                 clear stackedModels
                 stackedModels{1} = firstModel;
             end
 
-            %% Results evaluation
-            [perfStr.Accuracy, perfStr.Sensitivity, perfStr.Specificity] = commonUtility.Evaluations(gtLabels, predLabels);
-
             fgMasks = {testData.Masks};
             sRGBs = {testData.RGBs};
             predLabelsCell = cellfun(@(x) trainUtility.Predict(stackedModels, x, 'voting'), testScores, 'un', 0);
             origSizes = cellfun(@(x) size(x), fgMasks, 'un', 0);
 
-            jacsim = 0;
-            jacDensity = 0;
-            mahalDist = 0;
+            predMasks = cell(numel(sRGBs), 1);
+            trueMasks = cell(numel(sRGBs), 1);
             for i = 1:numel(sRGBs)
-
-                %% without post-processing
-                predMask = logical(hsi.RecoverSpatialDimensions(predLabelsCell{i}, origSizes{i}, fgMasks{i}));
-                trueMask = testData(i).ImageLabels;
-                
-                jacsim = jacsim + commonUtility.Jaccard(predMask, trueMask);
-                jacDensity = jacDensity + 0; % MeasureDensity(predMask, trueMask);
-                [h, w] = size(trueMask);
-                mahalDist = mahalDist + mahal([1]', reshape(predMask, [h * w, 1]));
+				predMasks{i} = logical(hsi.RecoverSpatialDimensions(predLabelsCell{i}, origSizes{i}, fgMasks{i}));
+                trueMasks{i} = testData(i).ImageLabels;
             end
 
-            perfStr.JaccardCoeff = jacsim / numel(sRGBs);
-            perfStr.JacDensity = jacDensity / numel(sRGBs);
-            perfStr.Mahalanobis = mahalDist / numel(sRGBs);
+            [perfStr] = trainUtility.Evaluation(modelName, featNum, predLabels, gtLabels, predMasks, trueMasks, stackedModels, trainLabels);
             perfStr.DRTrainTime = drTrainTime;
-            perfStr.ModelTrainTime = modelTrainTime;
-            perfStr.Name = modelName;
-            perfStr.Features = featNum;
-
-            % TO REMOVE
-            factors = 10;
-            kk = ceil(decimate(1:size(trainLabels, 1), factors));
-            ytrainDecim = trainLabels(kk, :);
-            % TO REMOVE
-
-            isTesting = true; % ~commonUtility.IsChild({'RunKfoldValidation'});
-            if ~isTesting
-                modN = numel(stackedModels);
-                aucX = cell(modN,1);
-                aucY = cell(modN,1);
-                aucVal = zeros(modN,1);
-                for i = 1:modN
-                    singleModel = fitPosterior(stackedModels{i});
-                    [~,score_svm] = resubPredict(singleModel);
-                    [aucX{i}, aucY{i}, ~, aucVal(i)] = perfcurve(ytrainDecim, score_svm(:, stackedModels{i}.ClassNames), 1);
-                end
-                [meanAucX, meanAucY] = trainUtility.GetMeanAUC(aucX, aucY);
-                perfStr.AUCX = meanAucX;
-                perfStr.AUCY = meanAucY;
-                perfStr.AUC = mean(aucVal);
-            else
-                perfStr.AUCX = [];
-                perfStr.AUCY = [];
-                perfStr.AUC = 0;
-            end
-            
+            perfStr.ModelTrainTime = modelTrainTime;            
         end
+		
         % ======================================================================
         %> @brief RunKfoldValidation trains and tests an classifier with cross validation.
         %>

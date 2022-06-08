@@ -6,7 +6,7 @@ dataset = config.GetSetting('Dataset');
 
 %% Read h5 data
 folds = 5;
-testTargets = {'157', '251', '227'};
+testTargets = {'157', '251', '227'}; % {'002', '019', '015'};
 dataType = 'hsi';
 
 hasLoad = true;
