@@ -1,11 +1,16 @@
 database = 'pslRaw-Denoisesmoothen32Augmented'; %'pslRaw32Augmented';
-fullDatabase = 'pslRaw';
 
+fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
 dirName = strcat('python-test\', '');
 baseDir = commonUtility.GetFilename('output', dirName, '');
+
+%%%
+baseDir = 'D:\elena\mspi\output\pslRaw-Denoisesmoothen32LOOCValidation\Framework-LOOCV\KMeans+SAM';
+
+
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};
 folderNames = folderNames(3:end);
