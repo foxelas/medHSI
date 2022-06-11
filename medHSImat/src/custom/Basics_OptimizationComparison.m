@@ -25,13 +25,13 @@ idx = strcmpi({v.optimizer}, 'RMSProp') & decVals & ~strcmpi({v.lossFunction}, '
 iouVals4 = [v(idx).val_iou_score];
 xVals4 = [v(idx).learningRate];
 
-figure(1); 
+figure(1);
 hold on;
 plot(xVals1, iouVals1, 'DisplayName', 'Adam, BCE, no decay', 'LineWidth', 2);
 plot(xVals2, iouVals2, 'DisplayName', 'RMSProp, BCE, no decay', 'LineWidth', 2);
 plot(xVals3, iouVals3, 'DisplayName', 'Adam, BCE+JC, no decay', 'LineWidth', 2);
 plot(xVals4, iouVals4, 'DisplayName', 'RMSProp, BCE+JC, no decay', 'LineWidth', 2);
-hold off; 
+hold off;
 
 ax = gca;
 ax.XAxis.Exponent = 0;
@@ -40,7 +40,7 @@ xlabel('Learning Rate');
 ylabel('IOU')
 legend('FontSize', 12);
 
-%%% Decay 
+%%% Decay
 
 % RMSProp, BCE+JC, no decay
 decVals = cell2mat(cellfun(@(x) x == 0, {v.decay}, 'un', 0));
@@ -61,12 +61,12 @@ iouVals3 = [v(idx).val_iou_score];
 xVals3 = [v(idx).learningRate];
 
 
-figure(2); 
+figure(2);
 hold on;
 plot(xVals1, iouVals1, 'DisplayName', 'RMSProp, BCE+JC, no decay', 'LineWidth', 2);
 plot(xVals2, iouVals2, 'DisplayName', 'RMSProp, BCE+JC, decay 1.e-5', 'LineWidth', 2);
 plot(xVals3, iouVals3, 'DisplayName', 'RMSProp, BCE+JC, decay 1.e-6', 'LineWidth', 2);
-hold off; 
+hold off;
 
 ax = gca;
 ax.XAxis.Exponent = 0;

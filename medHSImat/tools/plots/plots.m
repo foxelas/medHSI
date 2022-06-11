@@ -848,73 +848,76 @@ classdef plots
         end
 
         function [] = GroundTruthComparison(figNum, plotPath, rgbImg, labelImg, predImg)
-             
-             jacCoeff = jaccard(labelImg, round(predImg));
-             
-             fig = figure(figNum); clf; 
-             
-             subplot(1, 3, 1);
-             imshow(rgbImg);
-             title('Input Image', 'FontSize', 12); 
 
-             subplot(1, 3, 2);
-             imshow(labelImg);
-             title('Ground Truth', 'FontSize', 12); 
+            jacCoeff = jaccard(labelImg, round(predImg));
 
-             subplot(1, 3, 3);
-             imshow(predImg);
-             title('Prediction', 'FontSize', 12); 
-             text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
+            fig = figure(figNum);
+            clf;
 
-             plots.SavePlot(fig, plotPath);
+            subplot(1, 3, 1);
+            imshow(rgbImg);
+            title('Input Image', 'FontSize', 12);
+
+            subplot(1, 3, 2);
+            imshow(labelImg);
+            title('Ground Truth', 'FontSize', 12);
+
+            subplot(1, 3, 3);
+            imshow(predImg);
+            title('Prediction', 'FontSize', 12);
+            text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff*100), 'Horiz', 'left', 'Vert', 'bottom', 'FontSize', 12, 'Color', 'g');
+
+            plots.SavePlot(fig, plotPath);
         end
-        
+
         function [] = PostProcessingComparison(figNum, plotPath, labelImg, predImg, postPredImg)
-             
-             jacCoeff1 = jaccard(labelImg, round(predImg));
-             jacCoeff2 = jaccard(labelImg, round(postPredImg));
 
-             fig = figure(figNum); clf; 
-             
-             subplot(1, 3, 1);
-             imshow(labelImg);
-             title('Ground Truth', 'FontSize', 12); 
+            jacCoeff1 = jaccard(labelImg, round(predImg));
+            jacCoeff2 = jaccard(labelImg, round(postPredImg));
 
-             subplot(1, 3, 2);
-             imshow(predImg);
-             text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff1 * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
-             title('Prediction', 'FontSize', 12); 
+            fig = figure(figNum);
+            clf;
 
-             subplot(1, 3, 3);
-             imshow(postPredImg);
-             title('Post-Processed', 'FontSize', 12); 
-             text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff2 * 100), 'Horiz','left', 'Vert','bottom', 'FontSize', 12, 'Color', 'g');
+            subplot(1, 3, 1);
+            imshow(labelImg);
+            title('Ground Truth', 'FontSize', 12);
 
-             plots.SavePlot(fig, plotPath);
+            subplot(1, 3, 2);
+            imshow(predImg);
+            text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff1*100), 'Horiz', 'left', 'Vert', 'bottom', 'FontSize', 12, 'Color', 'g');
+            title('Prediction', 'FontSize', 12);
+
+            subplot(1, 3, 3);
+            imshow(postPredImg);
+            title('Post-Processed', 'FontSize', 12);
+            text(min(xlim), max(ylim), sprintf('JC: %.2f%%', jacCoeff2*100), 'Horiz', 'left', 'Vert', 'bottom', 'FontSize', 12, 'Color', 'g');
+
+            plots.SavePlot(fig, plotPath);
         end
-        
+
         function [] = PredictionValues(figNum, plotPath, predImg, borderImg)
-             fig = figure(figNum); clf; 
+            fig = figure(figNum);
+            clf;
 
-             subplot(1,2,1);       
-             imshow(predImg);
-             green = cat(3, zeros(size(borderImg)), borderImg, zeros(size(borderImg))); 
-             hold on;
-             h = imshow(green); 
-             hold off 
-             h.AlphaData = 0.4;
-             title('Patch borders');
+            subplot(1, 2, 1);
+            imshow(predImg);
+            green = cat(3, zeros(size(borderImg)), borderImg, zeros(size(borderImg)));
+            hold on;
+            h = imshow(green);
+            hold off
+            h.AlphaData = 0.4;
+            title('Patch borders');
 
-             subplot(1,2,2);       
-             imagesc(predImg, [0, 1]);
-             colormap('hot');
-             axis('off');
-             axis equal
-             axis tight;
-             %c = colorbar('Location', 'southoutside');
-             title('Output values');
+            subplot(1, 2, 2);
+            imagesc(predImg, [0, 1]);
+            colormap('hot');
+            axis('off');
+            axis equal
+            axis tight;
+            %c = colorbar('Location', 'southoutside');
+            title('Output values');
 
-             plots.SavePlot(fig, plotPath);
+            plots.SavePlot(fig, plotPath);
 
         end
 

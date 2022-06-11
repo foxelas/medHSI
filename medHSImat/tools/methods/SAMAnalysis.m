@@ -36,17 +36,17 @@ function [predImg] = SAMAnalysis(hsIm, labelInfo, option, threshold)
 %
 % @retval predImg [numeric array] | The predicted labels
 
-if nargin < 3 
+if nargin < 3
     option = 'library';
 end
 
-if nargin < 4 
-    threshold = 15; 
-end 
+if nargin < 4
+    threshold = 15;
+end
 
 if strcmpi(option, 'library')
     [scoreImg, predImg, argminImg] = hsIm.ArgminSAM();
-    
+
     figure(1);
     clf;
     % subplot 3
@@ -86,15 +86,15 @@ if strcmpi(option, 'library')
     [ssimval, ~] = ssim(predImg, uint8(labelInfo.Labels));
     imshowpair(predImg, labelInfo.Labels, 'Scaling', 'joint');
     title(sprintf('SSIM: %.5f', ssimval));
-    
-    argminImg =  double(argminImg) ./ 4; 
+
+    argminImg = double(argminImg) ./ 4;
 
 else
-        
+
     [scoreImg] = hsIm.SAMscore();
     predImg = uint8(scoreImg > threshold);
     argminImg = predImg;
-    
+
     figure(1);
     clf;
 
@@ -112,7 +112,7 @@ else
     [ssimval, ~] = ssim(predImg, uint8(labelInfo.Labels));
     imshowpair(predImg, labelInfo.Labels, 'Scaling', 'joint');
     title(sprintf('SSIM: %.5f', ssimval));
-         
+
 end
 
 plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, strcat('sam_', hsIm.ID)), 'png');

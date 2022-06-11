@@ -111,7 +111,7 @@ classdef segment
             apply.ToEach(@SAMAnalysis);
             plots.GetMontagetCollection(1, 'predLabel');
         end
-        
+
         function BySAM2()
             % BySAM2 applies SAM-based clustering.
             %

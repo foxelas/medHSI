@@ -128,12 +128,13 @@ for k = ks
     [trainPerformance{j}{k}, testPerformance{j}{k}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'RFI', q);
 end
 
-j = j + 1; 
+j = j + 1;
 fprintf('PCA-LDA: \n\n');
 [trainPerformance{j}{1}, testPerformance{j}{1}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'PCA-LDA', 20);
 
 %%%%%%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Save performance 
+
+%% Save performance
 save(filePath, 'trainPerformance', 'testPerformance');
 PrepareGraphs_Performance();
 

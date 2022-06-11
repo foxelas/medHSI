@@ -1063,8 +1063,8 @@ classdef hsi
 
             disp('SAM calculated only against a healthy skin signature.');
             reference = refLib(5).Data;
-            samVals = sam(permute(xCol, [3, 1, 2]), reference);         
-            samVals = rad2deg(samVals);       
+            samVals = sam(permute(xCol, [3, 1, 2]), reference);
+            samVals = rad2deg(samVals);
 
             scoreImg = hsi.RecoverSpatialDimensions(samVals', size(obj.FgMask), obj.FgMask);
         end
@@ -1103,7 +1103,7 @@ classdef hsi
             pixelN = size(xCol, 1);
 
             samVals = zeros(numel(refLib), pixelN);
-            for jj = 5 
+            for jj = 5
                 samVals(jj, :) = sam(permute(xCol, [3, 1, 2]), refLib(jj).Data);
             end
             [scoreImg, argminImg] = min(samVals, [], 1);
@@ -1116,7 +1116,7 @@ classdef hsi
             labelImg = uint8(labelImg);
             argminImg = uint8(argminImg);
         end
-        
+
         % ======================================================================
         %> @brief Denoise applies denoising to an hsi object.
         %>

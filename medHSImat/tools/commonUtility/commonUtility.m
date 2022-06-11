@@ -322,8 +322,8 @@ classdef commonUtility
 
             predLabel = logical(predLabel);
             realLabel = logical(realLabel);
-    
-            if (sum(predLabel, "all") == 0  && sum(realLabel, "all") ==0) 
+
+            if (sum(predLabel, "all") == 0 && sum(realLabel, "all") == 0)
                 jac = 1;
             else
                 jac = jaccard(predLabel, realLabel);
@@ -331,9 +331,9 @@ classdef commonUtility
 
             if isnan(jac)
                 v = 1;
-			end
-			
-            if isempty(jac) %% both predicted and real are zeros 
+            end
+
+            if isempty(jac) %% both predicted and real are zeros
                 jac = 1;
             end
         end

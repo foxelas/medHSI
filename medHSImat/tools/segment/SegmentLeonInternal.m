@@ -1,36 +1,36 @@
 function [segmentMask] = SegmentLeonInternal(hsIm)
-    
-    oldDs = config.GetSetting('Dataset');
-    filePath = commonUtility.GetFilename('dataset', fullfile('LeonReferences', 'LeonReferences') );
 
-    load(filePath, 'references');
-    r = numel(references);
+oldDs = config.GetSetting('Dataset');
+filePath = commonUtility.GetFilename('dataset', fullfile('LeonReferences', 'LeonReferences'));
 
-    signatures = hsIm.GetMaskedPixels();
-    k = 7;
-    [clusterLabels, ~] = kmeans(signatures, 7);
+load(filePath, 'references');
+r = numel(references);
 
-    [m, n] = size(hsIm.FgMask);
-    clusterLabelsImg = RecoverOriginalDimensionsInternal(clusterLabels, [m, n], hsIm.FgMask);
+signatures = hsIm.GetMaskedPixels();
+k = 7;
+[clusterLabels, ~] = kmeans(signatures, 7);
 
-    segmentMask = zeros(m, n);
-    for i = 1:k
-       targetSignatures = signatures(clusterLabels == i, :);
-       targetSignaturesImg = RecoverOriginalDimensionsInternal(targetSignatures, [m, n], clusterLabelsImg == i);
+[m, n] = size(hsIm.FgMask);
+clusterLabelsImg = RecoverOriginalDimensionsInternal(clusterLabels, [m, n], hsIm.FgMask);
 
-       sumOfSam = zeros(r, 1);
-       for j=1:r
-           sumOfSam(j) = sum(sam(targetSignaturesImg, references(j).Signature), "all");           
-       end
-       [~, minId] = min(sumOfSam);
-       segmentMask(clusterLabelsImg == i) = references(minId).Label;
+segmentMask = zeros(m, n);
+for i = 1:k
+    targetSignatures = signatures(clusterLabels == i, :);
+    targetSignaturesImg = RecoverOriginalDimensionsInternal(targetSignatures, [m, n], clusterLabelsImg == i);
+
+    sumOfSam = zeros(r, 1);
+    for j = 1:r
+        sumOfSam(j) = sum(sam(targetSignaturesImg, references(j).Signature), "all");
     end
+    [~, minId] = min(sumOfSam);
+    segmentMask(clusterLabelsImg == i) = references(minId).Label;
+end
 
-    segmentMask = logical(segmentMask);
+segmentMask = logical(segmentMask);
 %     figure(1);
 %     subplot(1,2,1);
 %     imagesc(clusterLabelsImg)
 %     subplot(1,2,2);
 %     imagesc(segmentMask);
-%    
+%
 end

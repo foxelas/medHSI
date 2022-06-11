@@ -46,9 +46,9 @@ if nargin < 1
     targetDataset = 'Core';
 end
 
-if nargin < 2 
+if nargin < 2
     baseDataset = 'psl';
-end 
+end
 %%%%%%%%%%%%%%%%%%%%% Prepare Data %%%%%%%%%%%%%%%%%%%%%
 
 config.SetOpt();
@@ -127,8 +127,8 @@ if strcmpi(targetDataset, 'pca')
         rescaledPCA = hsIm.Transform(false, 'pca', 3);
         [m, n, ~] = size(rescaledPCA);
         for j = 1:3
-            colImg = reshape(rescaledPCA(:,:,j), [m*n,1]);
-            rescaledPCA(:,:,j) = reshape(rescale(colImg), [m, n]); 
+            colImg = reshape(rescaledPCA(:, :, j), [m * n, 1]);
+            rescaledPCA(:, :, j) = reshape(rescale(colImg), [m, n]);
         end
         spectralData.Value = rescaledPCA;
         if size(spectralData.Value, 3) == 3 && ndims(spectralData.Value) == 3

@@ -47,7 +47,7 @@ classdef hsiUtility
             labelInfo = [];
             if ~exist(targetFilename, 'file')
                 warning('There are no data for the requested ID = %s.', targetID);
-            else      
+            else
                 variableInfo = who('-file', targetFilename);
                 fprintf('Loads from dataset %s with normalization %s.\n', config.GetSetting('Dataset'), config.GetSetting('Normalization'));
                 fprintf('Filename: %s.\n', targetFilename);
@@ -377,8 +377,8 @@ classdef hsiUtility
             if nargin < 1
                 fileName = commonUtility.GetFilename('output', ...
                     fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_full')), 'h5');
-            end 
-            
+            end
+
             if nargin < 2
                 [~, targetIDs] = commonUtility.DatasetInfo();
             end
@@ -388,24 +388,25 @@ classdef hsiUtility
         end
 
         function SaveToH5(targetIDs, fileName)
-                        
+
             if exist(fileName, 'file') > 0
                 disp('Deleting previously exported .h5 dataset.');
                 delete(fileName);
             end
-            
-            n = length(targetIDs); 
-            
+
+            n = length(targetIDs);
+
             needsToLoad = ~isstruct(targetIDs);
             if ~needsToLoad
                 sp = [targetIDs.SpectralData];
                 lb = [targetIDs.LabelInfo];
                 targetIDs = {targetIDs.TargetID};
             end
-                   
+
             for i = 1:n
                 targetName = num2str(targetIDs{i});
                 if needsToLoad
+
                     %% load HSI from .mat file
                     [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
                 else
@@ -471,8 +472,8 @@ classdef hsiUtility
             % h5disp(fileName);
             fprintf('Saved .h5 dataset at %s.\n\n', fileName);
         end
-        
-        
+
+
         %======================================================================
         %> @brief ReadDataset reads the dataset.
         %>
@@ -659,7 +660,7 @@ classdef hsiUtility
         %> @param patchSize [int] | The target patch size
         %>
         %> @retval patches [cell array] | The patches
-        %> @retval patchesIdx [cell array] | The subscripts of each patch 
+        %> @retval patchesIdx [cell array] | The subscripts of each patch
         %======================================================================
         function [patches, patchesIdx] = SplitToPatches(oldValue, patchSize)
             % SplitToPatches splits an image into patches.
@@ -676,7 +677,7 @@ classdef hsiUtility
             % @param patchSize [int] | The target patch size
             %
             % @retval patches [cell array] | The patches
-            % @retval patchesIdx [cell array] | The subscripts of each patch 
+            % @retval patchesIdx [cell array] | The subscripts of each patch
 
             [m, n, ~] = size(oldValue);
             a = floor(m / patchSize);

@@ -43,9 +43,9 @@ function [] = AugmentInternal(baseDataset, targetDataset, augType)
 % @param targetDataset [char] | The augmented dataset
 % @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
 %
-if nargin < 2 
+if nargin < 2
     targetDataset = strcat(baseDataset, 'Augmented');
-end 
+end
 
 if nargin < 3
     augType = 'set1';
