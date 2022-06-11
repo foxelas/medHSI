@@ -31,7 +31,7 @@ classdef trainUtility
         
 
         function [] = ExportFolds(baseDataset)
-        %Usage: trainUtility.ExportFolds('pslRaw-Denoisesmoothen32Augmented')
+        %Usage: trainUtility.ExportFolds('pslRaw32Augmented')
         % trainUtility.ExportFolds('pslRaw-Denoisesmoothen32')
 
             targetDataset =  strcat(baseDataset, 'LOOCValidation');

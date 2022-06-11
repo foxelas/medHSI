@@ -44,7 +44,7 @@ flist = [
     #successful 
     'sm_resnet',  
     'sm_resnet_pretrained',
-    #'cnn3d'
+    'cnn3d'
  ]
 
 

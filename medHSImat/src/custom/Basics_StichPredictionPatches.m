@@ -3,7 +3,7 @@ fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-dirName = fullfile('python-test', 'validation', 'cnn3d_2022-06-09\');
+dirName = fullfile('python-test', 'validation', 'xception3d_max_2022-06-10\');
 baseDir = commonUtility.GetFilename('output', dirName, '');
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};

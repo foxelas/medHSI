@@ -1,17 +1,19 @@
 
-dirs = {'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\KMeans+SAM\CV';
+dirs = {
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\KMeans+SAM\CV';
         'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Abundance-8\CV';
         'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Signature\CV';
-       'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_pretrained_2022-06-09';
-       'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_2022-06-09'; 
-       'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\cnn3d_2022-06-09'
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_pretrained_2022-06-09';
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_2022-06-09'; 
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\cnn3d_2022-06-09';
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\xception3d_max_2022-06-10'
        };
     
-names = { 'Kmeans+SAM', 'Abundance+SVM', 'Signature+SVM','Pretrained Resnet','Resnet', '3D CNN'};
+names = { 'Kmeans+SAM', 'Abundance+SVM', 'Signature+SVM','Pretrained Resnet','Resnet', '3D CNN', '3D Xception'};
 c = numel(dirs);
 
 saveNames = {'1', '2', '3', '4', '5', '6', '7'};
-types = [true, true, true, false, false, false];
+types = [true, true, true, false, false, false, false];
 close all;
 
 folds = 19;
@@ -29,7 +31,7 @@ saveDir = strrep(commonUtility.GetFilename('output', 'denoisedResults\', ''), 'p
 xVals1 = 1:folds;
 
 hold on
-for i = 1:c
+for i = 7:c
     load(fullfile(dirs{i}, '0_performance.mat'))
     
     if types(i)
