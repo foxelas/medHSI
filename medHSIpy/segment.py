@@ -6,6 +6,12 @@ from keras import backend
 from tools import hio, train_utils, cmdl, xmdl, segsm
 import segmentation_models as sm
 
+
+# import tensorflow as tf 
+# gpus = tf.config.experimental.list_physical_devices("GPU")
+# gpus = tf.config.experimental.set_memory_growth(gpus[0], True)
+# gpus = tf.config.experimental.set_memory_growth(gpus[1], True)
+
 WIDTH = 32 #64
 HEIGHT = 32 # 64
 NUMBER_OF_CLASSES = 1

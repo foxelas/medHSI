@@ -1,10 +1,9 @@
 database = 'pslRaw-Denoisesmoothen32Augmented'; %'pslRaw32Augmented';
 fullDatabase = 'pslRaw';
-
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-dirName = strcat('python-test\', '');
+dirName = fullfile('python-test', 'validation', 'cnn3d_2022-06-09\');
 baseDir = commonUtility.GetFilename('output', dirName, '');
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};

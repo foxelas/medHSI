@@ -1,6 +1,7 @@
 function [segmentMask] = SegmentLeonInternal(hsIm)
-
-    filePath = 'D:\temp\uni\mspi\matfiles\hsi\pslRaw\LeonReferences\LeonReferences.mat';
+    
+    oldDs = config.GetSetting('Dataset');
+    filePath = commonUtility.GetFilename('dataset', fullfile('LeonReferences', 'LeonReferences') );
 
     load(filePath, 'references');
     r = numel(references);
