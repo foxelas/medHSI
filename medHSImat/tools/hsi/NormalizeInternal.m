@@ -80,7 +80,8 @@ hsInorm = hsIm;
 hsInorm.Value = Inorm;
 
 if ~config.GetSetting('DisableNormalizationCheck')
-    plots.NormalizationCheck(1, hsIm, Iblack, Iwhite, hsInorm);
+    plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('NormCheckFolderName'), strcat(hsIm.ID,'_curves')), 'png');
+    plots.NormalizationCheck(1, plotPath, hsIm, Iblack, Iwhite, hsInorm);
 end
 
 hsInorm = hsInorm.Max(0);

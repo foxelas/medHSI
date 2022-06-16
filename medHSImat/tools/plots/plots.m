@@ -497,6 +497,15 @@ classdef plots
             plots.SavePlot(figHandle, plotPath);
         end
 
+        function [] = Export(fig, plotPath, img)
+            figHandle = figure(fig);
+            clf;
+            imshow(img);
+%             Export(figHandle, plotPath);
+            imwrite(img, plotPath);
+        end
+
+        
         %======================================================================
         %> @brief Cmap displays a gray image with a jet colormap.
         %>

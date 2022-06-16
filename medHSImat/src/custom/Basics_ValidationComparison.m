@@ -1,16 +1,36 @@
 
-dirs = {; ...
-    'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\KMeans+SAM\CV'; ...
-    'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Abundance-8\CV'; ...
-    'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Signature\CV'; ...
-    'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_pretrained_2022-06-09'; ...
-    'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_2022-06-09'; ...
-    'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\cnn3d_2022-06-09'; ...
-    'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\xception3d_max_2022-06-10'; ...
-    };
+isDenoised = false;
 
-names = {'Kmeans+SAM', 'Abundance+SVM', 'Signature+SVM', 'Pretrained Resnet', 'Resnet', '3D CNN', '3D Xception'};
-c = numel(dirs);
+config.SetSetting('Dataset', 'pslRaw');
+[~, targetIDs] = commonUtility.DatasetInfo();
+
+
+if isDenoised
+    dirs = {'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\KMeans+SAM\CV'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Abundance-8\CV'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Signature\CV'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_pretrained_2022-06-09'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_2022-06-09'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\cnn3d_2022-06-09'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\xception3d_max_2022-06-10'; ...
+        };
+    saveDir = strrep(commonUtility.GetFilename('output', 'denoisedResults\', ''), 'pslRaw', 'Results');
+
+else
+    dirs = {'D:\elena\mspi\output\pslRaw\Framework-LOOCV\KMeans+SAM\CV'; ...
+        'D:\elena\mspi\output\pslRaw\Framework-LOOCV\Abundance-8\CV'; ...
+        'D:\elena\mspi\output\pslRaw\Framework-LOOCV\Signature\CV'; ...
+        'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\sm_resnet_pretrained_2022-06-11'; ...
+        'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\sm_resnet_2022-06-11'; ...
+        'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\cnn3d_2022-06-12'; ...
+%         'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\xception3d_max_2022-06-10'; ...
+        };
+    saveDir = strrep(commonUtility.GetFilename('output', 'preprocessedResults\', ''), 'pslRaw', 'Results');
+
+end
+
+dirNumber = numel(dirs);
+names = {'Kmeans+SAM', 'Abundance+SVM', 'Signature+SVM', 'Pretrained-Resnet', 'Custom-Resnet', '3D CNN', '3D Xception'};
 
 saveNames = {'1', '2', '3', '4', '5', '6', '7'};
 types = [true, true, true, false, false, false, false];
@@ -24,19 +44,15 @@ else
     fprintf('Accuracy & Precision & Recall & JC & AUC \n');
 end
 
-config.SetSetting('Dataset', 'pslRaw');
-[~, targetIDs] = commonUtility.DatasetInfo();
-saveDir = strrep(commonUtility.GetFilename('output', 'denoisedResults\', ''), 'pslRaw', 'Results');
-
 xVals1 = 1:folds;
 
 hold on
-for i = 7:c
+for i = 1:dirNumber
     load(fullfile(dirs{i}, '0_performance.mat'))
 
     if types(i)
 
-        for j = 1:numel(targetIDs)
+        for j = 1:folds
             load(fullfile(strrep(dirs{i}, '\CV', ''), num2str(j), strcat('pred', '150', '.mat')), 'predImg');
             filePath = config.DirMake(fullfile(saveDir, num2str(j), strcat(saveNames{i}, '.mat')));
             figure(2);
@@ -52,14 +68,14 @@ for i = 7:c
         iouVals1 = [v.JaccardCoeff] * 100;
 
         figure(1);
-        plot(xVals1, iouVals1, 'DisplayName', names{i}, 'LineWidth', 2);
+        plot(xVals1, iouVals1(1:folds), 'DisplayName', names{i}, 'LineWidth', 2);
 
     else
         parts = strsplit(dirs{i}, '\');
         folder = parts{end};
         folderparts = strsplit(folder, '_');
 
-        for j = 1:numel(targetIDs)
+        for j = 1:folds
             folder2 = strjoin({folderparts{1:end-1}, num2str(j), folderparts{end}}, '_');
             loadPath = strjoin({parts{1:end}, folder2}, '\');
             load(fullfile(loadPath, strcat('pred', targetIDs{j}, '.mat')), 'predImg');
@@ -74,22 +90,24 @@ for i = 7:c
         v = cell2mat(testEval);
 
         iouVals1 = [v.val_iou_score] * 100;
-        figure(1);
-        plot(xVals1, iouVals1, 'DisplayName', names{i}, 'LineWidth', 2);
+        if length(iouVals1) >= folds
+            figure(1);
+            plot(xVals1, iouVals1(1:folds), 'DisplayName', names{i}, 'LineWidth', 2);
 
-        auc = mean(auc_val_);
+            auc = mean(auc_val_);
 
-        sensitivities = [v.val_true_positives] ./ ([v.val_true_positives] + [v.val_false_negatives]);
-        specificities = [v.val_true_negatives] ./ ([v.val_true_negatives] + [v.val_false_positives]);
+            sensitivities = [v.val_true_positives] ./ ([v.val_true_positives] + [v.val_false_negatives]);
+            specificities = [v.val_true_negatives] ./ ([v.val_true_negatives] + [v.val_false_positives]);
 
-        if ~hasSens
-            fprintf('%s & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.3f\n', ...
-                names{i}, mean([v.val_accuracy])*100, std([v.val_accuracy])*100, mean(sensitivities)*100, std(sensitivities)*100, ...
-                mean(specificities)*100, std(specificities)*100, mean([v.val_iou_score])*100, std([v.val_iou_score])*100, auc);
-        else
-            fprintf('%s & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.3f\n', ...
-                names{i}, mean([v.val_accuracy])*100, std([v.val_accuracy])*100, mean([v.val_precision])*100, std([v.val_precision])*100, ...
-                mean([v.val_recall])*100, std([v.val_recall])*100, mean([v.val_iou_score])*100, std([v.val_iou_score])*100, auc);
+            if ~hasSens
+                fprintf('%s & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.3f\n', ...
+                    names{i}, mean([v.val_accuracy])*100, std([v.val_accuracy])*100, mean(sensitivities)*100, std(sensitivities)*100, ...
+                    mean(specificities)*100, std(specificities)*100, mean([v.val_iou_score])*100, std([v.val_iou_score])*100, auc);
+            else
+                fprintf('%s & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.2f (%.2f) & %.3f\n', ...
+                    names{i}, mean([v.val_accuracy])*100, std([v.val_accuracy])*100, mean([v.val_precision])*100, std([v.val_precision])*100, ...
+                    mean([v.val_recall])*100, std([v.val_recall])*100, mean([v.val_iou_score])*100, std([v.val_iou_score])*100, auc);
+            end
         end
     end
 
@@ -108,22 +126,22 @@ set(gcf, 'Position', get(0, 'Screensize'));
 plots.SavePlot(1, fullfile(saveDir, 'fold-comparison.png'));
 
 
-for j = 1:numel(targetIDs)
-    filePath = fullfile(saveDir, num2str(j), '0.mat');
-    [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{j});
-    predImg = logical(labelInfo.Labels);
-    rgbImg = hsIm.GetDisplayImage();
-    save(filePath, 'predImg');
-    figure(2);
-    imshow(predImg);
-    save(filePath, 'predImg', 'rgbImg');
-    plots.SavePlot(2, strrep(filePath, '.mat', '.png'));
-end
+% for j = 1:numel(targetIDs)
+%     filePath = fullfile(saveDir, num2str(j), '0.mat');
+%     [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{j});
+%     predImg = logical(labelInfo.Labels);
+%     rgbImg = hsIm.GetDisplayImage();
+%     save(filePath, 'predImg');
+%     figure(2);
+%     imshow(predImg);
+%     save(filePath, 'predImg', 'rgbImg');
+%     plots.SavePlot(2, strrep(filePath, '.mat', '.png'));
+% end
 
-n = c + 1;
-imgs = cell(numel(targetIDs)*n);
+n = dirNumber + 1;
+imgs = cell(folds*n);
 c = 0;
-for j = 1:numel(targetIDs)
+for j = 1:folds
     for k = 0:(n - 1)
         filePath = fullfile(saveDir, num2str(j), strcat(num2str(k), '.mat'));
         if k == 0

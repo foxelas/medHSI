@@ -41,7 +41,7 @@ if ~isempty(plotType) && strcmpi(plotType, 'color') % isColor = 'color'
 
 else % isColor = 'boundary'
     BW = boundarymask(topIm);
-    imshow(imoverlay(baseIm, BW, 'cyan'), 'InitialMagnification', 67);
+    imshow(imoverlay(baseIm, BW, 'cyan'), 'InitialMagnification', 50);
 end
 
 title(figTitle);

@@ -52,33 +52,6 @@ if (saveImages)
             filename = strrep(filename, ext, '.eps');
             saveas(fig, filename, 'eps');
         end
-
-        %         if (cropBorders)
-        %             warning('off');
-        %             export_fig(filename, '-png', '-native', '-transparent');
-        %             warning('on');
-        %         else
-        %             if (saveInHQ)
-        %                 warning('off');
-        %                 export_fig(filename, '-png', '-native', '-nocrop');
-        %                 %print(handle, strcat(plotPath, '.png'), '-dpng', '-r600');
-        %                 warning('on');
-        %             else
-        %                 saveas(fig, filename, 'png');
-        %             end
-        %         end
-        %         if (saveEps)
-        %             namext = strcat(name, '.eps');
-        %             if (saveInBW)
-        %                 filename = fullfile(filepathBW, namext);
-        %                 saveas(fig, filename, 'eps');
-        %                 %                 export_fig(filename, '-eps', '-transparent', '-r900', '-gray');
-        %             else
-        %                 filename = fullfile(filepath, namext);
-        %                 saveas(fig, filename, 'epsc');
-        %                 %                 export_fig(filename, '-eps', '-transparent', '-r900', '-RGB');
-        %             end
-        %         end
         fprintf('Saved figure at %s.\n\n', filename);
     else
         warning('Empty plot path (config setting [plotPath]).')

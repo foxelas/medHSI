@@ -77,6 +77,7 @@ experiment = dataset;
 config.SetSetting('Experiment', experiment);
 config.SetSetting('CropBorders', true);
 isTest = config.GetSetting('IsTest');
+config.SetSetting('DisableNormalizationCheck', true);
 
 basedir = commonUtility.GetFilename('output', config.GetSetting('SnapshotsFolderName'), '');
 
@@ -160,8 +161,9 @@ for i = 1:length(targetIDs)
         plots.Show(1, dispImageRawPath, dispImageRaw);
 
         dispImageRgbPath = config.DirMake(basedir, 'preprocessed', saveName);
-        plots.Show(2, dispImageRgbPath, dispImageRgb);
-
+        % To preserve dimensions
+        plots.Export(2, dispImageRgbPath, dispImageRgb);
+        
         subImagePath = config.DirMake(basedir, 'preprocessed_channels', saveName);
         spectralData.SubimageMontage(3, subImagePath);
     end

@@ -28,7 +28,7 @@ function [] = PlotOverlay(baseIm, topIm, figTitle, fig)
 
 hasTitle = ~isempty(figTitle);
 
-imshow(imoverlay(baseIm, topIm, 'cyan'), 'InitialMagnification', 67);
+imshow(imoverlay(baseIm, topIm, 'cyan'), 'InitialMagnification', 50);
 if hasTitle
     title(figTitle);
 end

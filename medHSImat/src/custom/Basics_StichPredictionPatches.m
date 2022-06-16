@@ -1,9 +1,9 @@
-database = 'pslRaw-Denoisesmoothen32Augmented'; %'pslRaw32Augmented';
+database = 'pslRaw32Augmented'; %'pslRaw-Denoisesmoothen32Augmented'; %'pslRaw32Augmented';
 fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-dirName = fullfile('python-test', 'validation', 'xception3d_max_2022-06-10\');
+dirName = fullfile('python-test', 'validation', 'cnn3d_2022-06-12\');
 baseDir = commonUtility.GetFilename('output', dirName, '');
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};
@@ -22,8 +22,8 @@ for i = 1:numel(folderNames)
     for j = 1:numel(samples)
 
         config.SetSetting('Dataset', fullDatabase);
-        [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(strrep(samples{j}, 'sample', ''));
-        baseImg = hsIm.GetDisplayImage();
+        [hsImFullSize, labelInfo] = hsiUtility.LoadHsiAndLabel(strrep(samples{j}, 'sample', ''));
+        baseImg = hsImFullSize.GetDisplayImage();
         labelImg = rescale(labelInfo.Labels);
 
         [d1, d2] = size(labelImg);
@@ -67,6 +67,7 @@ for i = 1:numel(folderNames)
         %          rgbImg(1:size(pred,1), 1:size(pred,2), :) = img;
         %          rgbImg = GetDisplayImageInternal(rgbImg);
 
+        predImg(~hsImFullSize.FgMask) = 0;
         plotPath1 = fullfile(baseDir, folderNames{i}, strcat(samples{j}, '.png'));
         plots.GroundTruthComparison(1, plotPath1, baseImg, labelImg, predImg);
 
