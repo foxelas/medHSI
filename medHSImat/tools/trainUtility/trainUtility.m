@@ -413,7 +413,7 @@ classdef trainUtility
             ytrain = ytrain(kk, :);
             % TO REMOVE
 
-            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_LOOCV'});
+            hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_LOOCV', 'Basics_Test'});
             %             hasOptimization = ~commonUtility.IsChild({'RunKfoldValidation', 'ValidateTest2', 'Basics_Dimred2'});
 
             filePath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), 'SVMModel'), 'mat');

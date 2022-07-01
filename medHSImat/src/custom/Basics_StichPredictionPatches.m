@@ -3,8 +3,11 @@ fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-dirName = fullfile('python-test', 'validation', 'cnn3d_2022-06-12\');
+dirName = fullfile('python-test',  'cnn3d_2022-06-15\');
 baseDir = commonUtility.GetFilename('output', dirName, '');
+
+baseDir =  'D:\elena\mspi\output\split3-test\python-test\';
+
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};
 folderNames = folderNames(3:end);
@@ -45,6 +48,7 @@ for i = 1:numel(folderNames)
             id = strrep(id, '.mat', '');
             id = strrep(id, 'p_', '');
 
+            config.SetSetting('Dataset', 'split3-Denoisesmoothen32Augmented');
             [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(id);
             pos = labelInfo.Comment;
             ii = pos(1);

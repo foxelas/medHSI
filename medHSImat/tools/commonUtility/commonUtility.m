@@ -185,7 +185,7 @@ classdef commonUtility
 
             fdir = dir(strrep(commonUtility.GetFilename('dataset'), '.mat', '\*.mat'));
             if numel(fdir) < 1
-                error('You should first read the dataset. Use hsiUtility.ReadDataset().');
+                warning('You should first read the dataset. Use hsiUtility.ReadDataset().');
 
             else
                 datanames = {fdir.name};

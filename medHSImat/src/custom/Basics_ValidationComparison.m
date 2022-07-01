@@ -1,11 +1,10 @@
 
-isDenoised = false;
+showType = 'preprocessed'; %'denoised', 'preprocessed', 'merged'
 
 config.SetSetting('Dataset', 'pslRaw');
 [~, targetIDs] = commonUtility.DatasetInfo();
 
-
-if isDenoised
+if strcmpi(showType, 'denoised')
     dirs = {'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\KMeans+SAM\CV'; ...
         'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Abundance-8\CV'; ...
         'D:\elena\mspi\output\pslRaw-Denoisesmoothen\Framework-LOOCV\optimization-observed\Signature\CV'; ...
@@ -14,9 +13,8 @@ if isDenoised
         'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\cnn3d_2022-06-09'; ...
         'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\xception3d_max_2022-06-10'; ...
         };
-    saveDir = strrep(commonUtility.GetFilename('output', 'denoisedResults\', ''), 'pslRaw', 'Results');
 
-else
+elseif strcmpi(showType, 'preprocessed')
     dirs = {'D:\elena\mspi\output\pslRaw\Framework-LOOCV\KMeans+SAM\CV'; ...
         'D:\elena\mspi\output\pslRaw\Framework-LOOCV\Abundance-8\CV'; ...
         'D:\elena\mspi\output\pslRaw\Framework-LOOCV\Signature\CV'; ...
@@ -25,9 +23,19 @@ else
         'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\cnn3d_2022-06-12'; ...
 %         'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\xception3d_max_2022-06-10'; ...
         };
-    saveDir = strrep(commonUtility.GetFilename('output', 'preprocessedResults\', ''), 'pslRaw', 'Results');
-
+elseif strcmpi(showType, 'merged')
+    dirs = {'D:\elena\mspi\output\pslRaw\Framework-LOOCV\KMeans+SAM\CV'; ...
+        'D:\elena\mspi\output\pslRaw\Framework-LOOCV\Abundance-8\CV'; ...
+        'D:\elena\mspi\output\pslRaw\Framework-LOOCV\Signature\CV'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_pretrained_2022-06-09'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\sm_resnet_2022-06-09'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\cnn3d_2022-06-12'; ...
+        'D:\elena\mspi\output\pslRaw-Denoisesmoothen32Augmented\python-test\validation\xception3d_max_2022-06-10'; ...
+        };
 end
+saveDir = strrep(commonUtility.GetFilename('output', strcat(showType, '\'), ''), 'pslRaw', 'Results');
+folds = 19;
+
 
 dirNumber = numel(dirs);
 names = {'Kmeans+SAM', 'Abundance+SVM', 'Signature+SVM', 'Pretrained-Resnet', 'Custom-Resnet', '3D CNN', '3D Xception'};
@@ -36,7 +44,6 @@ saveNames = {'1', '2', '3', '4', '5', '6', '7'};
 types = [true, true, true, false, false, false, false];
 close all;
 
-folds = 19;
 hasSens = true;
 if hasSens
     fprintf('Accuracy & Sensitivity & Specificity & JC & AUC \n');
@@ -80,7 +87,6 @@ for i = 1:dirNumber
             loadPath = strjoin({parts{1:end}, folder2}, '\');
             load(fullfile(loadPath, strcat('pred', targetIDs{j}, '.mat')), 'predImg');
             filePath = config.DirMake(fullfile(saveDir, num2str(j), strcat(saveNames{i})));
-            save(filePath, 'predImg');
             figure(2);
             imshow(predImg);
             save(filePath, 'predImg');
@@ -126,17 +132,17 @@ set(gcf, 'Position', get(0, 'Screensize'));
 plots.SavePlot(1, fullfile(saveDir, 'fold-comparison.png'));
 
 
-% for j = 1:numel(targetIDs)
-%     filePath = fullfile(saveDir, num2str(j), '0.mat');
-%     [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{j});
-%     predImg = logical(labelInfo.Labels);
-%     rgbImg = hsIm.GetDisplayImage();
-%     save(filePath, 'predImg');
-%     figure(2);
-%     imshow(predImg);
-%     save(filePath, 'predImg', 'rgbImg');
-%     plots.SavePlot(2, strrep(filePath, '.mat', '.png'));
-% end
+for j = 1:folds %numel(targetIDs)
+    filePath = fullfile(saveDir, num2str(j), '0.mat');
+    [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{j});
+    predImg = logical(labelInfo.Labels);
+    rgbImg = hsIm.GetDisplayImage();
+    save(filePath, 'predImg');
+    figure(2);
+    imshow(predImg);
+    save(filePath, 'predImg', 'rgbImg');
+    plots.SavePlot(2, strrep(filePath, '.mat', '.png'));
+end
 
 n = dirNumber + 1;
 imgs = cell(folds*n);
