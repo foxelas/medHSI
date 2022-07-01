@@ -32,6 +32,11 @@ initUtility.MakeDataset(targetDataset, baseDataset);
 % targetConditions = {'raw', false};
 % hsiUtility.PrepareDataset(dataset, contentConditions, readForeground, targetConditions);
 
+%% Plot a montage of sRGBs of the read images 
+folder = fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed\');
+outputDir = commonUtility.GetFilename('output', folder, '');
+plots.MontageFolderContents(2, outputDir, [], 'sRGBs (only first 20 are shown)');
+
 %% Prepare Labels with Labelme
 % Use as base the sRGB images in config::[OutoutDir]/config::[Dataset]/00-Snapshots/
 % Export JSON labels and files and save them in a folder.
@@ -60,3 +65,8 @@ initUtility.MakeDataset(targetDataset, dataset);
 targetDataset = 'pca';
 baseDataset = 'psl512';
 initUtility.MakeDataset(targetDataset, baseDataset);
+
+% Augment the 32x32 patches 4-fold with flips 
+baseDataset = 'psl32';
+initUtility.MakeDataset('Augmented', baseDataset);
+
