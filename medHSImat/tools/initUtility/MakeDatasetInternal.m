@@ -1,49 +1,59 @@
 %======================================================================
-%> @brief Basics_MakeDataset prepares the target dataset.
-%>
+%> @brief MakeDataset prepares the target dataset.
+%> 
 %> You can choose among:
-%> -Core: the entire dataset
+%> -All: the entire dataset (reads from scratch)
+%> -Raw: the raw dataset (reads from scratch)
+%> -Fix: the fix dataset (reads from scratch)
 %> -Augmented: the augmented dataset (based on base dataset)
-%> -Raw: the raw dataset
-%> -Fix: the fix dataset
 %> -512: the resized 512x512 dataset (based on base dataset)
 %> -32: the 32x32 patch dataset (based on base dataset)
-%> Currently the base dataset is 'pslRaw'
+%> -pca: the pca dataset (based on base dataset)
 %>
 %> @b Usage
 %>
 %> @code
-%> Basics_MakeDataset('Augmented');
+%> config.SetSetting('Dataset', 'pslRaw');
+%> initUtility.MakeDataset('Augmented');
 %> %Returns dataset 'pslRawAugmented'
+%>
+%> initUtility.MakeDataset('Augmented', 'pslRaw');
+%>
 %> @endcode
 %>
-%> @param targetDataset [char] | Optional: The target dataset. Default: 'Core'.
+%> @param targetDataset [char] | Optional: The target dataset. Default: 'All'.
+%> @param targetDataset [char] | Optional: The base dataset. Default: 'psl'.
 %======================================================================
-function [] = Basics_MakeDataset(targetDataset, baseDataset)
-% Basics_MakeDataset prepares the target dataset.
+function [] = MakeDatasetInternal(targetDataset, baseDataset)
+% MakeDataset prepares the target dataset.
 %
 % You can choose among:
-% -Core: the entire dataset
+% -All: the entire dataset (reads from scratch)
+% -Raw: the raw dataset (reads from scratch)
+% -Fix: the fix dataset (reads from scratch)
 % -Augmented: the augmented dataset (based on base dataset)
-% -Raw: the raw dataset
-% -Fix: the fix dataset
 % -512: the resized 512x512 dataset (based on base dataset)
 % -32: the 32x32 patch dataset (based on base dataset)
-% Currently the base dataset is 'pslRaw'
+% -pca: the pca dataset (based on base dataset)
 %
 % @b Usage
 %
 % @code
-% Basics_MakeDataset('Augmented');
+% config.SetSetting('Dataset', 'pslRaw');
+% initUtility.MakeDataset('Augmented');
 % %Returns dataset 'pslRawAugmented'
-% @endcode
 %
-% @param targetDataset [char] | Optional: The target dataset. Default: 'Core'.
+% initUtility.MakeDataset('Augmented', 'pslRaw');
+%
+%  @endcode
+%
+% @param targetDataset [char] | Optional: The target dataset. Default: 'All'.
+% @param targetDataset [char] | Optional: The base dataset. Default: 'psl'.
 
 clc;
 
 if nargin < 1
-    targetDataset = 'Core';
+    targetDataset = 'All';
 end
 
 if nargin < 2
@@ -75,12 +85,6 @@ if strcmpi(targetDataset, 'Core')
     hsiUtility.PrepareDataset(targetDataset, dbSelection);
 end
 
-if strcmpi(targetDataset, 'Augmented')
-    targetDataset = strcat(baseDataset, targetDataset);
-    trainUtility.Augment(baseDataset, targetDataset, 'set1');
-end
-
-
 if strcmpi(targetDataset, 'Raw')
     targetDataset = strcat(prefix, targetDataset);
     dbSelection = {'tissue', true};
@@ -93,6 +97,11 @@ if strcmpi(targetDataset, 'Fix')
     dbSelection = {'tissue', true};
     targetConditions = {'fix', false};
     hsiUtility.PrepareDataset(targetDataset, dbSelection, readForeground, targetConditions);
+end
+
+if strcmpi(targetDataset, 'Augmented')
+    targetDataset = strcat(baseDataset, targetDataset);
+    trainUtility.Augment(baseDataset, targetDataset, 'set1');
 end
 
 if strcmpi(targetDataset, '512')
@@ -117,7 +126,7 @@ if strcmpi(targetDataset, 'pca')
 
     config.SetSetting('Dataset', baseDataset);
     [~, targetNames] = commonUtility.DatasetInfo(false);
-    targetDataset = strcat(baseDataset, '-pca');
+    targetDataset = strcat(baseDataset, targetDataset);
 
     for i = 1:length(targetNames)
         targetName = targetNames{i};
@@ -137,28 +146,9 @@ if strcmpi(targetDataset, 'pca')
             save(targetFilename, 'spectralData', 'labelInfo', '-v7.3');
         end
     end
+    
 end
 
-if strcmpi(targetDataset, '32-xception')
-    baseDataset = 'pslRaw32';
-
-    config.SetSetting('Dataset', baseDataset);
-    [~, targetNames] = commonUtility.DatasetInfo(false);
-    targetDataset = strcat(baseDataset, '-xception');
-
-    for i = 1:length(targetNames)
-        targetName = targetNames{i};
-        config.SetSetting('Dataset', baseDataset);
-        [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
-        spectralData = hsIm;
-        maxVal = max(hsIm.Value, [], 'all');
-        minVal = min(hsIm.Value, [], 'all');
-        spectralData.Value = rescale(hsIm.Value, -1, 1);
-
-        config.SetSetting('Dataset', targetDataset);
-        targetFilename = commonUtility.GetFilename('dataset', targetName);
-        save(targetFilename, 'spectralData', 'labelInfo', '-v7.3');
-    end
 end
 
 hsiUtility.ExportH5Dataset();

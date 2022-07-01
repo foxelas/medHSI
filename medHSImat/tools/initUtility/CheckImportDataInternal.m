@@ -11,7 +11,7 @@
 %> @retval flag [boolean] | A flag that indicates whether the check passes
 %> @retval fileS [struct] | A structure that contains information about files to be read
 %======================================================================
-function [flag, fileS] = CheckImportData()
+function [flag, fileS] = CheckImportDataInternal()
 % CheckImportData checks the structure of filenames and file information to be read.
 %
 % Reads .h5 files from the directory in config::[DataDir].

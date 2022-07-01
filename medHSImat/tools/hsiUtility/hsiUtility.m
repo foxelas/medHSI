@@ -344,8 +344,8 @@ classdef hsiUtility
         %> format.
         %>
         %> This function aggregates all small .mat files in a large .hdf5 dataset.
-        %> The dataset is assumed from config::[MatDir]\\[Dataset]\\*.mat.
-        %> After reading, the image is saved in config::[OutputDir]\\[Datasets]\\*.h5.
+        %> The dataset is assumed from config::[MatDir]\\config::[Dataset]\\*.mat.
+        %> After reading, the database is saved in config::[OutputDir]\\config::[Dataset]\\*.h5.
         %>
         %> @b Usage
         %>
@@ -360,8 +360,8 @@ classdef hsiUtility
             % format.
             %
             % This function aggregates all small .mat files in a large .hdf5 dataset.
-            % The dataset is assumed from config::[MatDir]\\[Dataset]\\*.mat.
-            % After reading, the image is saved in config::[OutputDir]\\[Datasets]\\*.h5.
+            % The dataset is assumed from config::[MatDir]\\config::[Dataset]\\*.mat.
+            % After reading, the database is saved in config::[OutputDir]\\config::[Dataset]\\*.h5.
             %
             % @b Usage
             %

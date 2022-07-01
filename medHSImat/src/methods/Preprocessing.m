@@ -38,18 +38,20 @@ function [hsIm] = Preprocessing(hsIm, targetID)
 
 option = config.GetSetting('Normalization');
 
+hasDenoising = false;
+
 if ~strcmp(option, 'raw')
-    %%Normalize
+    %% Normalize
     whiteReflectance = hsiUtility.LoadHSIReference(targetID, strcat('white_', option));
     blackReflectance = hsiUtility.LoadHSIReference(targetID, 'black');
     hsIm = hsIm.Normalize(whiteReflectance, blackReflectance);
 
-    %%Crop extreme spectra
+    %% Crop extreme spectra
     value = hsIm.Value;
     value = value(:, :, hsiUtility.GetWavelengths(311, 'index'));
     hsIm.Value = value;
 
-    %%Remove background
+    %% Remove background
     if ~isempty(hsIm.FgMask)
         col = hsIm.GetMaskedPixels(ones(size(hsIm.FgMask)), false);
         colMask = reshape(hsIm.FgMask, [size(hsIm.FgMask, 1) * size(hsIm.FgMask, 2), 1]);
@@ -57,6 +59,13 @@ if ~strcmp(option, 'raw')
         value = hsi.RecoverSpatialDimensions(col, size(hsIm.FgMask));
         hsIm.Value = value;
     end
+    
+    %% Denoise (Currently disabled)
+    if hasDenoising 
+        value = hsIm.Denoise('smoothen');
+        hsIm.Value = value;
+    end
+    
 end
 
 end

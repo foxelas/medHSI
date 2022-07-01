@@ -6,7 +6,7 @@
 %> montage previews of the results. It also prepares labels, when
 %> available.
 %>
-%>  Data samples are saved in .mat files so that one contains a
+%> Data samples are saved in .mat files so that one contains a
 %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 %> hsiInfo) variable.
 %> The save location is config::[Matdir]\\[Dataset]\\*.mat.
@@ -39,7 +39,7 @@ function [] = ReadDataset(dataset, contentConditions, readForeground, targetCond
 % montage previews of the results. It also prepares labels, when
 % available.
 %
-%  Data samples are saved in .mat files so that one contains a
+% Data samples are saved in .mat files so that one contains a
 % 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 % hsiInfo) variable.
 % The save location is config::[Matdir]\\[Dataset]\\*.mat.
@@ -140,11 +140,6 @@ for i = 1:length(targetIDs)
         save(filename, 'spectralData', '-v7.3');
 
         %% Read Label
-        % TO REMOVE
-        labeldir = fullfile(config.GetSetting('DataDir'), config.GetSetting('LabelsFolderName'), spectralData.TissueType, strcat(spectralData.ID, '.png'));
-        if ~exist(labeldir)
-            Basics_GetLabelFromLabelMe(spectralData);
-        end
         labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
 
         %% Save data info in a file

@@ -223,6 +223,10 @@ classdef hsiInfo
             sampleId = hsIm.SampleID;
             labels = hsiInfo.ReadLabelFromHsi(hsIm);
             [diagnosis, cancerType, comment] = hsiInfo.ReadDiagnosis(sampleId);
+            
+            if (size(hsIm.FgMask) ~= size(labels))
+                warning(strcat('Target: ', targetId ,'. The spatial size of the HSI cube and the label image are different.'));
+            end
             obj = hsiInfo(targetId, sampleId, labels, diagnosis, cancerType, comment);
         end
 
