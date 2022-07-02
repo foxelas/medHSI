@@ -662,6 +662,7 @@ classdef hsi
                 scores = GetMaskedPixelsInternal(scores, obj.FgMask);
             end
         end
+        
 
         % ======================================================================
         %> @brief Nfindr applies the algorithm only on the specimen pixels of the hsi, while ignoring the bakcground.
@@ -1117,6 +1118,47 @@ classdef hsi
             argminImg = uint8(argminImg);
         end
 
+        % ======================================================================
+        %> @brief Applies a specific function to the values of an hsi object.
+        %>
+        %> Depending on the target function and value change some functions of the hsi class may produce errors or wrong results.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> %Crop only a slice of the blue spectral range 
+        %> transformFun = @(x) x(:,:,30:50);
+        %> resultObj = hsIm.ApplyFucntion(tranformFun);
+        %> @endcode
+        %>
+        %> @param obj [hsi] | An instance of the hsi class
+        %> @param transformFun [function handle] | The function handle for the function to be applied. 
+        %>
+        %> @retval resultObj [hsi] | An instance of the hsi class
+        % ======================================================================
+        function [resultObj] = ApplyFunction(obj, transformFun)
+        % Applies a specific function to the values of an hsi object.
+        %
+        % Depending on the target function and value change some functions of the hsi class may produce errors or wrong results.
+        %
+        % @b Usage
+        %
+        % @code
+        % %Crop only a slice of the blue spectral range 
+        % transformFun = @(x) x(:,:,30:50);
+        % resultObj = hsIm.ApplyFucntion(tranformFun);
+        % @endcode
+        %
+        % @param obj [hsi] | An instance of the hsi class
+        % @param transformFun [function handle] | The function handle for the function to be applied. 
+        %
+        % @retval resultObj [hsi] | An instance of the hsi class
+         
+            resultObj = obj;
+            scores = transformFun(obj.Value);
+            resultObj.Value = scores;
+        end
+        
         % ======================================================================
         %> @brief Denoise applies denoising to an hsi object.
         %>

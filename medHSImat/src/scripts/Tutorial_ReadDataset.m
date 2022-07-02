@@ -48,6 +48,9 @@ init.PrepareLabels('02-Labels', dataset, contentConditions, targetConditions);
 %% Update labels in the hsi class files and prepare labelInfo class files 
 init.UpdateLabelInfos(dataset);
 
+%% Load the entire dataset as a list of hsi and hsiInfo classes 
+[hsiList, labelInfoList] = hsiUtility.LoadDataset();
+
 %% Export an .h5 database of all the preprocessed and labeled data   
 % After reading, the database is saved in config::[OutputDir]\\config::[Dataset]\\*.h5.
 hsiUtility.ExportH5Dataset();
@@ -70,3 +73,48 @@ initUtility.MakeDataset(targetDataset, baseDataset);
 baseDataset = 'psl32';
 initUtility.MakeDataset('Augmented', baseDataset);
 
+%% Export .h5 datasets of train/test folds 
+% The result is saved in
+% config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_train.h5
+% and
+% config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_test.h5
+
+baseDataset = 'pslRaw';
+testIds =  {'157', '251', '227'};
+trainUtility.ExportTrainTest(baseDataset, testIds);
+        
+%% Export .h5 datasets of LOOCV folds 
+% The result for fold XX is saved in
+% config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\XX\\hsi_baseDataset_train.h5
+% and
+% config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\XX\\hsi_baseDataset_test.h5
+
+%By patient 
+baseDataset = 'pslRaw32Augmented';
+trainUtility.ExportLOOCV(baseDataset, true);
+
+%By sample 
+baseDataset = 'pslRaw32Augmented';
+trainUtility.ExportLOOCV(baseDataset);
+
+%% Format data as arrays of tissue pixels instead of HSI cubes 
+config.SetSetting('Dataset', 'pslRaw');
+
+[hsiList, labelInfoList] = hsiUtility.LoadDataset();
+dataType = 'pixel';
+[X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfoList, dataType);
+
+%% Format data as only image and label values, ignore the hsi class and hsiInfo class 
+config.SetSetting('Dataset', 'pslRaw');
+
+[hsiList, labelInfoList] = hsiUtility.LoadDataset();
+dataType = 'image';
+[X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfoList, dataType);
+
+%% Custom format to reduce the spectral dimension for all HSI cubes 
+config.SetSetting('Dataset', 'pslRaw');
+
+[hsiList, labelInfoList] = hsiUtility.LoadDataset();
+dataType = 'hsi';
+transformFun = @(x) x(:,:,30:50); %@Dimred 
+[X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfoList, dataType, transformFun);

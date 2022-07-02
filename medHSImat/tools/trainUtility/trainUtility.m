@@ -5,108 +5,273 @@
 classdef trainUtility
     methods (Static)
 
-        function [] = ExportTrainTest(baseDataset, testIds)
+        %======================================================================
+        %> @brief FoldIndexes returns the sample ids for different folds. 
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> foldSampleIds = trainUtility.FoldIndexes(foldType);
+        %>
+        %> foldSampleIds = GetFolds(foldType);
+        %> @endcode
+        %>
+        %> @param foldType [char] | Optional: The type for selecting sample ids for folds. Options: ['byPatient', 'bySample']. Default: 'bySample'. 
+        %======================================================================
+        function [foldSampleIds] = FoldIndexes(foldType)
+            % FoldIndexes returns the sample ids for different folds. 
+            %
+            % @b Usage
+            %
+            % @code
+            % foldSampleIds = trainUtility.FoldIndexes(foldType);
+            %
+            % foldSampleIds = GetFolds(foldType);
+            % @endcode
+            %
+            % @param foldType [char] | Optional: The type for selecting sample ids for folds. Options: ['byPatient', 'bySample']. Default: 'bySample'. 
 
-            if nargin < 1
-                baseDataset = config.GetSetting('Dataset');
+            foldSampleIds = GetFolds(foldType);
+        end
+        %======================================================================
+        %> @brief TrainTestIndexes returns the indexes for train and test samples in the dataset.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> baseDataset = 'pslRaw';
+        %> testIds =  {'157', '251', '227'};
+        %> [trainTargetIDs, testTargetIDs] = trainUtility.TrainTestIndexes(baseDataset, testIds);
+        %> @endcode
+        %>
+        %> @param baseDataset [char] | The dataset
+        %> @param testIds [cell array] | The ids of samples to be used for testing
+        %>
+        %> @retval trainTargetIDs [cell array] | The target IDs for train.
+        %> @retval testTargetIDs [cell array] | The target IDs for test. 
+        %> @retval trainTargetIndexes [cell array] | The logical indexes for train.
+        %> @retval testTargetIndexes [cell array] | The logical indexes for test. 
+        %======================================================================
+        function [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = TrainTestIndexes(baseDataset, testIds)
+            % TrainTestIndexes returns the indexes for train and test samples in the dataset.
+            %
+            % @b Usage
+            %
+            % @code
+            % baseDataset = 'pslRaw';
+            % testIds =  {'157', '251', '227'};
+            % [trainTargetIDs, testTargetIDs] = trainUtility.TrainTestIndexes(baseDataset, testIds);
+            % @endcode
+            %
+            % @param baseDataset [char] | The dataset
+            % @param testIds [cell array] | The ids of samples to be used for testing
+            %
+            % @retval trainTargetIDs [cell array] | The target IDs for train.
+            % @retval testTargetIDs [cell array] | The target IDs for test. 
+            % @retval trainTargetIndexes [cell array] | The logical indexes for train.
+            % @retval testTargetIndexes [cell array] | The logical indexes for test. 
+            
+            config.SetSetting('Dataset', baseDataset);
+            [~, targetIDs] = commonUtility.DatasetInfo();
+            trainTargetIndexes = ~contains(targetIDs, testIds);
+            testTargetIndexes = contains(targetIDs, testIds);
+            trainTargetIDs = targetIDs(trainTargetIndexes);
+            testTargetIDs = targetIDs(testTargetIndexes);
+        end
+        
+        %======================================================================
+        %> @brief LOOCVIndexes returns the indexes for train and test samples in the dataset according to leave-one-out cross validation (LOOCV).
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> baseDataset = 'pslRaw32Augmented';
+        %> [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset);
+        %>
+        %> [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset, true);
+        %> @endcode
+        %>
+        %> @param baseDataset [char] | The dataset
+        %> @param isPatientBased [bool] | Optional: A flag for whether LOOCV is performed per patient or not (per sample). Default: false. 
+        %>
+        %> @retval trainTargetIDs [cell array] | The target IDs for each train fold.
+        %> @retval testTargetIDs [cell array] | The target IDs for each test fold. 
+        %> @retval trainTargetIndexes [cell array] | The logical indexes for each train fold.
+        %> @retval testTargetIndexes [cell array] | The logical indexes for each test fold. 
+        %======================================================================
+        function [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = LOOCVIndexes(baseDataset, isPatientBased)
+        % LOOCVIndexes returns the indexes for train and test samples in the dataset according to leave-one-out cross validation (LOOCV).
+        %
+        % @b Usage
+        %
+        % @code
+        % baseDataset = 'pslRaw32Augmented';
+        % [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset);
+        %
+        % [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset, true);
+        % @endcode
+        %
+        % @param baseDataset [char] | The dataset
+        % @param isPatientBased [bool] | Optional: A flag for whether LOOCV is performed per patient or not (per sample). Default: false. 
+        %
+        % @retval trainTargetIDs [cell array] | The target IDs for each train fold.
+        % @retval testTargetIDs [cell array] | The target IDs for each test fold. 
+        % @retval trainTargetIndexes [cell array] | The logical indexes for each train fold.
+        % @retval testTargetIndexes [cell array] | The logical indexes for each test fold. 
+
+            if nargin < 2 
+                isPatientBased = false;
             end
-
-            if nargin < 2
-                testIds = {'157', '251', '227'};
-            end
-
+            
             config.SetSetting('Dataset', baseDataset);
             [~, targetIDs] = commonUtility.DatasetInfo();
 
+            if isPatientBased
+                foldSampleIds = trainUtility.FoldIndexes('byPatient');
+            else
+                foldSampleIds = trainUtility.FoldIndexes('bySample');
+            end
+            discardedPatches =  initUtility.DiscardedPatches();
+
+            folds = numel(foldSampleIds);
+            trainTargetIndexes = cell(folds, 1);
+            testTargetIndexes = cell(folds, 1);
+            trainTargetIDs = cell(folds, 1);
+            testTargetIDs = cell(folds, 1);
+
+            for k = 1:folds
+                targetSampleIds = num2str(foldSampleIds{k});
+                ids = cell2mat(cellfun(@(x) contains(x, targetSampleIds), targetIDs, 'UniformOutput', false));
+                testIds = targetIDs(ids);
+                
+                if contains(baseDataset, 'Augmented')
+                    cleanIds = ~contains(targetIDs, strcat(discardedPatches, '_'));
+                else
+                    cleanIds = ~contains(strcat(targetIDs, '.'), strcat(discardedPatches, '.'));
+                end
+                
+                trainTargetIndexes{k} = ~contains(targetIDs, testIds) & cleanIds;
+                testTargetIndexes{k} = contains(targetIDs, testIds) & cleanIds;
+
+                trainTargetIDs{k} = targetIDs(trainTargetIndexes{k});
+                testTargetIDs{k}  = targetIDs(testTargetIndexes{k});
+            end
+
+        end
+        
+        %=====================================================================
+        %> @brief ExportTrainTest exports the train and test folds as individual .h5 datasets.
+        %>
+        %> The result is saved in
+        %> config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_train.h5
+        %> and
+        %> config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_test.h5
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> baseDataset = 'pslRaw';
+        %> testIds =  {'157', '251', '227'};
+        %> trainUtility.ExportTrainTest(baseDataset, testIds);
+        %> @endcode
+        %>
+        %> @param baseDataset [char] | The dataset
+        %> @param testIds [cell array] | The ids of samples to be used for testing
+        %======================================================================
+        function [] = ExportTrainTest(baseDataset, testIds)
+        % ExportTrainTest exports the train and test folds as individual .h5 datasets.
+        %
+        % The result is saved in
+        % config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_train.h5
+        % and
+        % config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_test.h5
+        %
+        % @b Usage
+        %
+        % @code
+        % baseDataset = 'pslRaw';
+        % testIds =  {'157', '251', '227'};
+        % trainUtility.ExportTrainTest(baseDataset, testIds);
+        % @endcode
+        %
+        % @param baseDataset [char] | The dataset
+        % @param testIds [cell array] | The ids of samples to be used for testing
+
+           [trainTargetIDs, testTargetIDs] = trainUtility.TrainTestIndexes(baseDataset, testIds);
+
             fileName = commonUtility.GetFilename('output', ...
                 fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_train')), 'h5');
-            trainTargetIDs = targetIDs(~contains(targetIDs, testIds));
             hsiUtility.SaveToH5(trainTargetIDs, fileName);
 
             fileName = commonUtility.GetFilename('output', ...
                 fullfile(config.GetSetting('DatasetsFolderName'), strcat('hsi_', config.GetSetting('Dataset'), '_test')), 'h5');
-            testTargetIDs = targetIDs(contains(targetIDs, testIds));
             hsiUtility.SaveToH5(testTargetIDs, fileName);
         end
 
 
-        function [] = ExportFolds(baseDataset)
-            %Usage: trainUtility.ExportFolds('pslRaw32Augmented')
-            % trainUtility.ExportFolds('pslRaw-Denoisesmoothen32')
+        %======================================================================
+        %> @brief ExportLOOCV exports data for leave one out cross validation (LOOCV). 
+        %>
+        %> Data from one sample are saved as one fold in one .h5 dataset.
+        %> Please not that some heavily stained patches or otherwise inappropriate patches/samples are discarderd. 
+        %>
+        %> The result for fold XX is saved in
+        %> config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\XX\\hsi_baseDataset_train.h5
+        %> and
+        %> config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\XX\\hsi_baseDataset_test.h5
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> baseDataset = 'pslRaw32Augmented';
+        %> trainUtility.ExportLOOCV(baseDataset);
+        %>
+        %> %LOOCV per patient
+        %> trainUtility.ExportLOOCV(baseDataset, true);
+        %> @endcode
+        %>
+        %> @param baseDataset [char] | The dataset
+        %> @param isPatientBased [bool] | Optional: A flag for whether LOOCV is performed per patient or not (per sample). Default: false. 
+        %======================================================================
+        function [] = ExportLOOCV(baseDataset, isPatientBased)
+        % ExportLOOCV exports data for leave one out cross validation (LOOCV). 
+        %
+        % Data from one sample are saved as one fold in one .h5 dataset.
+        % Please not that some heavily stained patches or otherwise inappropriate patches/samples are discarderd. 
+        %
+        % The result for fold XX is saved in
+        % config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\XX\\hsi_baseDataset_train.h5
+        % and
+        % config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\XX\\hsi_baseDataset_test.h5
+        %
+        % @b Usage
+        %
+        % @code
+        % baseDataset = 'pslRaw32Augmented';
+        % trainUtility.ExportLOOCV(baseDataset);
+        %
+        % %LOOCV per patient
+        % trainUtility.ExportLOOCV(baseDataset, true);
+        % @endcode
+        %
+        % @param baseDataset [char] | The dataset
+        % @param isPatientBased [bool] | Optional: A flag for whether LOOCV is performed per patient or not (per sample). Default: false. 
 
-            targetDataset = strcat(baseDataset, 'LOOCValidation');
-
-            config.SetSetting('Dataset', targetDataset);
-            baseDir = commonUtility.GetFilename('dataset', '', '');
-
-            config.SetSetting('Dataset', baseDataset);
-            [~, targetIDs] = commonUtility.DatasetInfo();
-
-            isPatiendBased = false;
-            if isPatiendBased
-                foldSampleIds = {{'001'}; {'002', '003', '004'}; {'005'}; {'006'}; {'007'}; {'008', '009'}; {'010'}; {'011'}; {'012'}; {'013'}; {'014'}; {'015', '016', '017', '018'}; {'019'}};
-            else
-                foldSampleIds = {{'001'}; {'002'}; {'003'}; {'004'}; {'005'}; {'006'}; {'007'}; {'008'}; {'009'}; {'010'}; {'011'}; {'012'}; {'013'}; {'014'}; {'015'}; ...
-                    {'016'}; {'017'}; {'018'}; {'019'}};
+            if nargin < 2 
+                isPatientBased = false;
             end
 
-            discardedPatches = {'187_patch32', '187_patch33', '199_patch24', '199_patch29', '199_patch30', '199_patch31', '199_patch32', '205_patch16', '205_patch22', ...
-                '205_patch23', '205_patch24', '205_patch29', '205_patch30', '205_patch31', '205_patch32', '205_patch33', '205_patch34', '205_patch35', '205_patch37', ...
-                '205_patch38', '205_patch39', '205_patch40', '205_patch41', '205_patch42', '205_patch43', '205_patch44', '205_patch47', '205_patch48', '205_patch49', ...
-                '205_patch51', '205_patch52', '205_patch53', '205_patch54', '205_patch57', '205_patch58', '205_patch61', '205_patch62', '205_patch63', '205_patch66', ...
-                '205_patch67', '205_patch71', '205_patch72', '205_patch73', '205_patch74', '205_patch75', '205_patch76', '205_patch77', '205_patch78', '205_patch81', ...
-                '205_patch82', '205_patch83', '205_patch84', '205_patch85', '205_patch86', '205_patch87', '205_patch88', '205_patch91', '205_patch92', '205_patch93', ...
-                '205_patch94', '205_patch95', '205_patch96', '205_patch97', '205_patch98', '205_patch99', '205_patch100', '205_patch101', '205_patch102', '205_patch103', ...
-                '205_patch104', '205_patch105', '205_patch106', '205_patch107', '205_patch108', '205_patch109', '205_patch110', '205_patch111', '205_patch112', ...
-                '205_patch113', '205_patch114', '205_patch117', '205_patch118', '205_patch119', '212_patch7', '251_patch41', '230_patch27', '227_patch1', ...
-                '193_patch8', '181_patch64', '187_patch1', '160_patch8', '157_patch3', '150_patch4'};
-
-            if contains(baseDataset, 'Augmented')
-                targetIDs = targetIDs(~contains(targetIDs, strcat(discardedPatches, '_')));
-            else
-                targetIDs = targetIDs(~contains(strcat(targetIDs, '.'), strcat(discardedPatches, '.')));
-            end
-
-            n = length(targetIDs);
-            dataStruct = struct('SpectralData', [], 'LabelInfo', [], 'TargetID', []);
-            for i = 1:n
-                targetName = num2str(targetIDs{i});
-                dataStruct(i).TargetID = targetName;
-                [dataStruct(i).SpectralData, dataStruct(i).LabelInfo] = hsiUtility.LoadHsiAndLabel(targetName);
-            end
-
-            folds = numel(foldSampleIds);
-            foldTargets = cell(folds, 1);
+            [trainTargetIDs, testTargetIDs, ~, ~] = trainUtility.LOOCVIndexes(baseDataset, isPatientBased);
+            folds = numel(trainTargetIDs);
 
             for k = 1:folds
-                targetSampleIds = foldSampleIds{k};
-                foldDir = config.DirMake(baseDir, num2str(k), '\');
-                testIds = {};
-
-                c = 0;
-                for i = 1:n
-                    if any(contains(targetSampleIds, dataStruct(i).LabelInfo.SampleID))
-                        targetName = dataStruct(i).TargetID;
-                        saveDir = fullfile(foldDir, strcat(targetName, '.mat'));
-                        spectralData = dataStruct(i).SpectralData;
-                        labelInfo = dataStruct(i).LabelInfo;
-                        save(saveDir, 'spectralData', 'labelInfo');
-                        c = c + 1;
-                        testIds{c} = targetName;
-                    end
-                end
-
-                foldTargets{k} = testIds;
-
                 fileName = commonUtility.GetFilename('output', ...
                     fullfile(config.GetSetting('DatasetsFolderName'), num2str(k), strcat('hsi_', config.GetSetting('Dataset'), '_train')), 'h5');
-                trainTargetIDs = ~contains(targetIDs, testIds);
-                hsiUtility.SaveToH5(dataStruct(trainTargetIDs), fileName);
+                hsiUtility.SaveToH5(trainTargetIDs{k}, fileName);
 
                 fileName = commonUtility.GetFilename('output', ...
                     fullfile(config.GetSetting('DatasetsFolderName'), num2str(k), strcat('hsi_', config.GetSetting('Dataset'), '_test')), 'h5');
-                testTargetIDs = contains(targetIDs, testIds);
-                hsiUtility.SaveToH5(dataStruct(testTargetIDs), fileName);
+                hsiUtility.SaveToH5(testTargetIDs{k}, fileName);
             end
 
         end
@@ -115,10 +280,10 @@ classdef trainUtility
         %> @brief Augment applies augmentation on the dataset
         %>
         %> The base dataset should be already saved before running augmentation.
-        %> For details check @c AugmentInternal .
+        %> For details check @c AugmentInternal.
         %>
-        %> 'set1': applies vertical and horizontal flipping.
-        %> 'set2': applies random rotation.
+        %> 'set1': applies vertical and horizontal flipping (4-fold augmentation).
+        %> 'set2': applies random rotation. PENDING
         %>
         %> @b Usage
         %>
@@ -140,10 +305,10 @@ classdef trainUtility
             % Augment applies augmentation on the dataset
             %
             % The base dataset should be already saved before running augmentation.
-            % For details check @c AugmentInternal .
+            % For details check @c AugmentInternal.
             %
-            % 'set1': applies vertical and horizontal flipping.
-            % 'set2': applies random rotation.
+            % 'set1': applies vertical and horizontal flipping (4-fold augmentation).
+            % 'set2': applies random rotation. PENDING
             %
             % @b Usage
             %
@@ -228,23 +393,25 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief PreprocessInternal transforms the dataset into images or pixels as preparation for training.
+        %> @brief Format transforms the dataset into images or pixels as preparation for training.
         %>
         %> For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
-        %> For more details check @c function PreprocessInternal .
+        %> For more details check @c function FormatInternal.
         %> This function can also handle multiscale transformations.
         %>
         %> @b Usage
         %>
         %> @code
-        %>   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Preprocess(hsiList, labelInfos, dataType);
+        %> [hsiList, labelInfoList] = hsiUtility.LoadDataset();
+        %> dataType = 'pixel';
+        %> [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfoList, dataType);
         %>
-        %>   transformFun = @Dimred;
-        %>   [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, dataType, transformFun);
+        %> transformFun = @Dimred;
+        %> [X, y, sRGBs, fgMasks, labelImgs] = FormatInternal(hsiList, labelInfoList, dataType, transformFun);
         %> @endcode
         %>
         %> @param hsiList [cell array] | The list of hsi objects
-        %> @param labelInfos [cell array] | The list of hsiInfo objects
+        %> @param labelInfoList [cell array] | The list of hsiInfo objects
         %> @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
         %> @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
         %>
@@ -255,20 +422,20 @@ classdef trainUtility
         %> @retval labelImgs [cell array] | The label masks for the data
         %>
         % ======================================================================
-        function [X, y, sRGBs, fgMasks, labelImgs] = Preprocess(hsiList, labelInfos, varargin)
-            % PreprocessInternal transforms the dataset into images or pixels as preparation for training.
+        function [X, y, sRGBs, fgMasks, labelImgs] = Format(hsiList, labelInfoList, varargin)
+            % Format transforms the dataset into images or pixels as preparation for training.
             %
             % For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
-            % For more details check @c function PreprocessInternal .
+            % For more details check @c function FormatInternal.
             % This function can also handle multiscale transformations.
             %
             % @b Usage
             %
             % @code
-            %   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Preprocess(hsiList, labelInfos, dataType);
+            %   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfos, dataType);
             %
             %   transformFun = @Dimred;
-            %   [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, dataType, transformFun);
+            %   [X, y, sRGBs, fgMasks, labelImgs] = FormatInternal(hsiList, labelInfos, dataType, transformFun);
             % @endcode
             %
             % @param hsiList [cell array] | The list of hsi objects
@@ -282,95 +449,62 @@ classdef trainUtility
             % @retval fgMasks [cell array] | The foreground masks of sRGBs for the data
             % @retval labelImgs [cell array] | The label masks for the data
             %
-            [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, varargin{:});
+            [X, y, sRGBs, fgMasks, labelImgs] = FormatInternal(hsiList, labelInfoList, varargin{:});
         end
 
         % ======================================================================
-        %> @brief SplitDatasetInternalsplits the dataset to train, test and prepares a cross validation setting.
+        %> @brief TrainTest splits the dataset to train, test or prepares a cross validation setting.
         %>
-        %> For more details check @c function SplitDatasetInternal .
+        %> For more details check @c function SplitTrainTest.
         %>
         %> @b Usage
         %>
         %> @code
-        %>   [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
+        %>  [trainData, testData] = trainUtility.TrainTest(dataset, 'pixel', 'custom', [], {'150', '132'});
+        %>
+        %>   [trainData, testData] = trainUtility.TrainTest(dataset, 'pixel', 'kfold', 5, []);
         %>
         %>   transformFun = @Dimred;
-        %>   [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testTargets, dataType, transformFun);
+        %>   [trainData, testData] = SplitTrainTest(dataset, 'hsi', 'LOOCV-bySample', [], [], transformFun);
         %> @endcode
         %>
         %> @param dataset [char] | The target dataset
-        %> @param folds [numeric] | The number of folds
-        %> @param testTargets [cell array] | The IDs of the test targets
         %> @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
+        %> @param splitType [char] | The type to split train/test data. Options: ['custom', 'kfold', 'LOOCV-byPatient', 'LOOCV-bySample'].
+        %> @param folds [int] | The number of folds.
+        %> @param testIds [cell array] | The ids of samples to be used for testing. Required when splitType is 'custom'. Can be empty otherwise.
         %> @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
         %>
         %> @retval trainData [struct] | The train data
         %> @retval testData [struct] | The test data
-        %> @retval cvp [struct] | The cross validation settings
-        %>
         % ======================================================================
-        function [trainData, testData, cvp] = SplitDataset(dataset, folds, testTargets, dataType, varargin)
-            % SplitDatasetInternalsplits the dataset to train, test and prepares a cross validation setting.
-            %
-            % For more details check @c function SplitDatasetInternal .
-            %
-            % @b Usage
-            %
-            % @code
-            %   [trainData, testData, cvp] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-            %
-            %   transformFun = @Dimred;
-            %   [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testTargets, dataType, transformFun);
-            % @endcode
-            %
-            % @param dataset [char] | The target dataset
-            % @param folds [numeric] | The number of folds
-            % @param testTargets [cell array] | The IDs of the test targets
-            % @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
-            % @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
-            %
-            % @retval trainData [struct] | The train data
-            % @retval testData [struct] | The test data
-            % @retval cvp [struct] | The cross validation settings
-            %
-            [trainData, testData, cvp] = SplitDatasetInternal(dataset, folds, testTargets, dataType, varargin{:});
-        end
-
-        % ======================================================================
-        %> @brief KfoldPartitions splits cross validation partitions.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> folds = 5;
-        %> [cvp] = trainUtility.KfoldPartitions(numData, folds);
-        %> @endcode
-        %>
-        %> @param numData [int] | The number of data
-        %> @param folds [int] | The number of folds
-        %>
-        %> @retval cvp [cell array] | The cross validation index splits
-        % ======================================================================
-        function [cvp] = KfoldPartitions(numData, folds)
-            % KfoldPartitions splits cross validation partitions.
-            %
-            % @b Usage
-            %
-            % @code
-            % folds = 5;
-            % [cvp] = trainUtility.KfoldPartitions(numData, folds);
-            % @endcode
-            %
-            % @param numData [int] | The number of data
-            % @param folds [int] | The number of folds
-            %
-            % @retval cvp [cell array] | The cross validation index splits
-
-            if nargin < 2
-                folds = 10;
-            end
-            cvp = cvpartition(numData, 'kfold', folds);
+        function [trainData, testData] = TrainTest(dataset, dataType, splitType, folds, testIds, varargin)
+        % TrainTest splits the dataset to train, test or prepares a cross validation setting.
+        %
+        % For more details check @c function SplitTrainTest.
+        %
+        % @b Usage
+        %
+        % @code
+        %   [trainData, testData] = trainUtility.TrainTest(dataset, 'pixel', 'custom', [], {'150', '132'});
+        %
+        %   [trainData, testData] = trainUtility.TrainTest(dataset, 'pixel', 'kfold', 5, []);
+        %
+        %   transformFun = @Dimred;
+        %   [trainData, testData] = SplitTrainTest(dataset, 'hsi', 'LOOCV-bySample', [], [], transformFun);
+        % @endcode
+        %
+        % @param dataset [char] | The target dataset
+        % @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
+        % @param splitType [char] | The type to split train/test data. Options:['custom', 'kfold', 'LOOCV-byPatient', 'LOOCV-bySample'].
+        % @param folds [int] | The number of folds.
+        % @param testIds [cell array] | The ids of samples to be used for testing. Required when splitType is 'custom'. Can be empty otherwise.
+        % @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
+        %
+        % @retval trainData [struct] | The train data
+        % @retval testData [struct] | The test data
+        
+            [trainData, testData] = SplitTrainTest(dataset, dataType, splitType, folds, testIds, varargin{:});
         end
 
         % ======================================================================

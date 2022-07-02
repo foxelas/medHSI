@@ -17,7 +17,12 @@ imshow(srgb); title('srgb')
 
 %% Get the wavelengths 
 w = hsiUtility.GetWavelengths(311);
-            
+           
+%% Apply a function on the hsi values 
+%e.g. Crop only a slice of the blue spectral range 
+transformFun = @(x) x(:,:,30:50);
+resultObj = hsIm.ApplyFucntion(tranformFun);
+
 %% Apply Denoising 
 denoised = spectralData.Denoise('smoothen');
 % See the denoised image compared to the original 

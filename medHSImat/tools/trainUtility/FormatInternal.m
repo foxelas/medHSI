@@ -1,5 +1,5 @@
 % ======================================================================
-%> @brief PreprocessInternal transforms the dataset into images or pixels as preparation for training.
+%> @brief FormatInternal transforms the dataset into images or pixels as preparation for training.
 %>
 %> For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
 %> For more details check @c function PreprocessInternal .
@@ -8,10 +8,10 @@
 %> @b Usage
 %>
 %> @code
-%>   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Preprocess(hsiList, labelInfos, dataType);
+%>   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfos, dataType);
 %>
 %>   transformFun = @Dimred;
-%>   [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, dataType, transformFun);
+%>   [X, y, sRGBs, fgMasks, labelImgs] = FormatInternal(hsiList, labelInfos, dataType, transformFun);
 %> @endcode
 %>
 %> @param hsiList [cell array] | The list of hsi objects
@@ -26,8 +26,8 @@
 %> @retval labelImgs [cell array] | The label masks for the data
 %>
 % ======================================================================
-function [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, dataType, transformFun)
-% PreprocessInternal transforms the dataset into images or pixels as preparation for training.
+function [X, y, sRGBs, fgMasks, labelImgs] = FormatInternal(hsiList, labelInfos, dataType, transformFun)
+% FormatInternal transforms the dataset into images or pixels as preparation for training.
 %
 % For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
 % For more details check @c function PreprocessInternal .
@@ -36,10 +36,10 @@ function [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelIn
 % @b Usage
 %
 % @code
-%   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Preprocess(hsiList, labelInfos, dataType);
+%   [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfos, dataType);
 %
 %   transformFun = @Dimred;
-%   [X, y, sRGBs, fgMasks, labelImgs] = PreprocessInternal(hsiList, labelInfos, dataType, transformFun);
+%   [X, y, sRGBs, fgMasks, labelImgs] = FormatInternal(hsiList, labelInfos, dataType, transformFun);
 % @endcode
 %
 % @param hsiList [cell array] | The list of hsi objects
@@ -68,9 +68,16 @@ for i = 1:n
     labelInfo = labelInfos{i};
     fgMask = hsIm.FgMask;
     ydata = [];
+    
+    srgb = hsIm.GetDisplayRescaledImage();
+    
+    if useTransform
+        hsIm = hsIm.ApplyFunction(transformFun);
+    end
+            
     if strcmp(dataType, 'image')
         xdata = hsIm.Value;
-        if hasLabels
+        if ~isempty(labelInfo.Labels)
             ydata = double(labelInfo.Labels);
         end
 
@@ -79,12 +86,7 @@ for i = 1:n
         ydata = labelInfo;
 
     elseif strcmp(dataType, 'pixel')
-        if useTransform
-            scores = transformFun(hsIm);
-            xdata = GetMaskedPixelsInternal(scores, fgMask);
-        else
-            xdata = hsIm.GetMaskedPixels(fgMask);
-        end
+        xdata = hsIm.GetMaskedPixels(fgMask);
         if ~isempty(labelInfo.Labels)
             ydata = double(GetMaskedPixelsInternal(labelInfo.Labels, fgMask));
         end
@@ -95,7 +97,7 @@ for i = 1:n
 
     X{i} = xdata;
     y{i} = ydata;
-    sRGBs{i} = hsIm.GetDisplayRescaledImage();
+    sRGBs{i} = srgb;
     fgMasks{i} = fgMask;
     labelImgs{i} = logical(labelInfo.Labels);
 

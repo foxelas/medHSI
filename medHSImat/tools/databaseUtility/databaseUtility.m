@@ -142,6 +142,10 @@ classdef databaseUtility
             if nargin < 2
                 sampleId = [];
             end
+            
+            if nargin < 1 
+                content = [];
+            end
 
             function [keyValue, isMatch] = GetCondition(value)
                 if iscell(value)

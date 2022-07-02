@@ -220,5 +220,37 @@ classdef initUtility
             
             MakeDatasetInternal(varargin{:});
         end
+        
+        %======================================================================
+        %> @brief GetDiscardedPatches returns the names of patches that should be discarded from the analyis.
+        %> 
+        %> You can add values according to your protocol. 
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [discardedPatches] =  GetDiscardedPatches();
+        %> 
+        %> [discardedPatches] =  initUtility.DiscardedPatches();
+        %> @endcode
+        %>
+        %> @retval discardedPatches [cell array] | The ids of the discarded patches.
+        %======================================================================
+        function [discardedPatches] = DiscardedPatches()
+            % GetDiscardedPatches returns the names of patches that should be discarded from the analyis.
+            % 
+            % You can add values according to your protocol. 
+            %
+            % @b Usage
+            %
+            % @code
+            % [discardedPatches] =  GetDiscardedPatches();
+            % 
+            % [discardedPatches] =  initUtility.DiscardedPatches();
+            % @endcode
+            %
+            % @retval discardedPatches [cell array] | The ids of the discarded patches.
+            discardedPatches = GetDiscardedPatches(); 
+        end
     end
 end
