@@ -252,5 +252,9 @@ classdef initUtility
             % @retval discardedPatches [cell array] | The ids of the discarded patches.
             discardedPatches = GetDiscardedPatches(); 
         end
+        
+        function [functionNames] = FunctionsWithoutSVMOptimization()
+            functionNames = {'Validation', 'ValidateTest2', 'Basics_LOOCV', 'Basics_Test'};
+        end
     end
 end

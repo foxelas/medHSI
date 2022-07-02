@@ -14,8 +14,8 @@ XTrain = cellfun(@(x, y) x.Transform(true, denoiseMethod, q, y, varargin{:}), {t
 XValid = cellfun(@(x, y) x.Transform(true, denoiseMethod, q, y, varargin{:}), {testData.Values}, {testData.ImageLabels}, 'un', 0);
 
 %Convert cell image data to concatenated array data
-XTrainscores = trainUtility.Cell2Mat(XTrain);
-XValidscores = trainUtility.Cell2Mat(XValid);
+XTrainscores = commonUtility.Cell2Mat(XTrain);
+XValidscores = commonUtility.Cell2Mat(XValid);
 
 XTrainscores2 = XTrainscores;
 XValidscores2 = XValidscores;

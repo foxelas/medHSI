@@ -118,3 +118,27 @@ config.SetSetting('Dataset', 'pslRaw');
 dataType = 'hsi';
 transformFun = @(x) x(:,:,30:50); %@Dimred 
 [X, y, sRGBs, fgMasks, labelImgs] = trainUtility.Format(hsiList, labelInfoList, dataType, transformFun);
+
+%% Reduce data with PCA and then cross validate with 5-fold cross validation 
+dataset = 'pslRaw'; 
+splitType = 'kfold';
+folds = 5;
+testIds = []; 
+svmSettings = [];
+validationPerformance = trainUtility.Validation(dataset, splitType, folds, testIds, 'PCA', 10, svmSettings);
+
+%% Reduce data with PCA and then cross validate with LOOCV cross validation 
+dataset = 'pslRaw'; 
+splitType = 'LOOCV-bySample';
+folds = [];
+testIds = []; 
+svmSettings = [];
+validationPerformance = trainUtility.Validation(dataset, splitType, folds, testIds, 'PCA', 10, svmSettings);
+
+%% Reduce data with Multiscale ClusterPCA and then cross validate with 5-fold cross validation and test 
+testIds = {'157', '251', '227'};
+method = 'MClusterPCA';
+q = 10;
+endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
+svmSettings = [];
+[validatedPerformance, testPerformance] = trainUtility.ValidateAndTest(dataset, testIds, method, q, svmSettings, endmemberNumArray);

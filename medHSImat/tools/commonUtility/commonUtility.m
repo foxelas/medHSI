@@ -381,6 +381,48 @@ classdef commonUtility
             specificity = cmat(1, 1) / (cmat(1, 1) + cmat(1, 2));
         end
 
+        % ======================================================================
+        %> @brief Cell2Mat concatenates the contents of a cell array of values to a matrix.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [matArr] = commonUtility.Cell2Mat(cellArr);
+        %> @endcode
+        %>
+        %> @param cellArr [cell array] | The cell array
+        %>
+        %> @retval arr [numeric array] | The array
+        % ======================================================================
+        function [arr] = Cell2Mat(cellArr)
+            % Cell2Mat concatenates the contents of a cell array of values to a matrix.
+            %
+            % @b Usage
+            %
+            % @code
+            % [matArr] = commonUtility.Cell2Mat(cellArr);
+            % @endcode
+            %
+            % @param cellArr [cell array] | The cell array
+            %
+            % @retval arr [numeric array] | The array
+
+            isStack = iscell(cellArr{1});
+            if isStack
+                numStack = numel(cellArr{1});
+                arr = cell(numStack, 1);
+                for i = 1:numStack
+                    cellStack = cellfun(@(x) x{i}', cellArr, 'un', 0);
+                    stackArr = [cellStack{:}];
+                    arr{i} = stackArr';
+                end
+            else
+                cellArr = cellfun(@(x) x', cellArr, 'un', 0);
+                arr = [cellArr{:}];
+                arr = arr';
+            end
+        end
+
 
         % ======================================================================
         %> @brief Sam returns the Spectral Angle Mapper value

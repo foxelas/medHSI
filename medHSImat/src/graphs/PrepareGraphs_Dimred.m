@@ -3,7 +3,7 @@ testTargets = {};
 dataType = 'pixel';
 dataset = config.GetSetting('Dataset');
 [X, ~, ~] = trainUtility.SplitDataset(dataset, folds, testTargets, dataType);
-Xscores = trainUtility.Cell2Mat({X.Values});
+Xscores = commonUtility.Cell2Mat({X.Values});
 
 q = 4;
 
