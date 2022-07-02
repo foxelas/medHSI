@@ -6,45 +6,6 @@ classdef segment
     methods (Static)
 
         % ======================================================================
-        %> @brief Apply implements segmentation according to options.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> segopt = segopt.GetOptions('Leon2020');
-        %> labels = segment.Apply(hsIm, segopt);
-        %> @endcode
-        %>
-        %> @param hsIm [hsi] | An instance of the hsi class
-        %> @param segopt [struct] | The segmentation options
-        %>
-        %> @retval labels [numeric array] | The segmented labels
-        % ======================================================================
-        function [labels] = ApplyOld(hsIm, segopt)
-            % Apply implements segmentation according to options.
-            %
-            % @b Usage
-            %
-            % @code
-            % segopt = segopt.GetOptions('Leon2020');
-            % labels = segment.Apply(hsIm, segopt);
-            % @endcode
-            %
-            % @param hsIm [hsi] | An instance of the hsi class
-            % @param segopt [struct] | The segmentation options
-            %
-            % @retval labels [numeric array] | The segmented labels
-            config.SetSetting('FileName', hsIm.ID);
-
-            labels = mainSegFun(hsiIm, segopt);
-
-            if segopt.HasPostProcessing
-                postProcFun = segopt.PostProcessingScheme;
-                labels = postProcFun(labels);
-            end
-        end
-
-        % ======================================================================
         %> @brief MorphologicalOps applies morpholigical operators on the
         %> segmented labels.
         %>
@@ -53,15 +14,15 @@ classdef segment
         %> @b Usage
         %>
         %> @code
-        %> outLabels = segment.MorphologicalOps(inLabels);
+        %> postMaskPredict = segment.MorphologicalOps(maskPredict);
         %> @endcode
         %>
-        %> @param inLabels [numeric array] | The input labels
+        %> @param maskPredict [numeric array] | The input labels
         %>
-        %> @retval outLabels [numeric array] | The output labels
+        %> @retval postMaskPredict [numeric array] | The output labels
         %>
         % ======================================================================
-        function [outLabels] = MorphologicalOps(inLabels)
+        function [postMaskPredict] = MorphologicalOps(maskPredict)
             % MorphologicalOps applies morpholigical operators on the
             % segmented labels.
             %
@@ -70,19 +31,37 @@ classdef segment
             % @b Usage
             %
             % @code
-            % outLabels = segment.MorphologicalOps(inLabels);
+            % postMaskPredict = segment.MorphologicalOps(maskPredict);
             % @endcode
             %
-            % @param inLabels [numeric array] | The input labels
+            % @param maskPredict [numeric array] | The input labels
             %
-            % @retval outLabels [numeric array] | The output labels
+            % @retval postMaskPredict [numeric array] | The output labels
             %
-            BW = imbinarize(inLabels);
+            BW = imbinarize(maskPredict);
             BW2 = imfill(BW, 'holes');
             se = strel('disk', 5);
-            outLabels = imclose(BW2, se);
+            postMaskPredict = imclose(BW2, se);
         end
 
+        function ByLeon()
+            % ByLeon applies segmentation based on Leon et al (2019).
+            %
+            % The method is applied on each image in the dataset. The results are saved in the output folder.
+            %
+            % @b Usage
+            %
+            % @code
+            % segment.ByLeon();
+            % @endcode
+            experiment = 'ByLeon';
+            Basics_Init(experiment);
+
+            apply.ToEach(@SegmentLeonInternal);
+            plots.GetMontagetCollection(1, 'clusters');
+            plots.GetMontagetCollection(2, 'leon');
+        end
+        
         % ======================================================================
         %> @brief BySAM applies SAM-based clustering.
         %>

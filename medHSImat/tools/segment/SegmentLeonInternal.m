@@ -1,6 +1,9 @@
-function [segmentMask] = SegmentLeonInternal(hsIm)
+function [segmentMask] = SegmentLeonInternal(hsIm, labelInfo)
 
-oldDs = config.GetSetting('Dataset');
+if nargin < 2 
+    labelInfo = [];
+end
+
 filePath = commonUtility.GetFilename('dataset', fullfile('LeonReferences', 'LeonReferences'));
 
 load(filePath, 'references');
@@ -27,10 +30,16 @@ for i = 1:k
 end
 
 segmentMask = logical(segmentMask);
-%     figure(1);
-%     subplot(1,2,1);
-%     imagesc(clusterLabelsImg)
-%     subplot(1,2,2);
-%     imagesc(segmentMask);
-%
+
+srgb = hsIm.GetDisplayImage();
+fgMask = hsIm.FgMask;
+savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
+plots.Superpixels(1, fullfile(savedir, 'clusters'), srgb, clusterLabelsImg, '', 'color', fgMask);
+
+
+srgb = hsIm.GetDisplayImage();
+fgMask = hsIm.FgMask;
+savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
+plots.Superpixels(2, fullfile(savedir, 'leon'), srgb, segmentMask, '', 'color', fgMask);
+
 end
