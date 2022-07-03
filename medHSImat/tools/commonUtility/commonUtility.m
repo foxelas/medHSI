@@ -88,7 +88,7 @@ classdef commonUtility
                         config.GetSetting('Experiment'), filename);
 
                 case 'param'
-                    fullPath = fullfile(config.GetSetting('ParamDir'), filename);
+                    fullPath = fullfile(config.GetSetting('ExecutionDir'), 'medHSI', 'parameters', filename);
 
                 case 'referencelib'
                     fullPath = config.DirMake(config.GetSetting('MatDir'), ...

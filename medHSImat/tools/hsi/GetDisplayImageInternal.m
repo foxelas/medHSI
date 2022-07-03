@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief GetDisplayImageInternal returns an RGB image from the hyperspectral data.
 %>
-%> Parameters are saved in config::[ParamDir]\\[ParametersFileName]
+%> Parameters are saved in medHSI\\parameters\\[ParametersFileName]
 %>
 %> @b Usage
 %>

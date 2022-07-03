@@ -13,6 +13,8 @@
 %> @section  Details
 %> For details refer to https://foxelas.github.io/medHSI/.
 %>
+%> You can find a tutorial at https://github.com/foxelas/medHSIdocs/raw/tutorial/tutorial.pdf.
+%>
 %> The structure is described in @ref descr. Also, check pages @b Classes and @b Files.
 %>
 %> If you find any mistakes or bugs, contact me by email at ealoupogianni[ at ]outlook.com.
@@ -63,14 +65,14 @@
 %>    - Replace conf/config.ini with setup/demos/config.ini
 %>    - Run
 %> @code
-%> script 'demo_init.m'
+%> script 'Tutorial_ReadDataset.m'
 %> @endcode
 %>
 %> @page descr Description
 %>
 %> @section Details
 %>
-%> The MedHSIMat folders contains subfolders for different uses.
+%> The MedHSIMat folder contains subfolders for different uses.
 %> - @b tools
 %>   - Contains key classes for MedHSI processing.
 %> - @b src

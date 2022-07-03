@@ -743,7 +743,7 @@ classdef plots
         %> @brief plots.Illumination  plots the illumination spectrum.
         %>
         %> The name of the illumination source is saved in config::[IlluminationSource].
-        %> Illumination information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
+        %> Illumination information is saved in medHSI\\parameters\\displayParam.mat
         %>
         %> @b Usage
         %> plots.Illumination();
@@ -769,7 +769,7 @@ classdef plots
         %======================================================================
         %> @brief plots.ColorMatchingFunctions  plots the color matching functions.
         %>
-        %> Information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
+        %> Information is saved in medHSI\\parameters\\displayParam.mat
         %>
         %> @b Usage
         %> plots.ColorMatchingFunctions();
