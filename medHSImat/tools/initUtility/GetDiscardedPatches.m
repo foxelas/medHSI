@@ -14,19 +14,6 @@
 %> @retval discardedPatches [cell array] | The ids of the discarded patches.
 %======================================================================
 function [discardedPatches] =  GetDiscardedPatches()   
-% GetDiscardedPatches returns the names of patches that should be discarded from the analyis.
-% 
-% You can add values according to your protocol. 
-%
-% @b Usage
-%
-% @code
-% [discardedPatches] =  GetDiscardedPatches();
-% 
-% [discardedPatches] =  initUtility.DiscardedPatches();
-% @endcode
-%
-% @retval discardedPatches [cell array] | The ids of the discarded patches.
 
 discardedPatches = {'187_patch32', '187_patch33', '199_patch24', '199_patch29', '199_patch30', '199_patch31', '199_patch32', '205_patch16', '205_patch22', ...
                 '205_patch23', '205_patch24', '205_patch29', '205_patch30', '205_patch31', '205_patch32', '205_patch33', '205_patch34', '205_patch35', '205_patch37', ...

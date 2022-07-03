@@ -25,30 +25,6 @@
 %> @param targetDataset [char] | Optional: The base dataset. Default: 'psl'.
 %======================================================================
 function [] = MakeDatasetInternal(targetDataset, baseDataset)
-% MakeDataset prepares the target dataset.
-%
-% You can choose among:
-% -All: the entire dataset (reads from scratch)
-% -Raw: the raw dataset (reads from scratch)
-% -Fix: the fix dataset (reads from scratch)
-% -Augmented: the augmented dataset (based on base dataset)
-% -512: the resized 512x512 dataset (based on base dataset)
-% -32: the 32x32 patch dataset (based on base dataset)
-% -pca: the pca dataset (based on base dataset)
-%
-% @b Usage
-%
-% @code
-% config.SetSetting('Dataset', 'pslRaw');
-% initUtility.MakeDataset('Augmented');
-% %Returns dataset 'pslRawAugmented'
-%
-% initUtility.MakeDataset('Augmented', 'pslRaw');
-%
-%  @endcode
-%
-% @param targetDataset [char] | Optional: The target dataset. Default: 'All'.
-% @param targetDataset [char] | Optional: The base dataset. Default: 'psl'.
 
 clc;
 
@@ -147,8 +123,6 @@ if strcmpi(targetDataset, 'pca')
         end
     end
     
-end
-
 end
 
 hsiUtility.ExportH5Dataset();

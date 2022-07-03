@@ -7,6 +7,8 @@
 %> [imCorr] = plots.BandStatistics(fig, inVectors, 'correlation');
 %>
 %> [imCorr] = plots.BandStatistics(fig, inVectors, 'covariance');
+%>
+%> [imCorr] = PlotBandStatistics(inVectors, 'covariance', figTitle, fig)
 %> @endcode
 %>
 %> @param inVectors [numeric array] | The input vectors
@@ -17,22 +19,6 @@
 %> @retval imCorr [numeric array] | The statistics values
 %======================================================================
 function [imCorr] = PlotBandStatistics(inVectors, statistic, figTitle, fig)
-% PlotBandStatistics plots statistics among spectral bands.
-%
-% @b Usage
-%
-% @code
-% [imCorr] = plots.BandStatistics(fig, inVectors, 'correlation');
-%
-% [imCorr] = plots.BandStatistics(fig, inVectors, 'covariance');
-% @endcode
-%
-% @param inVectors [numeric array] | The input vectors
-% @param statistic [char] | The statistic name
-% @param figTitle [char] | The figure title
-% @param fig [int] | The figure handle
-%
-% @retval imCorr [numeric array] | The statistics values
 
 if strcmpi(statistic, 'correlation')
     imCorr = corr(inVectors);

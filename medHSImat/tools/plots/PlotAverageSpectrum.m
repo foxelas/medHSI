@@ -8,6 +8,8 @@
 %> @code
 %> config.SetSetting([SaveFolder], 'Spectra-Example');
 %> plots.AverageSpectrum(fig, hsIm, figTitle);
+%>
+%> PlotAverageSpectrum(hsIm, hsImInfo, fig)΄΄
 %> @endcode
 %>
 %> @param fig [int] | The figure handle
@@ -15,20 +17,6 @@
 %> @param figTitle [char] | The figure title
 %======================================================================
 function PlotAverageSpectrum(hsIm, hsImInfo, fig)
-% PlotAverageSpectrum plots average spectra using a promt for custom mask selection.
-%
-% Need to set config::[SaveFolder] for saving purposes.
-%
-% @b Usage
-%
-% @code
-% config.SetSetting([SaveFolder], 'Spectra-Example');
-% plots.AverageSpectrum(fig, hsIm, figTitle);
-% @endcode
-%
-% @param fig [int] | The figure handle
-% @param hsIm [hsi] | An instance of the hsi class
-% @param figTitle [char] | The figure title
 
 maskROI = logical(hsImInfo.Labels) & hsIm.FgMask;
 maskNonROI = ~logical(hsImInfo.Labels) & hsIm.FgMask;

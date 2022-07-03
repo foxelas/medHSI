@@ -7,6 +7,8 @@
 %> plots.Spectra(fig, spectra, wavelengths, names, figTitle, markers);
 %>
 %> plots.Spectra(fig, spectra);
+%>
+%> PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig);
 %> @endcode
 %>
 %> @param fig [int] | The figure handle
@@ -17,22 +19,6 @@
 %> @param markers [cell array] | The curve markers
 %======================================================================
 function [] = PlotSpectra(spectra, wavelengths, names, figTitle, markers, fig)
-% PlotSpectra plots multiple spectra together.
-%
-% @b Usage
-%
-% @code
-% plots.Spectra(fig, spectra, wavelengths, names, figTitle, markers);
-%
-% plots.Spectra(fig, spectra);
-% @endcode
-%
-% @param fig [int] | The figure handle
-% @param spectra [numeric array] | The input vectors
-% @param wavelengths [numeric array] | The wavlength values
-% @param names [cell array] | The curve names
-% @param figTitle [char] | The figure title
-% @param markers [cell array] | The curve markers
 
 [~, n] = size(spectra);
 if isempty(wavelengths)

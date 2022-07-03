@@ -1,6 +1,8 @@
 %======================================================================
 %> @brief SavePlot saves a figure.
 %>
+%> The plot name should be set beforehand in config::[PlotPath].
+%>
 %> @b Usage
 %>
 %> @code
@@ -11,16 +13,6 @@
 %> @param fig [int] | The figure handle
 %======================================================================
 function [] = SavePlot(fig)
-% SavePlot saves a figure.
-%
-% @b Usage
-%
-% @code
-% config.SetSetting('PlotPath', '\temp\folder\img');
-% SavePlot(fig);
-% @endcode
-%
-% @param fig [int] | The figure handle
 
 saveImages = config.GetSetting('SaveImages');
 

@@ -16,21 +16,6 @@
 %> @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none.
 %======================================================================
 function [] = PrepareLabelsFromLabelMe(inputFolder, dataset, contentConditions, targetConditions)
-% PrepareLabelsFromLabelMe prepares labels in the DataDir after the labelme labels have been created.
-%
-% You can modify this function, according to your data structure. 
-%
-% Reads img.png files created by Labelme and prepares black and white label masks.
-% 
-% @b Usage
-% @code
-% initUtility.PrepareLabelsFromLabelMe('02-Labelme', 'pslRaw', {'tissue', true}, {'raw', false});
-% @endcode
-%
-% @param inputFolder [string] | The input folder where the labelme output is located. It should exist under config::[Dataset]/dataset/. 
-% @param dataset [string] | The name of target dataset
-% @param  contentConditions [cell array] | The content conditions for reading files
-% @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none.
 
 config.SetSetting('Dataset', dataset);
 config.SetSetting('SaveFolder', inputFolder);

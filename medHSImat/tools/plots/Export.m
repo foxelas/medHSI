@@ -1,3 +1,15 @@
+%======================================================================
+%> @brief Export writes an image using export_fig.
+%>
+%> @b Usage
+%>
+%> @code
+%> Export(fig, plotPath);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param plotPath [char] | The path for saving plot figures
+%======================================================================
 function [] = Export(fig, plotPath)
 
 saveImages = config.GetSetting('SaveImages');
