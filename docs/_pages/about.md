@@ -10,9 +10,10 @@ Developed and managed by [foxelas](https://github.com/foxelas/medHSI).
 
 ### Collaborators
 
-- Obi laboratory [homepage](http://www-obi.isl.titech.ac.jp/)
-- Kobayashi laboratory
-- Sasaki pathology laboratory
+- Obi laboratory [homepage](http://www-obi.isl.titech.ac.jp/) (Tokyo Institute of Technology)
+- Kobayashi laboratory (Saitama Medical University)
+- Central Pathology Department (Saitama Medical University)
+- Dermatology Department (Saitama Medical University)
 
 ### Affiliations
 
