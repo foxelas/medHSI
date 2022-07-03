@@ -584,7 +584,7 @@ classdef hsi
         %> values
         %> @retval Mdl [model] | The dimension reduction model
         % ======================================================================
-        function [coeff, scores, latent, explained, objective] = Dimred(obj, method, q, varargin)
+        function [coeff, scores, latent, explained, objective, Mdl] = Dimred(obj, method, q, varargin)
             % ======================================================================
             %> @brief Dimred reduces the dimensions of the hyperspectral image.
             %>
@@ -625,7 +625,7 @@ classdef hsi
             %> values
             %> @retval Mdl [model] | The dimension reduction model
             % ======================================================================
-            [coeff, scores, latent, explained, objective] = dimredUtility.Apply(obj.Value, method, q, obj.FgMask, varargin{:});
+            [coeff, scores, latent, explained, objective, Mdl] = dimredUtility.Apply(obj.Value, method, q, obj.FgMask, varargin{:});
         end
 
         % ======================================================================
@@ -644,7 +644,7 @@ classdef hsi
         %> @b Usage
         %>
         %> @code
-        %> scores = hsIm.Transform(superixelNumber);
+        %> scores = hsIm.Dim(superixelNumber);
         %> @endcode
         %>
         %> @param obj [hsi] | An instance of the hsi class

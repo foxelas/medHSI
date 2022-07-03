@@ -85,6 +85,7 @@ classdef segment
             % ======================================================================
             switch method
                 case lower('Leon')
+                    %Leon, R., Martinez-Vega, B., Fabelo, H., Ortega, S., Melian, V., Castaño, I., Carretero, G., Almeida, P., Garcia, A., Quevedo, E., Hernandez, J. A., Clavo, B., & M. Callico, G. (2020). Non-Invasive Skin Cancer Diagnosis Using Hyperspectral Imaging for In-Situ Clinical Support. Journal of Clinical Medicine, 9(6), 1662. https://doi.org/10.3390/jcm9061662
                     prediction = SegmentLeon(hsiIm);
 
                 case lower('SAM')
@@ -134,7 +135,7 @@ classdef segment
             %> @param method [char] | The segmentation method. Optional: ['Leon', 'SAM-library', 'SAM-healthy', 'Kmeans', 'HypercubeToolbox'].
             %> @param varargin [cell array] | The arguments necessary for the target method
             % ======================================================================
-            switch method
+            switch lower(method)
                 case lower('Leon')
                     experiment = 'ByLeon';
                     Basics_Init(experiment);

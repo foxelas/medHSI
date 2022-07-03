@@ -56,3 +56,18 @@ plotPath = fullfile(savedir, 'endmembers_comparison');
 plots.SavePlot(3, plotPath);
 
 %% Apply Dimension Reduction
+components = 10;
+[coeff, scores, latent, explained, objective, ~] = spectralData.Dimred('RICA', components);
+
+[coeff, scores, latent, explained, ~, Mdl] = spectralData.Dimred('LDA', components);
+
+flattenFlag = false;
+components = 10;
+superpixels = 30;
+pcaScores = spectralData.Transform(flattenFlag, 'SuperPCA', components, superpixels);
+
+
+%% Apply Segmentation
+clusters = 5; 
+mask = segment.Apply(spectralData, 'Kmeans', clusters);
+

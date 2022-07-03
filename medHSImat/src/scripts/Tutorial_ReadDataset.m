@@ -97,6 +97,18 @@ trainUtility.ExportLOOCV(baseDataset, true);
 baseDataset = 'pslRaw32Augmented';
 trainUtility.ExportLOOCV(baseDataset);
 
+%% Apply Kmeans segmentation on all images of the dataset and produce evidence 
+config.SetSetting('Dataset', 'pslRaw');
+segment.ApplyAndShow('Kmeans');
+
+%% Apply Leon segmentation on all images of the dataset and produce evidence 
+config.SetSetting('Dataset', 'pslRaw');
+segment.ApplyAndShow('Leon');
+
+%% Apply ICA dimension reduction on all images of the dataset and produce evidence 
+config.SetSetting('Dataset', 'pslRaw');
+dimredUtility.ApplyAndShow('ICA');
+
 %% Format data as arrays of tissue pixels instead of HSI cubes
 config.SetSetting('Dataset', 'pslRaw');
 

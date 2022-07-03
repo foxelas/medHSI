@@ -2,6 +2,7 @@
 %> @brief SegmentLeon applies Kmeans-based segmentation to an hsi.
 %>
 %> Proposed by Leon et al (2020).
+%> Leon, R., Martinez-Vega, B., Fabelo, H., Ortega, S., Melian, V., Castaño, I., Carretero, G., Almeida, P., Garcia, A., Quevedo, E., Hernandez, J. A., Clavo, B., & M. Callico, G. (2020). Non-Invasive Skin Cancer Diagnosis Using Hyperspectral Imaging for In-Situ Clinical Support. Journal of Clinical Medicine, 9(6), 1662. https://doi.org/10.3390/jcm9061662
 %>
 %> @b Usage
 %>
