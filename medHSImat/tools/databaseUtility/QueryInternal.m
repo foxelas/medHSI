@@ -25,32 +25,32 @@
 % ======================================================================
 function [filenames, tableIds, outRows] = QueryInternal(content, sampleId, captureDate, id, integrationTime, target, configuration)
 
-    warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
-    dataTable = databaseUtility.GetDataTable();
+warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
+dataTable = databaseUtility.GetDataTable();
 
-    if nargin < 7
-        configuration = [];
-    end
-    if nargin < 6
-        target = [];
-    end
-    if nargin < 5
-        integrationTime = [];
-    end
-    if nargin < 4
-        id = [];
-    end
-    if nargin < 3
-        captureDate = [];
-    end
+if nargin < 7
+    configuration = [];
+end
+if nargin < 6
+    target = [];
+end
+if nargin < 5
+    integrationTime = [];
+end
+if nargin < 4
+    id = [];
+end
+if nargin < 3
+    captureDate = [];
+end
 
-    if nargin < 2
-        sampleId = [];
-    end
+if nargin < 2
+    sampleId = [];
+end
 
-    if nargin < 1 
-        content = [];
-    end
+if nargin < 1
+    content = [];
+end
 
     function [keyValue, isMatch] = GetCondition(value)
         if iscell(value)
@@ -62,54 +62,54 @@ function [filenames, tableIds, outRows] = QueryInternal(content, sampleId, captu
         end
     end
 
-    setId = true(numel(dataTable.ID), 1);
+setId = true(numel(dataTable.ID), 1);
 
-    if ~isempty(configuration)
-        setId = setId & ismember(dataTable.Configuration, configuration);
+if ~isempty(configuration)
+    setId = setId & ismember(dataTable.Configuration, configuration);
+end
+
+if ~isempty(content)
+    [content, isMatchContent] = GetCondition(content);
+    if isMatchContent %whether content is exact match or just contains
+        setId = setId & ismember(dataTable.Content, content);
+    else
+        setId = setId & contains(lower(dataTable.Content), lower(content));
     end
+end
 
-    if ~isempty(content)
-        [content, isMatchContent] = GetCondition(content);
-        if isMatchContent %whether content is exact match or just contains
-            setId = setId & ismember(dataTable.Content, content);
-        else
-            setId = setId & contains(lower(dataTable.Content), lower(content));
-        end
+if ~isempty(integrationTime)
+    setId = setId & ismember(dataTable.IntegrationTime, integrationTime);
+end
+
+if ~isempty(target)
+    [target, isMatchTarget] = GetCondition(target);
+    if isMatchTarget
+        setId = setId & ismember(dataTable.Target, target);
+    else
+        setId = setId & contains(lower(dataTable.Target), lower(target));
     end
+end
 
-    if ~isempty(integrationTime)
-        setId = setId & ismember(dataTable.IntegrationTime, integrationTime);
-    end
+%            if ~isempty(captureDate)
+%                setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
+%            end
 
-    if ~isempty(target)
-        [target, isMatchTarget] = GetCondition(target);
-        if isMatchTarget
-            setId = setId & ismember(dataTable.Target, target);
-        else
-            setId = setId & contains(lower(dataTable.Target), lower(target));
-        end
-    end
+if ~isempty(id)
+    setId = setId & ismember(dataTable.ID, id);
+end
 
-    %            if ~isempty(captureDate)
-    %                setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
-    %            end
+if ~isempty(sampleId)
+    setId = setId & ismember(dataTable.SampleID, sampleId);
+end
 
-    if ~isempty(id)
-        setId = setId & ismember(dataTable.ID, id);
-    end
+setId = databaseUtility.SelectDatabaseSamples(dataTable, setId);
 
-    if ~isempty(sampleId)
-        setId = setId & ismember(dataTable.SampleID, sampleId);
-    end
+outRows = dataTable(setId, :);
+filenames = outRows.Filename;
+tableIds = outRows.ID;
 
-    setId = databaseUtility.SelectDatabaseSamples(dataTable, setId);
-
-    outRows = dataTable(setId, :);
-    filenames = outRows.Filename;
-    tableIds = outRows.ID;
-
-    % Sort by sampleID
-    [outRows, sortId] = sortrows(outRows, {'SampleID', 'IsUnfixed'}, {'ascend', 'descend'});
-    filenames = filenames(sortId);
-    tableIds = tableIds(sortId);
+% Sort by sampleID
+[outRows, sortId] = sortrows(outRows, {'SampleID', 'IsUnfixed'}, {'ascend', 'descend'});
+filenames = filenames(sortId);
+tableIds = tableIds(sortId);
 end

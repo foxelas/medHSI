@@ -25,9 +25,9 @@ if ndims(target) < 3
     error('Needs more than 3 dimensions.');
 end
 
-if nargin < 3 
-    fgMask  = []; 
-end 
+if nargin < 3
+    fgMask = [];
+end
 
 if nargin < 4
     method = 'NFindr';
@@ -62,7 +62,7 @@ switch lower(method)
         endmembers = ppi(rtarget, numEndmembers, 'ReductionMethod', reductionMethod);
     case lower('fippi')
         endmembers = fippi(rtarget, numEndmembers, 'ReductionMethod', reductionMethod);
-    otherwise 
+    otherwise
         error('Unavailable method for pure pixel calculation.');
 end
 

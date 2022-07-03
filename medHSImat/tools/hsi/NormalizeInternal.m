@@ -63,7 +63,7 @@ hsInorm = hsIm;
 hsInorm.Value = Inorm;
 
 if ~config.GetSetting('DisableNormalizationCheck')
-    plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('NormCheckFolderName'), strcat(hsIm.ID,'_curves')), 'png');
+    plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('NormCheckFolderName'), strcat(hsIm.ID, '_curves')), 'png');
     plots.NormalizationCheck(1, plotPath, hsIm, Iblack, Iwhite, hsInorm);
 end
 

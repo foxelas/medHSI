@@ -18,19 +18,19 @@ classdef commonUtility
         %>
         % ======================================================================
         function [bbox] = GetBoundingBoxMask(corners)
-        % ======================================================================
-        %> @brief GetBoundingBoxMask returns the mask corner indexes for a bounding box.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> bbox = commonUtility.GetBoundingBoxMask(corners);
-        %>
-        %> corners = [316, 382, 242, 295];
-        %> bbox = commonUtility.GetBoundingBoxMask(corners);
-        %> @endcode
-        %>
-        % ======================================================================
+            % ======================================================================
+            %> @brief GetBoundingBoxMask returns the mask corner indexes for a bounding box.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> bbox = commonUtility.GetBoundingBoxMask(corners);
+            %>
+            %> corners = [316, 382, 242, 295];
+            %> bbox = commonUtility.GetBoundingBoxMask(corners);
+            %> @endcode
+            %>
+            % ======================================================================
             bbox = [corners(1), corners(3), corners(2) - corners(1) + 1, corners(4) - corners(3) + 1];
         end
 
@@ -55,27 +55,27 @@ classdef commonUtility
         %> @retval fullPath [string] | The full path to the target file
         % ======================================================================
         function [fullPath] = GetFilename(directoryType, filename, extension)
-        % ======================================================================
-        %> @brief GetFilename returns the the directories for saved data.
-        %>
-        %> For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'output' or 'h5'
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> filename = num2str(id);
-        %> fullPath = commonUtility.GetFilename('label', filename);
-        %>
-        %> dirOnly = commonUtility.GetFilename('dataset', 'none', '');
-        %> @endcode
-        %>
-        %> @param directoryType [string] | The type of the directory to be recovered
-        %> @param filename [string] | Optional: The name of the file. Default: ''
-        %> @param extension [string] | Optional: The file extension. Default: 'mat'
-        %>
-        %> @retval fullPath [string] | The full path to the target file
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief GetFilename returns the the directories for saved data.
+            %>
+            %> For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'output' or 'h5'
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> filename = num2str(id);
+            %> fullPath = commonUtility.GetFilename('label', filename);
+            %>
+            %> dirOnly = commonUtility.GetFilename('dataset', 'none', '');
+            %> @endcode
+            %>
+            %> @param directoryType [string] | The type of the directory to be recovered
+            %> @param filename [string] | Optional: The name of the file. Default: ''
+            %> @param extension [string] | Optional: The file extension. Default: 'mat'
+            %>
+            %> @retval fullPath [string] | The full path to the target file
+            % ======================================================================
+
             if nargin < 2
                 filename = '';
             end
@@ -169,22 +169,22 @@ classdef commonUtility
         %> @retval targetIDs [string] | The targetIDs of saved files
         % ======================================================================
         function [datanames, targetIDs] = DatasetInfo(bySample)
-        % ======================================================================
-        %> @brief DatasetInfo returns datanames and targetIDs in the current dataset.
-        %>
-        %> The dataset is fetched from the directory according config::[Dataset].
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [datanames, targetIDs] = commonUtility.DatasetInfo();
-        %> @endcode
-        %>
-        %> @param bySample [boolean] | Optional: Flag about whether only unique sample ids should be recovered. Default: true.
-        %>
-        %> @retval datanames [string] | The datanames of saved files
-        %> @retval targetIDs [string] | The targetIDs of saved files
-        % ======================================================================
+            % ======================================================================
+            %> @brief DatasetInfo returns datanames and targetIDs in the current dataset.
+            %>
+            %> The dataset is fetched from the directory according config::[Dataset].
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> [datanames, targetIDs] = commonUtility.DatasetInfo();
+            %> @endcode
+            %>
+            %> @param bySample [boolean] | Optional: Flag about whether only unique sample ids should be recovered. Default: true.
+            %>
+            %> @retval datanames [string] | The datanames of saved files
+            %> @retval targetIDs [string] | The targetIDs of saved files
+            % ======================================================================
             if nargin < 1
                 bySample = false;
             end
@@ -226,25 +226,25 @@ classdef commonUtility
         %> @retval coefficient [numeric] | The coefficient value
         % ======================================================================
         function gfc = GoodnessOfFit(reconstructed, measured)
-        % ======================================================================
-        %> @brief GoodnessOfFit returns coodness of fit coefficient
-        %>
-        %> Compares the similarity of two curves. The higher the value, the
-        %> more similar the curves. Values above 0.99 are considered good for
-        %> reconstruction.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> gfc = commonUtility.GoodnessOfFit(reconstructed, measured);
-        %> @endcode
-        %>
-        %> @param reconstructed [vector] | The vector of the reconstructed curve
-        %> @param measured [vector] | The vector of the measured curve
-        %>
-        %> @retval coefficient [numeric] | The coefficient value
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief GoodnessOfFit returns coodness of fit coefficient
+            %>
+            %> Compares the similarity of two curves. The higher the value, the
+            %> more similar the curves. Values above 0.99 are considered good for
+            %> reconstruction.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> gfc = commonUtility.GoodnessOfFit(reconstructed, measured);
+            %> @endcode
+            %>
+            %> @param reconstructed [vector] | The vector of the reconstructed curve
+            %> @param measured [vector] | The vector of the measured curve
+            %>
+            %> @retval coefficient [numeric] | The coefficient value
+            % ======================================================================
+
             if size(reconstructed) ~= size(measured)
                 reconstructed = reconstructed';
             end
@@ -269,27 +269,27 @@ classdef commonUtility
         %> @retval errVal [numeric] | The coefficient value
         % ======================================================================
         function errVal = Nmse(reconstructed, measured)
-        % ======================================================================
-        %> @brief Nmse returns the Normalized Mean Square Error
-        %>
-        %> Compares the error between two curves. The smaller the value, the
-        %> more similar the curves.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> errVal = commonUtility.Nmse(reconstructed, measured);
-        %> @endcode
-        %>
-        %> @param reconstructed [vector] | The vector of the reconstructed curve
-        %> @param measured [vector] | The vector of the measured curve
-        %>
-        %> @retval errVal [numeric] | The coefficient value
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief Nmse returns the Normalized Mean Square Error
+            %>
+            %> Compares the error between two curves. The smaller the value, the
+            %> more similar the curves.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> errVal = commonUtility.Nmse(reconstructed, measured);
+            %> @endcode
+            %>
+            %> @param reconstructed [vector] | The vector of the reconstructed curve
+            %> @param measured [vector] | The vector of the measured curve
+            %>
+            %> @retval errVal [numeric] | The coefficient value
+            % ======================================================================
+
             errVal = (measured - reconstructed) * (measured - reconstructed)' / (measured * reconstructed');
         end
-        
+
         % ======================================================================
         %> @brief Rmse returns the Root Mean Square Error
         %>
@@ -308,24 +308,24 @@ classdef commonUtility
         %> @retval errVal [numeric] | The coefficient value
         % ======================================================================
         function errVal = Rmse(reconstructed, measured)
-        % ======================================================================
-        %> @brief Rmse returns the Root Mean Square Error
-        %>
-        %> Compares the error between two curves. The smaller the value, the
-        %> more similar the curves.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> errVal = commonUtility.Rmse(reconstructed, measured);
-        %> @endcode
-        %>
-        %> @param reconstructed [vector] | The vector of the reconstructed curve
-        %> @param measured [vector] | The vector of the measured curve
-        %>
-        %> @retval errVal [numeric] | The coefficient value
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief Rmse returns the Root Mean Square Error
+            %>
+            %> Compares the error between two curves. The smaller the value, the
+            %> more similar the curves.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> errVal = commonUtility.Rmse(reconstructed, measured);
+            %> @endcode
+            %>
+            %> @param reconstructed [vector] | The vector of the reconstructed curve
+            %> @param measured [vector] | The vector of the measured curve
+            %>
+            %> @retval errVal [numeric] | The coefficient value
+            % ======================================================================
+
             N = size(measured, 2);
             errVal = sqrt(((measured - reconstructed) * (measured - reconstructed)')/N);
         end
@@ -342,30 +342,30 @@ classdef commonUtility
         %> jac = commonUtility.Jaccard(prediction, groundTruth);
         %> @endcode
         %>
-        %> @param prediction [numeric array] | The predicted mask 
-        %> @param groundTruth [numeric array] | The ground truth mask 
+        %> @param prediction [numeric array] | The predicted mask
+        %> @param groundTruth [numeric array] | The ground truth mask
         %>
         %> @retval jacVal [numeric] | The jaccard coefficient value
         % ======================================================================
         function jacVal = Jaccard(prediction, groundTruth)
-        % ======================================================================
-        %> @brief Jaccard returns the Jaccard Coefficient.
-        %>
-        %> Compares the error between two masks. The higher the value, the
-        %> more similar the masks.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> jac = commonUtility.Jaccard(prediction, groundTruth);
-        %> @endcode
-        %>
-        %> @param prediction [numeric array] | The predicted mask 
-        %> @param groundTruth [numeric array] | The ground truth mask 
-        %>
-        %> @retval jacVal [numeric] | The jaccard coefficient value
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief Jaccard returns the Jaccard Coefficient.
+            %>
+            %> Compares the error between two masks. The higher the value, the
+            %> more similar the masks.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> jac = commonUtility.Jaccard(prediction, groundTruth);
+            %> @endcode
+            %>
+            %> @param prediction [numeric array] | The predicted mask
+            %> @param groundTruth [numeric array] | The ground truth mask
+            %>
+            %> @retval jacVal [numeric] | The jaccard coefficient value
+            % ======================================================================
+
             if ismatrix(prediction) || ismatrix(groundTruth)
                 prediction = prediction(:);
                 groundTruth = groundTruth(:);
@@ -388,7 +388,7 @@ classdef commonUtility
                 jacVal = 1;
             end
         end
-        
+
         % ======================================================================
         %> @brief Evaluations returns performance metrics for classification tasks
         %>
@@ -408,24 +408,24 @@ classdef commonUtility
         %> @retval specificity [numeric] | The model specificity
         % ======================================================================
         function [accuracy, sensitivity, specificity] = Evaluations(actual, predicted)
-        % ======================================================================
-        %> @brief Evaluations returns performance metrics for classification tasks
-        %>
-        %> Returns accuracy, sensitivity and specificity metrics.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [accuracy, sensitivity, specificity] = commonUtility.Evaluations(actual, predicted);
-        %> @endcode
-        %>
-        %> @param actual [vector] | The actual values
-        %> @param predicted [vector] | The predicted values
-        %>
-        %> @retval accuracy [numeric] | The model accuracy
-        %> @retval sensitivity [numeric] | The model sensitivity
-        %> @retval specificity [numeric] | The model specificity
-        % ======================================================================
+            % ======================================================================
+            %> @brief Evaluations returns performance metrics for classification tasks
+            %>
+            %> Returns accuracy, sensitivity and specificity metrics.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> [accuracy, sensitivity, specificity] = commonUtility.Evaluations(actual, predicted);
+            %> @endcode
+            %>
+            %> @param actual [vector] | The actual values
+            %> @param predicted [vector] | The predicted values
+            %>
+            %> @retval accuracy [numeric] | The model accuracy
+            %> @retval sensitivity [numeric] | The model sensitivity
+            %> @retval specificity [numeric] | The model specificity
+            % ======================================================================
             if ~isnumeric(actual) && isnumeric(predicted)
                 actual = double(actual);
             end
@@ -449,19 +449,19 @@ classdef commonUtility
         %> @retval arr [numeric array] | The array
         % ======================================================================
         function [arr] = Cell2Mat(cellArr)
-        % ======================================================================
-        %> @brief Cell2Mat concatenates the contents of a cell array of values to a matrix.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [matArr] = commonUtility.Cell2Mat(cellArr);
-        %> @endcode
-        %>
-        %> @param cellArr [cell array] | The cell array
-        %>
-        %> @retval arr [numeric array] | The array
-        % ======================================================================
+            % ======================================================================
+            %> @brief Cell2Mat concatenates the contents of a cell array of values to a matrix.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> [matArr] = commonUtility.Cell2Mat(cellArr);
+            %> @endcode
+            %>
+            %> @param cellArr [cell array] | The cell array
+            %>
+            %> @retval arr [numeric array] | The array
+            % ======================================================================
 
             isStack = iscell(cellArr{1});
             if isStack
@@ -490,26 +490,26 @@ classdef commonUtility
         %>
         %> @param target [numeric array] | The hsi cube
         %> @param reference [vector] | The reference curve
-        %> @param funHandle [function handle] | The function handle for the function to be applied. 
+        %> @param funHandle [function handle] | The function handle for the function to be applied.
         %>
         %> @retval dist [double] | The distance
         % ======================================================================
         function [dist] = CalcDistance(target, reference, funHandle)
-        % ======================================================================
-        %> @brief CalcDistance calculates a distance between a target hsi cube and a reference according to a target function.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [dist] = commonUtility.CalcDistance(target, reference, funHandle);
-        %> @endcode
-        %>
-        %> @param target [numeric array] | The hsi cube
-        %> @param reference [vector] | The reference curve
-        %> @param funHandle [function handle] | The function handle for the function to be applied. 
-        %>
-        %> @retval dist [double] | The distance
-        % ======================================================================
+            % ======================================================================
+            %> @brief CalcDistance calculates a distance between a target hsi cube and a reference according to a target function.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> [dist] = commonUtility.CalcDistance(target, reference, funHandle);
+            %> @endcode
+            %>
+            %> @param target [numeric array] | The hsi cube
+            %> @param reference [vector] | The reference curve
+            %> @param funHandle [function handle] | The function handle for the function to be applied.
+            %>
+            %> @retval dist [double] | The distance
+            % ======================================================================
             vals = reshape(target, [size(target, 1) * size(target, 2), size(target, 3)]);
             dists = arrayfun(@(rowidxs) funHandle(vals(rowidxs, :)', reference), (1:size(vals, 1)).');
             dist = reshape(dists, [size(target, 1), size(target, 2)]);
@@ -530,20 +530,20 @@ classdef commonUtility
         %> @retval dist [double] | The distance
         % ======================================================================
         function dist = Frechet(target, reference)
-        % ======================================================================
-        %> @brief Frechet calculates the Frechet distance between a target and a reference.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [dist] = commonUtility.Frechet(target, reference);
-        %> @endcode
-        %>
-        %> @param target [vector] | The target curve
-        %> @param reference [vector] | The reference curve
-        %>
-        %> @retval dist [double] | The distance
-        % ======================================================================
+            % ======================================================================
+            %> @brief Frechet calculates the Frechet distance between a target and a reference.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> [dist] = commonUtility.Frechet(target, reference);
+            %> @endcode
+            %>
+            %> @param target [vector] | The target curve
+            %> @param reference [vector] | The reference curve
+            %>
+            %> @retval dist [double] | The distance
+            % ======================================================================
             [dist, ~] = DiscreteFrechetDist(target, reference);
         end
 
@@ -562,20 +562,20 @@ classdef commonUtility
         %> @retval dist [double] | The distance
         % ======================================================================
         function dist = ProposedDistance(target, reference)
-        % ======================================================================
-        %> @brief Frechet calculates the Proposed distance between a target and a reference.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [dist] = commonUtility.ProposedDistance(target, reference);
-        %> @endcode
-        %>
-        %> @param target [vector] | The target curve
-        %> @param reference [vector] | The reference curve
-        %>
-        %> @retval dist [double] | The distance
-        % ======================================================================
+            % ======================================================================
+            %> @brief Frechet calculates the Proposed distance between a target and a reference.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> [dist] = commonUtility.ProposedDistance(target, reference);
+            %> @endcode
+            %>
+            %> @param target [vector] | The target curve
+            %> @param reference [vector] | The reference curve
+            %>
+            %> @retval dist [double] | The distance
+            % ======================================================================
             dist = ((sum((target).^2) / (sum((reference).^2))));
         end
 
@@ -593,19 +593,19 @@ classdef commonUtility
         %> @retval isChild [bool] | The flag that shows if it is child
         % ======================================================================
         function isChild = IsChild(targetParents)
-        % ======================================================================
-        %> @brief IsChild checks if a function is child to a set of target parents.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> [dist] = commonUtility.IsChild(targetParents);
-        %> @endcode
-        %>
-        %> @param targetParents [cell array] | The target parents
-        %>
-        %> @retval isChild [bool] | The flag that shows if it is child
-        % ======================================================================
+            % ======================================================================
+            %> @brief IsChild checks if a function is child to a set of target parents.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> [dist] = commonUtility.IsChild(targetParents);
+            %> @endcode
+            %>
+            %> @param targetParents [cell array] | The target parents
+            %>
+            %> @retval isChild [bool] | The flag that shows if it is child
+            % ======================================================================
             stack = dbstack();
             isChild = false;
             for k = 1:numel(stack)

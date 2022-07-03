@@ -31,7 +31,7 @@ if (saveImages)
             ext = '.png';
         end
         export_fig(filename, '-png', '-native', '-transparent');
-        
+
         if (saveEps)
             filename = strrep(filename, ext, '.eps');
             export_fig(filename, '-eps', '-transparent', '-r900', '-RGB');

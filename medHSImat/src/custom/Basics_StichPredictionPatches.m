@@ -3,10 +3,10 @@ fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-dirName = fullfile('python-test',  'cnn3d_2022-06-15\');
+dirName = fullfile('python-test', 'cnn3d_2022-06-15\');
 baseDir = commonUtility.GetFilename('output', dirName, '');
 
-baseDir =  'D:\elena\mspi\output\split3-test\python-test\';
+baseDir = 'D:\elena\mspi\output\split3-test\python-test\';
 
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};

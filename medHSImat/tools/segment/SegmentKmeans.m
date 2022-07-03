@@ -16,8 +16,8 @@
 %> @retval centroids [numeric array] | The cluster centroids
 % ======================================================================
 function [prediction, centroids] = SegmentKmeans(hsIm, clusters)
-    fgMask = hsIm.FgMask;
-    Xcol = hsIm.GetMaskedPixels(fgMask);
-    [labelsCol, centroids] = kmeans(Xcol, clusters);
-    prediction = hsi.RecoverSpatialDimensions(labelsCol, size(fgMask), fgMask);
+fgMask = hsIm.FgMask;
+Xcol = hsIm.GetMaskedPixels(fgMask);
+[labelsCol, centroids] = kmeans(Xcol, clusters);
+prediction = hsi.RecoverSpatialDimensions(labelsCol, size(fgMask), fgMask);
 end

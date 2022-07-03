@@ -1,6 +1,6 @@
 %======================================================================
 %> @brief MakeDataset prepares the target dataset.
-%> 
+%>
 %> You can choose among:
 %> -All: the entire dataset (reads from scratch)
 %> -Raw: the raw dataset (reads from scratch)
@@ -122,7 +122,7 @@ if strcmpi(targetDataset, 'pca')
             save(targetFilename, 'spectralData', 'labelInfo', '-v7.3');
         end
     end
-    
+
 end
 
 hsiUtility.ExportH5Dataset();

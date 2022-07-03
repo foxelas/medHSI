@@ -27,25 +27,25 @@ classdef apply
         %> @retval varargout [cell array] | The return values of the target function
         % ======================================================================
         function [varargout] = ToEach(funcHandle, varargin)
-        % ======================================================================
-        %> @brief ToEach applies a function on each of the data samples in the dataset.
-        %>
-        %> The target function should have arguments in the format of (hsIm,
-        %> , ...), where hsIm is an instance of class 'hsi'. The targetID
-        %> is saved for figure saving purposes in config::[FileName].
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> apply.ToEach(@CustomKmeans, 5);
-        %> @endcode
-        %>
-        %> @param funcHandle [function handle] | Handle of the target function to be applied
-        %> @param varargin [cell array] | The arguments necessary for the target function
-        %>
-        %> @retval varargout [cell array] | The return values of the target function
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief ToEach applies a function on each of the data samples in the dataset.
+            %>
+            %> The target function should have arguments in the format of (hsIm,
+            %> , ...), where hsIm is an instance of class 'hsi'. The targetID
+            %> is saved for figure saving purposes in config::[FileName].
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> apply.ToEach(@CustomKmeans, 5);
+            %> @endcode
+            %>
+            %> @param funcHandle [function handle] | Handle of the target function to be applied
+            %> @param varargin [cell array] | The arguments necessary for the target function
+            %>
+            %> @retval varargout [cell array] | The return values of the target function
+            % ======================================================================
+
             if nargin < 2
                 varargin = {};
             end
@@ -69,7 +69,7 @@ classdef apply
                 end
             end
         end
-        
+
         % ======================================================================
         %> @brief DisableFigures applies a script while suppressing figure production and saving.
         %>
@@ -85,21 +85,21 @@ classdef apply
         %> @retval varargout [cell array] | The return values of the target function
         % ======================================================================
         function [varargout] = DisableFigures(funcHandle, varargin)
-        % ======================================================================
-        %> @brief DisableFigures applies a script while suppressing figure production and saving.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> apply.DisableFigures(@apply.SuperpixelAnalysis);
-        %> @endcode
-        %>
-        %> @param funcHandle [function handle] | Handle of the target function to be applied
-        %> @param varargin [cell array] | The arguments necessary for the target function
-        %>
-        %> @retval varargout [cell array] | The return values of the target function
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief DisableFigures applies a script while suppressing figure production and saving.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> apply.DisableFigures(@apply.SuperpixelAnalysis);
+            %> @endcode
+            %>
+            %> @param funcHandle [function handle] | Handle of the target function to be applied
+            %> @param varargin [cell array] | The arguments necessary for the target function
+            %>
+            %> @retval varargout [cell array] | The return values of the target function
+            % ======================================================================
+
             warning('off', 'all');
             showFigures = config.GetSetting('ShowFigures');
             saveImages = config.GetSetting('SaveImages');
@@ -120,7 +120,7 @@ classdef apply
             config.SetSetting('ShowFigures', showFigures);
             warning('on', 'all');
         end
-        
+
         % ======================================================================
         %> @brief DisableSaveFigures applies a script while suppressing figure saving.
         %>
@@ -136,21 +136,21 @@ classdef apply
         %> @retval varargout [cell array] | The return values of the target function
         % ======================================================================
         function [varargout] = DisableSaveFigures(funcHandle, varargin)
-        % ======================================================================
-        %> @brief DisableSaveFigures applies a script while suppressing figure saving.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
-        %> @endcode
-        %>
-        %> @param funcHandle [function handle] | Handle of the target function to be applied
-        %> @param varargin [cell array] | The arguments necessary for the target function
-        %>
-        %> @retval varargout [cell array] | The return values of the target function
-        % ======================================================================
-        
+            % ======================================================================
+            %> @brief DisableSaveFigures applies a script while suppressing figure saving.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> apply.DisableSaveFigures(@apply.SuperpixelAnalysis);
+            %> @endcode
+            %>
+            %> @param funcHandle [function handle] | Handle of the target function to be applied
+            %> @param varargin [cell array] | The arguments necessary for the target function
+            %>
+            %> @retval varargout [cell array] | The return values of the target function
+            % ======================================================================
+
             warning('off', 'all');
             saveImages = config.GetSetting('SaveImages');
             config.SetSetting('SaveImages', false);
@@ -166,7 +166,7 @@ classdef apply
             config.SetSetting('SaveImages', saveImages);
             warning('on', 'all');
         end
-        
+
         % ======================================================================
         %> @brief RowFunc applies a function on each row of the input.
         %>
@@ -189,27 +189,27 @@ classdef apply
         %> @retval result [cell array] | The return values of the target function
         % ======================================================================
         function [result] = RowFunc(funcHandle, X, varargin)
-        % ======================================================================
-        %> @brief RowFunc applies a function on each row of the input.
-        %>
-        %> Is the input data is an hsi instance, then the pixels that
-        %> belong to the foreground mask are considered.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> meanVals = apply.RowFunc(@mean, X);
-        %>
-        %> meanVals = apply.RowFunc(@mean, hsIm);
-        %> @endcode
-        %>
-        %> @param funcHandle [function handle] | Handle of the target function to be applied
-        %> @param X [numeric array] | The input data as an array, where each
-        %> row is a feature vector.
-        %> @param varargin [cell array] | The arguments necessary for the target function
-        %>
-        %> @retval result [cell array] | The return values of the target function
-        % ======================================================================
+            % ======================================================================
+            %> @brief RowFunc applies a function on each row of the input.
+            %>
+            %> Is the input data is an hsi instance, then the pixels that
+            %> belong to the foreground mask are considered.
+            %>
+            %> @b Usage
+            %>
+            %> @code
+            %> meanVals = apply.RowFunc(@mean, X);
+            %>
+            %> meanVals = apply.RowFunc(@mean, hsIm);
+            %> @endcode
+            %>
+            %> @param funcHandle [function handle] | Handle of the target function to be applied
+            %> @param X [numeric array] | The input data as an array, where each
+            %> row is a feature vector.
+            %> @param varargin [cell array] | The arguments necessary for the target function
+            %>
+            %> @retval result [cell array] | The return values of the target function
+            % ======================================================================
 
             if hsi.IsHsi(X)
                 X = X.GetMaskedPixels();

@@ -74,13 +74,13 @@ for k = 1:3
                 %                 %estimated
                 %                 boxConstraint = 38.64;
                 %                 kernelScale = 4.1023;
-                
-% %                 %observed
-% %                 boxConstraint = 11.767;
-% %                 kernelScale = 2.6353;
-% %                 %                %estimated
-% %                 %                boxConstraint = 9.862;
-% %                 %                kernelScale = 2.799;
+
+                % %                 %observed
+                % %                 boxConstraint = 11.767;
+                % %                 kernelScale = 2.6353;
+                % %                 %                %estimated
+                % %                 %                boxConstraint = 9.862;
+                % %                 %                kernelScale = 2.799;
                 [testPerformance{i}, performanceRow(i, :)] = TrainClassifier(name, trainDataSet, testDataSet, 'none', 311, [], [boxConstraint, kernelScale]);
 
             case 'kmeans'

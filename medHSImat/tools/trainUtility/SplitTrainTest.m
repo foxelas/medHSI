@@ -26,60 +26,60 @@
 % ======================================================================
 function [trainData, testData, folds] = SplitTrainTest(baseDataset, dataType, splitType, folds, testIds, varargin)
 
-    config.SetSetting('Dataset', baseDataset);
-    
-    [hsiList, labelInfoList] = hsiUtility.LoadDataset();
+config.SetSetting('Dataset', baseDataset);
 
-    if strcmpi(splitType, 'custom')
-        [~, ~, trainTargetIndexes, testTargetIndexes] = trainUtility.TrainTestIndexes(baseDataset, testIds);
-        folds = 1;
-        
-    elseif strcmpi(splitType, 'kfold')
-        rng('default') % For reproducibility
-        cvp = cvpartition(numel(hsiList), 'kfold', folds);
-        trainTargetIndexes = {};
-        testTargetIndexes = {};
-        for k = 1:folds
-            trainTargetIndexes{k} = training(cvp, k);
-            testTargetIndexes{k} = test(cvp, k);
-        end
-        
-    elseif strcmpi(splitType, 'LOOCV-byPatient')
-        [~, ~, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset, true);
-        folds = numel(trainTargetIndexes);
-        
-    elseif strcmpi(splitType, 'LOOCV-bySample')
-        [~, ~, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset, false);
-        folds = numel(trainTargetIndexes);
-    end
-    
+[hsiList, labelInfoList] = hsiUtility.LoadDataset();
 
+if strcmpi(splitType, 'custom')
+    [~, ~, trainTargetIndexes, testTargetIndexes] = trainUtility.TrainTestIndexes(baseDataset, testIds);
+    folds = 1;
+
+elseif strcmpi(splitType, 'kfold')
+    rng('default') % For reproducibility
+    cvp = cvpartition(numel(hsiList), 'kfold', folds);
+    trainTargetIndexes = {};
+    testTargetIndexes = {};
     for k = 1:folds
-        if folds > 1
-            trainIds = trainTargetIndexes{k};
-            testIds = testTargetIndexes{k};
-        else
-            trainIds = trainTargetIndexes;
-            testIds = testTargetIndexes;
-        end
-        
-        hsiX = hsiList(trainIds);
-        labelsX = labelInfoList(trainIds);
-        [train_X, train_y, train_sRGBs, train_fgMasks, train_labelImgs] = trainUtility.Format(hsiX, labelsX, dataType, varargin{:});
-        foldTrainData = struct('Values', train_X, 'Labels', train_y, 'RGBs', train_sRGBs, 'Masks', train_fgMasks, 'ImageLabels', train_labelImgs);
-
-        hsiX = hsiList(testIds);
-        labelsX = labelInfoList(testIds);
-        [test_X, test_y, test_sRGBs, test_fgMasks, test_labelImgs] = trainUtility.Format(hsiX, labelsX, dataType, varargin{:});
-        foldTestData = struct('Values', test_X, 'Labels', test_y, 'RGBs', test_sRGBs, 'Masks', test_fgMasks, 'ImageLabels', test_labelImgs);
-
-        if folds > 1
-            trainData{k} = foldTrainData;
-            testData{k} = foldTestData;
-        else
-            trainData = foldTrainData;
-            testData = foldTestData;
-        end
+        trainTargetIndexes{k} = training(cvp, k);
+        testTargetIndexes{k} = test(cvp, k);
     end
 
-end 
+elseif strcmpi(splitType, 'LOOCV-byPatient')
+    [~, ~, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset, true);
+    folds = numel(trainTargetIndexes);
+
+elseif strcmpi(splitType, 'LOOCV-bySample')
+    [~, ~, trainTargetIndexes, testTargetIndexes] = trainUtility.LOOCVIndexes(baseDataset, false);
+    folds = numel(trainTargetIndexes);
+end
+
+
+for k = 1:folds
+    if folds > 1
+        trainIds = trainTargetIndexes{k};
+        testIds = testTargetIndexes{k};
+    else
+        trainIds = trainTargetIndexes;
+        testIds = testTargetIndexes;
+    end
+
+    hsiX = hsiList(trainIds);
+    labelsX = labelInfoList(trainIds);
+    [train_X, train_y, train_sRGBs, train_fgMasks, train_labelImgs] = trainUtility.Format(hsiX, labelsX, dataType, varargin{:});
+    foldTrainData = struct('Values', train_X, 'Labels', train_y, 'RGBs', train_sRGBs, 'Masks', train_fgMasks, 'ImageLabels', train_labelImgs);
+
+    hsiX = hsiList(testIds);
+    labelsX = labelInfoList(testIds);
+    [test_X, test_y, test_sRGBs, test_fgMasks, test_labelImgs] = trainUtility.Format(hsiX, labelsX, dataType, varargin{:});
+    foldTestData = struct('Values', test_X, 'Labels', test_y, 'RGBs', test_sRGBs, 'Masks', test_fgMasks, 'ImageLabels', test_labelImgs);
+
+    if folds > 1
+        trainData{k} = foldTrainData;
+        testData{k} = foldTestData;
+    else
+        trainData = foldTrainData;
+        testData = foldTestData;
+    end
+end
+
+end

@@ -41,6 +41,7 @@ option = config.GetSetting('Normalization');
 hasDenoising = false;
 
 if ~strcmp(option, 'raw')
+
     %% Normalize
     whiteReflectance = hsiUtility.LoadHSIReference(targetID, strcat('white_', option));
     blackReflectance = hsiUtility.LoadHSIReference(targetID, 'black');
@@ -59,13 +60,13 @@ if ~strcmp(option, 'raw')
         value = hsi.RecoverSpatialDimensions(col, size(hsIm.FgMask));
         hsIm.Value = value;
     end
-    
+
     %% Denoise (Currently disabled)
-    if hasDenoising 
+    if hasDenoising
         value = hsIm.Denoise('smoothen');
         hsIm.Value = value;
     end
-    
+
 end
 
 end

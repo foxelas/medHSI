@@ -127,7 +127,7 @@ for i = 1:length(targetIDs)
         dispImageRgbPath = config.DirMake(basedir, 'preprocessed', saveName);
         % To preserve dimensions
         plots.Export(2, dispImageRgbPath, dispImageRgb);
-        
+
         subImagePath = config.DirMake(basedir, 'preprocessed_channels', saveName);
         spectralData.SubimageMontage(3, subImagePath);
     end

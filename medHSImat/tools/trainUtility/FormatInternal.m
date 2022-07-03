@@ -42,13 +42,13 @@ for i = 1:n
     labelInfo = labelInfos{i};
     fgMask = hsIm.FgMask;
     ydata = [];
-    
+
     srgb = hsIm.GetDisplayRescaledImage();
-    
+
     if useTransform
         hsIm = hsIm.ApplyFunction(transformFun);
     end
-            
+
     if strcmp(dataType, 'image')
         xdata = hsIm.Value;
         if ~isempty(labelInfo.Labels)

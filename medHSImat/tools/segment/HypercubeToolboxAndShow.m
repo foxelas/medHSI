@@ -48,12 +48,12 @@ else
     plots.SavePlot(1, plotPath);
 
     figure(2);
-    montage(abundanceMap,'Size',[2 4],'BorderSize',[10 10]);
+    montage(abundanceMap, 'Size', [2, 4], 'BorderSize', [10, 10]);
     colormap default
     title('Abundance Maps for Endmembers');
     plotPath = fullfile(savedir, strcat(saveName, '_abundance'));
     plots.SavePlot(2, plotPath);
-    
+
     if hasLabels
         figure(3);
         savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
@@ -61,9 +61,9 @@ else
         img = {srgb, prediction};
         names = {labelInfo.Diagnosis, 'Clustering'};
         plotPath = fullfile(savedir, 'clustering');
-        plots.MontageWithLabel(3, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);       
+        plots.MontageWithLabel(3, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
     end
-    
+
 end
 
 end

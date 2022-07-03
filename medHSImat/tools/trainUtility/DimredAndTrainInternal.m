@@ -16,7 +16,7 @@
 %> svmSettings = [boxConstraint, kernelScale];
 %> [performanceStruct, trainedModel, Xvalid] = trainUtility.DimredAndTrain(trainData, testData, method, q, svmSettings);
 %>
-%> % Apply dimension reduction with additional settings. 
+%> % Apply dimension reduction with additional settings.
 %> superpixelNumber = 10;
 %> [performanceStruct, trainedModel, Xvalid] = trainUtility.DimredAndTrain(trainData, testData, 'SuperPCA', q, svmSettings, superpixelNumber);
 %> @endcode
@@ -34,95 +34,95 @@
 % ======================================================================
 function [performanceStruct, trainedModel, XTest] = DimredAndTrainInternal(trainData, testData, method, q, svmSettings, varargin)
 
-            % scope of training 
-            
-            if strcmpi(method, 'lda')
-                method = 'LDA-all'; %LDA is trained on all data
-                
-            elseif strcmpi(method, 'pca-lda')
-                method = 'PCA-LDA-all'; %PCA followed by LDA is trained on all data
-            end
+% scope of training
 
-            updatedMethod = method;
-            if strcmpi(method, 'autoencoder') || strcmpi(method, 'rfi')
-                updatedMethod = method; %'none'
-                scope = 'all';
-                
-            elseif strcmpi(method, 'lda') 
-                scope = 'all'; %LDA is trained on all data
-           
-            elseif strcmpi(method, 'pca-lda')
-                scope = 'all'; %PCA followed by LDA is trained on all data
-                
-            elseif contains(lower(method), '-all')
-                updatedMethod = strrep(method, '-all', '');
-                scope = 'all';
-                
-            else
-                scope = 'perSample';
-            end
+if strcmpi(method, 'lda')
+    method = 'LDA-all'; %LDA is trained on all data
 
-            if strcmpi(method, 'MSuperPCA') || strcmpi(method, 'MClusterPCA')
-                scope = 'stacked';
-            end
+elseif strcmpi(method, 'pca-lda')
+    method = 'PCA-LDA-all'; %PCA followed by LDA is trained on all data
+end
 
-            % Apply dimred depending on the scope 
-            if strcmpi(scope, 'perSample')
-                tic;
-                transTrain = cellfun(@(x, y) x.Transform(true, updatedMethod, q, y, varargin{:}), {trainData.Values}, {trainData.ImageLabels}, 'un', 0);
-                drTrainTime = toc;
-                drTrainTime = drTrainTime / numel(transTrain);
-                XTest = cellfun(@(x, y) x.Transform(true, updatedMethod, q, y, varargin{:}), {testData.Values}, {testData.ImageLabels}, 'un', 0);
+updatedMethod = method;
+if strcmpi(method, 'autoencoder') || strcmpi(method, 'rfi')
+    updatedMethod = method; %'none'
+    scope = 'all';
 
-                %Convert cell image data to concatenated array data
-                XTrainScores = commonUtility.Cell2Mat(transTrain);
-                XTestScores = commonUtility.Cell2Mat(XTest);
-            
-            else %strcmpi(scope, 'all')
-                tic;
-                dataCell = cellfun(@(x) x.GetMaskedPixels(), {trainData.Values}, 'un', 0);
-                dataArray = cell2mat(dataCell');
-                dataCell = cellfun(@(x, y) GetMaskedPixelsInternal(y, x), {trainData.Masks}, {trainData.ImageLabels}, 'un', 0);
-                dataLabels = cell2mat(dataCell');
-                [coeff, XTrainScores, ~, ~, ~] = dimredUtility.Apply(dataArray, updatedMethod, q, [], dataLabels, varargin{:});
-                drTrainTime = toc;
-                drTrainTime = drTrainTime / numel(trainData);
+elseif strcmpi(method, 'lda')
+    scope = 'all'; %LDA is trained on all data
 
-                dataCell = cellfun(@(x) x.GetMaskedPixels(), {testData.Values}, 'un', 0);
-                dataArray = cell2mat(dataCell');
-                if ~isempty(coeff) && ~isobject(coeff)
+elseif strcmpi(method, 'pca-lda')
+    scope = 'all'; %PCA followed by LDA is trained on all data
 
-                    XTestScores = dataArray * coeff;
-                    XTest = cellfun(@(x) x.Transform(true, 'pretrained', q, [], coeff), {testData.Values}, 'un', 0);
+elseif contains(lower(method), '-all')
+    updatedMethod = strrep(method, '-all', '');
+    scope = 'all';
 
-                elseif isobject(coeff)
-                    dimredStruct = coeff;
-                    XTestScores = dimredUtility.Transform(dataArray, updatedMethod, q, dimredStruct);
-                    XTest = cellfun(@(x) x.Transform(true, updatedMethod, q, [], dimredStruct), {testData.Values}, 'un', 0);
+else
+    scope = 'perSample';
+end
 
-                else
-                    error('Incomplete arguments. Dimension reduction failed.')
-                end
+if strcmpi(method, 'MSuperPCA') || strcmpi(method, 'MClusterPCA')
+    scope = 'stacked';
+end
 
-            end
-            
-            % Use only foreground pixels for the analysis 
-            transyTrain = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {trainData.ImageLabels}, {trainData.Masks}, 'un', 0);
-            yTrain = commonUtility.Cell2Mat(transyTrain);
-            transyValid = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {testData.ImageLabels}, {testData.Masks}, 'un', 0);
-            yTest = commonUtility.Cell2Mat(transyValid);
+% Apply dimred depending on the scope
+if strcmpi(scope, 'perSample')
+    tic;
+    transTrain = cellfun(@(x, y) x.Transform(true, updatedMethod, q, y, varargin{:}), {trainData.Values}, {trainData.ImageLabels}, 'un', 0);
+    drTrainTime = toc;
+    drTrainTime = drTrainTime / numel(transTrain);
+    XTest = cellfun(@(x, y) x.Transform(true, updatedMethod, q, y, varargin{:}), {testData.Values}, {testData.ImageLabels}, 'un', 0);
 
-            % Train SVM 
-            switch lower(scope)
-                case 'stacked'
-                    [yPredict, modelTrainTime, trainedModel, ~, ~] = trainUtility.StackMultiscale(@trainUtility.SVM, 'voting', XTrainScores, yTrain, XTestScores);
+    %Convert cell image data to concatenated array data
+    XTrainScores = commonUtility.Cell2Mat(transTrain);
+    XTestScores = commonUtility.Cell2Mat(XTest);
 
-                otherwise
-                    [yPredict, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainScores, yTrain, XTestScores, svmSettings);
-            end
+else %strcmpi(scope, 'all')
+    tic;
+    dataCell = cellfun(@(x) x.GetMaskedPixels(), {trainData.Values}, 'un', 0);
+    dataArray = cell2mat(dataCell');
+    dataCell = cellfun(@(x, y) GetMaskedPixelsInternal(y, x), {trainData.Masks}, {trainData.ImageLabels}, 'un', 0);
+    dataLabels = cell2mat(dataCell');
+    [coeff, XTrainScores, ~, ~, ~] = dimredUtility.Apply(dataArray, updatedMethod, q, [], dataLabels, varargin{:});
+    drTrainTime = toc;
+    drTrainTime = drTrainTime / numel(trainData);
 
-            % Evaluate Predictions
-            [performanceStruct, trainedModel] = trainUtility.ModelEvaluation(method, q, yPredict, yTest, yTrain, trainedModel, ...
-                drTrainTime, modelTrainTime, testData, XTest);
+    dataCell = cellfun(@(x) x.GetMaskedPixels(), {testData.Values}, 'un', 0);
+    dataArray = cell2mat(dataCell');
+    if ~isempty(coeff) && ~isobject(coeff)
+
+        XTestScores = dataArray * coeff;
+        XTest = cellfun(@(x) x.Transform(true, 'pretrained', q, [], coeff), {testData.Values}, 'un', 0);
+
+    elseif isobject(coeff)
+        dimredStruct = coeff;
+        XTestScores = dimredUtility.Transform(dataArray, updatedMethod, q, dimredStruct);
+        XTest = cellfun(@(x) x.Transform(true, updatedMethod, q, [], dimredStruct), {testData.Values}, 'un', 0);
+
+    else
+        error('Incomplete arguments. Dimension reduction failed.')
+    end
+
+end
+
+% Use only foreground pixels for the analysis
+transyTrain = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {trainData.ImageLabels}, {trainData.Masks}, 'un', 0);
+yTrain = commonUtility.Cell2Mat(transyTrain);
+transyValid = cellfun(@(x, y) GetMaskedPixelsInternal(x, y), {testData.ImageLabels}, {testData.Masks}, 'un', 0);
+yTest = commonUtility.Cell2Mat(transyValid);
+
+% Train SVM
+switch lower(scope)
+    case 'stacked'
+        [yPredict, modelTrainTime, trainedModel, ~, ~] = trainUtility.StackMultiscale(@trainUtility.SVM, 'voting', XTrainScores, yTrain, XTestScores);
+
+    otherwise
+        [yPredict, modelTrainTime, trainedModel] = trainUtility.RunSVM(XTrainScores, yTrain, XTestScores, svmSettings);
+end
+
+% Evaluate Predictions
+[performanceStruct, trainedModel] = trainUtility.ModelEvaluation(method, q, yPredict, yTest, yTrain, trainedModel, ...
+    drTrainTime, modelTrainTime, testData, XTest);
 
 end

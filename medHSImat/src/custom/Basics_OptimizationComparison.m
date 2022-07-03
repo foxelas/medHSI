@@ -75,35 +75,34 @@ xlabel('Learning Rate');
 ylabel('IOU')
 legend('FontSize', 12);
 
-figure(3); 
+figure(3);
 
 load('D:\elena\mspi\output\pslRaw32Augmented\python-test\test-wavelength\test3\0_performance.mat');
 v = cell2mat(testEval);
 y = [v.val_iou_score] * 100;
-yy =[v.val_precision] * 100;
+yy = [v.val_precision] * 100;
 x = [5, 10, 20, 30];
-plot(x,y,'LineWidth', 2);
+plot(x, y, 'LineWidth', 2);
 ylim([50, 100]);
 ylabel('Jaccard Coefficient (%)', 'FontSize', 15);
 xlabel('Kernel Size in Spectral Dimension', 'FontSize', 15);
-yyaxis right; 
-plot(x, yy,'LineWidth', 2);
-ylim([50,100]);
+yyaxis right;
+plot(x, yy, 'LineWidth', 2);
+ylim([50, 100]);
 ylabel('Precision (%)', 'FontSize', 15);
 
 
-
 load('D:\elena\mspi\output\split3\segmentation\trainData.mat')
-v  = cellfun(@(x) sum(x(:)) , {trainData.Masks}, 'un', 0);
-z  = cellfun(@(x) sum(x(:)) , {trainData.ImageLabels}, 'un', 0);
+v = cellfun(@(x) sum(x(:)), {trainData.Masks}, 'un', 0);
+z = cellfun(@(x) sum(x(:)), {trainData.ImageLabels}, 'un', 0);
 load('D:\elena\mspi\output\split3\segmentation\testData.mat')
 testData = testData(1:end-3);
 testData(3) = [];
-v2  = cellfun(@(x) sum(x(:)) , {testData.Masks}, 'un', 0);
-z2  = cellfun(@(x) sum(x(:)) , {testData.ImageLabels}, 'un', 0);
+v2 = cellfun(@(x) sum(x(:)), {testData.Masks}, 'un', 0);
+z2 = cellfun(@(x) sum(x(:)), {testData.ImageLabels}, 'un', 0);
 v11 = sum(cell2mat(v));
 z11 = sum(cell2mat(z));
 v22 = sum(cell2mat(v2));
 z22 = sum(cell2mat(z2));
-z11/v11 * 100 
-z22/v22 * 100
+z11 / v11 * 100
+z22 / v22 * 100

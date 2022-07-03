@@ -1,7 +1,7 @@
 
 saveTarget = 'segmentation';
 trainDataset = 'pslRaw';
-targetDataset = 'split3'; 
+targetDataset = 'split3';
 config.SetSetting('Dataset', trainDataset);
 [~, targetIDs] = commonUtility.DatasetInfo();
 
@@ -12,7 +12,7 @@ if ~loadData
     trainData = struct('Values', [], 'Labels', [], 'RGBs', [], 'Masks', [], 'ImageLabels', []);
     for i = 1:trainN
         [spectrumData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{i});
-        
+
         trainData(i).Values = spectrumData;
         trainData(i).Labels = labelInfo;
         trainData(i).RGBs = spectrumData.GetDisplayImage();
@@ -30,7 +30,7 @@ else
     load(fileName, 'trainData');
 end
 
-targetDataset = 'split3'; 
+targetDataset = 'split3';
 config.SetSetting('Dataset', targetDataset);
 [~, targetIDs] = commonUtility.DatasetInfo();
 
@@ -38,7 +38,7 @@ if ~loadData
     testN = numel(targetIDs);
     testData = struct('Values', [], 'Labels', [], 'RGBs', [], 'Masks', [], 'ImageLabels', []);
     for i = 1:testN
-        [spectrumData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{i});     
+        [spectrumData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetIDs{i});
         testData(i).Values = spectrumData;
         testData(i).Labels = labelInfo;
         testData(i).RGBs = spectrumData.GetDisplayImage();
@@ -65,7 +65,7 @@ for k = 1:3
 
     testDataSet = testData;
     trainDataSet = trainData; %struct('Values', [], 'Labels', [], 'RGBs', [], 'Masks', [], 'ImageLabels', []);
-    
+
     switch method
         case 'abundance'
             name = 'Abundance-8';
@@ -88,12 +88,12 @@ for k = 1:3
             %                 boxConstraint = 38.64;
             %                 kernelScale = 4.1023;
 
-% %                 %observed
-% %                 boxConstraint = 11.767;
-% %                 kernelScale = 2.6353;
-% %                 %                %estimated
-% %                 %                boxConstraint = 9.862;
-% %                 %                kernelScale = 2.799;
+            % %                 %observed
+            % %                 boxConstraint = 11.767;
+            % %                 kernelScale = 2.6353;
+            % %                 %                %estimated
+            % %                 %                boxConstraint = 9.862;
+            % %                 %                kernelScale = 2.799;
             [testPerformance{k}, performanceRow(k, :)] = TrainClassifier(name, trainDataSet, testDataSet, 'none', 311, [], [boxConstraint, kernelScale]);
 
         case 'kmeans'

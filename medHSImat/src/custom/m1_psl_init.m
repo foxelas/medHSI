@@ -30,7 +30,7 @@ for j = 1:numel(methods)
         w = hsiUtility.GetWavelengths(311);
 
         numEndmembers = 8;
-        endmembers = FindPurePixelsInternal(hsIm.Value, numEndmembers, hsIm.FgMask, 'nfindr'); 
+        endmembers = FindPurePixelsInternal(hsIm.Value, numEndmembers, hsIm.FgMask, 'nfindr');
 
         figure(2);
         plot(w, endmembers);
@@ -43,7 +43,7 @@ for j = 1:numel(methods)
         plotPath = fullfile(savedir, 'endmembers_1before');
         plots.SavePlot(2, plotPath);
 
-        endmembers = FindPurePixelsInternal(corrIm.Value, numEndmembers, corrIm.FgMask, 'nfindr');  
+        endmembers = FindPurePixelsInternal(corrIm.Value, numEndmembers, corrIm.FgMask, 'nfindr');
 
         figure(3);
         plot(w, endmembers);

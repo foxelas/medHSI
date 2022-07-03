@@ -18,21 +18,21 @@
 %> @retval argminImg [numeric array] | The arguments of references with minimum SAM scores
 % ======================================================================
 function [prediction, scoreImg, argminImg] = SegmentSAM(hsIm, option, threshold)
-    if nargin < 2
-        option = 'library';
-    end
+if nargin < 2
+    option = 'library';
+end
 
-    if nargin < 3
-        threshold = 15;
-    end
+if nargin < 3
+    threshold = 15;
+end
 
-    if strcmpi(option, 'library') % Comparison with a library of signatures
-        [scoreImg, prediction, argminImg] = hsIm.ArgminSAM();
-        argminImg = double(argminImg) ./ 4;
-        
-    else % Comparison with a single healthy signature
-       [scoreImg] = hsIm.SAMscore();
-       prediction = uint8(scoreImg > threshold);
-       argminImg = prediction;
-    end
+if strcmpi(option, 'library') % Comparison with a library of signatures
+    [scoreImg, prediction, argminImg] = hsIm.ArgminSAM();
+    argminImg = double(argminImg) ./ 4;
+
+else % Comparison with a single healthy signature
+    [scoreImg] = hsIm.SAMscore();
+    prediction = uint8(scoreImg > threshold);
+    argminImg = prediction;
+end
 end

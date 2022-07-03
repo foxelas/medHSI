@@ -26,7 +26,7 @@ maskSuper = superpixelLabels == targetLabel;
 
 
 numEndmembers = 6;
-endmembers = FindPurePixelsInternal(hsIm.Value, numEndmembers, hsIm.FgMask, 'nfindr'); 
+endmembers = FindPurePixelsInternal(hsIm.Value, numEndmembers, hsIm.FgMask, 'nfindr');
 clusterLabels = DistanceScoresInternal(hsIm.Value, endmembers, @sam);
 targetEndmember = 3;
 maskCluster = clusterLabels == targetEndmember;

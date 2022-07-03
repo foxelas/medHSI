@@ -42,279 +42,296 @@
 % ======================================================================
 function [coeff, scores, latent, explained, objective, Mdl] = DimredApply(X, method, q, fgMask, labelMask, varargin)
 
-    latent = [];
-    objective = [];
-    Mdl = [];
-    coeff = [];
+latent = [];
+objective = [];
+Mdl = [];
+coeff = [];
 
-    if nargin < 3
-        q = 10;
-    end
+if nargin < 3
+    q = 10;
+end
 
-    if nargin < 4
-        fgMask = [];
-    end
+if nargin < 4
+    fgMask = [];
+end
 
-    if nargin < 5
-        labelMask = [];
-    end
-    hasFgMask = ~isempty(fgMask);
-    flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'abundance'));
-    if ndims(X) < 3
-        flattenIn = false;
-    end
+if nargin < 5
+    labelMask = [];
+end
+hasFgMask = ~isempty(fgMask);
+flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'abundance'));
+if ndims(X) < 3
+    flattenIn = false;
+end
 
-    if flattenIn
-        if hasFgMask
-            Xcol = GetMaskedPixelsInternal(X, fgMask);
-        else
-            Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
-        end
+if flattenIn
+    if hasFgMask
+        Xcol = GetMaskedPixelsInternal(X, fgMask);
     else
-        Xcol = X;
+        Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
     end
+else
+    Xcol = X;
+end
 
 
-    rng default % For reproducibility
+rng default % For reproducibility
 
-    switch lower(method)
+switch lower(method)
 
-        case 'pca'
+    case 'pca'
+
         %% PCA
-            [coeff, scores, latent, ~, ~] = pca(Xcol, 'NumComponents', q);
+        [coeff, scores, latent, ~, ~] = pca(Xcol, 'NumComponents', q);
 
-        case 'ica'
-        case 'fastica'
+    case 'ica'
+    case 'fastica'
+
         %% FastICA
-            [scores, ~, coeff] = fastica(Xcol', 'numOfIC', q);
-            scores = scores';
-            coeff = coeff';
+        [scores, ~, coeff] = fastica(Xcol', 'numOfIC', q);
+        scores = scores';
+        coeff = coeff';
 
-        case 'rica'
+    case 'rica'
+
         %% RICA
-            warning('off', 'all');
-            Mdl = rica(Xcol, q, 'IterationLimit', 100, 'Lambda', 1);
-            coeff = Mdl.TransformWeights;
-            scores = Xcol * coeff;
-            objective = Mdl.FitInfo.Objective;
-            warning('on', 'all');
+        warning('off', 'all');
+        Mdl = rica(Xcol, q, 'IterationLimit', 100, 'Lambda', 1);
+        coeff = Mdl.TransformWeights;
+        scores = Xcol * coeff;
+        objective = Mdl.FitInfo.Objective;
+        warning('on', 'all');
 
-        case 'pca-lda'
-            %% PCA/LDA
-            [coeff, scores1, latent, ~, ~] = pca(Xcol, 'NumComponents', q);
-            if isempty(labelMask)
-                error('A supervised method requires labels as argument');
-            end
-            if flattenIn
-                if hasFgMask
-                    labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
-                else
-                    labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
-                end
+    case 'pca-lda'
+
+        %% PCA/LDA
+        [coeff, scores1, latent, ~, ~] = pca(Xcol, 'NumComponents', q);
+        if isempty(labelMask)
+            error('A supervised method requires labels as argument');
+        end
+        if flattenIn
+            if hasFgMask
+                labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
             else
-                labelMaskCol = labelMask;
+                labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
             end
-            Mdl = fitcdiscr(scores1, labelMaskCol);
-            scores = scores1 * Mdl.Coeffs(1, 2).Linear;  % scores = predict(Mdl, scores1);
-            q = numel(Mdl.ClassNames) - 1;
-            coeff = coeff * Mdl.Coeffs(1, 2).Linear;
+        else
+            labelMaskCol = labelMask;
+        end
+        Mdl = fitcdiscr(scores1, labelMaskCol);
+        scores = scores1 * Mdl.Coeffs(1, 2).Linear; % scores = predict(Mdl, scores1);
+        q = numel(Mdl.ClassNames) - 1;
+        coeff = coeff * Mdl.Coeffs(1, 2).Linear;
 
-        case 'lda'
-            %% Discriminant Analysis (LDA)
-            if isempty(labelMask)
-                error('A supervised method requires labels as argument');
-            end
-            if flattenIn
-                if hasFgMask
-                    labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
-                else
-                    labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
-                end
+    case 'lda'
+
+        %% Discriminant Analysis (LDA)
+        if isempty(labelMask)
+            error('A supervised method requires labels as argument');
+        end
+        if flattenIn
+            if hasFgMask
+                labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
             else
-                labelMaskCol = labelMask;
+                labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
             end
+        else
+            labelMaskCol = labelMask;
+        end
 
-            Mdl = fitcdiscr(Xcol, labelMaskCol);
-            scores = Xcol * Mdl.Coeffs(1, 2).Linear; %scores = predict(Mdl, Xcol);
-            coeff = Mdl.Coeffs(1, 2).Linear;
+        Mdl = fitcdiscr(Xcol, labelMaskCol);
+        scores = Xcol * Mdl.Coeffs(1, 2).Linear; %scores = predict(Mdl, Xcol);
+        coeff = Mdl.Coeffs(1, 2).Linear;
 
-        case 'qda'
-            %% Discriminant Analysis (QDA)
-            if isempty(labelMask)
-                error('A supervised method requires labels as argument');
-            end
-            if flattenIn
-                if hasFgMask
-                    labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
-                else
-                    labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
-                end
-            end
-            Mdl = fitcdiscr(Xcol, labelMaskCol, 'DiscrimType', 'quadratic');
-            scores = predict(Mdl, Xcol);
+    case 'qda'
 
-        case 'mselect'
-            %% Wavelength Selection
-            wavelengths = hsiUtility.GetWavelengths(311);
-            id1 = find(wavelengths == 540);
-            id2 = find(wavelengths == 650);
-            scores = Xcol(:, [id1, id2]);
-            coeff = zeros(numel(wavelengths), 1);
-            coeff(id1) = 1;
-            coeff(id2) = 1;
-
-        case 'superrica'
-            %% Superpixel RICA (SuperRICA)
-            if isempty(varargin)
-                pixelNum = 20;
+        %% Discriminant Analysis (QDA)
+        if isempty(labelMask)
+            error('A supervised method requires labels as argument');
+        end
+        if flattenIn
+            if hasFgMask
+                labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
             else
-                pixelNum = varargin{1};
+                labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
             end
+        end
+        Mdl = fitcdiscr(Xcol, labelMaskCol, 'DiscrimType', 'quadratic');
+        scores = predict(Mdl, Xcol);
 
-            [m, n, ~] = size(X);
+    case 'mselect'
+
+        %% Wavelength Selection
+        wavelengths = hsiUtility.GetWavelengths(311);
+        id1 = find(wavelengths == 540);
+        id2 = find(wavelengths == 650);
+        scores = Xcol(:, [id1, id2]);
+        coeff = zeros(numel(wavelengths), 1);
+        coeff(id1) = 1;
+        coeff(id2) = 1;
+
+    case 'superrica'
+
+        %% Superpixel RICA (SuperRICA)
+        if isempty(varargin)
+            pixelNum = 20;
+        else
+            pixelNum = varargin{1};
+        end
+
+        [m, n, ~] = size(X);
+        superpixelLabels = cubseg(X, pixelNum);
+        scores = dimredUtility.ApplySuperpixelBasedDimred(X, superpixelLabels, @(x) dimredUtility.RicaCoeffs(x, q));
+        scores = reshape(scores, [m, n, q]);
+
+    case 'superpca'
+
+        %% SuperPCA
+        if isempty(varargin)
+            pixelNum = 20;
+        else
+            pixelNum = varargin{1};
+        end
+
+        superpixelLabels = cubseg(X, pixelNum);
+        scores = SuperPCA(X, q, superpixelLabels);
+
+    case 'msuperpca'
+
+        %% Multiscale SuperPCA
+
+        if isempty(varargin)
+            endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
+        else
+            endmemberNumArray = varargin{1};
+        end
+
+        N = numel(endmemberNumArray);
+        scores = cell(N, 1);
+        for i = 1:N
+            pixelNum = endmemberNumArray(i);
             superpixelLabels = cubseg(X, pixelNum);
-            scores = dimredUtility.ApplySuperpixelBasedDimred(X, superpixelLabels, @(x) dimredUtility.RicaCoeffs(x, q));
-            scores = reshape(scores, [m, n, q]);
+            scores{i} = SuperPCA(X, q, superpixelLabels);
+        end
 
-        case 'superpca'
-            %% SuperPCA
-            if isempty(varargin)
-                pixelNum = 20;
+    case 'rfi'
+
+        %% Random Forest Importance (RFI)
+        if ~isempty(varargin) % Apply a pretrained dimension reduction
+            impOOB = varargin{1};
+
+        else % Train
+            t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
+            RFtrainedModel = fitrensemble(Xcol, double(labelMask), 'Method', 'Bag', 'Learners', t, 'NPrint', 50); %,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});
+            yHat = oobPredict(RFtrainedModel);
+            R2 = corr(RFtrainedModel.Y, yHat)^2;
+            fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
+            options = statset('UseParallel', true);
+            impOOB = oobPermutedPredictorImportance(RFtrainedModel, 'Options', options);
+        end
+
+        featImp = impOOB';
+        [~, idx] = sort(featImp, 'descend');
+        dropIdx = idx(q+1:end); % Drop the first and last wavelengths because they are noisy
+        featImp(dropIdx) = 0;
+        coeff = diag(featImp);
+        coeff(:, ~any(coeff, 1)) = []; % Drop zero columns
+
+        scores = dimredUtility.Transform(Xcol, 'pretrained', q, coeff);
+
+    case 'autoencoder'
+
+        %% Autoencoder (AE)
+        if ~isempty(varargin) % Apply a pretrained dimension reduction
+            autoenc = varargin{1};
+            scores = encode(autoenc, Xcol')';
+
+        else % Train
+            autoenc = trainAutoencoder(Xcol', q, 'MaxEpochs', 200);
+            scores = dimredUtility.Transform(Xcol, method, q, autoenc);
+            coeff = autoenc;
+        end
+
+    case 'clusterpca'
+
+        %% ClusterPCA
+        if isempty(varargin)
+            numEndmembers = 5;
+        else
+            numEndmembers = varargin{1};
+            if length(varargin) > 1
+                spectralSimilarityFun = varargin{2};
             else
-                pixelNum = varargin{1};
+                spectralSimilarityFun = @sam;
             end
+        end
 
-            superpixelLabels = cubseg(X, pixelNum);
-            scores = SuperPCA(X, q, superpixelLabels);
+        endmembers = FindPurePixelsInternal(X, numEndmembers, fgMask, 'nfindr');
+        clusterLabels = DistanceScoresInternal(X, endmembers, spectralSimilarityFun);
+        scores = SuperPCA(X, q, clusterLabels);
 
-        case 'msuperpca'
-            %% Multiscale SuperPCA
+    case 'mclusterpca'
 
-            if isempty(varargin)
-                endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
+        %% Multiscale ClusterPCA
+        if isempty(varargin)
+            endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
+        else
+            endmemberNumArray = varargin{1};
+            if length(varargin) > 1
+                spectralSimilarityFun = varargin{2};
             else
-                endmemberNumArray = varargin{1};
+                spectralSimilarityFun = @sam;
             end
+        end
 
-            N = numel(endmemberNumArray);
-            scores = cell(N, 1);
-            for i = 1:N
-                pixelNum = endmemberNumArray(i);
-                superpixelLabels = cubseg(X, pixelNum);
-                scores{i} = SuperPCA(X, q, superpixelLabels);
-            end
-
-        case 'rfi'
-            %% Random Forest Importance (RFI)
-            if ~isempty(varargin) % Apply a pretrained dimension reduction
-                impOOB = varargin{1};
-                
-            else % Train
-                t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
-                RFtrainedModel = fitrensemble(Xcol, double(labelMask), 'Method', 'Bag', 'Learners', t, 'NPrint', 50); %,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});   
-                yHat = oobPredict(RFtrainedModel);
-                R2 = corr(RFtrainedModel.Y, yHat)^2;
-                fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
-                options = statset('UseParallel', true);
-                impOOB = oobPermutedPredictorImportance(RFtrainedModel, 'Options', options);
-            end
-
-            featImp = impOOB';
-            [~, idx] = sort(featImp, 'descend');
-            dropIdx = idx(q+1:end); % Drop the first and last wavelengths because they are noisy 
-            featImp(dropIdx) = 0;
-            coeff = diag(featImp);
-            coeff(:, ~any(coeff, 1)) = []; % Drop zero columns
-
-            scores = dimredUtility.Transform(Xcol, 'pretrained', q, coeff);
-            
-        case 'autoencoder'
-            %% Autoencoder (AE)
-            if ~isempty(varargin) % Apply a pretrained dimension reduction
-                autoenc = varargin{1};
-                scores = encode(autoenc, Xcol')';
-                
-            else % Train
-                autoenc = trainAutoencoder(Xcol', q, 'MaxEpochs', 200);
-                scores = dimredUtility.Transform(Xcol, method, q, autoenc);
-                coeff = autoenc;
-            end
-
-        case 'clusterpca'
-            %% ClusterPCA
-            if isempty(varargin)
-                numEndmembers = 5;
-            else
-                numEndmembers = varargin{1};
-                if length(varargin) > 1 
-                    spectralSimilarityFun = varargin{2};
-                else
-                    spectralSimilarityFun = @sam;
-                end
-            end
-
+        N = numel(endmemberNumArray);
+        scores = cell(N, 1);
+        for i = 1:N
+            numEndmembers = endmemberNumArray(i);
             endmembers = FindPurePixelsInternal(X, numEndmembers, fgMask, 'nfindr');
             clusterLabels = DistanceScoresInternal(X, endmembers, spectralSimilarityFun);
-            scores = SuperPCA(X, q, clusterLabels);
-
-        case 'mclusterpca'
-            %% Multiscale ClusterPCA
-            if isempty(varargin)
-                endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
-            else
-                endmemberNumArray = varargin{1};
-                if length(varargin) > 1 
-                    spectralSimilarityFun = varargin{2};
-                else
-                    spectralSimilarityFun = @sam;
-                end
-            end
-
-            N = numel(endmemberNumArray);
-            scores = cell(N, 1);
-            for i = 1:N
-                numEndmembers = endmemberNumArray(i);
-                endmembers = FindPurePixelsInternal(X, numEndmembers, fgMask, 'nfindr');
-                clusterLabels = DistanceScoresInternal(X, endmembers, spectralSimilarityFun);
-                scores{i} = SuperPCA(X, q, clusterLabels);
-            end
-            
-        case 'abundance'
-            %% Abundance
-            if isempty(varargin)
-                numEndmembers = q;
-                endmembers = FindPurePixelsInternal(X, numEndmembers, fgMask, 'nfindr');
-            else
-                pathName = commonUtility.GetFilename('dataset', 'EndMembers\endmembers-8');
-                load(pathName, 'endmembers');
-                q = size(endmembers, 1);
-            end    
-            scores = estimateAbundanceLS(X, endmembers);
-
-        case 'pretrained'
-            %% Pretrained
-            if isempty(varargin)
-                error('The pretrained transformation matrix is missing.');
-            end
-            coeff = varargin{1};
-            scores = Xcol * coeff;
-            q = size(coeff, 2);
-
-        otherwise
-            %% No dimension reduction
-            scores = Xcol;
-            q = size(Xcol, 2);
-    end
-
-    explained = dimredUtility.CalculateExplained(scores, Xcol, X, fgMask);
-
-    if flattenIn
-        if hasFgMask
-            scores = hsi.RecoverSpatialDimensions(scores, size(X), fgMask);
-        else
-            scores = reshape(scores, [size(X, 1), size(X, 2), q]);
+            scores{i} = SuperPCA(X, q, clusterLabels);
         end
-    end
 
-    scores = hsiUtility.AdjustDimensions(scores, q);
+    case 'abundance'
+
+        %% Abundance
+        if isempty(varargin)
+            numEndmembers = q;
+            endmembers = FindPurePixelsInternal(X, numEndmembers, fgMask, 'nfindr');
+        else
+            pathName = commonUtility.GetFilename('dataset', 'EndMembers\endmembers-8');
+            load(pathName, 'endmembers');
+            q = size(endmembers, 1);
+        end
+        scores = estimateAbundanceLS(X, endmembers);
+
+    case 'pretrained'
+
+        %% Pretrained
+        if isempty(varargin)
+            error('The pretrained transformation matrix is missing.');
+        end
+        coeff = varargin{1};
+        scores = Xcol * coeff;
+        q = size(coeff, 2);
+
+    otherwise
+
+        %% No dimension reduction
+        scores = Xcol;
+        q = size(Xcol, 2);
+end
+
+explained = dimredUtility.CalculateExplained(scores, Xcol, X, fgMask);
+
+if flattenIn
+    if hasFgMask
+        scores = hsi.RecoverSpatialDimensions(scores, size(X), fgMask);
+    else
+        scores = reshape(scores, [size(X, 1), size(X, 2), q]);
+    end
+end
+
+scores = hsiUtility.AdjustDimensions(scores, q);
 end
