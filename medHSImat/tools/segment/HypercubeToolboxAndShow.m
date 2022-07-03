@@ -29,8 +29,7 @@ hasLabels = ~isempty(labelInfo);
 
 [prediction, endmembers, abundanceMap] = SegmentHypercubeToolbox(hsIm, reductionMethod, referenceMethod, similarityMethod);
 
-w = hsiUtility.GetWavelengths(311);
-
+w = hsiUtility.GetWavelengths(size(hsIm.Value, 3));
 
 if sum(endmembers(:)) == 0
     fprintf('All endmembers are zero curves for sample with id %s (%s).\n\n', hsIm.SampleID, labelInfo.Diagnosis);

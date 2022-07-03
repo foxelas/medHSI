@@ -70,8 +70,10 @@ if flattenIn
     else
         Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
     end
+    specDim = size(X,3);
 else
     Xcol = X;
+    specDim = size(X,2);
 end
 
 
@@ -162,7 +164,7 @@ switch lower(method)
     case 'mselect'
 
         %% Wavelength Selection
-        wavelengths = hsiUtility.GetWavelengths(311);
+        wavelengths = hsiUtility.GetWavelengths(specDim);
         id1 = find(wavelengths == 540);
         id2 = find(wavelengths == 650);
         scores = Xcol(:, [id1, id2]);

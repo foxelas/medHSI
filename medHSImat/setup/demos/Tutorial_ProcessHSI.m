@@ -27,7 +27,7 @@ srgb = spectralData.GetDisplayImage();
 imshow(srgb); title('srgb')
 
 %% Get the wavelengths
-w = hsiUtility.GetWavelengths(311);
+w = hsiUtility.GetWavelengths(size(hsIm.Value, 3));
 
 %% Apply a function on the hsi values
 %e.g. Crop only a slice of the blue spectral range

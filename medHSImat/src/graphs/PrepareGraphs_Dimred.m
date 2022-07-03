@@ -67,7 +67,7 @@ plots.SavePlot(fig, plotPath);
 fontSz = 15;
 fig = figure(1);
 names = {'Training across Dataset', 'Training per Sample', 'Training per Superpixel', 'Training per Cluster'};
-w = hsiUtility.GetWavelengths(311);
+w = hsiUtility.GetWavelengths(size(hsIm.Value, 3));
 for i = 1:4
     subplot(3, 2, i);
     curScore = eigs{i};
@@ -141,7 +141,7 @@ fig = figure(6);
 fontSz = 15;
 fig = figure(1);
 names = {'Training across Dataset', 'Training per Sample', 'Training per Superpixel', 'Training per Cluster'};
-w = hsiUtility.GetWavelengths(311);
+w = hsiUtility.GetWavelengths(size(hsIm.Value, 3));
 for i = 1:4
     ax = subplot(2, 2, i);
     curScore = scores{i};

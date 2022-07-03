@@ -68,7 +68,7 @@ plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveF
 plots.MontageWithLabel(2, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
 
 fig = figure(3);
-w = hsiUtility.GetWavelengths(311);
+w = hsiUtility.GetWavelengths(size(hsIm.Value, 3));
 hold on
 for i = 1:3
     v = explained(i);
