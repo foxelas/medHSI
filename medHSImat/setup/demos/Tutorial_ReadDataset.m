@@ -1,6 +1,7 @@
 % ======================================================================
 %> @brief Tutorial_ReadDataset is a tutorial on how to initialize and process the dataset.
 % ======================================================================
+
 %% Read settings from the file
 % Update config.ini to adjust directory names etc.
 config.SetOpt();
@@ -59,11 +60,10 @@ folder = fullfile(config.GetSetting('SnapshotsFolderName'), 'preprocessed\');
 outputDir = commonUtility.GetFilename('output', folder, '');
 plots.MontageFolderContents(2, outputDir, [], 'sRGBs (only first 20 are shown)');
 
-%% Get the Diagnosis info from the excel file 
+%% Get the Diagnosis info from the excel file
 % Returns information from the Diagnosis DB saved in is saved in config::[ImportDir]
 % (input\xxxDBDiagnosisInfoTable.xlsx)
 [filenames, targetIDs, outRows, diagnosis, stage] = databaseUtility.GetDiagnosisQuery(dbSelection);
-
 
 %% Prepare Labels with Labelme
 % Use as base the sRGB images in config::[OutoutDir]/config::[Dataset]/00-Snapshots/
@@ -133,21 +133,21 @@ trainUtility.ExportLOOCV(baseDataset, true);
 baseDataset = 'pslRaw32Augmented';
 trainUtility.ExportLOOCV(baseDataset);
 
-%% Prepare a reference library with reference spectra 
+%% Prepare a reference library with reference spectra
 % Select samples with ID 153 and 166 to be used as references for the
 % library for SAM calculation
 referenceIDs = {153, 166};
 refLib = hsiUtility.PrepareReferenceLibrary(referenceIDs);
 
-%% Apply Kmeans segmentation on all images of the dataset and produce evidence 
+%% Apply Kmeans segmentation on all images of the dataset and produce evidence
 config.SetSetting('Dataset', 'pslRaw');
 segment.ApplyAndShow('Kmeans');
 
-%% Apply Leon segmentation on all images of the dataset and produce evidence 
+%% Apply Leon segmentation on all images of the dataset and produce evidence
 config.SetSetting('Dataset', 'pslRaw');
 segment.ApplyAndShow('Leon');
 
-%% Apply ICA dimension reduction on all images of the dataset and produce evidence 
+%% Apply ICA dimension reduction on all images of the dataset and produce evidence
 config.SetSetting('Dataset', 'pslRaw');
 dimredUtility.ApplyAndShow('ICA');
 

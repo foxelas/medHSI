@@ -13,7 +13,7 @@ savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFo
 config.SetSetting('Normalization', 'raw');
 hsIm = hsiUtility.LoadHSI(targetID);
 
-%% Plot mean spectra 
+%% Plot mean spectra
 % Plot average spectra for an ROI on the sample
 fig = 1;
 plots.AverageSpectrum(fig, hsIm);
@@ -78,8 +78,6 @@ components = 10;
 superpixels = 30;
 pcaScores = spectralData.Transform(flattenFlag, 'SuperPCA', components, superpixels);
 
-
 %% Apply Segmentation
-clusters = 5; 
+clusters = 5;
 mask = segment.Apply(spectralData, 'Kmeans', clusters);
-
