@@ -24,21 +24,24 @@ classdef config
         %>
         % ======================================================================
         function [] = SetOpt()
-            % SetOpt sets parameters for running from Config.ini
-            %
-            % The values are recovered from MedHSIMat\\conf\\Config.ini.
-            % Then, the values are saved and accessed from a MedHSIMat\\conf\\Config.mat.
-            % Values are saved in an .ini format.
-            % For more details check @c function SetOpt .
-            %
-            % @b Usage
-            %
-            % @code
-            % config.SetOpt();
-            % @endcode
-            %
+        % ======================================================================
+        %> @brief SetOpt sets parameters for running from Config.ini
+        %>
+        %> The values are recovered from MedHSIMat\\conf\\Config.ini.
+        %> Then, the values are saved and accessed from a MedHSIMat\\conf\\Config.mat.
+        %> Values are saved in an .ini format.
+        %> For more details check @c function SetOpt .
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> config.SetOpt();
+        %> @endcode
+        %>
+        % ======================================================================     
             SetOpt();
         end
+        
         % ======================================================================
         %> @brief GetRunBaseDir gets the base directory.
         %>
@@ -53,22 +56,26 @@ classdef config
         %> @retval curDir [string] | The directory
         % ======================================================================
         function [curDir] = GetRunBaseDir()
-            % GetRunBaseDir gets the base directory.
-            %
-            % The base directory is ...\\MedHSIMat.
-            %
-            % @b Usage
-            %
-            % @code
-            % curDir = config.GetRunBaseDir();
-            % @endcode
-            %
-            % @retval curDir [string] | The directory
+        % ======================================================================
+        %> @brief GetRunBaseDir gets the base directory.
+        %>
+        %> The base directory is ...\\MedHSIMat.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> curDir = config.GetRunBaseDir();
+        %> @endcode
+        %>
+        %> @retval curDir [string] | The directory
+        % ======================================================================      
             currentDir = pwd;
             projectName = 'medHSI';
             parts = strsplit(currentDir, 'medHSI');
             curDir = fullfile(parts{1}, projectName);
         end
+        
+        
         % ======================================================================
         %> @brief GetConfDir gets the directory of the configuration file.
         %>
@@ -83,21 +90,22 @@ classdef config
         %> @retval curDir [string] | The directory
         % ======================================================================
         function [curDir] = GetConfDir()
-            % GetConfDir gets the directory of the configuration file.
-            %
-            % The configuration directory is ...\\MedHSIMat\\conf\\.
-            %
-            % @b Usage
-            %
-            % @code
-            % curDir = config.GetConfDir();
-            % @endcode
-            %
-            % @retval curDir [string] | The directory
-
+        % ======================================================================
+        %> @brief GetConfDir gets the directory of the configuration file.
+        %>
+        %> The configuration directory is ...\\MedHSIMat\\conf\\.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> curDir = config.GetConfDir();
+        %> @endcode
+        %>
+        %> @retval curDir [string] | The directory
+        % ======================================================================
             curDir = fullfile(config.GetRunBaseDir(), 'conf');
-
         end
+        
         % ======================================================================
         %> @brief DirMake makes a new directory from folder and file parts.
         %>
@@ -116,21 +124,23 @@ classdef config
         %> @retval filepath [string] | The filepath
         % ======================================================================
         function [filepath] = DirMake(varargin)
-            % DirMake makes a new directory from folder and file parts.
-            %
-            % If the requested directory does not exist, it is created.
-            % If the directory is not a subdirectory of config::[OutputDir], then it
-            % is added to the matlab path.
-            %
-            % @b Usage
-            %
-            % @code
-            % filepath = config.DirMake(config.GetSetting('MatDir'), 'database-v10');
-            % @endcode
-            %
-            % @param varargin [cell array] | The fileparts of the directory
-            %
-            % @retval filepath [string] | The filepath
+        % ======================================================================
+        %> @brief DirMake makes a new directory from folder and file parts.
+        %>
+        %> If the requested directory does not exist, it is created.
+        %> If the directory is not a subdirectory of config::[OutputDir], then it
+        %> is added to the matlab path.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> filepath = config.DirMake(config.GetSetting('MatDir'), 'database-v10');
+        %> @endcode
+        %>
+        %> @param varargin [cell array] | The fileparts of the directory
+        %>
+        %> @retval filepath [string] | The filepath
+        % ======================================================================   
             if nargin == 1
                 filepath = varargin{1};
             else
@@ -157,15 +167,17 @@ classdef config
         %> @retval flag [boolean] | The flag
         % ======================================================================
         function [hasGpu] = HasGPU()
-            % HasGPU checkes whether a GPU is available.
-            %
-            % @b Usage
-            %
-            % @code
-            % flag = config.HasGPU();
-            % @endcode
-            %
-            % @retval flag [boolean] | The flag
+        % ======================================================================
+        %> @brief HasGPU checkes whether a GPU is available.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> flag = config.HasGPU();
+        %> @endcode
+        %>
+        %> @retval flag [boolean] | The flag
+        % ======================================================================    
             v = dbstack;
             if numel(v) > 1
                 parentName = v(2).name;
@@ -197,17 +209,19 @@ classdef config
         %> @retval value [any] | The value of the parameter
         % ======================================================================
         function [value] = GetSetting(parameter)
-            % GetSetting gets a setting value from the config structure.
-            %
-            % @b Usage
-            %
-            % @code
-            % value = config.GetSetting('OutputDir');
-            % @endcode
-            %
-            % @param parameter [string] | The name of the parameter
-            %
-            % @retval value [any] | The value of the parameter
+        % ======================================================================
+        %> @brief GetSetting gets a setting value from the config structure.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> value = config.GetSetting('OutputDir');
+        %> @endcode
+        %>
+        %> @param parameter [string] | The name of the parameter
+        %>
+        %> @retval value [any] | The value of the parameter
+        % ======================================================================      
             settingsFile = fullfile(config.GetConfDir(), 'Config.mat');
             variableInfo = who('-file', settingsFile);
             if ismember(parameter, variableInfo)
@@ -232,17 +246,19 @@ classdef config
         %>
         % ======================================================================
         function [] = SetSetting(parameter, value)
-            % SetSetting sets a value in the config structure.
-            %
-            % @b Usage
-            %
-            % @code
-            % config.SetSetting('OutputDir', 'C:\\tempuser\\Desktop\\');
-            % @endcode
-            %
-            % @param parameter [string] | The name of the parameter
-            % @param value [any] | The value of the parameter
-            %
+        % ======================================================================
+        %> @brief SetSetting sets a value in the config structure.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> config.SetSetting('OutputDir', 'C:\\tempuser\\Desktop\\');
+        %> @endcode
+        %>
+        %> @param parameter [string] | The name of the parameter
+        %> @param value [any] | The value of the parameter
+        %>
+        % ======================================================================    
             settingsFile = fullfile(config.GetConfDir(), 'Config.mat');
             m = matfile(settingsFile, 'Writable', true);
             m.(parameter) = value;
@@ -263,17 +279,19 @@ classdef config
         %>
         % ======================================================================
         function [] = NotifySetting(paramName, paramValue)
-            % NotifySetting the value of a setting parameter
-            %
-            % @b Usage
-            %
-            % @code
-            % config.NotifySetting('outputDir', 'C:\\tempuser\\Desktop\\');
-            % @endcode
-            %
-            % @param parameter [string] | The name of the parameter
-            % @param value [any] | The value of the parameter
-            %
+        % ======================================================================
+        %> @brief NotifySetting the value of a setting parameter
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> config.NotifySetting('outputDir', 'C:\\tempuser\\Desktop\\');
+        %> @endcode
+        %>
+        %> @param parameter [string] | The name of the parameter
+        %> @param value [any] | The value of the parameter
+        %>
+        % ======================================================================       
             onOffOptions = {'OFF', 'ON'};
             if islogical(paramValue)
                 fprintf('--Setting [%s] to %s.\n', paramName, onOffOptions{paramValue+1});

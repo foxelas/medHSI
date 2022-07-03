@@ -12,17 +12,19 @@
 %>
 % ======================================================================
 function [] = SetOpt()
-% SetOpt sets parameters for running from config.ini
-%
-% The values are recovered from MedHSIMat\\conf\\config.ini.
-% Values are saved in an .ini format.
-%
-% @b Usage
-%
-% @code
-% SetOpt();
-% @endcode
-%
+% ======================================================================
+%> @brief SetOpt sets parameters for running from config.ini
+%>
+%> The values are recovered from MedHSIMat\\conf\\config.ini.
+%> Values are saved in an .ini format.
+%>
+%> @b Usage
+%>
+%> @code
+%> SetOpt();
+%> @endcode
+%>
+% ======================================================================
 
 disp('Reading configuration file [config.ini] ...');
 inputSettingsFile = fullfile(config.GetConfDir(), 'config.ini');
@@ -77,14 +79,14 @@ fprintf('\nSettings loaded from \n%s\nand saved in \n%s.\n\n', inputSettingsFile
 end
 
 function [arr] = GetArray(curVal)
-arr = strsplit(curVal, {'{', ', ', '}'});
-arr = cellfun(@(x) GetValueWithType(strtrim(x)), arr, 'UniformOutput', 0);
+    arr = strsplit(curVal, {'{', ', ', '}'});
+    arr = cellfun(@(x) GetValueWithType(strtrim(x)), arr, 'UniformOutput', 0);
 end
 
 function [updVal] = GetValueWithType(curVal)
-if ~isnan(str2double(curVal)) % numeric type
-    updVal = str2double(curVal);
-else % string type
-    updVal = curVal;
-end
+    if ~isnan(str2double(curVal)) % numeric type
+        updVal = str2double(curVal);
+    else % string type
+        updVal = curVal;
+    end
 end
