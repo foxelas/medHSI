@@ -18,23 +18,6 @@
 %> @retval wavelengths [array] | The sampling wavelengths
 % ======================================================================
 function [solaxSpec, wavelengths] = GetSolaxSpectra(method, showImage)
-% GetSolaxSpectra reconstructs values for Solax-IO illumination.
-%
-% Either read values from file in config::[ImportDir] or reconstruct it with spline.
-%
-% @b Usage
-%
-% @code
-% illum = GetSolaxSpectra();
-%
-% illum = GetSolaxSpectra('reconstructed');
-% @endcode
-%
-% @param method [string] | Optional: Recovery method. Default: 'real'.
-% @param showImage [boolean] | Optional: Flag to show image. Default: false.
-%
-% @retval solaxSpec [array] | The solax illumination spectra
-% @retval wavelengths [array] | The sampling wavelengths
 
 if nargin < 1
     method = 'real';

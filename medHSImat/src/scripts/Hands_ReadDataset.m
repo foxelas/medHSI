@@ -1,4 +1,6 @@
-%%%%%%%%%%%%%%%%%%%%% Initialization %%%%%%%%%%%%%%%%%%%%%
+% ======================================================================
+%> @brief Hands_ReadDataset prepares dataset of hsi samples of hands.
+% ======================================================================
 config.SetOpt();
 
 config.SetSetting('Normalization', 'byPixel');

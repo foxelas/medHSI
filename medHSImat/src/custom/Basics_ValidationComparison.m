@@ -22,6 +22,7 @@ elseif strcmpi(showType, 'preprocessed')
         'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\sm_resnet_pretrained_2022-06-11'; ...
         'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\sm_resnet_2022-06-11'; ...
         'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\cnn3d_2022-06-12'; ...
+        'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\xception3d5_max_2022-06-25'
         };
 elseif strcmpi(showType, 'merged')
     dirs = {'D:\elena\mspi\output\pslRaw\Framework-LOOCV\KMeans+SAM\CV'; ...
@@ -54,7 +55,7 @@ end
 xVals1 = 1:folds;
 
 hold on
-for i = 1:dirNumber
+for i = dirNumber:dirNumber
     load(fullfile(dirs{i}, '0_performance.mat'))
 
     if types(i)

@@ -6,7 +6,7 @@ config.SetSetting('Dataset', database);
 dirName = fullfile('python-test', 'cnn3d_2022-06-15\');
 baseDir = commonUtility.GetFilename('output', dirName, '');
 
-baseDir = 'D:\elena\mspi\output\split3-test\python-test\';
+baseDir = 'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\xception3d5_max_2022-06-25';
 
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};
@@ -48,7 +48,7 @@ for i = 1:numel(folderNames)
             id = strrep(id, '.mat', '');
             id = strrep(id, 'p_', '');
 
-            config.SetSetting('Dataset', 'split3-Denoisesmoothen32Augmented');
+            %config.SetSetting('Dataset', 'split3-Denoisesmoothen32Augmented');
             [hsIm, labelInfo] = hsiUtility.LoadHsiAndLabel(id);
             pos = labelInfo.Comment;
             ii = pos(1);

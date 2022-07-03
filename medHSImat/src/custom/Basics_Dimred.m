@@ -130,7 +130,7 @@ end
 
 j = j + 1;
 fprintf('PCA-LDA: \n\n');
-[trainPerformance{j}{1}, testPerformance{j}{1}] = trainUtility.ValidateTest2(trainData, testData, cvp, 'PCA-LDA', 20);
+[trainPerformance{j}{1}, testPerformance{j}{1}] = trainUtility.ValidateAndTest(trainData, testData, cvp, 'PCA-LDA', 20);
 
 %%%%%%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -1,3 +1,7 @@
+% ======================================================================
+%> @brief PlotReferences prepares images of the contents of the reference libraries.
+% ======================================================================
+
 load('D:\elena\mspi\matfiles\hsi\pslRaw\LeonReferences\LeonReferences.mat', 'references');
 
 w = hsiUtility.GetWavelengths(311);

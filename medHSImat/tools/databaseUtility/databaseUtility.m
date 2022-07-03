@@ -4,7 +4,8 @@
 %
 %> The database files are saved in config::[ImportDir]\\.
 %> Currently only .xlsx format is supported.
-%>
+%
+% For details check https://foxelas.github.io/medHSIdocs/classdatabase_utility.html
 % ======================================================================
 classdef databaseUtility
     methods (Static)
@@ -24,20 +25,6 @@ classdef databaseUtility
         %>
         % ======================================================================
         function [dataTable] = GetDataTable()
-            % ======================================================================
-            %>@brief databaseUtility.GetDataTable gets the database table.
-            %>
-            %> The table is recovered from
-            %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
-            %> 'capturedData'.
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> dataTable = databaseUtility.GetDataTable();
-            %> @endcode
-            %>
-            % ======================================================================
             dataTable = readtable(fullfile(config.GetSetting('ImportDir'), strcat(config.GetSetting('Database'), ...
                 config.GetSetting('DataInfoTableName'))), 'Sheet', 'capturedData');
         end
@@ -60,24 +47,6 @@ classdef databaseUtility
         %> @retval value [any] | The return value
         % ======================================================================
         function [value] = GetValueFromTable(tab, field, id)
-            % ======================================================================
-            %>@brief databaseUtility.GetValueFromTable gets a value from the database table
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> dataTable = databaseUtility.GetValueFromTable(tab, field, id);
-            %>
-            %> sampleID = databaseUtility.GetValueFromTable(outRows, 'SampleID', i);
-            %> @endcode
-            %>
-            %> @param tab [table] | A table with values
-            %> @param field [char] | The target field
-            %> @param id [int] | The target row index
-            %>
-            %> @retval value [any] | The return value
-            % ======================================================================
-
             column = tab.(field);
             if iscell(column)
                 value = column{id};
@@ -112,31 +81,6 @@ classdef databaseUtility
         %> @retval outRows [struct array] | The entire information rows of result hsi images
         % ======================================================================
         function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
-            % ======================================================================
-            %>@brief databaseUtility.Query returns a query result from the database.
-            %>
-            %> The table is recovered from
-            %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
-            %> 'capturedData'.
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> [filenames, tableIds, outRows] = databaseUtility.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
-            %> @endcode
-            %>
-            %> @param content [string or cell array] | The condition for Concent property
-            %> @param sampleId [string ] | The condition for SampleID property
-            %> @param captureDate [string] | The condition for CaptureDate property
-            %> @param id [string] | The condition for CaptureDate property
-            %> @param integrationTime [string] | The condition for IntegrationTime property
-            %> @param target [string] | The condition for Target property
-            %> @param configuration [string] | The condition for Configuration property
-            %>
-            %> @retval filenames [cell array] | The filenames of result hsi images
-            %> @retval tableIds [cell array] | The table IDs of result hsi images
-            %> @retval outRows [struct array] | The entire information rows of result hsi images
-            % ======================================================================
             [filenames, tableIds, outRows] = QueryInternal(content, sampleId, captureDate, id, integrationTime, target, configuration);
         end
 
@@ -164,30 +108,6 @@ classdef databaseUtility
         %> @retval outRows [struct array] | The entire information rows of result hsi images
         % ======================================================================
         function [targetIDs, outRows] = GetTargetIndexes(content, target)
-            % ======================================================================
-            %>@brief databaseUtility.GetTargetIndexes returns the target indexes based on content and target conditions.
-            %>
-            %> GetTargetIndexes returns target indexes and relevant rows from the databaseUtility in order to access specific types of samples.
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes(content, target);
-            %>
-            %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes(); %all
-            %>
-            %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes([], 'fix');
-            %>
-            %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'raw');
-            %> @endcode
-            %>
-            %> @param content [string or cell array] | The condition for Concent property
-            %> @param target [string] | The condition for Target property
-            %>
-            %> @retval tableIds [cell array] | The table IDs of result hsi images
-            %> @retval outRows [struct array] | The entire information rows of result hsi images
-            % ======================================================================
-
             if nargin < 1 || isempty(content)
                 content = {'tissue', true};
             end
@@ -220,25 +140,6 @@ classdef databaseUtility
         %> @retval setId [numeric array] | The currently selected indexes from the database table
         % ======================================================================
         function [setId] = SelectDatabaseSamples(dataTable, setId)
-            % ======================================================================
-            %>@brief databaseUtility.SelectDatabaseSamples returns indexes from the database table ignoring incorrect samples.
-            %>
-            %> It is used in @c function databaseUtility.Query
-            %>
-            %> YOU CAN UPDATE IT ACCORDING TO YOUR SPECIFICATIONS.
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> [setId] = databaseUtility.SelectDatabaseSamples(dataTable, setId);
-            %> @endcode
-            %>
-            %> @param dataTable [table] | The database table
-            %> @param setId [numeric array] | The currently selected indexes from the database table
-            %>
-            %> @retval setId [numeric array] | The currently selected indexes from the database table
-            % ======================================================================
-
             if strcmpi(config.GetSetting('Database'), 'psl')
                 setId = setId & ~contains(lower(dataTable.SampleID), 'b');
             end
@@ -262,24 +163,6 @@ classdef databaseUtility
         %> @retval fileConditions [cell array] | The file conditions
         % ======================================================================
         function [fileConditions] = GetFileConditions(content, target, id)
-            % ======================================================================
-            %>@brief databaseUtility.GetFileConditions returns file conditions according to the input arguments.
-            %>
-            %> To be used as input argments in databaseUtility.Query.
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> fileConditions = databaseUtility.GetFileConditions(content, target, id);
-            %> @endcode
-            %>
-            %> @param content [string or cell array] | The condition for Concent property
-            %> @param target [string] | The condition for Target property
-            %> @param id [string] | The condition for ID property
-            %>
-            %> @retval fileConditions [cell array] | The file conditions
-            % ======================================================================
-
             if nargin < 2
                 target = [];
             end
@@ -311,21 +194,6 @@ classdef databaseUtility
         %>
         % ======================================================================
         function [dataTable] = GetDiagnosisTable()
-            % ======================================================================
-            %>@brief databaseUtility.GetDiagnosisTable gets the database table.
-            %>
-            %> The table is recovered from
-            %> config::[ImportDir]\\[Database]\\[DiagnosisInfoTableName] file and sheet
-            %> 'Sheet1'.
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> dataTable = databaseUtility.GetDiagnosisTable();
-            %> @endcode
-            %>
-            % ======================================================================
-
             filename = fullfile(config.GetSetting('ImportDir'), strcat(config.GetSetting('Database'), ...
                 config.GetSetting('DiagnosisInfoTableName')));
             if exist(filename, 'file') > 0
@@ -354,24 +222,6 @@ classdef databaseUtility
         %> @retval sampleType [cell array] | The sample type of result hsi images
         % ======================================================================
         function [filenames, targetIDs, outRows, diagnosis, sampleType] = GetDiagnosisQuery(condition)
-            % ======================================================================
-            %>@brief databaseUtility.GetDiagnosisQuery gets query result from the diagnosis table.
-            %>
-            %> @b Usage
-            %>
-            %> @code
-            %> [filenames, targetIDs, outRows, diagnosis, sampleType] = databaseUtility.GetDiagnosisQuery({'tissue', true});
-            %> @endcode
-            %>
-            %> @param condition [cell array] | The condition for the query
-            %>
-            %> @retval filenames [cell array] | The filenames of result hsi images
-            %> @retval tableIds [cell array] | The table IDs of result hsi images
-            %> @retval outRows [struct array] | The entire information rows of result hsi images
-            %> @retval diagnosis [cell array] | The diagnosis of result hsi images
-            %> @retval sampleType [cell array] | The sample type of result hsi images
-            % ======================================================================
-
             [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
             dataTable = databaseUtility.GetDiagnosisTable();
             diagnosis = cell(length(filenames), 1);
