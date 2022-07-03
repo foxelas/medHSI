@@ -286,10 +286,9 @@ classdef hsiUtility
         %> @param targetIDs [cell array] | The target IDs of target hsi cubes.
         %> @param saveName [char] | The save name for the .h5 file.
         %======================================================================
-        function [] = SaveToH5Internal(targetIDs, saveName)
-            SaveToH5(targetIDs, saveName)
+        function [] = SaveToH5(targetIDs, saveName)
+            SaveToH5Internal(targetIDs, saveName)
         end
-
 
         %======================================================================
         %> @brief hsiUtility.ReadDataset reads the dataset.
