@@ -16,22 +16,7 @@
 %> @retval prediction [numeric array] | The predicted labels
 % ======================================================================
 function [prediction] = SegmentLeon(hsIm) 
-% SegmentLeon applies Kmeans-based segmentation to an hsi.
-%
-% Proposed by Leon et al (2020).
-%
-% @b Usage
-%
-% @code
-% [prediction] = segment.Apply(hsIm, 'Leon');
-%
-% [prediction] = SegmentLeon(hsIm);
-% @endcode
-%
-% @param hsIm [hsi] | An instance of the hsi class
-%
-% @retval prediction [numeric array] | The predicted labels
-s
+
     filePath = commonUtility.GetFilename('dataset', fullfile('LeonReferences', 'LeonReferences'));
 
     load(filePath, 'references');

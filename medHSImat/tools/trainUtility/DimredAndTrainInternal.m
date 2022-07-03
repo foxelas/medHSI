@@ -33,38 +33,6 @@
 %> @retval Xvalid [numeric array] | The dimension-reduced test data
 % ======================================================================
 function [performanceStruct, trainedModel, XTest] = DimredAndTrainInternal(trainData, testData, method, q, svmSettings, varargin)
-        % DimredAndTrainInternal trains and test an SVM classifier after dimension reduction.
-        %
-        % Observations are processed with the SVM as individual spectrums per pixel.
-        % See @c dimredUtility for more information about additional arguments.
-        %
-        % How to change application scope of the dimension reduction method:
-        % Join '-all' on 'method' string to train dimred on all data.
-        % Otherwise, dimred is trained individually on each sample and according to the requirements of 'method'.
-        %
-        % @b Usage
-        %
-        % @code
-        % boxConstraint = 2.1;
-        % kernelScale = 4.3;
-        % svmSettings = [boxConstraint, kernelScale];
-        % [performanceStruct, trainedModel, Xvalid] = trainUtility.DimredAndTrain(trainData, testData, method, q, svmSettings);
-        %
-        % % Apply dimension reduction with additional settings. 
-        % superpixelNumber = 10;
-        % [performanceStruct, trainedModel, Xvalid] = trainUtility.DimredAndTrain(trainData, testData, 'SuperPCA', q, svmSettings, superpixelNumber);
-        % @endcode
-        %
-        % @param trainData [struct] | The train data
-        % @param testData [struct] | The test data
-        % @param method [char] | The dimension reduction method
-        % @param q [int] | The reduced dimension
-        % @param svmSettings [numeric array] | The settings for the SVM. It is an array of two values, 'BoxConstraint' and 'KernelScale'. If no setting is given, the model is optimized with 'KernelScale' = 'auto'.
-        % @param varargin [cell array] | The arguments necessary for the dimension reduction method
-        %
-        % @retval performanceStruct [struct] | The model's performance
-        % @retval trainedModel [model] | The trained SVM model
-        % @retval Xvalid [numeric array] | The dimension-reduced test data
 
             % scope of training 
             

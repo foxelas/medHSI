@@ -12,18 +12,7 @@
 %> @param foldType [char] | Optional: The type for selecting sample ids for folds. Options: ['byPatient', 'bySample']. Default: 'bySample'. 
 %======================================================================
 function [foldSampleIds] = GetFolds(foldType)
-% FoldIndexes returns the sample ids for different folds. 
-%
-% @b Usage
-%
-% @code
-% foldSampleIds = trainUtility.FoldIndexes(foldType);
-%
-% foldSampleIds = GetFolds(foldType);
-% @endcode
-%
-% @param foldType [char] | Optional: The type for selecting sample ids for folds. Options: ['byPatient', 'bySample']. Default: 'bySample'. 
- 
+
     if nargin < 1 
         foldType = 'bySample';
     end

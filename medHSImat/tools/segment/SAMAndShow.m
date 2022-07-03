@@ -19,24 +19,6 @@
 %> @retval prediction [numeric array] | The predicted labels
 % ======================================================================
 function [prediction] = SAMAndShow(hsIm, labelInfo, option, threshold)
-% SAMAndShow applies SAM-based segmentation to an hsi and plots image results.
-%
-% Need to set config::[SaveFolder] for image output.
-%
-% @b Usage
-%
-% @code
-% segment.ApplyAndShow('SAM', 'healthy', 13);
-%
-% prediction = SAMAndShow(hsIm, labelInfo, 'healthy', 13);
-% @endcode
-%
-% @param hsIm [hsi] | An instance of the hsi class
-% @param labelInfo [hsiInfo] | An instance of the hsiInfo class
-% @param option [char] | Optional: The option for application. Options: ['library', 'healthy']. Default: 'library'.
-% @param threshold [double] | Optional: The threshold. Required when 'option' is 'healthy'. Default: 15.
-%
-% @retval prediction [numeric array] | The predicted labels
 
 if nargin < 3
     option = 'library';

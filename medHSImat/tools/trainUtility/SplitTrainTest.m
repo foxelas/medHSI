@@ -25,33 +25,6 @@
 % @retval folds [int] | The number of folds.
 % ======================================================================
 function [trainData, testData, folds] = SplitTrainTest(baseDataset, dataType, splitType, folds, testIds, varargin)
-% SplitTrainTest splits the dataset to train, test or prepares a cross validation setting.
-%
-% For more details check @c function SplitTrainTest.
-%
-% @b Usage
-%
-% @code
-%   [trainData, testData, folds] = trainUtility.TrainTest(dataset, 'pixel', 'custom', [], {'150', '132'});
-%
-%   [trainData, testData, folds] = trainUtility.TrainTest(dataset, 'pixel', 'kfold', 5, []);
-%
-%   transformFun = @Dimred;
-%   [trainData, testData, folds] = SplitTrainTest(dataset, 'hsi', 'LOOCV-bySample', [], [], transformFun);
-% @endcode
-%
-% @param dataset [char] | The target dataset
-% @param dataType [char] | The target data type, either 'hsi', 'image' or 'pixel'
-% @param splitType [char] | The type to split train/test data. Options: c
-% @param folds [int] | The number of folds. Required when splitType is 'kfold'. Can be empty otherwise.
-% @param testIds [cell array] | The ids of samples to be used for testing. Required when splitType is 'custom'. Can be empty otherwise.
-% @param transformFun [function handle] | Optional: The function handle for the function to be applied. Default: None.
-% @param varargin [cell array] | The arguments necessary for the transformFun.
-%
-% @retval trainData [struct] | The train data
-% @retval testData [struct] | The test data
-% @retval folds [int] | The number of folds.
-
 
     config.SetSetting('Dataset', baseDataset);
     

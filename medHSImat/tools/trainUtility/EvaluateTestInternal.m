@@ -15,20 +15,6 @@
 %> @param yTest [numeric array] | The ground truth labels.
 % ======================================================================
 function [] = EvaluateTestInternal(trainedModel, testData, XTestScores, yTest)
-% EvaluateTestInternal prepares figures of the predicted segments during testing.
-%
-% @b Usage
-%
-% @code
-% EvaluateTestInternal(trainedModel, testData, XTestScores, yTest);
-%
-% trainUtility.EvaluateTestInternal(trainedModel, testData, XTestScores, yTest);
-% @endcode
-%
-% @param trainedModel [cell array] | The stacked models. If only one model is used, then it has length 1.
-% @param testData [cell array] | The test data.
-% @param XTestScores [numeric array] | The train feature vectors.
-% @param yTest [numeric array] | The ground truth labels.
 
     fgMasks = {testData.Masks};
     sRGBs = {testData.RGBs};
