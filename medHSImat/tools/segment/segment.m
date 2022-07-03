@@ -138,7 +138,7 @@ classdef segment
             switch lower(method)
                 case lower('Leon')
                     experiment = 'ByLeon';
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     apply.ToEach(@LeonAndShow);
                     plots.GetMontagetCollection(1, 'clusters');
@@ -146,14 +146,14 @@ classdef segment
 
                 case lower('SAM-library')
                     experiment = 'SAM-BCC&MCC';
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     apply.ToEach(@SAMAndShow);
                     plots.GetMontagetCollection(1, 'predLabel');
 
                 case lower('SAM-healthy')
                     experiment = 'SAM-Healthy';
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     threshold = 13;
                     apply.ToEach(@SAMAndShow, 'healthy', threshold);
@@ -161,7 +161,7 @@ classdef segment
 
                 case lower('Kmeans')
                     experiment = 'Kmeans';
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     apply.ToEach(@KmeansAndShow, 5);
                     plots.GetMontagetCollection(1, 'kmeans-clustering');
@@ -179,7 +179,7 @@ classdef segment
                     end
 
                     experiment = strcat('HStoolbox', '-', reductionMethod, '-', referenceMethod, '-', similarityMethod);
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     apply.ToEach(@HypercubeToolboxAndShow, reductionMethod, referenceMethod, similarityMethod);
                     plots.GetMontagetCollection(1, 'endmembers');

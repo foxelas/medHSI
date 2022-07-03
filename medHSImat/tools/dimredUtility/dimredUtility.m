@@ -497,19 +497,19 @@ classdef dimredUtility
 
                 case lower('ICA')
                     experiment = strcat('FastICA');
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
                     icNum = 3;
                     apply.ToEach(@dimredUtility.Analysis, 'ica', icNum);
 
                 case lower('RICA')
                     experiment = strcat('RICA');
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
                     icNum = 3;
                     apply.ToEach(@dimredUtility.Analysis, 'rica', icNum);
 
                 case lower('PCA')
                     experiment = strcat('PCA');
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
                     pcNum = 3;
                     apply.ToEach(@dimredUtility.Analysis, 'pca', pcNum);
 
@@ -520,7 +520,7 @@ classdef dimredUtility
 
                     % Manual
                     experiment = strcat('SuperPCA-Manual', '-Superpixels', num2str(pixelNum));
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     isManual = true;
                     apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
@@ -536,7 +536,7 @@ classdef dimredUtility
 
                     % From SuperPCA package
                     experiment = strcat('SuperPCA', '-Superpixels', num2str(pixelNum));
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     isManual = false;
                     apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
@@ -552,7 +552,7 @@ classdef dimredUtility
 
                 case lower('MSuperPCA')
                     experiment = strcat('MultiscaleSuperPCA-Manual');
-                    Basics_Init(experiment);
+                    initUtility.InitExperiment(experiment);
 
                     pixelNumArray = floor(50*sqrt(2).^[-2:2]);
                     apply.ToEach(@MultiscaleSuperpixelAnalysis, pixelNumArray);

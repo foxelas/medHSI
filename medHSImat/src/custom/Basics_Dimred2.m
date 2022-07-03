@@ -1,7 +1,7 @@
 experiment = strcat('Dimred', '28-Apr-2022', '-rbf-100000-outlier0,05');
 config.SetSetting('Dataset', 'pslRaw');
 
-Basics_Init(experiment);
+initUtility.InitExperiment(experiment);
 dataset = config.GetSetting('Dataset');
 
 %% Read h5 data

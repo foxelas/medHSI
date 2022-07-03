@@ -1,3 +1,6 @@
+% ======================================================================
+%> @brief Tutorial_ProcessHSI is a tutorial on how to initialize and process an instance of the hsi class.
+% ======================================================================
 close all;
 
 %% Application on an image
@@ -5,6 +8,15 @@ targetID = '150';
 config.SetSetting('SaveFolder', 'Test');
 config.SetSetting('FileName', targetID);
 savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
+
+%% Load the raw measured data (without normalization)
+config.SetSetting('Normalization', 'raw');
+hsIm = hsiUtility.LoadHSI(targetID);
+
+%% Plot mean spectra 
+% Plot average spectra for an ROI on the sample
+fig = 1;
+plots.AverageSpectrum(fig, hsIm);
 
 %% Load the preprocessed data and label info
 [spectralData, labelInfo] = hsiUtility.LoadHsiAndLabel(targetID);

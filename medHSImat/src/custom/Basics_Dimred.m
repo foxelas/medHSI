@@ -6,7 +6,7 @@ function [trainPerformance, testPerformance] = Basics_Dimred()
 % load(filePath2);
 
 experiment = strcat('Dimred', date(), '-rbf-100000-outlier0,05');
-Basics_Init(experiment);
+initUtility.InitExperiment(experiment);
 
 dataset = config.GetSetting('Dataset');
 
