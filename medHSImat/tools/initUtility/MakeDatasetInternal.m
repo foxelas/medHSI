@@ -48,8 +48,6 @@ config.SetSetting('Normalization', 'byPixel');
 prefix = config.GetSetting('Database');
 readForeground = true;
 
-CheckImportData();
-
 %Disable normalization check during data reading
 config.SetSetting('DisableNormalizationCheck', true);
 %Do no use mask for unispectrum calculation

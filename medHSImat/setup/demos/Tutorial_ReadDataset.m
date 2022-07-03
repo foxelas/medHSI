@@ -21,7 +21,7 @@ initUtility.InitExperiment(experiment, dataset);
 % All images are captured in a dark container, saved as .hsm
 % and manually exported to .h5 using software for
 % 2D Spectrorardiomerter ver 1.15.0.0., TOPCON TECHNOHOUSE c2015
-[flag, fileS] = InitUtility.CheckImportData();
+[flag, fileS] = initUtility.CheckImportData();
 
 %% Read values from raw,white,black .h5 files
 % Sample information is saved in importDir (input\xxxDBDataInfoTable.xlsx)

@@ -68,7 +68,6 @@ end
 fprintf('Data directory is set to %s.\n', DataDir);
 fprintf('Import directory is set to %s.\n', ImportDir);
 fprintf('Output directory is set to %s.\n', OutputDir);
-fprintf('Parameter directory is set to %s.\n', commonUtility.GetFilename('param', '', ''));
 fprintf('Matfile directory is set to %s.\n', MatDir);
 
 clear parts row varName rawValue varValue i tmp;

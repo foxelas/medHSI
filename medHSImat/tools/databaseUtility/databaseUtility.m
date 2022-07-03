@@ -26,7 +26,7 @@ classdef databaseUtility
         % ======================================================================
         function [dataTable] = GetDataTable()
             dataTable = readtable(fullfile(config.GetSetting('ImportDir'), strcat(config.GetSetting('Database'), ...
-                config.GetSetting('DataInfoTableName'))), 'Sheet', 'capturedData');
+                config.GetSetting('DataInfoTableName'))), 'Sheet', 'DataInfo');
         end
 
         % ======================================================================
@@ -80,8 +80,8 @@ classdef databaseUtility
         %> @retval tableIds [cell array] | The table IDs of result hsi images
         %> @retval outRows [struct array] | The entire information rows of result hsi images
         % ======================================================================
-        function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
-            [filenames, tableIds, outRows] = QueryInternal(content, sampleId, captureDate, id, integrationTime, target, configuration);
+        function [filenames, tableIds, outRows] = Query(varargin)
+            [filenames, tableIds, outRows] = QueryInternal(varargin{:});
         end
 
         % ======================================================================
