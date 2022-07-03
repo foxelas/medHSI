@@ -5,7 +5,7 @@ classdef dimredUtility
         %>
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
-        %> ICA (FastICA), RICA, SuperRICA,
+        %> ICA (FastICA), RICA, SuperRICA, Abundance,
         %> LDA, QDA, PCA-LDA, MSelect, pretrained.
         %> Methods autoencoder and RFI are available only for pre-trained models.
         %>
@@ -43,418 +43,49 @@ classdef dimredUtility
         %> @retval Mdl [model] | The dimension reduction model
         % ======================================================================
         function [coeff, scores, latent, explained, objective, Mdl] = Apply(X, method, q, fgMask, labelMask, varargin)
-            % Apply reduces the dimensions of the hyperspectral image.
-            %
-            % Currently available methods:
-            % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA,
-            % ICA (FastICA), RICA, SuperRICA,
-            % LDA, QDA, PCA-LDA, MSelect, pretrained.
-            % Methods autoencoder and RFI are available only for pre-trained models.
-            %
-            % Additionally, for pre-trained parameters RFI and Autoencoder are available.
-            % For an unknown method, the input data is returned.
-            %
-            % @b Usage
-            %
-            % @code
-            % q = 10;
-            % [coeff, scores, latent, explained, objective] = dimredUtility.Apply(X,
-            % method, q, fgMask);
-            %
-            % [coeff, scores, latent, explained, ~] = dimredUtility.Apply(X, 'pca', 10);
-            %
-            % [coeff, scores, ~, ~, objective] = dimredUtility.Apply(X, 'rica', 40);
-            %
-            % [~, scores, ~, ~, ~, Mdl] = dimredUtility.Apply(X, 'lda', 1, [], labelMask);
-            % @endcode
-            %
-            % @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
-            % @param method [string] | The method for dimension reduction
-            % @param q [int] | The number of components to be retained
-            % @param fgMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
-            % @param labelMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
-            % @param varargin [cell array] | Optional additional arguments for methods that require them
-            %
-            % @retval coeff [numeric array] | The transformation coefficients
-            % @retval scores [numeric array] | The transformed values
-            % @retval latent [numeric array] | The latent values
-            % @retval explained [numeric array] | The percentage of explained
-            % variance
-            % @retval objective [numeric array] | The objective function
-            % values
-            % @retval Mdl [model] | The dimension reduction model
-
-            latent = [];
-            objective = [];
-            Mdl = [];
-            coeff = [];
-
-            if nargin < 3
-                q = 10;
-            end
-
-            if nargin < 4
-                fgMask = [];
-            end
-
-            if nargin < 5
-                labelMask = [];
-            end
-            hasFgMask = ~isempty(fgMask);
-            flattenIn = ~(contains(lower(method), 'super') || contains(lower(method), 'cluster') || contains(lower(method), 'abundance'));
-            if ndims(X) < 3
-                flattenIn = false;
-            end
-
-            if flattenIn
-                if hasFgMask
-                    Xcol = GetMaskedPixelsInternal(X, fgMask);
-                else
-                    Xcol = reshape(X, [size(X, 1) * size(X, 2), size(X, 3)]);
-                end
-            else
-                Xcol = X;
-            end
-
-
-            rng default % For reproducibility
-
-            switch lower(method)
-
-                %% PCA
-                case 'pca'
-                    [coeff, scores, latent, ~, ~] = pca(Xcol, 'NumComponents', q);
-
-                    %% FastICA
-                case 'ica'
-                case 'fastica'
-                    [scores, ~, coeff] = fastica(Xcol', 'numOfIC', q);
-                    scores = scores';
-                    coeff = coeff';
-
-                    %% RICA
-                case 'rica'
-                    warning('off', 'all');
-                    Mdl = rica(Xcol, q, 'IterationLimit', 100, 'Lambda', 1);
-                    coeff = Mdl.TransformWeights;
-                    scores = Xcol * coeff;
-                    objective = Mdl.FitInfo.Objective;
-                    warning('on', 'all');
-
-                case 'pca-lda'
-                    [coeff, scores1, latent, ~, ~] = pca(Xcol, 'NumComponents', q);
-                    if isempty(labelMask)
-                        error('A supervised method requires labels as argument');
-                    end
-                    if flattenIn
-                        if hasFgMask
-                            labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
-                        else
-                            labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
-                        end
-                    else
-                        labelMaskCol = labelMask;
-                    end
-                    Mdl = fitcdiscr(scores1, labelMaskCol);
-                    % scores = predict(Mdl, scores1);
-                    scores = scores1 * Mdl.Coeffs(1, 2).Linear;
-                    q = numel(Mdl.ClassNames) - 1;
-
-                    %                     [W, LAMBDA] = eig(Mdl.BetweenSigma, Mdl.Sigma); %Must be in the right order!
-                    %                     lambda = diag(LAMBDA);
-                    %                     [lambda, SortOrder] = sort(lambda, 'descend');
-                    %                     W = W(:, SortOrder);
-                    coeff = coeff * Mdl.Coeffs(1, 2).Linear;
-
-                    %% Discriminant Analysis (LDA)
-                case 'lda'
-                    if isempty(labelMask)
-                        error('A supervised method requires labels as argument');
-                    end
-                    if flattenIn
-                        if hasFgMask
-                            labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
-                        else
-                            labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
-                        end
-                    else
-                        labelMaskCol = labelMask;
-                    end
-
-                    Mdl = fitcdiscr(Xcol, labelMaskCol);
-                    %scores = predict(Mdl, Xcol);
-                    scores = Xcol * Mdl.Coeffs(1, 2).Linear;
-                    coeff = Mdl.Coeffs(1, 2).Linear;
-
-                    %% Discriminant Analysis (QDA)
-                case 'qda'
-                    if isempty(labelMask)
-                        error('A supervised method requires labels as argument');
-                    end
-                    if flattenIn
-                        if hasFgMask
-                            labelMaskCol = GetMaskedPixelsInternal(labelMask, fgMask);
-                        else
-                            labelMaskCol = reshape(labelMask, [size(labelMask, 1) * size(labelMask, 2), 1]);
-                        end
-                    end
-                    Mdl = fitcdiscr(Xcol, labelMaskCol, 'DiscrimType', 'quadratic');
-                    scores = predict(Mdl, Xcol);
-
-                    %% Wavelength Selection
-                case 'mselect'
-                    wavelengths = hsiUtility.GetWavelengths(311);
-                    id1 = find(wavelengths == 540);
-                    id2 = find(wavelengths == 650);
-                    scores = Xcol(:, [id1, id2]);
-                    coeff = zeros(numel(wavelengths), 1);
-                    coeff(id1) = 1;
-                    coeff(id2) = 1;
-
-                    %% Superpixel RICA (SuperRICA)
-                case 'superrica'
-                    if isempty(varargin)
-                        pixelNum = 20;
-                    else
-                        pixelNum = varargin{1};
-                    end
-
-                    [m, n, ~] = size(X);
-                    %%super-pixels segmentation
-                    superpixelLabels = cubseg(X, pixelNum);
-
-                    scores = dimredUtility.ApplySuperpixelBasedDimred(X, superpixelLabels, @(x) dimredUtility.RicaCoeffs(x, q));
-                    scores = reshape(scores, [m, n, q]);
-
-                    %% SuperPCA
-                case 'superpca'
-                    if isempty(varargin)
-                        pixelNum = 20;
-                    else
-                        pixelNum = varargin{1};
-                    end
-
-                    %%super-pixels segmentation
-                    superpixelLabels = cubseg(X, pixelNum);
-
-                    %%SupePCA based DR
-                    scores = SuperPCA(X, q, superpixelLabels);
-
-                    %% Multiscale SuperPCA
-                case 'msuperpca'
-
-                    if isempty(varargin)
-                        endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
-                    else
-                        endmemberNumArray = varargin{1};
-                    end
-
-                    N = numel(endmemberNumArray);
-                    scores = cell(N, 1);
-                    for i = 1:N
-                        pixelNum = endmemberNumArray(i);
-
-                        %%super-pixels segmentation
-                        superpixelLabels = cubseg(X, pixelNum);
-
-                        %%SupePCA based DR
-                        scores{i} = SuperPCA(X, q, superpixelLabels);
-                    end
-
-                    %% Random Forest Importance (RFI)
-                case 'rfi'
-                    if ~isempty(varargin)
-                        % Apply pretrained
-                        impOOB = varargin{1};
-                        %[~, idxOrder] = sort(impOOB, 'descend');
-                        %ido = idxOrder(1:q);
-                        %scores = Xcol(:, ido);
-                    else
-                        % Train
-
-                        t = templateTree('NumVariablesToSample', 'all', 'Reproducible', true);
-                        %'NumVariablesToSample', 'all', ...% 'Type', 'classification', ...
-                        %'PredictorSelection', 'allsplits', 'Surrogate', 'off', 'Reproducible', true);
-                        RFtrainedModel = fitrensemble(Xcol, double(labelMask), 'Method', 'Bag', 'Learners', t, 'NPrint', 50);
-                        %,  'OptimizeHyperparameters',{'NumLearningCycles','LearnRate','MaxNumSplits'});
-                        yHat = oobPredict(RFtrainedModel);
-                        R2 = corr(RFtrainedModel.Y, yHat)^2;
-                        fprintf('trainedModel explains %0.1f of the variability around the mean.\n', R2);
-                        options = statset('UseParallel', true);
-                        impOOB = oobPermutedPredictorImportance(RFtrainedModel, 'Options', options);
-                    end
-
-                    featImp = impOOB';
-                    [~, idx] = sort(featImp, 'descend');
-                    dropIdx = idx(q+1:end);
-                    featImp(dropIdx) = 0;
-                    coeff = diag(featImp);
-                    coeff(:, ~any(coeff, 1)) = []; %drop zero columns
-
-                    scores = dimredUtility.Transform(Xcol, 'pretrained', q, coeff);
-
-                    %% Autoencoder (AE)
-                case 'autoencoder'
-                    if ~isempty(varargin)
-                        % Apply Pre-trained
-                        autoenc = varargin{1};
-                        scores = encode(autoenc, Xcol')';
-                    else
-                        % Train
-
-                        %                     parallel.gpu.enableCUDAForwardCompatibility(true)
-                        % % Warning: The CUDA driver must recompile the GPU libraries because your device is more
-                        % % recent than the libraries. Recompiling can take several minutes. Learn more.
-                        %                     gpuDevice(1);
-                        autoenc = trainAutoencoder(Xcol', q, 'MaxEpochs', 200);
-                        scores = dimredUtility.Transform(Xcol, method, q, autoenc);
-                        coeff = autoenc;
-                    end
-
-                    %% ClusterPCA
-                case 'clusterpca'
-                    %%Find endmembers
-
-                    if isempty(varargin)
-                        numEndmembers = 5;
-                    else
-                        numEndmembers = varargin{1};
-                    end
-
-                    endmembers = NfindrInternal(X, numEndmembers, fgMask);
-
-                    %%Find discrepancy metrics
-                    clusterLabels = DistanceScoresInternal(X, endmembers, @sam);
-
-                    scores = SuperPCA(X, q, clusterLabels);
-
-                    %% ClusterPCA2
-                case 'cluster2pca'
-                    %%Find endmembers
-
-                    if isempty(varargin)
-                        numEndmembers = 5;
-                    else
-                        numEndmembers = varargin{1};
-                    end
-
-                    endmembers = NfindrInternal(X, numEndmembers, fgMask);
-
-                    %%Find discrepancy metrics
-                    clusterLabels = DistanceScoresInternal(X, endmembers, @ns3);
-
-                    scores = SuperPCA(X, q, clusterLabels);
-
-                case 'abundance'
-                    %%Find endmembers
-
-                    %                      if isempty(varargin)
-                    %                         numEndmembers = 5;
-                    %                     else
-                    %                         numEndmembers = varargin{1};
-                    %                      end
-                    numEndmembers = q;
-                    endmembers = NfindrInternal(X, numEndmembers, fgMask);
-                    scores = estimateAbundanceLS(X, endmembers);
-
-                case 'abundance2'
-                    pathName = commonUtility.GetFilename('dataset', 'EndMembers\endmembers-8');
-                    load(pathName, 'endmembers');
-                    numEndmembers = 8;
-                    scores = estimateAbundanceLS(X, endmembers);
-
-                case 'abundance-lbp'
-
-
-                case 'cluster3pca'
-                    %%Find numClusters
-
-                    if isempty(varargin)
-                        numClusters = 5;
-                    else
-                        numClusters = varargin{1};
-                    end
-
-                    refLib = hsiUtility.GetReferenceLibrary();
-                    healthy = refLib(5).Data;
-
-                    %%Find discrepancy metrics
-                    angles = ns3(X, healthy);
-                    %angles = rad2deg(DistanceScoresInternal(X, healthy, @ns3));
-                    angles = rad2deg(angles);
-                    [m, n] = size(angles);
-                    clusterLabels = kmeans(reshape(angles, [m * n, 1]), numClusters);
-                    clusterLabels = reshape(clusterLabels, [m, n]);
-                    scores = SuperPCA(X, q, clusterLabels);
-
-                case 'cluster4pca'
-                    %%Find numClusters
-
-                    if isempty(varargin)
-                        numClusters = 5;
-                    else
-                        numClusters = varargin{1};
-                    end
-
-                    refLib = hsiUtility.GetReferenceLibrary();
-                    healthy = refLib(5).Data;
-
-                    %%Find discrepancy metrics
-                    angles = ns3(X, healthy);
-                    %angles = rad2deg(DistanceScoresInternal(X, healthy, @ns3));
-                    angles = rad2deg(angles);
-                    scores = angles;
-                    q = 1;
-
-                    %% Multiscale ClusterPCA
-                case 'mclusterpca'
-
-                    if isempty(varargin)
-                        endmemberNumArray = floor(20*sqrt(2).^[-2:2]);
-                    else
-                        endmemberNumArray = varargin{1};
-                    end
-
-                    N = numel(endmemberNumArray);
-                    scores = cell(N, 1);
-                    for i = 1:N
-                        numEndmembers = endmemberNumArray(i);
-
-                        %%Find endmembers
-                        endmembers = NfindrInternal(X, numEndmembers, fgMask);
-
-                        %%Find discrepancy metrics
-                        clusterLabels = DistanceScoresInternal(X, endmembers, @sam);
-
-                        %%SupePCA based DR
-                        scores{i} = SuperPCA(X, q, clusterLabels);
-                    end
-
-                case 'pretrained'
-                    if isempty(varargin)
-                        error('The pretrained transformation matrix is missing.');
-                    end
-                    coeff = varargin{1};
-                    scores = Xcol * coeff;
-                    q = size(coeff, 2);
-
-                    %% No dimension reduction
-                otherwise
-                    scores = Xcol;
-                    q = size(Xcol, 2);
-            end
-
-            explained = dimredUtility.CalculateExplained(scores, Xcol, X, fgMask);
-
-            if flattenIn
-                if hasFgMask
-                    scores = hsi.RecoverSpatialDimensions(scores, size(X), fgMask);
-                else
-                    scores = reshape(scores, [size(X, 1), size(X, 2), q]);
-                end
-            end
-
-            scores = hsiUtility.AdjustDimensions(scores, q);
+        % ======================================================================
+        %> @brief Apply reduces the dimensions of the hyperspectral image.
+        %>
+        %> Currently available methods:
+        %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
+        %> ICA (FastICA), RICA, SuperRICA, Abundance,
+        %> LDA, QDA, PCA-LDA, MSelect, pretrained.
+        %> Methods autoencoder and RFI are available only for pre-trained models.
+        %>
+        %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
+        %> For an unknown method, the input data is returned.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> q = 10;
+        %> [coeff, scores, latent, explained, objective] = dimredUtility.Apply(X,
+        %> method, q, fgMask);
+        %>
+        %> [coeff, scores, latent, explained, ~] = dimredUtility.Apply(X, 'pca', 10);
+        %>
+        %> [coeff, scores, ~, ~, objective] = dimredUtility.Apply(X, 'rica', 40);
+        %>
+        %> [~, scores, ~, ~, ~, Mdl] = dimredUtility.Apply(X, 'lda', 1, [], labelMask);
+        %> @endcode
+        %>
+        %> @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
+        %> @param method [string] | The method for dimension reduction
+        %> @param q [int] | The number of components to be retained
+        %> @param fgMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
+        %> @param labelMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
+        %> @param varargin [cell array] | Optional additional arguments for methods that require them
+        %>
+        %> @retval coeff [numeric array] | The transformation coefficients
+        %> @retval scores [numeric array] | The transformed values
+        %> @retval latent [numeric array] | The latent values
+        %> @retval explained [numeric array] | The percentage of explained
+        %> variance
+        %> @retval objective [numeric array] | The objective function
+        %> values
+        %> @retval Mdl [model] | The dimension reduction model
+        % ======================================================================
+            [coeff, scores, latent, explained, objective, Mdl] = DimredApply(X, method, q, fgMask, labelMask, varargin{:});
         end
 
         % ======================================================================
@@ -463,7 +94,7 @@ classdef dimredUtility
         %> @b Usage
         %>
         %> @code
-        %> [peformanceStruct] = dimredUtility.Transform(inScores, method, qNum, trainedObj);
+        %> [transScores] = dimredUtility.Transform(inScores, method, qNum, trainedObj);
         %> @endcode
         %>
         %> @param inScores [numeric array] | The target array
@@ -474,20 +105,22 @@ classdef dimredUtility
         %> @retval transScores [numeric array] | The transformed scores
         % ======================================================================
         function [transScores] = Transform(inScores, method, q, trainedObj)
-            % Transform applies a pretrained dimension reduction method.
-            %
-            % @b Usage
-            %
-            % @code
-            % [peformanceStruct] = trainUtility.Transform(inScores, method, qNum, trainedObj);
-            % @endcode
-            %
-            % @param inScores [numeric array] | The target array
-            % @param method [char] | The dimension reduction method
-            % @param q [int] | The reduced dimension
-            % @param trainedObj [numeric array] | The trained dimension reduction object
-            %
-            % @retval transScores [numeric array] | The transformed scores
+        % ======================================================================
+        %> @brief Transform applies a pretrained dimension reduction method.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [transScores] = dimredUtility.Transform(inScores, method, qNum, trainedObj);
+        %> @endcode
+        %>
+        %> @param inScores [numeric array] | The target array
+        %> @param method [char] | The dimension reduction method
+        %> @param q [int] | The reduced dimension
+        %> @param trainedObj [numeric array] | The trained dimension reduction object
+        %>
+        %> @retval transScores [numeric array] | The transformed scores
+        % ======================================================================
             [~, transScores, ~, ~, ~] = dimredUtility.Apply(inScores, method, q, [], [], trainedObj);
         end
 
@@ -521,86 +154,36 @@ classdef dimredUtility
         %> @retval scores [numeric array] | The transformed values
         % ======================================================================
         function [scores] = Analysis(hsIm, labelInfo, method, varargin)
-            % Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
-            %
-            % Currently available methods:
-            % PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
-            % ICA (FastICA), RICA, SuperRICA,
-            % LDA, QDA, MSelect.
-            % Methods autoencoder and RFI are available only for pre-trained models.
-            %
-            % Additionally, for pre-trained parameters RFI and Autoencoder are available.
-            % For an unknown method, the input data is returned.
-            %
-            % @b Usage
-            %
-            % @code
-            % q = 10;
-            % [scores] = dimredUtility.Analysis(hsIm, labelInfo, 'pca', q);
-            % @endcode
-            %
-            % @param hsIm [hsi] | An instance of the hsi class
-            % @param labelInfo [hsiInfo] | An instance of the hsiInfo class
-            % @param method [string] | The method for dimension reduction
-            % @param q [int] | The number of components to be retained
-            % @param fgMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
-            % @param labelMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
-            % @param varargin [cell array] | Optional additional arguments for methods that require them
-            %
-            % @retval scores [numeric array] | The transformed values
-
-            if nargin < 2
-                labelInfo = [];
-            end
-
-            close all;
-
-            %% Preparation
-            srgb = hsIm.GetDisplayImage('rgb');
-
-            if strcmpi(method, 'ica')
-                [coeff, scores, ~, explained, ~] = hsIm.Dimred('ica', varargin{:});
-                subName = 'Independent Component';
-                limitVal = [];
-            end
-
-            if strcmpi(method, 'rica')
-                [coeff, scores, ~, explained, ~] = hsIm.Dimred('rica', varargin{:});
-                subName = 'Reconstructed Component';
-                limitVal = [[0, 0]; [-3, 3]; [-1, 1]; [-15, 0]];
-            end
-
-            if strcmpi(method, 'pca')
-                [coeff, scores, ~, explained, ~] = hsIm.Dimred('pca', varargin{:});
-                subName = 'Principal Component';
-                limitVal = [[0, 0]; [-3, 10]; [-3, 3]; [-1, 1]];
-            end
-
-
-            img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
-            names = {labelInfo.Diagnosis, strjoin({subName, '1'}, {' '}), strjoin({subName, '2'}, {' '}), strjoin({subName, '3'}, {' '})};
-            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ca'), 'png');
-            plots.MontageCmap(1, plotPath, img, names, false, limitVal);
-
-            img = {srgb, squeeze(scores(:, :, 1)), squeeze(scores(:, :, 2)), squeeze(scores(:, :, 3))};
-            names = {labelInfo.Diagnosis, strjoin({subName, '1'}, {' '}), strjoin({subName, '2'}, {' '}), strjoin({subName, '3'}, {' '})};
-            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ca_overlay'), 'png');
-            plots.MontageWithLabel(2, plotPath, img, names, labelInfo.Labels, hsIm.FgMask);
-
-            fig = figure(3);
-            w = hsiUtility.GetWavelengths(311);
-            hold on
-            for i = 1:3
-                v = explained(i);
-                name = strcat('TransVector', num2str(i), '(', sprintf('%.2f%%', v), ')');
-                plot(w, coeff(:, i), 'DisplayName', name, 'LineWidth', 2);
-            end
-            hold off
-            xlabel('Wavelength (nm)');
-            ylabel('Coefficient (a.u.)');
-            legend('Location', 'northwest');
-            plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), hsIm.ID, 'ca_vectors'), 'png');
-            plots.SavePlot(fig, plotPath);
+        % ======================================================================
+        %> @brief Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
+        %>
+        %> Currently available methods:
+        %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
+        %> ICA (FastICA), RICA, SuperRICA,
+        %> LDA, QDA, MSelect.
+        %> Methods autoencoder and RFI are available only for pre-trained models.
+        %>
+        %> Additionally, for pre-trained parameters RFI and Autoencoder are available.
+        %> For an unknown method, the input data is returned.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> q = 10;
+        %> [scores] = dimredUtility.Analysis(hsIm, labelInfo, 'pca', q);
+        %> @endcode
+        %>
+        %> @param hsIm [hsi] | An instance of the hsi class
+        %> @param labelInfo [hsiInfo] | An instance of the hsiInfo class
+        %> @param method [string] | The method for dimension reduction
+        %> @param q [int] | The number of components to be retained
+        %> @param fgMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
+        %> @param labelMask [numerical array] | A 2D logical array marking pixels to be used in PCA calculation
+        %> @param varargin [cell array] | Optional additional arguments for methods that require them
+        %>
+        %> @retval scores [numeric array] | The transformed values
+        % ======================================================================
+            [scores] = DimredAnalysis(hsIm, labelInfo, method, varargin{:});
         end
 
         % ======================================================================
@@ -618,18 +201,21 @@ classdef dimredUtility
         %> @retval explained [numeric array] | The explained values.
         % ======================================================================
         function [explained] = Explained(originalData, transData)
-            % Explained returns the explained percentage for each component after dimension reduction.
-            %
-            % @b Usage
-            %
-            % @code
-            % [explained] = dimredUtility.Explained( Xcol_, scores_);
-            % @endcode
-            %
-            % @param scores [cell array] | The dimension reduction scores in a 2D format.
-            % @param Xcol_ [numeric array] | The original data in a 2D format
-            %
-            % @retval explained [numeric array] | The explained values.
+        % ======================================================================
+        %> @brief Explained returns the explained percentage for each component after dimension reduction.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [explained] = dimredUtility.Explained( Xcol_, scores_);
+        %> @endcode
+        %>
+        %> @param scores [cell array] | The dimension reduction scores in a 2D format.
+        %> @param Xcol_ [numeric array] | The original data in a 2D format
+        %>
+        %> @retval explained [numeric array] | The explained values.
+        % ======================================================================
+        
             explained = var(transData) ./ sum(var(originalData));
         end
 
@@ -650,20 +236,22 @@ classdef dimredUtility
         %> @retval explained [numeric array] | The explained values.
         % ======================================================================
         function [explained] = CalculateExplained(scores_, Xcol_, X_, mask_)
-            % CalculateExplained calculates the explained percentage for each component of dimension reduction.
-            %
-            % @b Usage
-            %
-            % @code
-            % [explained] = dimredUtility.CalculateExplained(scores_, Xcol_, X_, mask_, explained_);
-            % @endcode
-            %
-            % @param scores [cell array] | The dimension reduction scores
-            % @param Xcol_ [numeric array] | The original data in a column format.
-            % @param X_ [numeric array] | The original data in a 3D format.
-            % @param mask_ [numeric array] | The foreground mask.
-            %
-            % @retval explained [numeric array] | The explained values.
+        % ======================================================================
+        %> @brief CalculateExplained calculates the explained percentage for each component of dimension reduction.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [explained] = dimredUtility.CalculateExplained(scores_, Xcol_, X_, mask_, explained_);
+        %> @endcode
+        %>
+        %> @param scores [cell array] | The dimension reduction scores
+        %> @param Xcol_ [numeric array] | The original data in a column format.
+        %> @param X_ [numeric array] | The original data in a 3D format.
+        %> @param mask_ [numeric array] | The foreground mask.
+        %>
+        %> @retval explained [numeric array] | The explained values.
+        % ======================================================================
 
             if ~iscell(scores_) && ndims(scores_) == 2
                 explained = dimredUtility.Explained(Xcol_, scores_);
@@ -698,18 +286,20 @@ classdef dimredUtility
         %> @retval coeff [numeric array] | The transformation coefficients
         % ======================================================================
         function [coeff] = RicaCoeffs(target, q)
-            % RicaCoeffs applies RICA and returns the coefficients vector.
-            %
-            % @b Usage
-            %
-            % @code
-            % coeff = dimredUtility.RicaCoeffs(X,q);
-            % @endcode
-            %
-            % @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
-            % @param q [int] | The number of components to be retained
-            %
-            % @retval coeff [numeric array] | The transformation coefficients
+        % ======================================================================
+        %> @brief RicaCoeffs applies RICA and returns the coefficients vector.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> coeff = dimredUtility.RicaCoeffs(X,q);
+        %> @endcode
+        %>
+        %> @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
+        %> @param q [int] | The number of components to be retained
+        %>
+        %> @retval coeff [numeric array] | The transformation coefficients
+        % ======================================================================
             Mdl = rica(target, q, 'IterationLimit', 100, 'Lambda', 5);
             coeff = Mdl.TransformWeights;
         end
@@ -728,20 +318,24 @@ classdef dimredUtility
         %> @param funcHandle [function handle] | The function handle to be applied
         %>
         %> @retval scores [numeric array] | The transformed values
+        % ======================================================================
         function [scores] = ApplySuperpixelBasedDimred(X, superpixelLabels, funcHandle)
-            % ApplySuperpixelBasedDimred applies a  target function on an hsi object's superpixels and returns the tranformed scores.
-            %
-            % @b Usage
-            %
-            % @code
-            % coeff = dimredUtility.ApplySuperpixelBasedDimred(X,superpixelLabels, @(x) RicaCoeffs(x, q));
-            % @endcode
-            %
-            % @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
-            % @param superpixelLabels [numeric array] | The superpixel labels
-            % @param funcHandle [function handle] | The function handle to be applied
-            %
-            % @retval scores [numeric array] | The transformed values
+        % ======================================================================
+        %> @brief ApplySuperpixelBasedDimred applies a  target function on an hsi object's superpixels and returns the tranformed scores.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> coeff = dimredUtility.ApplySuperpixelBasedDimred(X,superpixelLabels, @(x) RicaCoeffs(x, q));
+        %> @endcode
+        %>
+        %> @param X [numeric array] | The input data as a matrix with MxN observations and Z columns
+        %> @param superpixelLabels [numeric array] | The superpixel labels
+        %> @param funcHandle [function handle] | The function handle to be applied
+        %>
+        %> @retval scores [numeric array] | The transformed values
+        % ======================================================================
+
             [M, N, ~] = size(X);
             Results_segment = seg_im_class(X, superpixelLabels);
             Num = size(Results_segment.Y, 2);
@@ -777,26 +371,28 @@ classdef dimredUtility
         %> to tissue pixels
         % ======================================================================
         function [scores, labels, validLabels] = MultiscaleSuperPCA(obj, pixelNumArray, pcNum)
-            % MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
-            %
-            % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
-            %
-            % @b Usage
-            %
-            % @code
-            % [scores, labels, validLabels] = dimredUtility.MultiscaleSuperPCA(hsIm);
-            %
-            % [scores, labels, validLabels] = dimredUtility.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
-            % @endcode
-            %
-            % @param hsIm [hsi] | An instance of the hsi class
-            % @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
-            % @param pcNum [int] | Otional: The number of PCA components. Default: 3.
-            %
-            % @retval scores [cell array] | The PCA scores
-            % @retval labels [cell array] | The labels of the superpixels
-            % @retval validLabels [cell array] | The superpixel labels that refer
-            % to tissue pixels
+        % ======================================================================
+        %> @brief MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
+        %>
+        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [scores, labels, validLabels] = dimredUtility.MultiscaleSuperPCA(hsIm);
+        %>
+        %> [scores, labels, validLabels] = dimredUtility.MultiscaleSuperPCA(hsIm, isManual, pixelNum, pcNum);
+        %> @endcode
+        %>
+        %> @param hsIm [hsi] | An instance of the hsi class
+        %> @param pixelNumArray [numeric array] | Optional: An array of the number of superpixels. Default: [ 9, 14, 20, 28, 40]..
+        %> @param pcNum [int] | Otional: The number of PCA components. Default: 3.
+        %>
+        %> @retval scores [cell array] | The PCA scores
+        %> @retval labels [cell array] | The labels of the superpixels
+        %> @retval validLabels [cell array] | The superpixel labels that refer
+        %> to tissue pixels
+        % ======================================================================
             if nargin < 2
                 pixelNumArray = floor(20*sqrt(2).^[-2:2]);
             end
@@ -829,255 +425,142 @@ classdef dimredUtility
         %> @endcode
         %>
         %> @param hsIm [hsi] | An instance of the hsi class
-        %> @param isManual [boolean] | A  flag to show whether is manual (local)
+        %> @param isManual [boolean] | Optional: A  flag to show whether is manual (local)
         %> implementation or by SuperPCA package. Default: false.
-        %> @param pixelNum [int] | The number of superpixels. Default: 20.
-        %> @param pcNum [int] | The number of PCA components. Default: 3.
+        %> @param pixelNum [int] | Optional: The number of superpixels. Default: 20.
+        %> @param pcNum [int] | Optional: The number of PCA components. Default: 3.
         %>
         %> @retval scores [numeric array] | The PCA scores
         %> @retval labels [numeric array] | The labels of the superpixels
         %> @retval validLabels [numeric array] | The superpixel labels that refer
         %> to tissue pixels
         % ======================================================================
-        function [scores, labels, validLabels] = SuperPCA(obj, isManual, pixelNum, pcNum)
-            % SuperPCA applies SuperPCA to an hsi object.
-            %
-            % Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
-            %
-            % @b Usage
-            %
-            % @code
-            % [scores, labels, validLabels] = dimredUtility.SuperPCA(hsIm);
-            %
-            % [scores, labels, validLabels] = dimredUtility.SuperPCA(hsIm, isManual, pixelNum, pcNum);
-            % @endcode
-            %
-            % @param hsIm [hsi] | An instance of the hsi class
-            % @param isManual [boolean] | A  flag to show whether is manual (local)
-            % implementation or by SuperPCA package. Default: false.
-            % @param pixelNum [int] | The number of superpixels. Default: 20.
-            % @param pcNum [int] | The number of PCA components. Default: 3.
-            %
-            % @retval scores [numeric array] | The PCA scores
-            % @retval labels [numeric array] | The labels of the superpixels
-            % @retval validLabels [numeric array] | The superpixel labels that refer
-            % to tissue pixels
-            if nargin < 2
-                isManual = false;
-            end
-
-            if nargin < 3
-                pixelNum = 20;
-            end
-
-            if nargin < 4
-                pcNum = 3;
-            end
-
-            fgMask = obj.FgMask;
-
-            %% Calculate superpixels
-            if isManual
-                %%Apply PCA to entire image
-                [~, scores, latent, explained, ~] = obj.Dimred('pca', pcNum, fgMask);
-                %                 explained(1:pcNum);
-                %                 latent(1:pcNum);
-
-                % Use the 1st PCA component for superpixel calculation
-                redImage = rescale(squeeze(scores(:, :, 1)));
-                [labels, ~] = superpixels(redImage, pixelNum);
-
-                scores = SuperPCA(obj.Value, pcNum, labels);
-
-                % Keep only pixels that belong to the tissue (Superpixel might assign
-                % background pixels also). The last label is background label.
-                [labels, validLabels] = hsiUtility.CleanLabels(labels, fgMask, pixelNum);
-
-            else
-                %%super-pixels segmentation
-                labels = cubseg(obj.Value, pixelNum);
-
-                % Keep only pixels that belong to the tissue (Superpixel might assign
-                % background pixels also). The last label is background label.
-                [labels, validLabels] = hsiUtility.CleanLabels(labels, fgMask, pixelNum);
-
-                %%SupePCA based DR
-                scores = SuperPCA(obj.Value, pcNum, labels);
-            end
-
-        end
-
+        function [scores, labels, validLabels] = SuperPCA(obj, varargin)
         % ======================================================================
-        %> @brief ByICA applies FastICA.
+        %> @brief SuperPCA applies SuperPCA to an hsi object.
+        %>
+        %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [scores, labels, validLabels] = dimredUtility.SuperPCA(hsIm);
+        %>
+        %> [scores, labels, validLabels] = dimredUtility.SuperPCA(hsIm, isManual, pixelNum, pcNum);
+        %> @endcode
+        %>
+        %> @param hsIm [hsi] | An instance of the hsi class
+        %> @param isManual [boolean] | Optional: A  flag to show whether is manual (local)
+        %> implementation or by SuperPCA package. Default: false.
+        %> @param pixelNum [int] | Optional: The number of superpixels. Default: 20.
+        %> @param pcNum [int] | Optional: The number of PCA components. Default: 3.
+        %>
+        %> @retval scores [numeric array] | The PCA scores
+        %> @retval labels [numeric array] | The labels of the superpixels
+        %> @retval validLabels [numeric array] | The superpixel labels that refer
+        %> to tissue pixels
+        % ======================================================================
+        
+            [scores, labels, validLabels] = SuperPCAInternal(obj, varargin{:});
+        end
+        
+        % ======================================================================
+        %> @brief ApplyAndShow applies a dimension reduction and produces evidence.
         %>
         %> The method is applied on each image in the dataset. The results are saved in the output folder.
         %>
         %> @b Usage
         %>
         %> @code
-        %> dimredUtility.ByICA();
+        %> dimredUtility.ApplyAndShow('FastICA');
         %> @endcode
+        %>
+        %> @param method [char] | The dimension reduction method. Options: ['ICA', 'RICA', 'PCA', 'SuperPCA', 'MSuperPCA']. 
+        %> @param varargin [cell array] | Optional: The arguments necessary for the target function
         % ======================================================================
-        function ByICA()
-            % ByICA applies FastICA.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % dimredUtility.ByICA();
-            % @endcode
-
-            experiment = strcat('FastICA');
-            Basics_Init(experiment);
-            icNum = 3;
-            apply.ToEach(@dimredUtility.Analysis, 'ica', icNum);
-        end
-
+        function [] = ApplyAndShow(method, varargin)
         % ======================================================================
-        %> @brief ByRICA applies Reconstructed Independent Component Analysis.
+        %> @brief ApplyAndShow applies a dimension reduction and produces evidence.
         %>
         %> The method is applied on each image in the dataset. The results are saved in the output folder.
         %>
         %> @b Usage
         %>
         %> @code
-        %> dimredUtility.ByRICA();
+        %> dimredUtility.ApplyAndShow('FastICA');
         %> @endcode
-        % ======================================================================
-        function ByRICA()
-            % ByRICA applies Reconstructed Independent Component Analysis.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % dimredUtility.ByRICA();
-            % @endcode
-
-            experiment = strcat('RICA');
-            Basics_Init(experiment);
-            icNum = 3;
-            apply.ToEach(@dimredUtility.Analysis, 'rica', icNum);
-        end
-
-        % ======================================================================
-        %> @brief ByPCA applies Principal Component Analysis.
         %>
-        %> The method is applied on each image in the dataset. The results are saved in the output folder.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> dimredUtility.ByPCA();
-        %> @endcode
-        % ======================================================================
-        function ByPCA()
-            % ByPCA applies Principal Component Analysis.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % dimredUtility.ByPCA();
-            % @endcode
+        %> @param method [char] | The dimension reduction method. Options: ['ICA', 'RICA', 'PCA', 'SuperPCA', 'MSuperPCA']. 
+        %> @param varargin [cell array] | Optional: The arguments necessary for the target function
+        % ======================================================================v
+            switch lower(method) 
+                
+                case lower('ICA')
+                    experiment = strcat('FastICA');                   
+                    Basics_Init(experiment);
+                    icNum = 3;
+                    apply.ToEach(@dimredUtility.Analysis, 'ica', icNum);
+                    
+                case lower('RICA')
+                    experiment = strcat('RICA');
+                    Basics_Init(experiment);
+                    icNum = 3;
+                    apply.ToEach(@dimredUtility.Analysis, 'rica', icNum);
+                    
+                case lower('PCA')
+                    experiment = strcat('PCA');
+                    Basics_Init(experiment);
+                    pcNum = 3;
+                    apply.ToEach(@dimredUtility.Analysis, 'pca', pcNum);
+                    
+                case lower('SuperPCA')
+                    % SuperPCA
+                    pixelNum = 30;
+                    pcNum = 5;
 
-            experiment = strcat('PCA');
-            Basics_Init(experiment);
-            pcNum = 3;
-            apply.ToEach(@dimredUtility.Analysis, 'pca', pcNum);
-        end
+                    % Manual
+                    experiment = strcat('SuperPCA-Manual', '-Superpixels', num2str(pixelNum));
+                    Basics_Init(experiment);
 
-        % ======================================================================
-        %> @brief BySuperPCA applies Superpixel-wise Principal Component Analysis.
-        %>
-        %> The method is applied on each image in the dataset. The results are saved in the output folder.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> dimredUtility.BySuperPCA();
-        %> @endcode
-        % ======================================================================
-        function BySuperPCA()
-            % BySuperPCA applies Superpixel-wise Principal Component Analysis.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % dimredUtility.BySuperPCA();
-            % @endcode
+                    isManual = true;
+                    apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
 
-            %% SuperPCA
-            pixelNum = 30;
-            pcNum = 5;
+                    close all;
+                    if config.GetSetting('IsTest')
+                        plots.GetMontagetCollection(1, 'eigenvectors');
+                    end
+                    plots.GetMontagetCollection(2, 'superpixel_mask');
+                    plots.GetMontagetCollection(3, 'pc1');
+                    plots.GetMontagetCollection(4, 'pc2');
+                    plots.GetMontagetCollection(5, 'pc3');
 
-            %% Manual
-            experiment = strcat('SuperPCA-Manual', '-Superpixels', num2str(pixelNum));
-            Basics_Init(experiment);
+                    % From SuperPCA package
+                    experiment = strcat('SuperPCA', '-Superpixels', num2str(pixelNum));
+                    Basics_Init(experiment);
 
-            isManual = true;
-            apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
+                    isManual = false;
+                    apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
 
-            close all;
-            if config.GetSetting('IsTest')
-                plots.GetMontagetCollection(1, 'eigenvectors');
+                    close all;
+                    if config.GetSetting('IsTest')
+                        plots.GetMontagetCollection(1, 'eigenvectors');
+                    end
+                    plots.GetMontagetCollection(2, 'superpixel_mask');
+                    plots.GetMontagetCollection(3, 'pc1');
+                    plots.GetMontagetCollection(4, 'pc2');
+                    plots.GetMontagetCollection(5, 'pc3');
+            
+                case lower('MSuperPCA')
+                    experiment = strcat('MultiscaleSuperPCA-Manual');
+                    Basics_Init(experiment);
+
+                    pixelNumArray = floor(50*sqrt(2).^[-2:2]);
+                    apply.ToEach(@MultiscaleSuperpixelAnalysis, pixelNumArray);
+            
+                otherwise
+                    disp('Incorrect dimention reduction method.');
             end
-            plots.GetMontagetCollection(2, 'superpixel_mask');
-            plots.GetMontagetCollection(3, 'pc1');
-            plots.GetMontagetCollection(4, 'pc2');
-            plots.GetMontagetCollection(5, 'pc3');
-
-            %% From SuperPCA package
-            experiment = strcat('SuperPCA', '-Superpixels', num2str(pixelNum));
-            Basics_Init(experiment);
-
-            isManual = false;
-            apply.ToEach(@SuperpixelAnalysis, isManual, pixelNum, pcNum);
-
-            close all;
-            if config.GetSetting('IsTest')
-                plots.GetMontagetCollection(1, 'eigenvectors');
-            end
-            plots.GetMontagetCollection(2, 'superpixel_mask');
-            plots.GetMontagetCollection(3, 'pc1');
-            plots.GetMontagetCollection(4, 'pc2');
-            plots.GetMontagetCollection(5, 'pc3');
         end
 
-        % ======================================================================
-        %> @brief ByMSuperPCA applies Multiscale Superpixel-wise Principal Component Analysis.
-        %>
-        %> The method is applied on each image in the dataset. The results are saved in the output folder.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> dimredUtility.ByMSuperPCA();
-        %> @endcode
-        % ======================================================================
-        function ByMSuperPCA()
-            % ByMSuperPCA applies Multiscale Superpixel-wise Principal Component Analysis.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % dimredUtility.ByMSuperPCA();
-            % @endcode
-
-            %% Multiscale SuperPCA
-            experiment = strcat('MultiscaleSuperPCA-Manual');
-            Basics_Init(experiment);
-
-            pixelNumArray = floor(50*sqrt(2).^[-2:2]);
-            apply.ToEach(@MultiscaleSuperpixelAnalysis, pixelNumArray);
-        end
     end
 end

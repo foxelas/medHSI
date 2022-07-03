@@ -33,8 +33,8 @@ plots.SavePlot(2, plotPath);
 
 % See the influence of denoising on the endmembers 
 numEndmembers = 8;
-endmembersBefore = spectralData.Nfindr(numEndmembers);
-endmembersAfter = denoised.Nfindr(numEndmembers);  
+endmembersBefore = spectralData.FindPurePixels(numEndmembers, 'Nfindr');
+endmembersAfter = denoised.FindPurePixels(numEndmembers, 'Nfindr');  
 
 figure(3);
 subplot(2, 1, 1); plot(w, endmembersBefore);

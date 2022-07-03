@@ -22,9 +22,9 @@ classdef apply
         %> @endcode
         %>
         %> @param funcHandle [Function Handle] | Handle of the target function to be applied
-        %> @param varargin [Cell array] | The arguments necessary for the target function
+        %> @param varargin [cell array] | The arguments necessary for the target function
         %>
-        %> @retval varargout [Cell array] | The return values of the target function
+        %> @retval varargout [cell array] | The return values of the target function
         % ======================================================================
         function [varargout] = ToEach(funcHandle, varargin)
             % ScriptToEachImage applies a script on each of the data samples in the dataset.

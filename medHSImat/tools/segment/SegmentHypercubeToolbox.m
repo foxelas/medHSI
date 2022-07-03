@@ -24,36 +24,12 @@
 % ======================================================================
 function [prediction, endmembers, abundanceMap] = SegmentHypercubeToolbox(hsIm, reductionMethod, referenceMethod, similarityMethod)
 
-    colHsIm = hsIm.GetMaskedPixels();
-    n = size(colHsIm, 1);
-    F = factor(n);
-    if F(1) > 0 && F(1) ~= n
-        rscolHsIm = reshape(colHsIm, [n / F(1), F(1), size(colHsIm, 2)]);
-    else
-        colHsIm = colHsIm(1:(n - 1), :);
-        n = n - 1;
-        F = factor(n);
-        rscolHsIm = reshape(colHsIm, [n / F(1), F(1), size(colHsIm, 2)]);
-    end
-
     if strcmpi(reductionMethod, 'PCA') || strcmpi(reductionMethod, 'MNF')
         disp('Incorrect reduction method. Please select PCA or MNF.');
     end
     
     % numEndmembers = countEndmembersHFC(hsIm.Value,'PFA',10^-7);
-    switch referenceMethod
-        case 'nfindr'
-            numEndmembers = 8;
-            endmembers = nfindr(rscolHsIm, numEndmembers, 'ReductionMethod', reductionMethod);
-        case 'ppi' 
-            numEndmembers = 5;
-            endmembers = ppi(rscolHsIm, numEndmembers, 'ReductionMethod', reductionMethod);
-        case 'fippi'
-            numEndmembers = 5;
-            endmembers = fippi(rscolHsIm, numEndmembers, 'ReductionMethod', reductionMethod);
-        otherwise 
-            error('Unavailable reference method.');
-    end
+    endmembers = hsIm.FindPurePixels(numEndmembers, referenceMethod, reductionMethod);
     
     switch similarityMethod
         case 'sid'
