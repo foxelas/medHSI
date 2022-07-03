@@ -9,6 +9,8 @@
 %> @b Usage
 %>
 %> @code
+%> dimredUtility.ApplyAndShow('MSuperPCA');
+%>
 %> MultiscaleSuperpixelAnalysis(hsIm);
 %>
 %> apply.ToEach(@MultiscaleSuperpixelAnalysis, 20, 3);
@@ -26,31 +28,7 @@
 %> to tissue pixels
 % ======================================================================
 function [scores, labels, validLabels] = MultiscaleSuperpixelAnalysis(hsIm, labelInfo, varargin)
-% MultiscaleSuperpixelAnalysis applies Multiscale SuperPCA to an hsi and visualizes
-% the result.
-%
-% Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
-%
-% Need to set config::[SaveFolder] for image output.
-%
-% @b Usage
-%
-% @code
-% MultiscaleSuperpixelAnalysis(hsIm);
-%
-% apply.ToEach(@MultiscaleSuperpixelAnalysis, 20, 3);
-% @endcode
-%
-% @param hsIm [hsi] | An instance of the hsi class
-% @param labelInfo [hsiInfo] | An instance of the  hsiInfo class
-% @param pixelNumArray [numeric array] | The array of superpixels.
-% Default: [ 9, 14, 20, 28, 40].
-% @param pcNum [int] | The number of PCA components. Default: 3.
-%
-% @retval scores [cell array] | The PCA scores
-% @retval labels [cell array] | The labels of the superpixels
-% @retval validLabels [cell array] | The superpixel labels that refer
-% to tissue pixels
+
 close all;
 
 if nargin < 2

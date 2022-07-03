@@ -92,7 +92,7 @@ classdef hsiInfo
     methods (Static)
 
         % ======================================================================
-        %> @brief GetMultiClassLabels prepares multiclass labels.
+        %> @brief hsiInfo.GetMultiClassLabels prepares multiclass labels.
         %>
         %> The hsi object should be read beforehand.
         %> Classes are: background (0), healthy (1), border (2), malignant(3).
@@ -110,7 +110,7 @@ classdef hsiInfo
         % ======================================================================
         function mcLabels = GetMultiClassLabels(targetId, labels)
             % ======================================================================
-            %> @brief GetMultiClassLabels prepares multiclass labels.
+            %> @brief hsiInfo.GetMultiClassLabels prepares multiclass labels.
             %>
             %> The hsi object should be read beforehand.
             %> Classes are: background (0), healthy (1), border (2), malignant(3).
@@ -141,7 +141,7 @@ classdef hsiInfo
         end
 
         % ======================================================================
-        %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
+        %> @brief hsiInfo.ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
         %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
@@ -162,7 +162,7 @@ classdef hsiInfo
         % ======================================================================
         function [obj] = ReadHsiInfo(targetId, sampleId)
             % ======================================================================
-            %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
+            %> @brief hsiInfo.ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
             %>
             %> The input data should be saved in folder with config::[LabelDir]\\*.png.
             %> The data should be saved in folders according to tissue type, e.g.
@@ -188,7 +188,7 @@ classdef hsiInfo
         end
 
         % ======================================================================
-        %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
+        %> @brief hsiInfo.ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
         %>
         %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
@@ -208,7 +208,7 @@ classdef hsiInfo
         % ======================================================================
         function [obj] = ReadHsiInfoFromHsi(hsIm)
             % ======================================================================
-            %> @brief ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
+            %> @brief hsiInfo.ReadHsiInfo reads label information and prepares an instance of class hsiInfo.
             %>
             %> The input data should be saved in folder with config::[LabelDir]\\*.png.
             %> The data should be saved in folders according to tissue type, e.g.
@@ -239,7 +239,7 @@ classdef hsiInfo
         end
 
         % ======================================================================
-        %> @brief ReadLabel reads label information from a label image.
+        %> @brief hsiInfo.ReadLabel reads label information from a label image.
         %>
         %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
@@ -257,7 +257,7 @@ classdef hsiInfo
         % ======================================================================
         function [labelMask] = ReadLabel(targetID)
             % ======================================================================
-            %> @brief ReadLabel reads label information from a label image.
+            %> @brief hsiInfo.ReadLabel reads label information from a label image.
             %>
             %> The input data should be saved in folder with config::[LabelDir]\\*.png.
             %> The data should be saved in folders according to tissue type, e.g.
@@ -285,7 +285,7 @@ classdef hsiInfo
         end
 
         % ======================================================================
-        %> @brief ReadLabelFromHsi reads label information from a label image.
+        %> @brief hsiInfo.ReadLabelFromHsi reads label information from a label image.
         %>
         %> The input data should be saved in folder with config::[LabelDir]\\*.png.
         %> The data should be saved in folders according to tissue type, e.g.
@@ -303,7 +303,7 @@ classdef hsiInfo
         % ======================================================================
         function [labelMask] = ReadLabelFromHsi(hsIm)
             % ======================================================================
-            %> @brief ReadLabelFromHsi reads label information from a label image.
+            %> @brief hsiInfo.ReadLabelFromHsi reads label information from a label image.
             %>
             %> The input data should be saved in folder with config::[LabelDir]\\*.png.
             %> The data should be saved in folders according to tissue type, e.g.
@@ -363,7 +363,7 @@ classdef hsiInfo
         end
 
         % ======================================================================
-        %> @brief ReadDiagnosis reads diagnosis information from an excel file.
+        %> @brief hsiInfo.ReadDiagnosis reads diagnosis information from an excel file.
         %>
         %> Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiseaseInfoTableName].
         %>
@@ -381,7 +381,7 @@ classdef hsiInfo
         % ======================================================================
         function [diagnosis, cancerType, comment] = ReadDiagnosis(sampleId)
             % ======================================================================
-            %> @brief ReadDiagnosis reads diagnosis information from an excel file.
+            %> @brief hsiInfo.ReadDiagnosis reads diagnosis information from an excel file.
             %>
             %> Diagnostic data should be saved in config::[ImportDir]\\[Database]+[DiseaseInfoTableName].
             %>

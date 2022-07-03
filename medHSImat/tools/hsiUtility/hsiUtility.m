@@ -9,7 +9,7 @@
 classdef hsiUtility
     methods (Static)
         %======================================================================
-        %> @brief LoadHsiAndLabel loads both hsi and hsiInfo objects
+        %> @brief hsiUtility.LoadHsiAndLabel loads both hsi and hsiInfo objects
         %>
         %> The hsi and hsiInfo objects should have been initialized beforehand with
         %> hsiUtility.PrepareDataset().
@@ -27,7 +27,7 @@ classdef hsiUtility
         %======================================================================
         function [spectralData, labelInfo] = LoadHsiAndLabel(targetID)
             %======================================================================
-            %> @brief LoadHsiAndLabel loads both hsi and hsiInfo objects
+            %> @brief hsiUtility.LoadHsiAndLabel loads both hsi and hsiInfo objects
             %>
             %> The hsi and hsiInfo objects should have been initialized beforehand with
             %> hsiUtility.PrepareDataset().
@@ -65,7 +65,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief LoadDataset loads both hsi and hsiInfo objects in the dataset.
+        %> @brief hsiUtility.LoadDataset loads both hsi and hsiInfo objects in the dataset.
         %>
         %> The hsi and hsiInfo objects should have been initialized beforehand with
         %> hsiUtility.PrepareDataset().
@@ -83,7 +83,7 @@ classdef hsiUtility
         %======================================================================
         function [hsiList, labelInfoList] = LoadDataset(dataset)
             %======================================================================
-            %> @brief LoadDataset loads both hsi and hsiInfo objects in the dataset.
+            %> @brief hsiUtility.LoadDataset loads both hsi and hsiInfo objects in the dataset.
             %>
             %> The hsi and hsiInfo objects should have been initialized beforehand with
             %> hsiUtility.PrepareDataset().
@@ -118,7 +118,7 @@ classdef hsiUtility
 
         %% System properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %======================================================================
-        %> @brief GetWavelengths returns the wavelengths of the hyperspectral image
+        %> @brief hsiUtility.GetWavelengths returns the wavelengths of the hyperspectral image
         %>
         %> Depending on the option, it either returns the wavelengths or the
         %> wavelength indexes of the spectral image.
@@ -144,7 +144,7 @@ classdef hsiUtility
         %======================================================================
         function [x] = GetWavelengths(m, option)
             %======================================================================
-            %> @brief GetWavelengths returns the wavelengths of the hyperspectral image
+            %> @brief hsiUtility.GetWavelengths returns the wavelengths of the hyperspectral image
             %>
             %> Depending on the option, it either returns the wavelengths or the
             %> wavelength indexes of the spectral image.
@@ -220,7 +220,7 @@ classdef hsiUtility
 
         %% Input/Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %======================================================================
-        %> @brief ReadH5 loads the hyperspectral image from an .h5 file.
+        %> @brief hsiUtility.ReadH5 loads the hyperspectral image from an .h5 file.
         %>
         %> The .h5 data are assumed to be saved in config::[DataDir]\\*.h5.
         %> After reading, the image is saved in config::[MatDir]\\[Database]\\*.mat.
@@ -239,7 +239,7 @@ classdef hsiUtility
         %======================================================================
         function [spectralData, imageXYZ, wavelengths] = ReadH5(filename)
             %======================================================================
-            %> @brief ReadH5 loads the hyperspectral image from an .h5 file.
+            %> @brief hsiUtility.ReadH5 loads the hyperspectral image from an .h5 file.
             %>
             %> The .h5 data are assumed to be saved in config::[DataDir]\\*.h5.
             %> After reading, the image is saved in config::[MatDir]\\[Database]\\*.mat.
@@ -261,7 +261,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief ReadTriplet reads and saves the three hyperspectral images
+        %> @brief hsiUtility.ReadTriplet reads and saves the three hyperspectral images
         %>
         %> The hyperspectral data are saved in .h5 format. The raw, white and black
         %> (if exist) images are read one-by-one for the same target. Each HSI is
@@ -288,7 +288,7 @@ classdef hsiUtility
         %======================================================================
         function [spectralData] = ReadTriplet(varargin)
             %======================================================================
-            %> @brief ReadTriplet reads and saves the three hyperspectral images
+            %> @brief hsiUtility.ReadTriplet reads and saves the three hyperspectral images
             %>
             %> The hyperspectral data are saved in .h5 format. The raw, white and black
             %> (if exist) images are read one-by-one for the same target. Each HSI is
@@ -318,7 +318,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief LoadRaw loads the raw hyperspectral image.
+        %> @brief hsiUtility.LoadRaw loads the raw hyperspectral image.
         %>
         %> The raw image is loaded from config::[MatDir]\\[TripletsName]\\*_target.mat.
         %>
@@ -335,7 +335,7 @@ classdef hsiUtility
         %======================================================================
         function [spectralData] = LoadRaw(targetID)
             %======================================================================
-            %> @brief LoadRaw loads the raw hyperspectral image.
+            %> @brief hsiUtility.LoadRaw loads the raw hyperspectral image.
             %>
             %> The raw image is loaded from config::[MatDir]\\[TripletsName]\\*_target.mat.
             %>
@@ -356,7 +356,7 @@ classdef hsiUtility
 
         %% Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %======================================================================
-        %> @brief ExportH5Dataset exports the entire selected dataset in .hdf5
+        %> @brief hsiUtility.ExportH5Dataset exports the entire selected dataset in .hdf5
         %> format.
         %>
         %> This function aggregates all small .mat files in a large .hdf5 dataset.
@@ -373,7 +373,7 @@ classdef hsiUtility
         %======================================================================
         function [] = ExportH5Dataset(fileName, targetIDs)
             %======================================================================
-            %> @brief ExportH5Dataset exports the entire selected dataset in .hdf5
+            %> @brief hsiUtility.ExportH5Dataset exports the entire selected dataset in .hdf5
             %> format.
             %>
             %> This function aggregates all small .mat files in a large .hdf5 dataset.
@@ -406,7 +406,7 @@ classdef hsiUtility
 
 
         %======================================================================
-        %> @brief SaveToH5 saves the data of a set of target ids as a dataset in .hdf5
+        %> @brief hsiUtility.SaveToH5 saves the data of a set of target ids as a dataset in .hdf5
         %> format.
         %>
         %> This function aggregates all small .mat files in a large .hdf5 dataset.
@@ -429,7 +429,7 @@ classdef hsiUtility
         %======================================================================
         function [] = SaveToH5Internal(targetIDs, saveName)
             %======================================================================
-            %> @brief SaveToH5 saves the data of a set of target ids as a dataset in .hdf5
+            %> @brief hsiUtility.SaveToH5 saves the data of a set of target ids as a dataset in .hdf5
             %> format.
             %>
             %> This function aggregates all small .mat files in a large .hdf5 dataset.
@@ -456,7 +456,7 @@ classdef hsiUtility
 
 
         %======================================================================
-        %> @brief ReadDataset reads the dataset.
+        %> @brief hsiUtility.ReadDataset reads the dataset.
         %>
         %> ReadDataset reads a group of hsi data according to condition, prepares
         %> .mat files for the raw spectral data, applies preprocessing and returns
@@ -483,7 +483,7 @@ classdef hsiUtility
         %======================================================================
         function [] = PrepareDataset(varargin)
             %======================================================================
-            %> @brief ReadDataset reads the dataset.
+            %> @brief hsiUtility.ReadDataset reads the dataset.
             %>
             %> ReadDataset reads a group of hsi data according to condition, prepares
             %> .mat files for the raw spectral data, applies preprocessing and returns
@@ -514,7 +514,7 @@ classdef hsiUtility
         %% References %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         %======================================================================
-        %> @brief LoadHSIReference reads the reference hyperspectral image (white or black).
+        %> @brief hsiUtility.LoadHSIReference reads the reference hyperspectral image (white or black).
         %>
         %> It is valid for hyperspectral data already saved as .mat files
         %> in config::[MatDir]\\[TripletsName]\\*_white.mat or *_black.mat.
@@ -537,7 +537,7 @@ classdef hsiUtility
         %======================================================================
         function [spectralData] = LoadHSIReference(targetId, refType)
             %======================================================================
-            %> @brief LoadHSIReference reads the reference hyperspectral image (white or black).
+            %> @brief hsiUtility.LoadHSIReference reads the reference hyperspectral image (white or black).
             %>
             %> It is valid for hyperspectral data already saved as .mat files
             %> in config::[MatDir]\\[TripletsName]\\*_white.mat or *_black.mat.
@@ -563,7 +563,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief ResizeArray resizes an irray to a target image size.
+        %> @brief hsiUtility.ResizeArray resizes an irray to a target image size.
         %>
         %> Depending on the input array's size and the target size, it will be cropped or zero-padded.
         %>
@@ -580,7 +580,7 @@ classdef hsiUtility
         %======================================================================
         function [newValue] = ResizeArray(oldValue, imgSize)
             %======================================================================
-            %> @brief ResizeArray resizes an irray to a target image size.
+            %> @brief hsiUtility.ResizeArray resizes an irray to a target image size.
             %>
             %> Depending on the input array's size and the target size, it will be cropped or zero-padded.
             %>
@@ -634,7 +634,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief SplitToPatches splits an image into patches.
+        %> @brief hsiUtility.SplitToPatches splits an image into patches.
         %>
         %> The patches are saved in a cell array. The number of patches depends on the ratio between the input array size and the target patch size.
         %>
@@ -652,7 +652,7 @@ classdef hsiUtility
         %======================================================================
         function [patches, patchesIdx] = SplitToPatches(oldValue, patchSize)
             %======================================================================
-            %> @brief SplitToPatches splits an image into patches.
+            %> @brief hsiUtility.SplitToPatches splits an image into patches.
             %>
             %> The patches are saved in a cell array. The number of patches depends on the ratio between the input array size and the target patch size.
             %>
@@ -687,7 +687,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief Resize resizes or splits in patches the values of an hsi object and the associated hsiInfo object.
+        %> @brief hsiUtility.Resize resizes or splits in patches the values of an hsi object and the associated hsiInfo object.
         %>
         %> Depending on the input array's size and the target size, it will be cropped or zero-padded.
         %>
@@ -706,7 +706,7 @@ classdef hsiUtility
         %======================================================================
         function [updObj, updObjInfo, patchSubs] = Resize(obj, objInfo)
             %======================================================================
-            %> @brief Resize resizes or splits in patches the values of an hsi object and the associated hsiInfo object.
+            %> @brief hsiUtility.Resize resizes or splits in patches the values of an hsi object and the associated hsiInfo object.
             %>
             %> Depending on the input array's size and the target size, it will be cropped or zero-padded.
             %>
@@ -763,7 +763,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief PrepareReferenceLibrary reads and prepares a library of spectral references.
+        %> @brief hsiUtility.PrepareReferenceLibrary reads and prepares a library of spectral references.
         %>
         %> It can be used for various comparisons, including Spectral Angle
         %> Mapper (SAM) calculation.
@@ -790,7 +790,7 @@ classdef hsiUtility
         end
 
         %======================================================================
-        %> @brief GetReferenceLibrary loads a library of spectral references.
+        %> @brief hsiUtility.GetReferenceLibrary loads a library of spectral references.
         %>
         %> It loads a library created previously by @c function hsiUtility.PrepareReferenceLibrary .
         %> The result is loaded from config::[MatDir]\\[Database]\\[ReferenceLibraryName]\\[RreferenceLibraryName].mat.
@@ -810,7 +810,7 @@ classdef hsiUtility
         %======================================================================
         function [refLib] = GetReferenceLibrary()
             %======================================================================
-            %> @brief GetReferenceLibrary loads a library of spectral references.
+            %> @brief hsiUtility.GetReferenceLibrary loads a library of spectral references.
             %>
             %> It loads a library created previously by @c function hsiUtility.PrepareReferenceLibrary .
             %> The result is loaded from config::[MatDir]\\[Database]\\[ReferenceLibraryName]\\[RreferenceLibraryName].mat.
@@ -841,7 +841,7 @@ classdef hsiUtility
         end
 
         % ======================================================================
-        %> @brief AdjustDimensions zero pads to adjust the length of the
+        %> @brief hsiUtility.AdjustDimensions zero pads to adjust the length of the
         %> third dimension.
         %>
         %> @b Usage
@@ -857,7 +857,7 @@ classdef hsiUtility
         % ======================================================================
         function [scores] = AdjustDimensions(scores, q)
             % ======================================================================
-            %> @brief AdjustDimensions zero pads to adjust the length of the
+            %> @brief hsiUtility.AdjustDimensions zero pads to adjust the length of the
             %> third dimension.
             %>
             %> @b Usage
@@ -896,7 +896,7 @@ classdef hsiUtility
         end
 
         % ======================================================================
-        %> @brief CleanLabels returns superpixel labels that contain tissue pixels.
+        %> @brief hsiUtility.CleanLabels returns superpixel labels that contain tissue pixels.
         %>
         %> Keep only pixels that belong to the tissue (Superpixel might assign
         %> background pixels also). The last label is background label.
@@ -917,7 +917,7 @@ classdef hsiUtility
         % ======================================================================
         function [cleanLabels, validLabels] = CleanLabels(labels, fgMask, pixelNum)
             % ======================================================================
-            %> @brief CleanLabels returns superpixel labels that contain tissue pixels.
+            %> @brief hsiUtility.CleanLabels returns superpixel labels that contain tissue pixels.
             %>
             %> Keep only pixels that belong to the tissue (Superpixel might assign
             %> background pixels also). The last label is background label.

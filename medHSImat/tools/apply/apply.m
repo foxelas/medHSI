@@ -1,5 +1,5 @@
 % ======================================================================
-%> @brief A utility class for applying functions to different data samples
+%> @brief apply is a utility class for applying functions en mass and independently to different data samples
 %
 %> Functions using apply are applied on the currently selected dataset,
 %> unless mentioned otherwise. The dataset name is recovered from
@@ -9,7 +9,7 @@
 classdef apply
     methods (Static)
         % ======================================================================
-        %> @brief ToEach applies a function on each of the data samples in the dataset.
+        %> @brief apply.ToEach applies a function on each of the data samples in the dataset.
         %>
         %> The target function should have arguments in the format of (hsIm,
         %> , ...), where hsIm is an instance of class 'hsi'. The targetID
@@ -28,7 +28,7 @@ classdef apply
         % ======================================================================
         function [varargout] = ToEach(funcHandle, varargin)
             % ======================================================================
-            %> @brief ToEach applies a function on each of the data samples in the dataset.
+            %> @brief apply.ToEach applies a function on each of the data samples in the dataset.
             %>
             %> The target function should have arguments in the format of (hsIm,
             %> , ...), where hsIm is an instance of class 'hsi'. The targetID
@@ -71,7 +71,7 @@ classdef apply
         end
 
         % ======================================================================
-        %> @brief DisableFigures applies a script while suppressing figure production and saving.
+        %> @brief apply.DisableFigures applies a script while suppressing figure production and saving.
         %>
         %> @b Usage
         %>
@@ -86,7 +86,7 @@ classdef apply
         % ======================================================================
         function [varargout] = DisableFigures(funcHandle, varargin)
             % ======================================================================
-            %> @brief DisableFigures applies a script while suppressing figure production and saving.
+            %> @brief apply.DisableFigures applies a script while suppressing figure production and saving.
             %>
             %> @b Usage
             %>
@@ -122,7 +122,7 @@ classdef apply
         end
 
         % ======================================================================
-        %> @brief DisableSaveFigures applies a script while suppressing figure saving.
+        %> @brief apply.DisableSaveFigures applies a script while suppressing figure saving.
         %>
         %> @b Usage
         %>
@@ -137,7 +137,7 @@ classdef apply
         % ======================================================================
         function [varargout] = DisableSaveFigures(funcHandle, varargin)
             % ======================================================================
-            %> @brief DisableSaveFigures applies a script while suppressing figure saving.
+            %> @brief apply.DisableSaveFigures applies a script while suppressing figure saving.
             %>
             %> @b Usage
             %>
@@ -168,7 +168,7 @@ classdef apply
         end
 
         % ======================================================================
-        %> @brief RowFunc applies a function on each row of the input.
+        %> @brief apply.RowFunc applies a function on each row of the input.
         %>
         %> Is the input data is an hsi instance, then the pixels that
         %> belong to the foreground mask are considered.
@@ -190,7 +190,7 @@ classdef apply
         % ======================================================================
         function [result] = RowFunc(funcHandle, X, varargin)
             % ======================================================================
-            %> @brief RowFunc applies a function on each row of the input.
+            %> @brief apply.RowFunc applies a function on each row of the input.
             %>
             %> Is the input data is an hsi instance, then the pixels that
             %> belong to the foreground mask are considered.

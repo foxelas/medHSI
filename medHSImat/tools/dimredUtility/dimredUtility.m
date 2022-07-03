@@ -1,7 +1,10 @@
+% ======================================================================
+%> @brief dimredUtility is a class that handles dimension reduction.
+% ======================================================================
 classdef dimredUtility
     methods (Static)
         % ======================================================================
-        %> @brief Apply reduces the dimensions of the hyperspectral image.
+        %> @brief dimredUtility.Apply reduces the dimensions of the hyperspectral image.
         %>
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
@@ -44,7 +47,7 @@ classdef dimredUtility
         % ======================================================================
         function [coeff, scores, latent, explained, objective, Mdl] = Apply(X, method, q, fgMask, labelMask, varargin)
             % ======================================================================
-            %> @brief Apply reduces the dimensions of the hyperspectral image.
+            %> @brief dimredUtility.Apply reduces the dimensions of the hyperspectral image.
             %>
             %> Currently available methods:
             %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
@@ -89,7 +92,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief Transform applies a pretrained dimension reduction method.
+        %> @brief dimredUtility.Transform applies a pretrained dimension reduction method.
         %>
         %> @b Usage
         %>
@@ -106,7 +109,7 @@ classdef dimredUtility
         % ======================================================================
         function [transScores] = Transform(inScores, method, q, trainedObj)
             % ======================================================================
-            %> @brief Transform applies a pretrained dimension reduction method.
+            %> @brief dimredUtility.Transform applies a pretrained dimension reduction method.
             %>
             %> @b Usage
             %>
@@ -125,7 +128,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
+        %> @brief dimredUtility.Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
         %>
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
@@ -155,7 +158,7 @@ classdef dimredUtility
         % ======================================================================
         function [scores] = Analysis(hsIm, labelInfo, method, varargin)
             % ======================================================================
-            %> @brief Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
+            %> @brief dimredUtility.Analysis reduces the dimensions of the hyperspectral image and produces evidence graphs.
             %>
             %> Currently available methods:
             %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA
@@ -187,7 +190,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief Explained returns the explained percentage for each component after dimension reduction.
+        %> @brief dimredUtility.Explained returns the explained percentage for each component after dimension reduction.
         %>
         %> @b Usage
         %>
@@ -202,7 +205,7 @@ classdef dimredUtility
         % ======================================================================
         function [explained] = Explained(originalData, transData)
             % ======================================================================
-            %> @brief Explained returns the explained percentage for each component after dimension reduction.
+            %> @brief dimredUtility.Explained returns the explained percentage for each component after dimension reduction.
             %>
             %> @b Usage
             %>
@@ -220,7 +223,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief CalculateExplained calculates the explained percentage for each component of dimension reduction.
+        %> @brief dimredUtility.CalculateExplained calculates the explained percentage for each component of dimension reduction.
         %>
         %> @b Usage
         %>
@@ -237,7 +240,7 @@ classdef dimredUtility
         % ======================================================================
         function [explained] = CalculateExplained(scores_, Xcol_, X_, mask_)
             % ======================================================================
-            %> @brief CalculateExplained calculates the explained percentage for each component of dimension reduction.
+            %> @brief dimredUtility.CalculateExplained calculates the explained percentage for each component of dimension reduction.
             %>
             %> @b Usage
             %>
@@ -272,7 +275,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief RicaCoeffs applies RICA and returns the coefficients vector.
+        %> @brief dimredUtility.RicaCoeffs applies RICA and returns the coefficients vector.
         %>
         %> @b Usage
         %>
@@ -287,7 +290,7 @@ classdef dimredUtility
         % ======================================================================
         function [coeff] = RicaCoeffs(target, q)
             % ======================================================================
-            %> @brief RicaCoeffs applies RICA and returns the coefficients vector.
+            %> @brief dimredUtility.RicaCoeffs applies RICA and returns the coefficients vector.
             %>
             %> @b Usage
             %>
@@ -305,7 +308,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief ApplySuperpixelBasedDimred applies a  target function on an hsi object's superpixels and returns the tranformed scores.
+        %> @brief dimredUtility.ApplySuperpixelBasedDimred applies a  target function on an hsi object's superpixels and returns the tranformed scores.
         %>
         %> @b Usage
         %>
@@ -321,7 +324,7 @@ classdef dimredUtility
         % ======================================================================
         function [scores] = ApplySuperpixelBasedDimred(X, superpixelLabels, funcHandle)
             % ======================================================================
-            %> @brief ApplySuperpixelBasedDimred applies a  target function on an hsi object's superpixels and returns the tranformed scores.
+            %> @brief dimredUtility.ApplySuperpixelBasedDimred applies a  target function on an hsi object's superpixels and returns the tranformed scores.
             %>
             %> @b Usage
             %>
@@ -349,7 +352,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
+        %> @brief dimredUtility.MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
         %>
         %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
         %>
@@ -372,7 +375,7 @@ classdef dimredUtility
         % ======================================================================
         function [scores, labels, validLabels] = MultiscaleSuperPCA(obj, pixelNumArray, pcNum)
             % ======================================================================
-            %> @brief MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
+            %> @brief dimredUtility.MultiscaleSuperPCA applies multiscale SuperPCA to an hsi object.
             %>
             %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
             %>
@@ -412,7 +415,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief SuperPCA applies SuperPCA to an hsi object.
+        %> @brief dimredUtility.SuperPCA applies SuperPCA to an hsi object.
         %>
         %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
         %>
@@ -437,7 +440,7 @@ classdef dimredUtility
         % ======================================================================
         function [scores, labels, validLabels] = SuperPCA(obj, varargin)
             % ======================================================================
-            %> @brief SuperPCA applies SuperPCA to an hsi object.
+            %> @brief dimredUtility.SuperPCA applies SuperPCA to an hsi object.
             %>
             %> Needs SuperPCA package to work https://github.com/junjun-jiang/SuperPCA .
             %>
@@ -465,7 +468,7 @@ classdef dimredUtility
         end
 
         % ======================================================================
-        %> @brief ApplyAndShow applies a dimension reduction and produces evidence.
+        %> @brief dimredUtility.ApplyAndShow applies a dimension reduction and produces evidence.
         %>
         %> The method is applied on each image in the dataset. The results are saved in the output folder.
         %>
@@ -480,7 +483,7 @@ classdef dimredUtility
         % ======================================================================
         function [] = ApplyAndShow(method, varargin)
             % ======================================================================
-            %> @brief ApplyAndShow applies a dimension reduction and produces evidence.
+            %> @brief dimredUtility.ApplyAndShow applies a dimension reduction and produces evidence.
             %>
             %> The method is applied on each image in the dataset. The results are saved in the output folder.
             %>

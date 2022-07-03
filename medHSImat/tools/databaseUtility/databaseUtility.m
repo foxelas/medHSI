@@ -1,5 +1,5 @@
 % ======================================================================
-%> @brief databaseUtility is a class that handles interactions with the
+%>@brief databaseUtility is a class that handles interactions with the
 %> database file.
 %
 %> The database files are saved in config::[ImportDir]\\.
@@ -10,7 +10,7 @@ classdef databaseUtility
     methods (Static)
 
         % ======================================================================
-        %> @brief GetDataTable gets the database table.
+        %>@brief databaseUtility.GetDataTable gets the database table.
         %>
         %> The table is recovered from
         %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
@@ -25,7 +25,7 @@ classdef databaseUtility
         % ======================================================================
         function [dataTable] = GetDataTable()
             % ======================================================================
-            %> @brief GetDataTable gets the database table.
+            %>@brief databaseUtility.GetDataTable gets the database table.
             %>
             %> The table is recovered from
             %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
@@ -43,7 +43,7 @@ classdef databaseUtility
         end
 
         % ======================================================================
-        %> @brief GetValueFromTable gets a value from the database table
+        %>@brief databaseUtility.GetValueFromTable gets a value from the database table
         %>
         %> @b Usage
         %>
@@ -61,7 +61,7 @@ classdef databaseUtility
         % ======================================================================
         function [value] = GetValueFromTable(tab, field, id)
             % ======================================================================
-            %> @brief GetValueFromTable gets a value from the database table
+            %>@brief databaseUtility.GetValueFromTable gets a value from the database table
             %>
             %> @b Usage
             %>
@@ -87,7 +87,7 @@ classdef databaseUtility
         end
 
         % ======================================================================
-        %> @brief Query returns a query result from the database.
+        %>@brief databaseUtility.Query returns a query result from the database.
         %>
         %> The table is recovered from
         %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
@@ -113,7 +113,7 @@ classdef databaseUtility
         % ======================================================================
         function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
             % ======================================================================
-            %> @brief Query returns a query result from the database.
+            %>@brief databaseUtility.Query returns a query result from the database.
             %>
             %> The table is recovered from
             %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
@@ -141,7 +141,7 @@ classdef databaseUtility
         end
 
         % ======================================================================
-        %> @brief GetTargetIndexes returns the target indexes based on content and target conditions.
+        %>@brief databaseUtility.GetTargetIndexes returns the target indexes based on content and target conditions.
         %>
         %> GetTargetIndexes returns target indexes and relevant rows from the databaseUtility in order to access specific types of samples.
         %>
@@ -165,7 +165,7 @@ classdef databaseUtility
         % ======================================================================
         function [targetIDs, outRows] = GetTargetIndexes(content, target)
             % ======================================================================
-            %> @brief GetTargetIndexes returns the target indexes based on content and target conditions.
+            %>@brief databaseUtility.GetTargetIndexes returns the target indexes based on content and target conditions.
             %>
             %> GetTargetIndexes returns target indexes and relevant rows from the databaseUtility in order to access specific types of samples.
             %>
@@ -202,7 +202,7 @@ classdef databaseUtility
         end
 
         % ======================================================================
-        %> @brief SelectDatabaseSamples returns indexes from the database table ignoring incorrect samples.
+        %>@brief databaseUtility.SelectDatabaseSamples returns indexes from the database table ignoring incorrect samples.
         %>
         %> It is used in @c function databaseUtility.Query
         %>
@@ -221,7 +221,7 @@ classdef databaseUtility
         % ======================================================================
         function [setId] = SelectDatabaseSamples(dataTable, setId)
             % ======================================================================
-            %> @brief SelectDatabaseSamples returns indexes from the database table ignoring incorrect samples.
+            %>@brief databaseUtility.SelectDatabaseSamples returns indexes from the database table ignoring incorrect samples.
             %>
             %> It is used in @c function databaseUtility.Query
             %>
@@ -245,7 +245,7 @@ classdef databaseUtility
         end
 
         % ======================================================================
-        %> @brief GetFileConditions returns file conditions according to the input arguments.
+        %>@brief databaseUtility.GetFileConditions returns file conditions according to the input arguments.
         %>
         %> To be used as input argments in databaseUtility.Query.
         %>
@@ -263,7 +263,7 @@ classdef databaseUtility
         % ======================================================================
         function [fileConditions] = GetFileConditions(content, target, id)
             % ======================================================================
-            %> @brief GetFileConditions returns file conditions according to the input arguments.
+            %>@brief databaseUtility.GetFileConditions returns file conditions according to the input arguments.
             %>
             %> To be used as input argments in databaseUtility.Query.
             %>
@@ -297,7 +297,7 @@ classdef databaseUtility
         end
 
         % ======================================================================
-        %> @brief GetDiagnosisTable gets the database table.
+        %>@brief databaseUtility.GetDiagnosisTable gets the database table.
         %>
         %> The table is recovered from
         %> config::[ImportDir]\\[Database]\\[DiagnosisInfoTableName] file and sheet
@@ -312,7 +312,7 @@ classdef databaseUtility
         % ======================================================================
         function [dataTable] = GetDiagnosisTable()
             % ======================================================================
-            %> @brief GetDiagnosisTable gets the database table.
+            %>@brief databaseUtility.GetDiagnosisTable gets the database table.
             %>
             %> The table is recovered from
             %> config::[ImportDir]\\[Database]\\[DiagnosisInfoTableName] file and sheet
@@ -337,7 +337,7 @@ classdef databaseUtility
         end
 
         % ======================================================================
-        %> @brief GetDiagnosisQuery gets query result from the diagnosis table.
+        %>@brief databaseUtility.GetDiagnosisQuery gets query result from the diagnosis table.
         %>
         %> @b Usage
         %>
@@ -355,7 +355,7 @@ classdef databaseUtility
         % ======================================================================
         function [filenames, targetIDs, outRows, diagnosis, sampleType] = GetDiagnosisQuery(condition)
             % ======================================================================
-            %> @brief GetDiagnosisQuery gets query result from the diagnosis table.
+            %>@brief databaseUtility.GetDiagnosisQuery gets query result from the diagnosis table.
             %>
             %> @b Usage
             %>

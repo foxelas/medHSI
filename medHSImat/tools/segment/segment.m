@@ -1,12 +1,11 @@
 % ======================================================================
 %> @brief segment is a class that handles segmentation of hyperspectral data.
-%>
 % ======================================================================
 classdef segment
     methods (Static)
 
         % ======================================================================
-        %> @brief segment.MorphologicalOps applies morphological operators on the
+        %> @brief segment.segment.MorphologicalOps applies morphological operators on the
         %> segmented labels.
         %>
         %> This function closes holes in the segmented mask.
@@ -23,7 +22,7 @@ classdef segment
         % ======================================================================
         function [postMaskPredict] = MorphologicalOps(maskPredict)
             % ======================================================================
-            %> @brief segment.MorphologicalOps applies morphological operators on the
+            %> @brief segment.segment.MorphologicalOps applies morphological operators on the
             %> segmented labels.
             %>
             %> This function closes holes in the segmented mask.
@@ -45,7 +44,7 @@ classdef segment
         end
 
         % ======================================================================
-        %> @brief segment.Apply segments an hsi cube according to a method.
+        %> @brief segment.segment.Apply segments an hsi cube according to a method.
         %>
         %> For more information refer to @c SegmentLeon, @c SegmentSAM, @c SegmentKmeans and @c SegmentHypercubeToolbox.
         %>
@@ -65,7 +64,7 @@ classdef segment
         % ======================================================================
         function [prediction] = Apply(hsiIm, method, varargin)
             % ======================================================================
-            %> @brief segment.Apply segments an hsi cube according to a method.
+            %> @brief segment.segment.Apply segments an hsi cube according to a method.
             %>
             %> For more information refer to @c SegmentLeon, @c SegmentSAM, @c SegmentKmeans and @c SegmentHypercubeToolbox.
             %>
@@ -103,7 +102,7 @@ classdef segment
         end
 
         % ======================================================================
-        %> @brief segment.ApplyAndShow segments an hsi cube according to a method and shows figures with the results.
+        %> @brief segment.segment.ApplyAndShow segments an hsi cube according to a method and shows figures with the results.
         %>
         %> If a label hsiInfo exists, then comparison with labels is performed.
         %>
@@ -120,7 +119,7 @@ classdef segment
         % ======================================================================
         function [] = ApplyAndShow(method, varargin)
             % ======================================================================
-            %> @brief segment.ApplyAndShow segments an hsi cube according to a method and shows figures with the results.
+            %> @brief segment.segment.ApplyAndShow segments an hsi cube according to a method and shows figures with the results.
             %>
             %> If a label hsiInfo exists, then comparison with labels is performed.
             %>

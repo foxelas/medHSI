@@ -1,12 +1,11 @@
 % ======================================================================
 %> @brief plots is a class that holds all functions for figure plotting.
-%>
 % ======================================================================
 classdef plots
     methods (Static)
 
         %======================================================================
-        %> @brief Apply runs a plotting function.
+        %> @brief plots.Apply runs a plotting function.
         %>
         %> The function should take the figure handle as last argument.
         %>
@@ -27,7 +26,7 @@ classdef plots
         %======================================================================
         function [varargout] = Apply(fig, plotPath, funcHandle, varargin)
             %======================================================================
-            %> @brief Apply runs a plotting function.
+            %> @brief plots.Apply runs a plotting function.
             %>
             %> The function should take the figure handle as last argument.
             %>
@@ -75,7 +74,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief SavePlot saves a figure plot.
+        %> @brief plots.SavePlot saves a figure plots.
         %>
         %> The plot name should be set beforehand in config::[PlotPath].
         %>
@@ -91,7 +90,7 @@ classdef plots
         %======================================================================
         function [] = SavePlot(fig, plotPath)
             %======================================================================
-            %> @brief SavePlot saves a figure plot.
+            %> @brief plots.SavePlot saves a figure plots.
             %>
             %> The plot name should be set beforehand in config::[PlotPath].
             %>
@@ -113,7 +112,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief GetLineColorMap returns a linecolor map based on the style.
+        %> @brief plots.GetLineColorMap returns a linecolor map based on the style.
         %>
         %> Available keys are:
         %> 'class': {'Benign', 'Atypical', 'Malignant'}
@@ -135,7 +134,7 @@ classdef plots
         %======================================================================
         function [lineColorMap] = GetLineColorMap(style, names)
             %======================================================================
-            %> @brief GetLineColorMap returns a linecolor map based on the style.
+            %> @brief plots.GetLineColorMap returns a linecolor map based on the style.
             %>
             %> Available keys are:
             %> 'class': {'Benign', 'Atypical', 'Malignant'}
@@ -195,7 +194,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief BandStatistics plots statistics among spectral bands.
+        %> @brief plots.BandStatistics plots statistics among spectral bands.
         %>
         %> For more details check @c function PlotBandStatistics .
         %>
@@ -216,7 +215,7 @@ classdef plots
         %======================================================================
         function [imCorr] = BandStatistics(fig, plotPath, varargin)
             %======================================================================
-            %> @brief BandStatistics plots statistics among spectral bands.
+            %> @brief plots.BandStatistics plots statistics among spectral bands.
             %>
             %> For more details check @c function PlotBandStatistics .
             %>
@@ -239,7 +238,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Spectra plots multiple spectra together.
+        %> @brief plots.Spectra plots multiple spectra together.
         %>
         %> For more details check @c function PlotSpectra .
         %>
@@ -261,7 +260,7 @@ classdef plots
         %======================================================================
         function [] = Spectra(fig, plotPath, varargin)
             %======================================================================
-            %> @brief Spectra plots multiple spectra together.
+            %> @brief plots.Spectra plots multiple spectra together.
             %>
             %> For more details check @c function PlotSpectra .
             %>
@@ -286,7 +285,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief AverageSpectrum plots average spectra using a promt for custom mask selection.
+        %> @brief plots.AverageSpectrum plots average spectra using a promt for custom mask selection.
         %>
         %> Need to set config[SaveFolder] for saving purposes.
         %> For more details check @c function PlotAverageSpectrum .
@@ -304,7 +303,7 @@ classdef plots
         %======================================================================
         function [] = AverageSpectrum(fig, plotPath, varargin)
             %======================================================================
-            %> @brief AverageSpectrum plots average spectra using a promt for custom mask selection.
+            %> @brief plots.AverageSpectrum plots average spectra using a promt for custom mask selection.
             %>
             %> Need to set config[SaveFolder] for saving purposes.
             %> For more details check @c function PlotAverageSpectrum .
@@ -325,7 +324,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Components plots the components of a hyperspectral image.
+        %> @brief plots.Components plots the components of a hyperspectral image.
         %>
         %> For more details check @c function PlotComponents .
         %>
@@ -342,7 +341,7 @@ classdef plots
         %======================================================================
         function [] = Components(varargin)
             %======================================================================
-            %> @brief Components plots the components of a hyperspectral image.
+            %> @brief plots.Components plots the components of a hyperspectral image.
             %>
             %> For more details check @c function PlotComponents .
             %>
@@ -362,7 +361,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Eigenvectors plots the eigenvectors of a decomposition.
+        %> @brief plots.Eigenvectors plots the eigenvectors of a decomposition.
         %>
         %> For more details check @c function PlotEigenvectors .
         %>
@@ -380,7 +379,7 @@ classdef plots
         %======================================================================
         function [] = Eigenvectors(fig, plotPath, varargin)
             %======================================================================
-            %> @brief Eigenvectors plots the eigenvectors of a decomposition.
+            %> @brief plots.Eigenvectors plots the eigenvectors of a decomposition.
             %>
             %> For more details check @c function PlotEigenvectors .
             %>
@@ -401,7 +400,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Overlay applies a mask over a base image.
+        %> @brief plots.Overlay applies a mask over a base image.
         %>
         %> For more details check @c function PlotOverlay .
         %>
@@ -419,7 +418,7 @@ classdef plots
         %======================================================================
         function [] = Overlay(fig, plotPath, varargin)
             %======================================================================
-            %> @brief Overlay applies a mask over a base image.
+            %> @brief plots.Overlay applies a mask over a base image.
             %>
             %> For more details check @c function PlotOverlay .
             %>
@@ -440,7 +439,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Pair displays a pair of images side by side.
+        %> @brief plots.Pair displays a pair of images side by side.
         %>
         %> @b Usage
         %>
@@ -456,7 +455,7 @@ classdef plots
         %======================================================================
         function [] = Pair(fig, plotPath, img1, img2, figTitle)
             %======================================================================
-            %> @brief Pair displays a pair of images side by side.
+            %> @brief plots.Pair displays a pair of images side by side.
             %>
             %> @b Usage
             %>
@@ -483,7 +482,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Show displays an image.
+        %> @brief plots.Show displays an image.
         %>
         %> @b Usage
         %>
@@ -498,7 +497,7 @@ classdef plots
         %======================================================================
         function [] = Show(fig, plotPath, img, figTitle)
             %======================================================================
-            %> @brief Show displays an image.
+            %> @brief plots.Show displays an image.
             %>
             %> @b Usage
             %>
@@ -522,7 +521,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Export exports an image using imwrite.
+        %> @brief plots.Export exports an image using imwrite.
         %>
         %> @b Usage
         %>
@@ -544,7 +543,7 @@ classdef plots
 
 
         %======================================================================
-        %> @brief Cmap displays a gray image with a jet colormap.
+        %> @brief plots.Cmap displays a gray image with a jet colormap.
         %>
         %> @b Usage
         %>
@@ -559,7 +558,7 @@ classdef plots
         %======================================================================
         function [] = Cmap(fig, plotPath, img, figTitle)
             %======================================================================
-            %> @brief Cmap displays a gray image with a jet colormap.
+            %> @brief plots.Cmap displays a gray image with a jet colormap.
             %>
             %> @b Usage
             %>
@@ -582,7 +581,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Superpixels plots superpixel labels
+        %> @brief plots.Superpixels plots superpixel labels
         %>
         %> For more details check @c function PlotSuperpixels .
         %>
@@ -604,7 +603,7 @@ classdef plots
         %======================================================================
         function [] = Superpixels(fig, plotPath, varargin)
             %======================================================================
-            %> @brief Superpixels plots superpixel labels
+            %> @brief plots.Superpixels plots superpixel labels
             %>
             %> For more details check @c function PlotSuperpixels .
             %>
@@ -628,7 +627,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief MontageFolderContents plots contents of a folder as a montage.
+        %> @brief plots.MontageFolderContents plots contents of a folder as a montage.
         %>
         %> For more details check @c function PlotMontageFolderContents .
         %>
@@ -650,7 +649,7 @@ classdef plots
         %======================================================================
         function [] = MontageFolderContents(fig, varargin)
             %======================================================================
-            %> @brief MontageFolderContents plots contents of a folder as a montage.
+            %> @brief plots.MontageFolderContents plots contents of a folder as a montage.
             %>
             %> For more details check @c function PlotMontageFolderContents .
             %>
@@ -674,7 +673,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief GetMontagetCollection plots a montage of images with a target filename under different subfolders.
+        %> @brief plots.GetMontagetCollection plots a montage of images with a target filename under different subfolders.
         %>
         %> The base output folder is assumed to be pre-set with config::[SaveFolder].
         %> Subfolders are assumed to be named with a sample's TargetID.
@@ -691,7 +690,7 @@ classdef plots
         %======================================================================
         function GetMontagetCollection(fig, target)
             %======================================================================
-            %> @brief GetMontagetCollection plots a montage of images with a target filename under different subfolders.
+            %> @brief plots.GetMontagetCollection plots a montage of images with a target filename under different subfolders.
             %>
             %> The base output folder is assumed to be pre-set with config::[SaveFolder].
             %> Subfolders are assumed to be named with a sample's TargetID.
@@ -713,7 +712,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief NormalizationCheck  plots the values recovered after normalization.
+        %> @brief plots.NormalizationCheck  plots the values recovered after normalization.
         %>
         %> For more details check @c function PlotNormalizationCheck .
         %> The user needs to input a custom mask.
@@ -732,7 +731,7 @@ classdef plots
         %======================================================================
         function [] = NormalizationCheck(fig, plotPath, varargin)
             %======================================================================
-            %> @brief NormalizationCheck  plots the values recovered after normalization.
+            %> @brief plots.NormalizationCheck  plots the values recovered after normalization.
             %>
             %> For more details check @c function PlotNormalizationCheck .
             %> The user needs to input a custom mask.
@@ -754,7 +753,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Montage plots the montage of an image list.
+        %> @brief plots.Montage plots the montage of an image list.
         %>
         %> @b Usage
         %> plots.Montage(1, plotPath, labels, names, plotPath);
@@ -767,7 +766,7 @@ classdef plots
         %======================================================================
         function [] = Montage(figNum, plotPath, img, names)
             %======================================================================
-            %> @brief Montage plots the montage of an image list.
+            %> @brief plots.Montage plots the montage of an image list.
             %>
             %> @b Usage
             %> plots.Montage(1, plotPath, labels, names, plotPath);
@@ -791,7 +790,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief MontageCmap plots the heat map montage of an image list.
+        %> @brief plots.MontageCmap plots the heat map montage of an image list.
         %>
         %> @b Usage
         %> plots.MontageCmap(1, plotPath, labels, names);
@@ -805,7 +804,7 @@ classdef plots
         %======================================================================
         function [] = MontageCmap(figNum, plotPath, img, names, hasLimits, limitVal)
             %======================================================================
-            %> @brief MontageCmap plots the heat map montage of an image list.
+            %> @brief plots.MontageCmap plots the heat map montage of an image list.
             %>
             %> @b Usage
             %> plots.MontageCmap(1, plotPath, labels, names);
@@ -861,7 +860,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief MontageWithLabel plots a montage of an image list with labels.
+        %> @brief plots.MontageWithLabel plots a montage of an image list with labels.
         %>
         %> @b Usage
         %> plots.MontageWithLabel(1, plotPath, img, names, labelMask, fgMask);
@@ -876,7 +875,7 @@ classdef plots
         %======================================================================
         function [] = MontageWithLabel(figNum, plotPath, img, names, labelMask, fgMask)
             %======================================================================
-            %> @brief MontageWithLabel plots a montage of an image list with labels.
+            %> @brief plots.MontageWithLabel plots a montage of an image list with labels.
             %>
             %> @b Usage
             %> plots.MontageWithLabel(1, plotPath, img, names, labelMask, fgMask);
@@ -923,7 +922,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief GroundTruthComparison plots the comparison of a prediction image to the ground truth labels.
+        %> @brief plots.GroundTruthComparison plots the comparison of a prediction image to the ground truth labels.
         %>
         %> The Jaccard Coefficient is also presented in the title.
         %>
@@ -939,7 +938,7 @@ classdef plots
         %======================================================================
         function [] = GroundTruthComparison(figNum, plotPath, rgbImg, labelImg, predImg)
             %======================================================================
-            %> @brief GroundTruthComparison plots the comparison of a prediction image to the ground truth labels.
+            %> @brief plots.GroundTruthComparison plots the comparison of a prediction image to the ground truth labels.
             %>
             %> The Jaccard Coefficient is also presented in the title.
             %>
@@ -976,7 +975,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief PostProcessingComparison plots the comparison of a prediction image to the ground truth labels and to post processed labels.
+        %> @brief plots.PostProcessingComparison plots the comparison of a prediction image to the ground truth labels and to post processed labels.
         %>
         %> The Jaccard Coefficient is also presented in the title.
         %>
@@ -992,7 +991,7 @@ classdef plots
         %======================================================================
         function [] = PostProcessingComparison(figNum, plotPath, labelImg, predImg, postPredImg)
             %======================================================================
-            %> @brief PostProcessingComparison plots the comparison of a prediction image to the ground truth labels and to post processed labels.
+            %> @brief plots.PostProcessingComparison plots the comparison of a prediction image to the ground truth labels and to post processed labels.
             %>
             %> The Jaccard Coefficient is also presented in the title.
             %>
@@ -1030,7 +1029,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief PredictionValues plots the prediction values using a heatmap.
+        %> @brief plots.PredictionValues plots the prediction values using a heatmap.
         %>
         %> The borders of patches are also presented with green.
         %>
@@ -1045,7 +1044,7 @@ classdef plots
         %======================================================================
         function [] = PredictionValues(figNum, plotPath, predImg, borderImg)
             %======================================================================
-            %> @brief PredictionValues plots the prediction values using a heatmap.
+            %> @brief plots.PredictionValues plots the prediction values using a heatmap.
             %>
             %> The borders of patches are also presented with green.
             %>
@@ -1085,7 +1084,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief ReferenceLibrary  plots the reference spectra in the library.
+        %> @brief plots.ReferenceLibrary  plots the reference spectra in the library.
         %>
         %> @b Usage
         %> refLib = hsiUtility.GetReferenceLibrary();
@@ -1097,7 +1096,7 @@ classdef plots
         %======================================================================
         function [] = ReferenceLibrary(fig, refLib)
             %======================================================================
-            %> @brief ReferenceLibrary  plots the reference spectra in the library.
+            %> @brief plots.ReferenceLibrary  plots the reference spectra in the library.
             %>
             %> @b Usage
             %> refLib = hsiUtility.GetReferenceLibrary();
@@ -1128,7 +1127,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief Illumination  plots the illumination spectrum.
+        %> @brief plots.Illumination  plots the illumination spectrum.
         %>
         %> The name of the illumination source is saved in config::[IlluminationSource].
         %> Illumination information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
@@ -1139,7 +1138,7 @@ classdef plots
         %======================================================================
         function [] = Illumination()
             %======================================================================
-            %> @brief Illumination  plots the illumination spectrum.
+            %> @brief plots.Illumination  plots the illumination spectrum.
             %>
             %> The name of the illumination source is saved in config::[IlluminationSource].
             %> Illumination information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
@@ -1166,7 +1165,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief ColorMatchingFunctions  plots the color matching functions.
+        %> @brief plots.ColorMatchingFunctions  plots the color matching functions.
         %>
         %> Information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
         %>
@@ -1176,7 +1175,7 @@ classdef plots
         %======================================================================
         function [] = ColorMatchingFunctions()
             %======================================================================
-            %> @brief ColorMatchingFunctions  plots the color matching functions.
+            %> @brief plots.ColorMatchingFunctions  plots the color matching functions.
             %>
             %> Information is saved in medHSI\\config::[ParamDir]\\displayParam.mat
             %>
@@ -1208,7 +1207,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief ChromophoreAbsorption  plots the skin chromophore absorption functions.
+        %> @brief plots.ChromophoreAbsorption  plots the skin chromophore absorption functions.
         %>
         %> Information is saved in config::[ImportDir]\\*.csv.
         %> Required .csv files:
@@ -1224,7 +1223,7 @@ classdef plots
         %======================================================================
         function [extCoeffEumelanin2, extCoeffHbO, extCoeffHbR] = ChromophoreAbsorption()
             %======================================================================
-            %> @brief ChromophoreAbsorption  plots the skin chromophore absorption functions.
+            %> @brief plots.ChromophoreAbsorption  plots the skin chromophore absorption functions.
             %>
             %> Information is saved in config::[ImportDir]\\*.csv.
             %> Required .csv files:
@@ -1296,7 +1295,7 @@ classdef plots
         end
 
         %======================================================================
-        %> @brief WithShadedArea plots a the average and std for a set of lines and returns the line handle.
+        %> @brief plots.WithShadedArea plots a the average and std for a set of lines and returns the line handle.
         %>
         %> The average is presented together with a shaded area above and below.
         %>
@@ -1313,7 +1312,7 @@ classdef plots
         %======================================================================
         function [h] = WithShadedArea(x, arr, lineName, lineOpt)
             %======================================================================
-            %> @brief WithShadedArea plots a the average and std for a set of lines and returns the line handle.
+            %> @brief plots.WithShadedArea plots a the average and std for a set of lines and returns the line handle.
             %>
             %> The average is presented together with a shaded area above and below.
             %>

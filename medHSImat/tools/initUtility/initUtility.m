@@ -1,5 +1,5 @@
 % ======================================================================
-%> @brief A utility class for initialization purposes.
+%> @brief initUtility is a utility class for initialization purposes.
 %
 %> Functions are applied on the currently selected dataset,
 %> unless mentioned otherwise. The dataset name is recovered as
@@ -12,7 +12,7 @@
 classdef initUtility
     methods (Static)
         %======================================================================
-        %> @brief InitExperiment prepares the initialization settings for
+        %> @brief initUtility.InitExperiment prepares the initialization settings for
         %> according to the experiment and the selected dataset.
         %>
         %>
@@ -30,7 +30,7 @@ classdef initUtility
         %======================================================================
         function [] = InitExperiment(experiment, dataset)
             %======================================================================
-            %> @brief InitExperiment prepares the initialization settings for
+            %> @brief initUtility.InitExperiment prepares the initialization settings for
             %> according to the experiment and the selected dataset.
             %>
             %>
@@ -65,7 +65,7 @@ classdef initUtility
 
 
         %======================================================================
-        %> @brief CheckImportData checks the structure of filenames and file information to be read.
+        %> @brief initUtility.CheckImportData checks the structure of filenames and file information to be read.
         %>
         %> Reads .h5 files from the directory in config::[DataDir].
         %>
@@ -79,7 +79,7 @@ classdef initUtility
         %======================================================================
         function [flag, fileS] = CheckImportData()
             %======================================================================
-            %> @brief CheckImportData checks the structure of filenames and file information to be read.
+            %> @brief initUtility.CheckImportData checks the structure of filenames and file information to be read.
             %>
             %> Reads .h5 files from the directory in config::[DataDir].
             %>
@@ -96,7 +96,7 @@ classdef initUtility
         end
 
         %======================================================================
-        %> @brief PrepareLabels prepares labels in the DataDir after the labelme labels have been created.
+        %> @brief initUtility.PrepareLabels prepares labels in the DataDir after the labelme labels have been created.
         %>
         %> You can modify this function, according to your data structure.
         %>
@@ -114,7 +114,7 @@ classdef initUtility
         %======================================================================
         function [] = PrepareLabels(inputFolder, dataset, contentConditions, targetConditions)
             %======================================================================
-            %> @brief PrepareLabels prepares labels in the DataDir after the labelme labels have been created.
+            %> @brief initUtility.PrepareLabels prepares labels in the DataDir after the labelme labels have been created.
             %>
             %> You can modify this function, according to your data structure.
             %>
@@ -135,7 +135,7 @@ classdef initUtility
         end
 
         %======================================================================
-        %> @brief UpdateLabels updates labelsInfo files after the labels have been created.
+        %> @brief initUtility.UpdateLabels updates labelsInfo files after the labels have been created.
         %> Labels should be saved in %config::[DataDir]/'02-Labels'/
         %>
         %> Reads img.png files created by Labelme and prepares black and white label masks.
@@ -149,7 +149,7 @@ classdef initUtility
         %======================================================================
         function [] = UpdateLabelInfos(dataset)
             %======================================================================
-            %> @brief UpdateLabels updates labelsInfo files after the labels have been created.
+            %> @brief initUtility.UpdateLabels updates labelsInfo files after the labels have been created.
             %> Labels should be saved in %config::[DataDir]/'02-Labels'/
             %>
             %> Reads img.png files created by Labelme and prepares black and white label masks.
@@ -179,7 +179,7 @@ classdef initUtility
         end
 
         %======================================================================
-        %> @brief MakeDataset prepares the target dataset.
+        %> @brief initUtility.MakeDataset prepares the target dataset.
         %>
         %> You can choose among:
         %> -All: the entire dataset (reads from scratch)
@@ -206,7 +206,7 @@ classdef initUtility
         %======================================================================
         function [] = MakeDataset(varargin)
             %======================================================================
-            %> @brief MakeDataset prepares the target dataset.
+            %> @brief initUtility.MakeDataset prepares the target dataset.
             %>
             %> You can choose among:
             %> -All: the entire dataset (reads from scratch)
@@ -236,7 +236,7 @@ classdef initUtility
         end
 
         %======================================================================
-        %> @brief GetDiscardedPatches returns the names of patches that should be discarded from the analyis.
+        %> @brief initUtility.GetDiscardedPatches returns the names of patches that should be discarded from the analyis.
         %>
         %> You can add values according to your protocol.
         %>
@@ -252,7 +252,7 @@ classdef initUtility
         %======================================================================
         function [discardedPatches] = DiscardedPatches()
             %======================================================================
-            %> @brief GetDiscardedPatches returns the names of patches that should be discarded from the analyis.
+            %> @brief initUtility.GetDiscardedPatches returns the names of patches that should be discarded from the analyis.
             %>
             %> You can add values according to your protocol.
             %>
@@ -270,7 +270,7 @@ classdef initUtility
         end
 
         %======================================================================
-        %> @brief FunctionsWithoutSVMOptimization sets the names of functions, for which no SVM optimization will be used in their children functions.
+        %> @brief initUtility.FunctionsWithoutSVMOptimization sets the names of functions, for which no SVM optimization will be used in their children functions.
         %>
         %> You can add function names according to your prefrences.
         %>
@@ -284,7 +284,7 @@ classdef initUtility
         %======================================================================
         function [functionNames] = FunctionsWithoutSVMOptimization()
             %======================================================================
-            %> @brief FunctionsWithoutSVMOptimization sets the names of functions, for which no SVM optimization will be used in their children functions.
+            %> @brief initUtility.FunctionsWithoutSVMOptimization sets the names of functions, for which no SVM optimization will be used in their children functions.
             %>
             %> You can add function names according to your prefrences.
             %>

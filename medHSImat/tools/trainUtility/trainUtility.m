@@ -1,12 +1,11 @@
 % ======================================================================
 %> @brief trainUtility is a class that handles training of hyperspectral data.
-%>
 % ======================================================================
 classdef trainUtility
     methods (Static)
 
         %======================================================================
-        %> @brief FoldIndexes returns the sample ids for different folds.
+        %> @brief trainUtility.FoldIndexes returns the sample ids for different folds.
         %>
         %> @b Usage
         %>
@@ -20,7 +19,7 @@ classdef trainUtility
         %======================================================================
         function [foldSampleIds] = FoldIndexes(foldType)
             %======================================================================
-            %> @brief FoldIndexes returns the sample ids for different folds.
+            %> @brief trainUtility.FoldIndexes returns the sample ids for different folds.
             %>
             %> @b Usage
             %>
@@ -37,7 +36,7 @@ classdef trainUtility
         end
 
         %======================================================================
-        %> @brief TrainTestIndexes returns the indexes for train and test samples in the dataset.
+        %> @brief trainUtility.TrainTestIndexes returns the indexes for train and test samples in the dataset.
         %>
         %> @b Usage
         %>
@@ -57,7 +56,7 @@ classdef trainUtility
         %======================================================================
         function [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = TrainTestIndexes(baseDataset, testIds)
             %======================================================================
-            %> @brief TrainTestIndexes returns the indexes for train and test samples in the dataset.
+            %> @brief trainUtility.TrainTestIndexes returns the indexes for train and test samples in the dataset.
             %>
             %> @b Usage
             %>
@@ -85,7 +84,7 @@ classdef trainUtility
         end
 
         %======================================================================
-        %> @brief LOOCVIndexes returns the indexes for train and test samples in the dataset according to leave-one-out cross validation (LOOCV).
+        %> @brief trainUtility.LOOCVIndexes returns the indexes for train and test samples in the dataset according to leave-one-out cross validation (LOOCV).
         %>
         %> @b Usage
         %>
@@ -106,7 +105,7 @@ classdef trainUtility
         %======================================================================
         function [trainTargetIDs, testTargetIDs, trainTargetIndexes, testTargetIndexes] = LOOCVIndexes(baseDataset, isPatientBased)
             %======================================================================
-            %> @brief LOOCVIndexes returns the indexes for train and test samples in the dataset according to leave-one-out cross validation (LOOCV).
+            %> @brief trainUtility.LOOCVIndexes returns the indexes for train and test samples in the dataset according to leave-one-out cross validation (LOOCV).
             %>
             %> @b Usage
             %>
@@ -167,7 +166,7 @@ classdef trainUtility
         end
 
         %=====================================================================
-        %> @brief ExportTrainTest exports the train and test folds as individual .h5 datasets.
+        %> @brief trainUtility.ExportTrainTest exports the train and test folds as individual .h5 datasets.
         %>
         %> The result is saved in
         %> config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_train.h5
@@ -187,7 +186,7 @@ classdef trainUtility
         %======================================================================
         function [] = ExportTrainTest(baseDataset, testIds)
             %=====================================================================
-            %> @brief ExportTrainTest exports the train and test folds as individual .h5 datasets.
+            %> @brief trainUtility.ExportTrainTest exports the train and test folds as individual .h5 datasets.
             %>
             %> The result is saved in
             %> config::[OutputDir]\\baseDataset\\config::[DatasetsFolderName]\\hsi_baseDataset_train.h5
@@ -219,7 +218,7 @@ classdef trainUtility
 
 
         %======================================================================
-        %> @brief ExportLOOCV exports data for leave one out cross validation (LOOCV).
+        %> @brief trainUtility.ExportLOOCV exports data for leave one out cross validation (LOOCV).
         %>
         %> Data from one sample are saved as one fold in one .h5 dataset.
         %> Please not that some heavily stained patches or otherwise inappropriate patches/samples are discarderd.
@@ -244,7 +243,7 @@ classdef trainUtility
         %======================================================================
         function [] = ExportLOOCV(baseDataset, isPatientBased)
             %======================================================================
-            %> @brief ExportLOOCV exports data for leave one out cross validation (LOOCV).
+            %> @brief trainUtility.ExportLOOCV exports data for leave one out cross validation (LOOCV).
             %>
             %> Data from one sample are saved as one fold in one .h5 dataset.
             %> Please not that some heavily stained patches or otherwise inappropriate patches/samples are discarderd.
@@ -288,7 +287,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief Augment applies augmentation on the dataset
+        %> @brief trainUtility.Augment applies augmentation on the dataset
         %>
         %> The base dataset should be already saved before running augmentation.
         %> For details check @c AugmentInternal.
@@ -314,7 +313,7 @@ classdef trainUtility
         % ======================================================================
         function [] = Augment(varargin)
             % ======================================================================
-            %> @brief Augment applies augmentation on the dataset
+            %> @brief trainUtility.Augment applies augmentation on the dataset
             %>
             %> The base dataset should be already saved before running augmentation.
             %> For details check @c AugmentInternal.
@@ -342,7 +341,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief ResizeInternal applies resizing on the dataset.
+        %> @brief trainUtility.ResizeInternal applies resizing on the dataset.
         %>
         %> The base dataset should be already saved with @c hsiUtility.PrepareDataset before running ResizeInternal.
         %>
@@ -374,7 +373,7 @@ classdef trainUtility
         % ======================================================================
         function [] = Resize(varargin)
             % ======================================================================
-            %> @brief ResizeInternal applies resizing on the dataset.
+            %> @brief trainUtility.ResizeInternal applies resizing on the dataset.
             %>
             %> The base dataset should be already saved with @c hsiUtility.PrepareDataset before running ResizeInternal.
             %>
@@ -408,7 +407,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief Format transforms the dataset into images or pixels as preparation for training.
+        %> @brief trainUtility.Format transforms the dataset into images or pixels as preparation for training.
         %>
         %> For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
         %> For more details check @c function FormatInternal.
@@ -439,7 +438,7 @@ classdef trainUtility
         % ======================================================================
         function [X, y, sRGBs, fgMasks, labelImgs] = Format(hsiList, labelInfoList, varargin)
             % ======================================================================
-            %> @brief Format transforms the dataset into images or pixels as preparation for training.
+            %> @brief trainUtility.Format transforms the dataset into images or pixels as preparation for training.
             %>
             %> For data type 'image', the function rearranges pixels as a pixel (observation) by feature 2D array.
             %> For more details check @c function FormatInternal.
@@ -472,7 +471,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief TrainTest splits the dataset to train, test or prepares a cross validation setting.
+        %> @brief trainUtility.TrainTest splits the dataset to train, test or prepares a cross validation setting.
         %>
         %> For more details check @c function SplitTrainTest.
         %>
@@ -501,7 +500,7 @@ classdef trainUtility
         % ======================================================================
         function [trainData, testData] = TrainTest(dataset, dataType, splitType, folds, testIds, varargin)
             % ======================================================================
-            %> @brief TrainTest splits the dataset to train, test or prepares a cross validation setting.
+            %> @brief trainUtility.TrainTest splits the dataset to train, test or prepares a cross validation setting.
             %>
             %> For more details check @c function SplitTrainTest.
             %>
@@ -533,7 +532,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief SVM trains an RBF SVM classifier.
+        %> @brief trainUtility.SVM trains an RBF SVM classifier.
         %>
         %> You can alter the settings of the SVM classifier according to your specifications.
         %> Optimization is not used on functions at @c initUtility.FunctionsWithoutSVMOptimization.
@@ -559,7 +558,7 @@ classdef trainUtility
         % ======================================================================
         function [SVMModel] = SVM(Xtrain, ytrain, svmSettings)
             % ======================================================================
-            %> @brief SVM trains an RBF SVM classifier.
+            %> @brief trainUtility.SVM trains an RBF SVM classifier.
             %>
             %> You can alter the settings of the SVM classifier according to your specifications.
             %> Optimization is not used on functions at @c initUtility.FunctionsWithoutSVMOptimization.
@@ -637,7 +636,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief RunSVM trains and test an SVM classifier.
+        %> @brief trainUtility.RunSVM trains and test an SVM classifier.
         %>
         %> @b Usage
         %>
@@ -661,7 +660,7 @@ classdef trainUtility
         % ======================================================================
         function [predlabels, st, SVMModel] = RunSVM(Xtrain, ytrain, Xvalid, svmSettings)
             % ======================================================================
-            %> @brief RunSVM trains and test an SVM classifier.
+            %> @brief trainUtility.RunSVM trains and test an SVM classifier.
             %>
             %> @b Usage
             %>
@@ -691,7 +690,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief StackMultiscale trains a collection of stacked classifiers.
+        %> @brief trainUtility.StackMultiscale trains a collection of stacked classifiers.
         %>
         %> @b Usage
         %>
@@ -713,7 +712,7 @@ classdef trainUtility
         % ======================================================================
         function [predLabels, st, models, XtrainTrans, XvalidTrans] = StackMultiscale(classifierFun, fusionMethod, Xtrain, ytrain, Xvalid)
             % ======================================================================
-            %> @brief StackMultiscale trains a collection of stacked classifiers.
+            %> @brief trainUtility.StackMultiscale trains a collection of stacked classifiers.
             %>
             %> @b Usage
             %>
@@ -762,7 +761,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief Predict returns the predicted labels from the model.
+        %> @brief trainUtility.Predict returns the predicted labels from the model.
         %>
         %> @b Usage
         %>
@@ -781,7 +780,7 @@ classdef trainUtility
         % ======================================================================
         function predLabels = Predict(trainedModel, Xtest, fusionMethod, hasPosterior)
             % ======================================================================
-            %> @brief Predict returns the predicted labels from the model.
+            %> @brief trainUtility.Predict returns the predicted labels from the model.
             %>
             %> @b Usage
             %>
@@ -841,7 +840,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief DimredAndTrain trains and test an SVM classifier after dimension reduction.
+        %> @brief trainUtility.DimredAndTrain trains and test an SVM classifier after dimension reduction.
         %>
         %> Observations are processed with the SVM as individual spectrums per pixel.
         %> See @c dimredUtility for more information about additional arguments.
@@ -876,7 +875,7 @@ classdef trainUtility
         % ======================================================================
         function [performanceStruct, trainedModel, XValid] = DimredAndTrain(trainData, testData, method, q, svmSettings, varargin)
             % ======================================================================
-            %> @brief DimredAndTrain trains and test an SVM classifier after dimension reduction.
+            %> @brief trainUtility.DimredAndTrain trains and test an SVM classifier after dimension reduction.
             %>
             %> Observations are processed with the SVM as individual spectrums per pixel.
             %> See @c dimredUtility for more information about additional arguments.
@@ -913,7 +912,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief GetMeanAUC returns average AUC values across folds.
+        %> @brief trainUtility.GetMeanAUC returns average AUC values across folds.
         %>
         %> @b Usage
         %>
@@ -929,7 +928,7 @@ classdef trainUtility
         % ======================================================================
         function [meanAucX, meanAucY] = GetMeanAUC(aucX, aucY)
             % ======================================================================
-            %> @brief GetMeanAUC returns average AUC values across folds.
+            %> @brief trainUtility.GetMeanAUC returns average AUC values across folds.
             %>
             %> @b Usage
             %>
@@ -959,7 +958,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief GetAUC prepares the average AUC values across different folds.
+        %> @brief trainUtility.GetAUC prepares the average AUC values across different folds.
         %>
         %> It can take considerable time and delay calculations.
         %> To disable, set config::[IsTest] to true.
@@ -980,7 +979,7 @@ classdef trainUtility
         % ======================================================================
         function [meanAucX, meanAucY, meanAucVal] = GetAUC(trainedModels, yTrain, XTest)
             % ======================================================================
-            %> @brief GetAUC prepares the average AUC values across different folds.
+            %> @brief trainUtility.GetAUC prepares the average AUC values across different folds.
             %>
             %> It can take considerable time and delay calculations.
             %> To disable, set config::[IsTest] to true.
@@ -1039,7 +1038,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief Evaluation prepares a performance structure with various information.
+        %> @brief trainUtility.Evaluation prepares a performance structure with various information.
         %>
         %> The returned values are:
         %> -'Name'
@@ -1076,7 +1075,7 @@ classdef trainUtility
         % ======================================================================
         function [performance] = Evaluation(modelName, featNum, yPredict, yTest, masksPredict, masksTest, trainedModels, yTrain, XTest)
             % ======================================================================
-            %> @brief Evaluation prepares a performance structure with various information.
+            %> @brief trainUtility.Evaluation prepares a performance structure with various information.
             %>
             %> The returned values are:
             %> -'Name'
@@ -1146,7 +1145,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief ModelEvaluation returns the model evaluation results.
+        %> @brief trainUtility.ModelEvaluation returns the model evaluation results.
         %>
         %> The returned values are:
         %> -'Name'
@@ -1187,7 +1186,7 @@ classdef trainUtility
         function [performance, trainedModel] = ModelEvaluation(modelName, featNum, yPredict, yTest, yTrain, ...
                 trainedModel, drTrainTime, modelTrainTime, testData, XTestScores)
             % ======================================================================
-            %> @brief ModelEvaluation returns the model evaluation results.
+            %> @brief trainUtility.ModelEvaluation returns the model evaluation results.
             %>
             %> The returned values are:
             %> -'Name'
@@ -1250,7 +1249,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief Validation trains and tests an SVM classifier with cross validation.
+        %> @brief trainUtility.Validation trains and tests an SVM classifier with cross validation.
         %>
         %> Observations are processed with the SVM as individual spectrums per pixel.
         %> See @c SplitTrainTest for more information about preparing validation folds.
@@ -1278,7 +1277,7 @@ classdef trainUtility
         % ======================================================================
         function [validatedPerformance] = Validation(dataset, splitType, folds, testIds, method, q, svmSettings, varargin)
             % ======================================================================
-            %> @brief Validation trains and tests an SVM classifier with cross validation.
+            %> @brief trainUtility.Validation trains and tests an SVM classifier with cross validation.
             %>
             %> Observations are processed with the SVM as individual spectrums per pixel.
             %> See @c SplitTrainTest for more information about preparing validation folds.
@@ -1334,7 +1333,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief ValidateAndTest validates an SVM classifier with cross validation and then tests it.
+        %> @brief trainUtility.ValidateAndTest validates an SVM classifier with cross validation and then tests it.
         %>
         %> Observations are processed with the SVM as individual spectrums per pixel.
         %> See @c SplitTrainTest for more information about preparing validation folds.
@@ -1364,7 +1363,7 @@ classdef trainUtility
         % ======================================================================
         function [validatedPerformance, testPerformance] = ValidateAndTest(dataset, testIds, method, q, svmSettings, varargin)
             % ======================================================================
-            %> @brief ValidateAndTest validates an SVM classifier with cross validation and then tests it.
+            %> @brief trainUtility.ValidateAndTest validates an SVM classifier with cross validation and then tests it.
             %>
             %> Observations are processed with the SVM as individual spectrums per pixel.
             %> See @c SplitTrainTest for more information about preparing validation folds.
@@ -1410,7 +1409,7 @@ classdef trainUtility
         end
 
         % ======================================================================
-        %> @brief EvaluateTestInternal prepares figures of the predicted segments during testing.
+        %> @brief trainUtility.EvaluateTestInternal prepares figures of the predicted segments during testing.
         %>
         %> @b Usage
         %>
@@ -1427,7 +1426,7 @@ classdef trainUtility
         % ======================================================================
         function [] = EvaluateTest(trainedModel, testData, XTestScores, yTest)
             % ======================================================================
-            %> @brief EvaluateTestInternal prepares figures of the predicted segments during testing.
+            %> @brief trainUtility.EvaluateTestInternal prepares figures of the predicted segments during testing.
             %>
             %> @b Usage
             %>

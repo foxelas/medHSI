@@ -1,5 +1,5 @@
 % ======================================================================
-%> @brief config is a class that holds the run configuration.
+%> @brief config is a class that handles the run configuration.
 %
 %> It is used to set and fetch options for running.
 %> In order to refer to settings in the Config.ini file, the term
@@ -9,7 +9,7 @@
 classdef config
     methods (Static)
         % ======================================================================
-        %> @brief SetOpt sets parameters for running from Config.ini
+        %> @brief config.SetOpt sets parameters for running from Config.ini
         %>
         %> The values are recovered from MedHSIMat\\conf\\Config.ini.
         %> Then, the values are saved and accessed from a MedHSIMat\\conf\\Config.mat.
@@ -25,7 +25,7 @@ classdef config
         % ======================================================================
         function [] = SetOpt()
             % ======================================================================
-            %> @brief SetOpt sets parameters for running from Config.ini
+            %> @brief config.SetOpt sets parameters for running from Config.ini
             %>
             %> The values are recovered from MedHSIMat\\conf\\Config.ini.
             %> Then, the values are saved and accessed from a MedHSIMat\\conf\\Config.mat.
@@ -43,7 +43,7 @@ classdef config
         end
 
         % ======================================================================
-        %> @brief GetRunBaseDir gets the base directory.
+        %> @brief config.GetRunBaseDir gets the base directory.
         %>
         %> The base directory is ...\\MedHSIMat.
         %>
@@ -57,7 +57,7 @@ classdef config
         % ======================================================================
         function [curDir] = GetRunBaseDir()
             % ======================================================================
-            %> @brief GetRunBaseDir gets the base directory.
+            %> @brief config.GetRunBaseDir gets the base directory.
             %>
             %> The base directory is ...\\MedHSIMat.
             %>
@@ -77,7 +77,7 @@ classdef config
 
 
         % ======================================================================
-        %> @brief GetConfDir gets the directory of the configuration file.
+        %> @brief config.GetConfDir gets the directory of the configuration file.
         %>
         %> The configuration directory is ...\\MedHSIMat\\conf\\.
         %>
@@ -91,7 +91,7 @@ classdef config
         % ======================================================================
         function [curDir] = GetConfDir()
             % ======================================================================
-            %> @brief GetConfDir gets the directory of the configuration file.
+            %> @brief config.GetConfDir gets the directory of the configuration file.
             %>
             %> The configuration directory is ...\\MedHSIMat\\conf\\.
             %>
@@ -107,7 +107,7 @@ classdef config
         end
 
         % ======================================================================
-        %> @brief DirMake makes a new directory from folder and file parts.
+        %> @brief config.DirMake makes a new directory from folder and file parts.
         %>
         %> If the requested directory does not exist, it is created.
         %> If the directory is not a subdirectory of config::[OutputDir], then it
@@ -125,7 +125,7 @@ classdef config
         % ======================================================================
         function [filepath] = DirMake(varargin)
             % ======================================================================
-            %> @brief DirMake makes a new directory from folder and file parts.
+            %> @brief config.DirMake makes a new directory from folder and file parts.
             %>
             %> If the requested directory does not exist, it is created.
             %> If the directory is not a subdirectory of config::[OutputDir], then it
@@ -156,7 +156,7 @@ classdef config
         end
 
         % ======================================================================
-        %> @brief HasGPU checkes whether a GPU is available.
+        %> @brief config.HasGPU checkes whether a GPU is available.
         %>
         %> @b Usage
         %>
@@ -168,7 +168,7 @@ classdef config
         % ======================================================================
         function [hasGpu] = HasGPU()
             % ======================================================================
-            %> @brief HasGPU checkes whether a GPU is available.
+            %> @brief config.HasGPU checkes whether a GPU is available.
             %>
             %> @b Usage
             %>
@@ -196,7 +196,7 @@ classdef config
         end
 
         % ======================================================================
-        %> @brief GetSetting gets a setting value from the config structure.
+        %> @brief config.GetSetting gets a setting value from the config structure.
         %>
         %> @b Usage
         %>
@@ -210,7 +210,7 @@ classdef config
         % ======================================================================
         function [value] = GetSetting(parameter)
             % ======================================================================
-            %> @brief GetSetting gets a setting value from the config structure.
+            %> @brief config.GetSetting gets a setting value from the config structure.
             %>
             %> @b Usage
             %>
@@ -233,7 +233,7 @@ classdef config
         end
 
         % ======================================================================
-        %> @brief SetSetting sets a value in the config structure.
+        %> @brief config.SetSetting sets a value in the config structure.
         %>
         %> @b Usage
         %>
@@ -247,7 +247,7 @@ classdef config
         % ======================================================================
         function [] = SetSetting(parameter, value)
             % ======================================================================
-            %> @brief SetSetting sets a value in the config structure.
+            %> @brief config.SetSetting sets a value in the config structure.
             %>
             %> @b Usage
             %>
@@ -266,7 +266,7 @@ classdef config
         end
 
         % ======================================================================
-        %> @brief NotifySetting the value of a setting parameter
+        %> @brief config.NotifySetting the value of a setting parameter
         %>
         %> @b Usage
         %>
@@ -280,7 +280,7 @@ classdef config
         % ======================================================================
         function [] = NotifySetting(paramName, paramValue)
             % ======================================================================
-            %> @brief NotifySetting the value of a setting parameter
+            %> @brief config.NotifySetting the value of a setting parameter
             %>
             %> @b Usage
             %>

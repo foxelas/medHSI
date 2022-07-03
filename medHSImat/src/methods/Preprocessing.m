@@ -13,28 +13,11 @@
 %> @endcode
 %>
 %> @param obj [hsi] | An instance of the hsi class
-%> @param targetId [char] | The unique ID of the target sample
+%> @param targetID [char] | The unique ID of the target sample
 %>
 %> @return instance of the hsi class
 % ======================================================================
 function [hsIm] = Preprocessing(hsIm, targetID)
-% Preprocessing data according to specifications.
-%
-% The setting config::[Normalization] needs to be set beforehand.
-%
-% YOU CAN CHANGE THIS FUNCTION ACCORDING TO YOUR SPECIFICATIONS.
-%
-% @b Usage
-%
-% @code
-% config.SetSetting('Normalization', 'byPixel');
-% [newI, idxs] = Preprocess(hsIm, targetID);
-% @endcode
-%
-% @param obj [hsi] | An instance of the hsi class
-% @param targetId [char] | The unique ID of the target sample
-%
-% @return instance of the hsi class
 
 option = config.GetSetting('Normalization');
 

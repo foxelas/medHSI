@@ -7,6 +7,8 @@
 %> @b Usage
 %>
 %> @code
+%> dimredUtility.ApplyAndShow('SuperPCA');
+%>
 %> SuperpixelAnalysis(hsIm);
 %>
 %> apply.ToEach(@SuperpixelAnalysis, true, 20, 3);
@@ -25,30 +27,6 @@
 %> to tissue pixels
 % ======================================================================
 function [scores, labels, validLabels] = SuperpixelAnalysis(hsIm, labelInfo, varargin)
-% SuperpixelAnalysis applies SuperPCA to an hsi and visualizes
-% the result.
-%
-% Need to set config::[SaveFolder] for image output.
-%
-% @b Usage
-%
-% @code
-% SuperpixelAnalysis(hsIm);
-%
-% apply.ToEach(@SuperpixelAnalysis, true, 20, 3);
-% @endcode
-%
-% @param hsIm [hsi] | An instance of the hsi class
-% @param labelInfo [hsiInfo] | An instance of the  hsiInfo class
-% @param isManual [boolean] | A  flag to show whether is manual (local)
-% implementation or by SuperPCA package. Default: false.
-% @param pixelNum [int] | The number of superpixels. Default: 20.
-% @param pcNum [int] | The number of PCA components. Default: 3.
-%
-% @retval scores [numeric array] | The PCA scores
-% @retval labels [numeric array] | The labels of the superpixels
-% @retval validLabels [numeric array] | The superpixel labels that refer
-% to tissue pixels
 
 if nargin < 2
     labelInfo = [];

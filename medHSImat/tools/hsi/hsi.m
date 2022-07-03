@@ -129,7 +129,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Update updates the Value property.
+        %> @brief hsi.Update updates the Value property.
         %>
         %> The Value values are updated for specific indexes with new values.
         %>
@@ -147,7 +147,7 @@ classdef hsi
         % ======================================================================
         function [obj] = Update(obj, ind, vals)
             % ======================================================================
-            %> @brief Update updates the Value property.
+            %> @brief hsi.Update updates the Value property.
             %>
             %> The Value values are updated for specific indexes with new values.
             %>
@@ -171,7 +171,7 @@ classdef hsi
 
         %% Masking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
-        %> @brief GetMaskedPixels gets all spectral values included in a mask.
+        %> @brief hsi.GetMaskedPixels gets all spectral values included in a mask.
         %>
         %> Pixels are picked up by @c function GetMaskedPixelsInternal.
         %> If the mask is missing, the foreground mask is used.
@@ -191,7 +191,7 @@ classdef hsi
         % ======================================================================
         function [maskedPixels] = GetMaskedPixels(obj, inMask, isForegroundOnly)
             % ======================================================================
-            %> @brief GetMaskedPixels gets all spectral values included in a mask.
+            %> @brief hsi.GetMaskedPixels gets all spectral values included in a mask.
             %>
             %> Pixels are picked up by @c function GetMaskedPixelsInternal.
             %> If the mask is missing, the foreground mask is used.
@@ -228,7 +228,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief GetCustomMask returns a manually drawn polygon mask.
+        %> @brief hsi.GetCustomMask returns a manually drawn polygon mask.
         %>
         %> Pixels are picked up by @c function GetMaskedPixelsInternal.
         %> If the mask is missing, a manually selected mask is assigned by
@@ -246,7 +246,7 @@ classdef hsi
         % ======================================================================
         function [customMask] = GetCustomMask(obj)
             % ======================================================================
-            %> @brief GetCustomMask returns a manually drawn polygon mask.
+            %> @brief hsi.GetCustomMask returns a manually drawn polygon mask.
             %>
             %> Pixels are picked up by @c function GetMaskedPixelsInternal.
             %> If the mask is missing, a manually selected mask is assigned by
@@ -267,7 +267,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief GetFgMask returns the foreground mask for a sample.
+        %> @brief hsi.GetFgMask returns the foreground mask for a sample.
         %>
         %> The foreground mask corresponds to the tensors that belong to
         %> the tissue. The mask is prepared using @c function
@@ -295,7 +295,7 @@ classdef hsi
         % ======================================================================
         function [fgMask] = GetFgMask(obj, varargin)
             % ======================================================================
-            %> @brief GetFgMask returns the foreground mask for a sample.
+            %> @brief hsi.GetFgMask returns the foreground mask for a sample.
             %>
             %> The foreground mask corresponds to the tensors that belong to
             %> the tissue. The mask is prepared using @c function
@@ -326,7 +326,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief GetAverageSpectra returns average spectra for different masks.
+        %> @brief hsi.GetAverageSpectra returns average spectra for different masks.
         %>
         %> The target masks are set in an 3D array where the last dimension is the mask counter.
         %> If the mask is missing, then the average of the entire image is
@@ -347,7 +347,7 @@ classdef hsi
         % ======================================================================
         function [averages] = GetAverageSpectra(obj, varargin)
             % ======================================================================
-            %> @brief GetAverageSpectra returns average spectra for different masks.
+            %> @brief hsi.GetAverageSpectra returns average spectra for different masks.
             %>
             %> The target masks are set in an 3D array where the last dimension is the mask counter.
             %> If the mask is missing, then the average of the entire image is
@@ -373,7 +373,7 @@ classdef hsi
         %% Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         % ======================================================================
-        %> @brief Normalize a given hyperspectral image.
+        %> @brief hsi.Normalize a given hyperspectral image.
         %>
         %> The setting config::[Normalization] needs to be set beforehand.
         %> For more details check @c function NormalizeInternal.
@@ -394,7 +394,7 @@ classdef hsi
         % ======================================================================
         function [obj] = Normalize(obj, varargin)
             % ======================================================================
-            %> @brief Normalize a given hyperspectral image.
+            %> @brief hsi.Normalize a given hyperspectral image.
             %>
             %> The setting config::[Normalization] needs to be set beforehand.
             %> For more details check @c function NormalizeInternal.
@@ -418,7 +418,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Preprocess data according to specifications.
+        %> @brief hsi.Preprocess data according to specifications.
         %>
         %> The setting config::[Normalization] needs to be set beforehand.
         %> For more details check @c function Preprocessing.
@@ -439,7 +439,7 @@ classdef hsi
         % ======================================================================
         function [obj] = Preprocess(obj, targetID)
             % ======================================================================
-            %> @brief Preprocess data according to specifications.
+            %> @brief hsi.Preprocess data according to specifications.
             %>
             %> The setting config::[Normalization] needs to be set beforehand.
             %> For more details check @c function Preprocessing.
@@ -464,7 +464,7 @@ classdef hsi
 
         %% Dimension Reduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
-        %> @brief ToColumn reshapes the Value to a column of spectra.
+        %> @brief hsi.ToColumn reshapes the Value to a column of spectra.
         %>
         %> Reshapes the Value property from 3D to 2D. Each row is one
         %> tensors spectral information.
@@ -481,7 +481,7 @@ classdef hsi
         % ======================================================================
         function [col] = ToColumn(obj)
             % ======================================================================
-            %> @brief ToColumn reshapes the Value to a column of spectra.
+            %> @brief hsi.ToColumn reshapes the Value to a column of spectra.
             %>
             %> Reshapes the Value property from 3D to 2D. Each row is one
             %> tensors spectral information.
@@ -502,7 +502,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
+        %> @brief hsi.DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
         %>
         %> You can set the spectral distance metric with funcHandle.
         %> Common spectral ditance metrics are @@sam, sid, @jmsam, @ns3, @sidsam.
@@ -522,7 +522,7 @@ classdef hsi
         % ======================================================================
         function [clusterLabels] = DistanceScores(obj, varargin)
             % ======================================================================
-            %> @brief DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
+            %> @brief hsi.DistanceScores returns similarity clustering labels for a target hsi based on a references set of spectral curves.
             %>
             %> You can set the spectral distance metric with funcHandle.
             %> Common spectral ditance metrics are @@sam, sid, @jmsam, @ns3, @sidsam.
@@ -545,7 +545,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Dimred reduces the dimensions of the hyperspectral image.
+        %> @brief hsi.Dimred reduces the dimensions of the hyperspectral image.
         %>
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA,
@@ -586,7 +586,7 @@ classdef hsi
         % ======================================================================
         function [coeff, scores, latent, explained, objective, Mdl] = Dimred(obj, method, q, varargin)
             % ======================================================================
-            %> @brief Dimred reduces the dimensions of the hyperspectral image.
+            %> @brief hsi.Dimred reduces the dimensions of the hyperspectral image.
             %>
             %> Currently available methods:
             %> PCA, SuperPCA, MSuperPCA, ClusterPCA, MClusterPCA,
@@ -629,7 +629,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Transform applies a transform to the hyperspectral data.
+        %> @brief hsi.Transform applies a transform to the hyperspectral data.
         %>
         %> Currently available methods:
         %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA,
@@ -657,7 +657,7 @@ classdef hsi
         % ======================================================================
         function [scores] = Transform(obj, flattenFlag, method, q, varargin)
             % ======================================================================
-            %> @brief Transform applies a transform to the hyperspectral data.
+            %> @brief hsi.Transform applies a transform to the hyperspectral data.
             %>
             %> Currently available methods:
             %> PCA, SuperPCA, MSuperPCA, ClusterSuperPCA,
@@ -695,7 +695,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief FindPurePixels applies the algorithm on an hsi object.
+        %> @brief hsi.FindPurePixels applies the algorithm on an hsi object.
         %>
         %> When a foreground mask is provided, then pure pixels are calculated using only the specimen pixels of the hsi, while ignoring the bakcground.
         %> For more details see @c FindPurePuxelsInternal.
@@ -718,7 +718,7 @@ classdef hsi
         % ======================================================================
         function [endmembers] = FindPurePixels(obj, numEndmembers, varargin)
             % ======================================================================
-            %> @brief FindPurePixels applies the algorithm on an hsi object.
+            %> @brief hsi.FindPurePixels applies the algorithm on an hsi object.
             %>
             %> When a foreground mask is provided, then pure pixels are calculated using only the specimen pixels of the hsi, while ignoring the bakcground.
             %> For more details see @c FindPurePuxelsInternal.
@@ -744,7 +744,7 @@ classdef hsi
 
         %% Visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
-        %> @brief GetDisplayImage returns an RGB image from the hyperspectral data.
+        %> @brief hsi.GetDisplayImage returns an RGB image from the hyperspectral data.
         %>
         %> For more details check @c function GetDisplayImageInternal.
         %> @b Usage
@@ -766,7 +766,7 @@ classdef hsi
         % ======================================================================
         function [dispImage] = GetDisplayImage(obj, varargin)
             % ======================================================================
-            %> @brief GetDisplayImage returns an RGB image from the hyperspectral data.
+            %> @brief hsi.GetDisplayImage returns an RGB image from the hyperspectral data.
             %>
             %> For more details check @c function GetDisplayImageInternal.
             %> @b Usage
@@ -791,7 +791,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief GetDisplayRescaledImage returns an rescaled RGB image from the hyperspectral data.
+        %> @brief hsi.GetDisplayRescaledImage returns an rescaled RGB image from the hyperspectral data.
         %>
         %> For more details check @c function GetDisplayImageInternal.
         %>
@@ -814,7 +814,7 @@ classdef hsi
         % ======================================================================
         function [dispImage] = GetDisplayRescaledImage(obj, varargin)
             % ======================================================================
-            %> @brief GetDisplayRescaledImage returns an rescaled RGB image from the hyperspectral data.
+            %> @brief hsi.GetDisplayRescaledImage returns an rescaled RGB image from the hyperspectral data.
             %>
             %> For more details check @c function GetDisplayImageInternal.
             %>
@@ -840,7 +840,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief SubimageMontage plots a montage of the subimages of a hyperspectral image.
+        %> @brief hsi.SubimageMontage plots a montage of the subimages of a hyperspectral image.
         %>
         %> @b Usage
         %>
@@ -854,7 +854,7 @@ classdef hsi
         % ======================================================================
         function [] = SubimageMontage(obj, fig, plotPath)
             % ======================================================================
-            %> @brief SubimageMontage plots a montage of the subimages of a hyperspectral image.
+            %> @brief hsi.SubimageMontage plots a montage of the subimages of a hyperspectral image.
             %>
             %> @b Usage
             %>
@@ -886,7 +886,7 @@ classdef hsi
 
         %% Metrics %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
-        %> @brief GetBandCorrelation returns pixel correlations at each spectral band.
+        %> @brief hsi.GetBandCorrelation returns pixel correlations at each spectral band.
         %>
         %> @b Usage
         %>
@@ -903,7 +903,7 @@ classdef hsi
         % ======================================================================
         function [c] = GetBandCorrelation(obj, hasPixelSelection)
             % ======================================================================
-            %> @brief GetBandCorrelation returns pixel correlations at each spectral band.
+            %> @brief hsi.GetBandCorrelation returns pixel correlations at each spectral band.
             %>
             %> @b Usage
             %>
@@ -942,7 +942,7 @@ classdef hsi
 
         %% Operators %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ======================================================================
-        %> @brief Plus adds a value to Value property
+        %> @brief hsi.Plus adds a value to Value property
         %>
         %> @b Usage
         %>
@@ -957,7 +957,7 @@ classdef hsi
         % ======================================================================
         function [obj] = Plus(obj, hsiIm)
             % ======================================================================
-            %> @brief Plus adds a value to Value property
+            %> @brief hsi.Plus adds a value to Value property
             %>
             %> @b Usage
             %>
@@ -974,7 +974,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Minus subracts values from Value property
+        %> @brief hsi.Minus subracts values from Value property
         %>
         %> @b Usage
         %>
@@ -989,7 +989,7 @@ classdef hsi
         % ======================================================================
         function [obj] = Minus(obj, hsiIm)
             % ======================================================================
-            %> @brief Minus subracts values from Value property
+            %> @brief hsi.Minus subracts values from Value property
             %>
             %> @b Usage
             %>
@@ -1006,7 +1006,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Max calculates the max between a value array and a Value property
+        %> @brief hsi.Max calculates the max between a value array and a Value property
         %>
         %> @b Usage
         %>
@@ -1021,7 +1021,7 @@ classdef hsi
         % ======================================================================
         function [obj] = Max(obj, value)
             % ======================================================================
-            %> @brief Max calculates the max between a value array and a Value property
+            %> @brief hsi.Max calculates the max between a value array and a Value property
             %>
             %> @b Usage
             %>
@@ -1038,7 +1038,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief IsNan calculates nan indexes of a Value property
+        %> @brief hsi.IsNan calculates nan indexes of a Value property
         %>
         %> @b Usage
         %>
@@ -1052,7 +1052,7 @@ classdef hsi
         % ======================================================================
         function [ind] = IsNan(obj)
             % ======================================================================
-            %> @brief IsNan calculates nan indexes of a Value property
+            %> @brief hsi.IsNan calculates nan indexes of a Value property
             %>
             %> @b Usage
             %>
@@ -1068,7 +1068,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief IsInf calculates infinite indexes of a Value property
+        %> @brief hsi.IsInf calculates infinite indexes of a Value property
         %>
         %> @b Usage
         %>
@@ -1082,7 +1082,7 @@ classdef hsi
         % ======================================================================
         function [ind] = IsInf(obj)
             % ======================================================================
-            %> @brief IsInf calculates infinite indexes of a Value property
+            %> @brief hsi.IsInf calculates infinite indexes of a Value property
             %>
             %> @b Usage
             %>
@@ -1098,7 +1098,7 @@ classdef hsi
         end
 
         %======================================================================
-        %> @brief SAMscore returns SAM silimarity scores compared to a healthy tissue signature in degrees for a target hsi image.
+        %> @brief hsi.SAMscore returns SAM silimarity scores compared to a healthy tissue signature in degrees for a target hsi image.
         %>
         %> The reference library @c hsiUtility.GetReferenceLibrary() needs to be set beforehand.
         %>
@@ -1114,7 +1114,7 @@ classdef hsi
         %======================================================================
         function [scoreImg] = SAMscore(obj)
             %======================================================================
-            %> @brief SAMscore returns SAM silimarity scores compared to a healthy tissue signature in degrees for a target hsi image.
+            %> @brief hsi.SAMscore returns SAM silimarity scores compared to a healthy tissue signature in degrees for a target hsi image.
             %>
             %> The reference library @c hsiUtility.GetReferenceLibrary() needs to be set beforehand.
             %>
@@ -1141,7 +1141,7 @@ classdef hsi
         end
 
         %======================================================================
-        %> @brief ArgminSAM returns SAM scores for a target hsi image.
+        %> @brief hsi.ArgminSAM returns SAM scores for a target hsi image.
         %>
         %> The reference library @c hsiUtility.GetReferenceLibrary() needs to be set beforehand.
         %>
@@ -1159,7 +1159,7 @@ classdef hsi
         %======================================================================
         function [scoreImg, labelImg, argminImg] = ArgminSAM(obj)
             %======================================================================
-            %> @brief ArgminSAM returns SAM scores for a target hsi image.
+            %> @brief hsi.ArgminSAM returns SAM scores for a target hsi image.
             %>
             %> The reference library @c hsiUtility.GetReferenceLibrary() needs to be set beforehand.
             %>
@@ -1195,7 +1195,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Applies a specific function to the values of an hsi object.
+        %> @brief hsi.Applies a specific function to the values of an hsi object.
         %>
         %> Depending on the target function and value change some functions of the hsi class may produce errors or wrong results.
         %>
@@ -1215,7 +1215,7 @@ classdef hsi
         % ======================================================================
         function [resultObj] = ApplyFunction(obj, transformFun, varargin)
             % ======================================================================
-            %> @brief Applies a specific function to the values of an hsi object.
+            %> @brief hsi.Applies a specific function to the values of an hsi object.
             %>
             %> Depending on the target function and value change some functions of the hsi class may produce errors or wrong results.
             %>
@@ -1240,7 +1240,7 @@ classdef hsi
         end
 
         % ======================================================================
-        %> @brief Denoise applies denoising to an hsi object.
+        %> @brief hsi.Denoise applies denoising to an hsi object.
         %>
         %> @b Usage
         %>
@@ -1257,7 +1257,7 @@ classdef hsi
         % ======================================================================
         function [corrected] = Denoise(obj, method)
             % ======================================================================
-            %> @brief Denoise applies denoising to an hsi object.
+            %> @brief hsi.Denoise applies denoising to an hsi object.
             %>
             %> @b Usage
             %>
@@ -1290,7 +1290,7 @@ classdef hsi
     methods (Static)
 
         %======================================================================
-        %> @brief Load recovers the saved instance for the targetID
+        %> @brief hsi.Load recovers the saved instance for the targetID
         %>
         %> In order to work properly it need the argument to be read and preprocessed first.
         %> Use @c function hsiUtility.PrepareDataset for initialization.
@@ -1314,7 +1314,7 @@ classdef hsi
         %======================================================================
         function [obj] = Load(targetID, dataType)
             %======================================================================
-            %> @brief Load recovers the saved instance for the targetID
+            %> @brief hsi.Load recovers the saved instance for the targetID
             %>
             %> In order to work properly it need the argument to be read and preprocessed first.
             %> Use @c function hsiUtility.PrepareDataset for initialization.
@@ -1361,7 +1361,7 @@ classdef hsi
         end
 
         %======================================================================
-        %> @brief RecoverSpatialDimensions recovers the original spatial dimension
+        %> @brief hsi.RecoverSpatialDimensions recovers the original spatial dimension
         %> from masked pixels.
         %>
         %> Data with original spatial dimensions and reduced spectral dimensions
@@ -1383,7 +1383,7 @@ classdef hsi
         %======================================================================
         function [recHsi] = RecoverSpatialDimensions(varargin)
             %======================================================================
-            %> @brief RecoverSpatialDimensions recovers the original spatial dimension
+            %> @brief hsi.RecoverSpatialDimensions recovers the original spatial dimension
             %> from masked pixels.
             %>
             %> Data with original spatial dimensions and reduced spectral dimensions
@@ -1408,7 +1408,7 @@ classdef hsi
         end
 
         %======================================================================
-        %> @brief IsHsi checks if a variable is of an hsi instance
+        %> @brief hsi.IsHsi checks if a variable is of an hsi instance
         %>
         %> @b Usage
         %>
@@ -1422,7 +1422,7 @@ classdef hsi
         %======================================================================
         function [flag] = IsHsi(obj)
             %======================================================================
-            %> @brief IsHsi checks if a variable is of an hsi instance
+            %> @brief hsi.IsHsi checks if a variable is of an hsi instance
             %>
             %> @b Usage
             %>

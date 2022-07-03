@@ -5,7 +5,7 @@
 classdef commonUtility
     methods (Static)
         % ======================================================================
-        %> @brief GetBoundingBoxMask returns the mask corner indexes for a bounding box.
+        %> @brief commonUtility.GetBoundingBoxMask returns the mask corner indexes for a bounding box.
         %>
         %> @b Usage
         %>
@@ -19,7 +19,7 @@ classdef commonUtility
         % ======================================================================
         function [bbox] = GetBoundingBoxMask(corners)
             % ======================================================================
-            %> @brief GetBoundingBoxMask returns the mask corner indexes for a bounding box.
+            %> @brief commonUtility.GetBoundingBoxMask returns the mask corner indexes for a bounding box.
             %>
             %> @b Usage
             %>
@@ -35,7 +35,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief GetFilename returns the the directories for saved data.
+        %> @brief commonUtility.GetFilename returns the the directories for saved data.
         %>
         %> For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'output' or 'h5'
         %>
@@ -56,7 +56,7 @@ classdef commonUtility
         % ======================================================================
         function [fullPath] = GetFilename(directoryType, filename, extension)
             % ======================================================================
-            %> @brief GetFilename returns the the directories for saved data.
+            %> @brief commonUtility.GetFilename returns the the directories for saved data.
             %>
             %> For filename choose between: 'preprocessed', 'dataset', 'target', 'white', 'black', 'raw', 'model', 'param', 'referenceLib', 'output' or 'h5'
             %>
@@ -153,7 +153,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief DatasetInfo returns datanames and targetIDs in the current dataset.
+        %> @brief commonUtility.DatasetInfo returns datanames and targetIDs in the current dataset.
         %>
         %> The dataset is fetched from the directory according config::[Dataset].
         %>
@@ -170,7 +170,7 @@ classdef commonUtility
         % ======================================================================
         function [datanames, targetIDs] = DatasetInfo(bySample)
             % ======================================================================
-            %> @brief DatasetInfo returns datanames and targetIDs in the current dataset.
+            %> @brief commonUtility.DatasetInfo returns datanames and targetIDs in the current dataset.
             %>
             %> The dataset is fetched from the directory according config::[Dataset].
             %>
@@ -208,7 +208,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief GoodnessOfFit returns coodness of fit coefficient
+        %> @brief commonUtility.GoodnessOfFit returns coodness of fit coefficient
         %>
         %> Compares the similarity of two curves. The higher the value, the
         %> more similar the curves. Values above 0.99 are considered good for
@@ -227,7 +227,7 @@ classdef commonUtility
         % ======================================================================
         function gfc = GoodnessOfFit(reconstructed, measured)
             % ======================================================================
-            %> @brief GoodnessOfFit returns coodness of fit coefficient
+            %> @brief commonUtility.GoodnessOfFit returns coodness of fit coefficient
             %>
             %> Compares the similarity of two curves. The higher the value, the
             %> more similar the curves. Values above 0.99 are considered good for
@@ -252,7 +252,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief Nmse returns the Normalized Mean Square Error
+        %> @brief commonUtility.Nmse returns the Normalized Mean Square Error
         %>
         %> Compares the error between two curves. The smaller the value, the
         %> more similar the curves.
@@ -270,7 +270,7 @@ classdef commonUtility
         % ======================================================================
         function errVal = Nmse(reconstructed, measured)
             % ======================================================================
-            %> @brief Nmse returns the Normalized Mean Square Error
+            %> @brief commonUtility.Nmse returns the Normalized Mean Square Error
             %>
             %> Compares the error between two curves. The smaller the value, the
             %> more similar the curves.
@@ -291,7 +291,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief Rmse returns the Root Mean Square Error
+        %> @brief commonUtility.Rmse returns the Root Mean Square Error
         %>
         %> Compares the error between two curves. The smaller the value, the
         %> more similar the curves.
@@ -309,7 +309,7 @@ classdef commonUtility
         % ======================================================================
         function errVal = Rmse(reconstructed, measured)
             % ======================================================================
-            %> @brief Rmse returns the Root Mean Square Error
+            %> @brief commonUtility.Rmse returns the Root Mean Square Error
             %>
             %> Compares the error between two curves. The smaller the value, the
             %> more similar the curves.
@@ -331,7 +331,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief Jaccard returns the Jaccard Coefficient.
+        %> @brief commonUtility.Jaccard returns the Jaccard Coefficient.
         %>
         %> Compares the error between two masks. The higher the value, the
         %> more similar the masks.
@@ -349,7 +349,7 @@ classdef commonUtility
         % ======================================================================
         function jacVal = Jaccard(prediction, groundTruth)
             % ======================================================================
-            %> @brief Jaccard returns the Jaccard Coefficient.
+            %> @brief commonUtility.Jaccard returns the Jaccard Coefficient.
             %>
             %> Compares the error between two masks. The higher the value, the
             %> more similar the masks.
@@ -381,7 +381,7 @@ classdef commonUtility
             end
 
             if isnan(jacVal)
-                v = 1;
+                jacVal = 1;
             end
 
             if isempty(jacVal) %% both predicted and real are zeros
@@ -390,7 +390,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief Evaluations returns performance metrics for classification tasks
+        %> @brief commonUtility.Evaluations returns performance metrics for classification tasks
         %>
         %> Returns accuracy, sensitivity and specificity metrics.
         %>
@@ -409,7 +409,7 @@ classdef commonUtility
         % ======================================================================
         function [accuracy, sensitivity, specificity] = Evaluations(actual, predicted)
             % ======================================================================
-            %> @brief Evaluations returns performance metrics for classification tasks
+            %> @brief commonUtility.Evaluations returns performance metrics for classification tasks
             %>
             %> Returns accuracy, sensitivity and specificity metrics.
             %>
@@ -436,7 +436,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief Cell2Mat concatenates the contents of a cell array of values to a matrix.
+        %> @brief commonUtility.Cell2Mat concatenates the contents of a cell array of values to a matrix.
         %>
         %> @b Usage
         %>
@@ -450,7 +450,7 @@ classdef commonUtility
         % ======================================================================
         function [arr] = Cell2Mat(cellArr)
             % ======================================================================
-            %> @brief Cell2Mat concatenates the contents of a cell array of values to a matrix.
+            %> @brief commonUtility.Cell2Mat concatenates the contents of a cell array of values to a matrix.
             %>
             %> @b Usage
             %>
@@ -480,7 +480,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief CalcDistance calculates a distance between a target hsi cube and a reference according to a target function.
+        %> @brief commonUtility.CalcDistance calculates a distance between a target hsi cube and a reference according to a target function.
         %>
         %> @b Usage
         %>
@@ -496,7 +496,7 @@ classdef commonUtility
         % ======================================================================
         function [dist] = CalcDistance(target, reference, funHandle)
             % ======================================================================
-            %> @brief CalcDistance calculates a distance between a target hsi cube and a reference according to a target function.
+            %> @brief commonUtility.CalcDistance calculates a distance between a target hsi cube and a reference according to a target function.
             %>
             %> @b Usage
             %>
@@ -516,7 +516,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief Frechet calculates the Frechet distance between a target and a reference.
+        %> @brief commonUtility.Frechet calculates the Frechet distance between a target and a reference.
         %>
         %> @b Usage
         %>
@@ -531,7 +531,7 @@ classdef commonUtility
         % ======================================================================
         function dist = Frechet(target, reference)
             % ======================================================================
-            %> @brief Frechet calculates the Frechet distance between a target and a reference.
+            %> @brief commonUtility.Frechet calculates the Frechet distance between a target and a reference.
             %>
             %> @b Usage
             %>
@@ -548,7 +548,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief Frechet calculates the Proposed distance between a target and a reference.
+        %> @brief commonUtility.Frechet calculates the Proposed distance between a target and a reference.
         %>
         %> @b Usage
         %>
@@ -563,7 +563,7 @@ classdef commonUtility
         % ======================================================================
         function dist = ProposedDistance(target, reference)
             % ======================================================================
-            %> @brief Frechet calculates the Proposed distance between a target and a reference.
+            %> @brief commonUtility.Frechet calculates the Proposed distance between a target and a reference.
             %>
             %> @b Usage
             %>
@@ -580,7 +580,7 @@ classdef commonUtility
         end
 
         % ======================================================================
-        %> @brief IsChild checks if a function is child to a set of target parents.
+        %> @brief commonUtility.IsChild checks if a function is child to a set of target parents.
         %>
         %> @b Usage
         %>
@@ -594,7 +594,7 @@ classdef commonUtility
         % ======================================================================
         function isChild = IsChild(targetParents)
             % ======================================================================
-            %> @brief IsChild checks if a function is child to a set of target parents.
+            %> @brief commonUtility.IsChild checks if a function is child to a set of target parents.
             %>
             %> @b Usage
             %>
