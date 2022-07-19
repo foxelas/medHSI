@@ -13,7 +13,7 @@
 %> @section  Details
 %> For details refer to https://foxelas.github.io/medHSI/.
 %>
-%> You can find a tutorial at https://github.com/foxelas/medHSIdocs/raw/tutorial/tutorial.pdf.
+%> You can find a tutorial at https://foxelas.github.io/medHSI/tutorial/.
 %>
 %> The structure is described in @ref descr. Also, check pages @b Classes and @b Files.
 %>
