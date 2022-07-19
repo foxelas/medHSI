@@ -47,8 +47,8 @@ classdef dimredUtility
         %> values
         %> @retval Mdl [model] | The dimension reduction model
         % ======================================================================
-        function [coeff, scores, latent, explained, objective, Mdl] = Apply(X, method, q, fgMask, labelMask, varargin)
-            [coeff, scores, latent, explained, objective, Mdl] = DimredApply(X, method, q, fgMask, labelMask, varargin{:});
+        function [coeff, scores, latent, explained, objective, Mdl] = Apply(X, method, q, fgMask, varargin)
+            [coeff, scores, latent, explained, objective, Mdl] = DimredApply(X, method, q, fgMask, varargin{:});
         end
 
         % ======================================================================

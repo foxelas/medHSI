@@ -30,8 +30,8 @@ fgMask = hsIm.FgMask;
 savedir = commonUtility.GetFilename('output', fullfile(config.GetSetting('SaveFolder'), config.GetSetting('FileName')), '');
 plots.Superpixels(1, fullfile(savedir, 'kmeans-clustering'), srgb, prediction, '', 'color', fgMask);
 
-names = cell(clusterNum, 1);
-for i = 1:clusterNum
+names = cell(clusters, 1);
+for i = 1:clusters
     names{i} = strcat('Centroid', num2str(i));
 end
 plots.Spectra(2, fullfile(savedir, 'kmeans-centroids'), centroids, hsiUtility.GetWavelengths(size(hsIm.Value, 3)), names, 'Kmeans centroids');

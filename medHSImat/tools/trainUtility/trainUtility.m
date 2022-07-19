@@ -96,7 +96,12 @@ classdef trainUtility
             testTargetIDs = cell(folds, 1);
 
             for k = 1:folds
-                targetSampleIds = num2str(foldSampleIds{k});
+                if iscell(foldSampleIds{k})
+                    stringVal = foldSampleIds{k}{1};
+                else
+                    stringVal = foldSampleIds{k};
+                end
+                targetSampleIds = num2str(stringVal);
                 ids = cell2mat(cellfun(@(x) contains(x, targetSampleIds), targetIDs, 'UniformOutput', false));
                 testIds = targetIDs(ids);
 
@@ -320,9 +325,9 @@ classdef trainUtility
         %> @retval testData [struct] | The test data
         %> @retval folds [int] | The number of folds.
         % ======================================================================
-        function [trainData, testData] = TrainTest(dataset, dataType, splitType, folds, testIds, varargin)
+        function [trainData, testData, folds] = TrainTest(dataset, dataType, splitType, folds, testIds, varargin)
  
-            [trainData, testData] = SplitTrainTest(dataset, dataType, splitType, folds, testIds, varargin{:});
+            [trainData, testData, folds] = SplitTrainTest(dataset, dataType, splitType, folds, testIds, varargin{:});
         end
 
         % ======================================================================
@@ -840,14 +845,14 @@ classdef trainUtility
         % ======================================================================
         function [validatedPerformance] = Validation(dataset, splitType, folds, testIds, method, q, svmSettings, varargin)
 
-            dataType = 'pixel';
+            dataType = 'hsi';
             [trainData, testData, folds] = trainUtility.TrainTest(dataset, dataType, splitType, folds, testIds);
 
             if folds == 1
                 error('Cannot run cross-validation on a single fold');
             end
 
-            performance = cell(numValidSets, 1);
+            performance = cell(folds, 1);
             for k = 1:folds
                 trainDataFold = trainData{k};
                 testDataFold = testData{k};
