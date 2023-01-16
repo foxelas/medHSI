@@ -30,11 +30,12 @@ def not_supported(varname):
 ######################### Config #########################
 import configparser
 
-dirSep = '\\'
+dirSep = "\\"
 
 def get_base_dir():
     cwd = os.getcwd()
-    parts = cwd.split("\\")
+    parts = cwd.split(dirSep)
+
     parts = parts[0: parts.index('medHSI')+1]
     parts.insert(1, os.sep)
     base_dir = os.path.join(*parts)
@@ -55,16 +56,18 @@ def parse_config():
     # print("Loading from settings conf/config.ini \n")
     # print("Sections")
     # print(config.sections())
+    
+    # config['Data Settings']['Dataset'] = 'pslTestAugmented'
     return config
 
 conf = parse_config()
 
 def get_savedir():
-    dirName = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['pythonTest'])
+    dirName = os.path.join(conf['Directories']['PutputDir'], conf['Data Settings']['Dataset'], conf['Folder Names']['PythonTestFolderName'])
     return dirName
 
 def get_tripletdir():
-    dirName = os.path.join(conf['Directories']['matDir'], conf['Folder Names']['triplets'] )
+    dirName = os.path.join(conf['Directories']['MatDir'], str.join(conf['Data Settings']['Database'], conf['Input Folder Names']['TripletsName'] ))
     return dirName
 
 ######################### Load #########################
@@ -100,20 +103,21 @@ def load_black_mat(fname, varname):
     hsi = load_from_mat73(fname + '_black.mat', varname) 
     return hsi
 
-def load_dataset(fpath, sampleType='pixel', ash5=0):
+def load_dataset(fpath, sampleType='pixel'):
     f = load_from_h5(fpath)
     hsiList = []
+    labelList = []
+
     keyList = list(f.keys())
 
     for keyz in keyList:
-        if ash5 == 1:
-            val = f[keyz]
-        else:
-            val = f[keyz][:]
-        
-        if val.shape[2] != 311:
+        val = f[keyz]['hsi'][:]
+        lab = f[keyz]['label'][:]
+
+        if val.shape[2] !=  311 | val.shape[2] != 3:
             val = np.transpose(val, [1, 2, 0])
         hsiList.append(val)
+        labelList.append(lab.astype(np.int8))
 
     dataList = []
     if sampleType == 'pixel':
@@ -124,7 +128,7 @@ def load_dataset(fpath, sampleType='pixel', ash5=0):
         dataList = hsiList
     else:
         not_supported('SampleType')
-    return dataList, keyList          
+    return dataList, keyList, labelList          
 
 def load_images(fpath):
     images = []
@@ -145,7 +149,10 @@ def load_label_images(fpath):
 def get_labels_from_mask(imgList):
     labels = []
     for img in imgList: 
-        grayIm = cv2.convertScaleAbs(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))  
+        if img.ndim > 2: 
+            grayIm = cv2.convertScaleAbs(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))  
+        else: 
+            grayIm = img
         #print("Min", np.min(np.min(grayIm)), "and Max ", np.max(np.max(grayIm)))     	
         (thresh, blackAndWhiteImage) = cv2.threshold(grayIm, 170, 255, cv2.THRESH_BINARY)  	
         labelImg = np.logical_not(blackAndWhiteImage)
@@ -238,26 +245,34 @@ def get_display_image(hsi, imgType = 'srgb', channel = 150):
     recon = []
     if imgType == 'srgb':        
         [m,n,z] = hsi.shape
-        
-        filename = os.path.join(get_base_dir(), conf['Directories']['paramDir'], 'displayParam_311.mat')
+        if z  == 3: 
+            colImage = np.reshape( hsi, (m*n, z) )  
+            maxConst = np.max(colImage)
+            minConst = np.min(colImage)
+            colImage = (colImage - float(minConst))/ (float(maxConst) - float(minConst))
+            recon = np.reshape(colImage, (m, n, 3))
 
-        xyz = load_from_mat(filename, 'xyz')
-        illumination = load_from_mat(filename, 'illumination')
+        else:     
+            filename = os.path.join(get_base_dir(), "parameters", 'displayParam_311.mat')
 
-        colImage = np.reshape( hsi, (m*n, z) )  
-        normConst = np.amax(colImage)
-        colImage = colImage / float(normConst)
-        colImage =  colImage * illumination
-        colXYZ = np.dot(colImage, np.squeeze(xyz))
+            xyz = load_from_mat(filename, 'xyz')
+            illumination = load_from_mat(filename, 'illumination')
+
+            colImage = np.reshape( hsi, (m*n, z) )  
+            normConst = np.amax(colImage)
+            colImage = colImage / float(normConst)
+            colImage =  colImage * illumination
+            colXYZ = np.dot(colImage, np.squeeze(xyz))
+            
+            imXYZ = np.reshape(colXYZ, (m, n, 3))
+            imXYZ[imXYZ < 0] = 0
+            imXYZ = imXYZ / np.amax(imXYZ)
+            dispImage_ = xyz2rgb(imXYZ)
+            dispImage_[dispImage_ < 0] = 0
+            dispImage_[dispImage_ > 1] = 1
+            dispImage_ = dispImage_**0.4
+            recon =  dispImage_
         
-        imXYZ = np.reshape(colXYZ, (m, n, 3))
-        imXYZ[imXYZ < 0] = 0
-        imXYZ = imXYZ / np.amax(imXYZ)
-        dispImage_ = xyz2rgb(imXYZ)
-        dispImage_[dispImage_ < 0] = 0
-        dispImage_[dispImage_ > 1] = 1
-        dispImage_ = dispImage_**0.4
-        recon =  dispImage_
 
     elif imgType =='channel':
         recon = hsi[:,:, channel]
@@ -301,6 +316,7 @@ def show_image(x, figTitle = None, hasGreyScale = False, fpath = ""):
     
 def show_montage(dataList, filename = None, imgType = 'srgb', channel = 150):
     #Needs to have same number of dimensions for each image, type float single
+
     hsiList = np.array([get_display_image(x, imgType, channel) for x in dataList], dtype='float64')
     if imgType != 'grey':
         m = skimage.util.montage(hsiList, channel_axis = 3)
@@ -309,7 +325,7 @@ def show_montage(dataList, filename = None, imgType = 'srgb', channel = 150):
         m = skimage.util.montage(hsiList)
 
     if filename == None: 
-        filename = os.path.join(conf['Directories']['outputDir'], 'T20211207-python', 'normalized-montage.jpg')
+        filename = os.path.join("/home/nfs/ealoupogianni/mspi/output/", conf['Data Settings']['Dataset'], conf['Folder Names']['PythonTestFolderName'], 'normalized-montage.jpg')
     skimage.io.imsave(filename, m)
 
 

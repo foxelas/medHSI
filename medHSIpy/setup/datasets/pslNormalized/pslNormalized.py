@@ -92,7 +92,7 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
 
 
     conf = hsi_io.conf
-    fpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['datasets'], 'hsi_normalized_full.h5')
+    fpath = os.path.join(conf['Directories']['OutputDir'], conf['Folder Names']['Datasets'], 'hsi_normalized_full.h5')
         
     dataList, keyList = hsi_io.load_dataset(fpath, 'image')
 
@@ -106,7 +106,7 @@ class Pslnormalized(tfds.core.GeneratorBasedBuilder):
     croppedData = hsi_io.center_crop_list(dataList, 70, 70, True)
 
     # Prepare labels 
-    labelpath = os.path.join(conf['Directories']['outputDir'], conf['Folder Names']['labelsManual'])
+    labelpath = os.path.join(conf['Directories']['OutputDir'], conf['Folder Names']['LabelsManual'])
     labelRgb = hsi_io.load_label_images(labelpath)
     labelImages = hsi_io.get_labels_from_mask(labelRgb)
     croppedLabels = hsi_io.center_crop_list(labelImages)

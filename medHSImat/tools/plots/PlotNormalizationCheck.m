@@ -1,20 +1,35 @@
+%======================================================================
+%> @brief PlotNormalizationCheck  plots the values recovered after normalization.
+%>
+%> The user needs to input a custom mask.
+%> Disable in config::[DisableReflectranceExtremaPlots].
+%>
+%> @b Usage
+%> plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm);
+%>
+%> PlotNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param Iin [hsi] | The measurement image
+%> @param Iblack [hsi] | The black image
+%> @param Iwhite [hsi] | The white image
+%> @param Inorm [hsi] | The normalization image
+%======================================================================
 function PlotNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
-%%PlotNormalizationCheck plots the values recovered after normalization
-%   user needs to input a mask
-%
-%   Usage:
-%   PlotsNormalizationCheck(Iin, Iblack, Iwhite, Inorm, fig)
-%   plots.NormalizationCheck(fig, Iin, Iblack, Iwhite, Inorm)
 
 %Need to draw mask
-[mask, Iin_mask] = GetMaskFromFigureInternal(Iin);
-Iblack_mask = GetPixelsFromMaskInternal(Iblack, mask);
-Iwhite_mask = GetPixelsFromMaskInternal(Iwhite, mask);
-Inorm_mask = GetPixelsFromMaskInternal(Inorm, mask);
+close all;
+
+mask = Iin.GetCustomMask();
+Iin_mask = Iin.GetMaskedPixels(mask);
+Iblack_mask = GetMaskedPixelsInternal(Iblack, mask);
+Iwhite_mask = GetMaskedPixelsInternal(Iwhite, mask);
+Inorm_mask = Inorm.GetMaskedPixels(mask);
 x = hsiUtility.GetWavelengths(size(Iin_mask, 2));
 
 close all;
-figure(fig);
+fig = figure(fig);
 clf;
 hold on;
 plot(x, mean(reshape(Iwhite_mask, [size(Iwhite_mask, 1), size(Iwhite_mask, 2)])), 'DisplayName', 'Average White', 'LineWidth', 2);
@@ -25,12 +40,18 @@ plot(x, min(reshape(Iwhite_mask, [size(Iwhite_mask, 1), size(Iwhite_mask, 2)])),
 plot(x, min(reshape(Iblack_mask, [size(Iblack_mask, 1), size(Iblack_mask, 2)])), 'DisplayName', 'Min Black', 'LineWidth', 2);
 plot(x, min(reshape(Iin_mask, [size(Iin_mask, 1), size(Iin_mask, 2)])), 'DisplayName', 'Min Tissue', 'LineWidth', 2);
 
+minVal = min(Iwhite_mask(:)-Iblack_mask(:));
+fids = find((Iwhite_mask(:) - Iblack_mask(:)) == minVal);
+[row, col] = ind2sub(size(Iwhite_mask), fids(1));
+ws = hsiUtility.GetWavelengths(401, 'raw');
+
 hold off; legend;
-min(Iwhite_mask(:)-Iblack_mask(:))
+fprintf('Min(I_w - I_b) is %.5f at row (pixel) %d and column %d (wavelength %d). \n', minVal, row, col, ws(col));
+fprintf('If minVal is negative and wavelenth is at the extreme, then it is discarded later as noise. \n');
 xlabel('Wavelength (nm)', 'FontSize', 15);
 ylabel('Reflectance (a.u.)', 'FontSize', 15);
 
-figure(fig+1);
+fig2 = figure();
 clf;
 hold on
 for i = 1:size(Inorm_mask, 1)
@@ -49,17 +70,17 @@ legend(h, 'Location', 'northwest', 'FontSize', 15);
 ax = gca;
 ax.YAxis.Exponent = 0;
 
-fig3 = figure(fig+2);
-rgb = hsiUtility.GetDisplayImage(Iin);
-plots.Overlay(fig3, rgb, mask);
+baseFolder = commonUtility.GetFilename('output', config.GetSetting('NormCheckFolderName'), '');
 
-baseFolder = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('normCheck'), config.GetSetting('fileName'));
-config.SetSetting('plotName', strcat(baseFolder, '_raw.jpg'));
-plots.SavePlot(fig);
-config.SetSetting('plotName', strcat(baseFolder, '_norm.jpg'));
-plots.SavePlot(fig+1);
-config.SetSetting('plotName', strcat(baseFolder, '_mask.jpg'));
-plots.SavePlot(fig3);
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_raw.png'));
+plots.SavePlot(fig, plotPath);
 
-close all;
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_norm.png'));
+plots.SavePlot(fig2, plotPath);
+
+fig3 = figure();
+rgb = Iin.GetDisplayImage();
+plotPath = fullfile(baseFolder, strcat(config.GetSetting('FileName'), '_mask.png'));
+plots.Overlay(fig3, plotPath, rgb, mask);
+
 end

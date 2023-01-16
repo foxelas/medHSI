@@ -1,27 +1,37 @@
-function [] = PlotSuperpixels(baseImage, labels, figTitle, plotType, fgMask, fig)
-% PlotSuperpixels plots the results of superpixel segmentation on the image
-%
-%   Usage:
-%   PlotSuperpixels(baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', [], 1);
-%   PlotSuperpixels(baseImage, labels, 'Superpixels of image 3', 'color', fgMask, 1);
+%======================================================================
+%> @brief PlotSuperpixels plots superpixel labels
+%>
+%> @b Usage
+%>
+%> @code
+%> plots.Superpixels(fig, baseImage, labels, 'Superpixel Boundary of image 3', 'boundary', []);
+%>
+%> plots.Superpixels(fig, baseImage, labels, 'Superpixels of image 3', 'color', fgMask);
+%>
+%> PlotSuperpixels(baseIm, topIm, figTitle, plotType, fgMask, fig);
+%> @endcode
+%>
+%> @param fig [int] | The figure handle
+%> @param baseIm [numeric array] | The base image
+%> @param topIm [numeric array] | The top image
+%> @param figTitle [char] | The figure title
+%> @param plotType [char] | The plot type, either 'color' or 'boundary'
+%> @param fgMask [numeric array] | The foreground mask
+%======================================================================
+function [] = PlotSuperpixels(baseIm, topIm, figTitle, plotType, fgMask, fig)
 
 if ~isempty(plotType) && strcmpi(plotType, 'color') % isColor = 'color'
-    if ~isempty(fgMask)
-        v = labels(fgMask);
-        a = unique(v);
-        counts = histc(v(:), a);
-        specimenSuperpixelIds = a(counts > 300)';
-    else
-        specimenSuperpixelIds = 1:length(unique(v));
-    end
-    B = labeloverlay(baseImage, labels, 'IncludedLabels', specimenSuperpixelIds);
+    topIm = topIm + 1; % To remove label 0, because labeloverlay ignores it
+    topIm(~fgMask) = 0;
+    B = labeloverlay(baseIm, topIm);
     imshow(B);
+
 else % isColor = 'boundary'
-    BW = boundarymask(labels);
-    imshow(imoverlay(baseImage, BW, 'cyan'), 'InitialMagnification', 67);
+    BW = boundarymask(topIm);
+    imshow(imoverlay(baseIm, BW, 'cyan'), 'InitialMagnification', 50);
 end
 
 title(figTitle);
-SavePlot(fig);
+plots.SavePlot(fig);
 
 end

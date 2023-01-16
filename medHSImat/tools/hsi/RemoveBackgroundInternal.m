@@ -1,15 +1,32 @@
-function [updI, fgMask] = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
-%     REMOVEBACKGROUND removes the background from the specimen image
-%
-%     Usage:
-%     [updatedHSI, foregroundMask] = RemoveBackground(I)
-%     [updatedHSI, foregroundMask] = RemoveBackground(I, colorLevelsForKMeans,
-%         attemptsForKMeans, bigHoleCoefficient, closingCoefficient, openingCoefficient)
-%     See also https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html
+% ======================================================================
+%> @brief RemoveBackgroundInternal returns the foreground mask for a sample.
+%>
+%> The foreground mask corresponds to the tensors that belong to
+%> the tissue.
+%> See also
+%> https://www.mathworks.com/help/images/color-based-segmentation-using-k-means-clustering.html.
+%>
+%> @b Usage
+%>
+%> @code
+%> hsIm = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, layerSelectionThreshold, bigHoleCoefficient, closingCoefficient, openingCoefficient);
+%> @endcode
+%>
+%> @param obj [hsi] | An instance of the hsi class
+%> @param colorLevelsForKMeans [int] | Optional: Color levels for Kmeans. Default is 6.
+%> @param attemptsForKMeans [int] | Optional: Attempts for Kmeans. Default is 3.
+%> @param layerSelectionThreshold [double] | Optional: Threshold for layer selection. Default is 0.1.
+%> @param bigHoleCoefficient [double] | Optional: Coefficient for closing big holes. Default is 1000
+%> @param closingCoefficient [double] | Optional: Coefficient for closing operation. Default is 2.
+%> @param openingCoefficient [double] | Optional: Coefficient for opening operation. Default is 5.
+%>
+%> @retval fgMask [numeric array] | A foreground mask
+% ======================================================================
+function [updI, fgMask] = RemoveBackgroundInternal(I, colorLevelsForKMeans, attemptsForKMeans, layerSelectionThreshold, bigHoleCoefficient, closingCoefficient, openingCoefficient)
 
 [m, n, z] = size(I);
 if z > 3
-    Irgb = hsiUtility.GetDisplayImage(I, 'rgb');
+    Irgb = GetDisplayImageInternal(I, 'rgb');
 else
     Irgb = I;
 end
@@ -76,11 +93,11 @@ else
     % cluster1 = Irgb .* double(specimenMask);
 end
 
-filepath = config.DirMake(config.GetSetting('saveDir'), config.GetSetting('backgroundRemoval'), ...
-    config.GetSetting('database'), strcat(config.GetSetting('fileName'), '.jpg'));
-config.SetSetting('plotName', filepath);
-
-plots.Overlay(1, Irgb, fgMask);
+if config.GetSetting('ShowFigures')
+    filepath = commonUtility.GetFilename('output', fullfile(config.GetSetting('BackgroundRemovalFolderName'), ...
+        strcat(config.GetSetting('FileName'), '_foreground')), 'png');
+    plots.Overlay(1, filepath, Irgb, fgMask);
+end
 
 updI = I .* repmat(double(fgMask), [1, 1, z]);
 

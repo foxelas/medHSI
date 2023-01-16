@@ -1,11 +1,33 @@
+% ======================================================================
+%> @brief SetOpt sets parameters for running from config.ini
+%>
+%> The values are recovered from MedHSIMat\\conf\\config.ini.
+%> Values are saved in an .ini format.
+%>
+%> @b Usage
+%>
+%> @code
+%> SetOpt();
+%> @endcode
+%>
+% ======================================================================
 function [] = SetOpt()
-%     SETOPT sets parameters for running from conf/Config.ini
-%
-%     Usage:
-%     SetOpt()
+% ======================================================================
+%> @brief SetOpt sets parameters for running from config.ini
+%>
+%> The values are recovered from MedHSIMat\\conf\\config.ini.
+%> Values are saved in an .ini format.
+%>
+%> @b Usage
+%>
+%> @code
+%> SetOpt();
+%> @endcode
+%>
+% ======================================================================
 
-disp('Reading configuration file [Config.ini] ...');
-inputSettingsFile = fullfile(config.GetConfDir(), 'Config.ini');
+disp('Reading configuration file [config.ini] ...');
+inputSettingsFile = fullfile(config.GetConfDir(), 'config.ini');
 
 tmp = delimread(inputSettingsFile, {', '}, 'raw');
 for i = 1:length(tmp.raw)
@@ -23,20 +45,12 @@ for i = 1:length(tmp.raw)
         if isempty(rawValue)
             varValue = [];
             switch varName
-                case 'inputDir'
-                    varValue = fullfile(parentDir, 'input\');
                 case 'importDir'
-                    varValue = fullfile(inputDir, 'import\');
-                case 'outputDir'
-                    varValue = fullfile(parentDir, 'output\');
-                case 'dataDir'
-                    varValue = parentDataDir;
+                    varValue = fullfile(dataDir, 'import\');
                 case 'matDir'
-                    varValue = fullfile(parentDataDir, 'matfiles', 'hsi\');
-                case 'saveDir'
-                    varValue = outputDir;
-                case 'inDir'
-                    varValue = parentDataDir;
+                    varValue = fullfile(outputDir, 'matfiles', 'hsi\');
+                case 'paramDir'
+                    varValue = fullfile(dataDir, 'parameters\');
             end
 
         elseif strcmpi(rawValue, 'true') || strcmpi(rawValue, 'false') % logical type
@@ -51,13 +65,15 @@ for i = 1:length(tmp.raw)
     end
 end
 
-fprintf('Data directory is set to %s.\n', dataDir);
-fprintf('Save directory is set to %s.\n', saveDir);
+fprintf('Data directory is set to %s.\n', DataDir);
+fprintf('Import directory is set to %s.\n', ImportDir);
+fprintf('Output directory is set to %s.\n', OutputDir);
+fprintf('Matfile directory is set to %s.\n', MatDir);
 
 clear parts row varName rawValue varValue i tmp;
 settingsFile = strrep(inputSettingsFile, '.ini', '.mat');
 save(settingsFile);
-fprintf('Settings loaded from %s and saved in %s.\n', inputSettingsFile, settingsFile);
+fprintf('\nSettings loaded from \n%s\nand saved in \n%s.\n\n', inputSettingsFile, settingsFile);
 
 end
 

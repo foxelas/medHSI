@@ -1,135 +1,113 @@
+% ======================================================================
+%>@brief databaseUtility is a class that handles interactions with the
+%> database file.
+%
+%> The database files are saved in config::[ImportDir]\\.
+%> Currently only .xlsx format is supported.
+%
+% For details check https://foxelas.github.io/medHSIdocs/classdatabase_utility.html
+% ======================================================================
 classdef databaseUtility
     methods (Static)
 
-        %% Contents
-        %
-        %   Static:
-        %         [dataTable] = GetdatabaseUtility()
-        %         [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
-        %         [targetIDs, outRows] = GetTargetIndexes(content, target)
-        %         [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
-        %         [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
-        %         [setId] = SelectDatabaseSamples(dataTable, setId)
-        %         [fileConditions] = GetFileConditions(content, target, id)
-
-        function [dataTable] = GetdatabaseUtility()
-
-            %% GetdatabaseUtility returns the db structure as a table
-            %
-            %   Usage:
-            %   dataTable = GetdatabaseUtility()
-            dataTable = readtable(fullfile(config.GetSetting('importDir'), strcat(config.GetSetting('database'), ...
-                config.GetSetting('dataInfoTableName'))), 'Sheet', 'capturedData');
+        % ======================================================================
+        %>@brief databaseUtility.GetDataTable gets the database table.
+        %>
+        %> The table is recovered from
+        %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
+        %> 'capturedData'.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> dataTable = databaseUtility.GetDataTable();
+        %> @endcode
+        %>
+        % ======================================================================
+        function [dataTable] = GetDataTable()
+            dataTable = readtable(fullfile(config.GetSetting('ImportDir'), strcat(config.GetSetting('Database'), ...
+                config.GetSetting('DataInfoTableName'))), 'Sheet', 'DataInfo');
         end
 
-        function [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
-
-            %% Query Gets the respective filename for configuration value
-            %   arguments are received in the order of
-            %     'configuration' [light source]
-            %     'content' [type of captured object]
-            %     'integrationTime' [value of integration time]
-            %     'target' [details about captured object]
-            %     'dataDate' [captureDate]
-            %     'id' [number value for id ]
-            %
-            %   Usage:
-            %   [filenames, tableIds, outRows] = Query(content, sampleId, captureDate, id, integrationTime, target, configuration)
-
-            warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
-            dataTable = databaseUtility.GetdatabaseUtility();
-
-            if nargin < 7
-                configuration = [];
+        % ======================================================================
+        %>@brief databaseUtility.GetValueFromTable gets a value from the database table
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> dataTable = databaseUtility.GetValueFromTable(tab, field, id);
+        %>
+        %> sampleID = databaseUtility.GetValueFromTable(outRows, 'SampleID', i);
+        %> @endcode
+        %>
+        %> @param tab [table] | A table with values
+        %> @param field [char] | The target field
+        %> @param id [int] | The target row index
+        %>
+        %> @retval value [any] | The return value
+        % ======================================================================
+        function [value] = GetValueFromTable(tab, field, id)
+            column = tab.(field);
+            if iscell(column)
+                value = column{id};
+            else
+                value = column(id);
             end
-            if nargin < 6
-                target = [];
-            end
-            if nargin < 5
-                integrationTime = [];
-            end
-            if nargin < 4
-                id = [];
-            end
-            if nargin < 3
-                captureDate = [];
-            end
-
-            if nargin < 2
-                sampleId = [];
-            end
-
-            function [keyValue, isMatch] = GetCondition(value)
-                if iscell(value)
-                    isMatch = value{2};
-                    keyValue = value{1};
-                else
-                    isMatch = true;
-                    keyValue = value;
-                end
-            end
-
-            setId = true(numel(dataTable.ID), 1);
-
-            if ~isempty(configuration)
-                setId = setId & ismember(dataTable.configuration, configuration);
-            end
-
-            if ~isempty(content)
-                [content, isMatchContent] = GetCondition(content);
-                if isMatchContent %whether content is exact match or just contains
-                    setId = setId & ismember(dataTable.Content, content);
-                else
-                    setId = setId & contains(lower(dataTable.Content), lower(content));
-                end
-            end
-
-            if ~isempty(integrationTime)
-                setId = setId & ismember(dataTable.IntegrationTime, integrationTime);
-            end
-
-            if ~isempty(target)
-                [target, isMatchTarget] = GetCondition(target);
-                if isMatchTarget
-                    setId = setId & ismember(dataTable.Target, target);
-                else
-                    setId = setId & contains(lower(dataTable.Target), lower(target));
-                end
-            end
-
-            if ~isempty(captureDate)
-                setId = setId & ismember(dataTable.CaptureDate, str2double(captureDate));
-            end
-
-            if ~isempty(id)
-                setId = setId & ismember(dataTable.ID, id);
-            end
-
-            if ~isempty(sampleId)
-                setId = setId & ismember(dataTable.SampleID, sampleId);
-            end
-
-            setId = databaseUtility.SelectDatabaseSamples(dataTable, setId);
-
-            outRows = dataTable(setId, :);
-            filenames = outRows.Filename;
-            tableIds = outRows.ID;
-
-            % Sort by sampleID
-            [outRows, sortId] = sortrows(outRows, {'SampleID', 'IsUnfixed'}, {'ascend', 'descend'});
-            filenames = filenames(sortId);
-            tableIds = tableIds(sortId);
         end
 
+        % ======================================================================
+        %>@brief databaseUtility.Query returns a query result from the database.
+        %>
+        %> The table is recovered from
+        %> config::[ImportDir]\\[Database]\\[DataInfoTableName] file and sheet
+        %> 'capturedData'.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [filenames, tableIds, outRows] = databaseUtility.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
+        %> @endcode
+        %>
+        %> @param content [string or cell array] | The condition for Concent property
+        %> @param sampleId [string ] | The condition for SampleID property
+        %> @param captureDate [string] | The condition for CaptureDate property
+        %> @param id [string] | The condition for CaptureDate property
+        %> @param integrationTime [string] | The condition for IntegrationTime property
+        %> @param target [string] | The condition for Target property
+        %> @param configuration [string] | The condition for Configuration property
+        %>
+        %> @retval filenames [cell array] | The filenames of result hsi images
+        %> @retval tableIds [cell array] | The table IDs of result hsi images
+        %> @retval outRows [struct array] | The entire information rows of result hsi images
+        % ======================================================================
+        function [filenames, tableIds, outRows] = Query(varargin)
+            [filenames, tableIds, outRows] = QueryInternal(varargin{:});
+        end
+
+        % ======================================================================
+        %>@brief databaseUtility.GetTargetIndexes returns the target indexes based on content and target conditions.
+        %>
+        %> GetTargetIndexes returns target indexes and relevant rows from the databaseUtility in order to access specific types of samples.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes(content, target);
+        %>
+        %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes(); %all
+        %>
+        %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes([], 'fix');
+        %>
+        %> [targetIDs, outRows] = databaseUtility.GetTargetIndexes({'tissue', true}, 'raw');
+        %> @endcode
+        %>
+        %> @param content [string or cell array] | The condition for Concent property
+        %> @param target [string] | The condition for Target property
+        %>
+        %> @retval tableIds [cell array] | The table IDs of result hsi images
+        %> @retval outRows [struct array] | The entire information rows of result hsi images
+        % ======================================================================
         function [targetIDs, outRows] = GetTargetIndexes(content, target)
-            %GetTargetIndexes returns target indexes and relevant rows from the databaseUtility in
-            %order to access specific categories of *tissue* samples.
-            %
-            %   Usage:
-            %   [targetIDs, outRows] = GetTargetIndexes(); %all
-            %   [targetIDs, outRows] = GetTargetIndexes([], 'fix'); %fix
-            %   [targetIDs, outRows] = GetTargetIndexes({'tissue', true}, 'raw'); %raw
-
             if nargin < 1 || isempty(content)
                 content = {'tissue', true};
             end
@@ -143,84 +121,48 @@ classdef databaseUtility
 
         end
 
-        function [filename, tableId, outRow] = GetFilename(content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
-
-            %% GetFilename Gets the respective filename for configuration value
-            %   arguments are received in the order of
-            %     'content' [type of captured object]
-            %     'sampleId' [number value for sample id]
-            %     'captureDate' [captureDate for object]
-            %     'id' [number value for id ]
-            %     'integrationTime' [value of integration time]
-            %     'target' [details about captured object]
-            %     'configuration' [light source]
-            %
-            %   Usage:
-            %   [filename, tableId, outRow] = GetFilename(content, sampleId,
-            %   captureDate, id, integrationTime, target, configuration, specialTarget)
-
-            if nargin < 8
-                specialTarget = '';
-            end
-
-            if ~isempty(integrationTime)
-                initialIntegrationTime = integrationTime;
-            end
-
-            [~, ~, outRow] = databaseUtility.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
-            outRow = databaseUtility.CheckOutRow(outRow, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget);
-
-            filename = outRow.Filename{1};
-            tableId = outRow.ID;
-
-            if outRow.IntegrationTime ~= initialIntegrationTime
-                setSetting('integrationTime', integrationTime);
-            end
-
-            if nargin >= 3 && ~isempty(integrationTime) && integrationTime ~= outRow.IntegrationTime
-                warning('Integration time in the settings and in the retrieved file differs.');
-                %     setSetting('integrationTime', integrationTime);
-            end
-
-        end
-
-        function [outR] = CheckOutRow(inR, content, sampleId, captureDate, id, integrationTime, target, configuration, specialTarget)
-            outR = inR;
-            if isempty(inR.ID) && ~isempty(specialTarget)
-                if strcmp(specialTarget, 'black')
-                    configuration = 'noLight';
-                end
-                [~, ~, outR] = databaseUtility.Query(content, sampleId, captureDate, id, integrationTime, target, configuration);
-                if isempty(outR.ID) && strcmp(specialTarget, 'black')
-                    [~, ~, outR] = databaseUtility.Query('capOn', sampleId, '20210107', id, integrationTime, target, configuration);
-                end
-            end
-
-            if numel(outR.ID) > 1
-                warning('Taking the first from multiple rows that satisfy the conditions.');
-                outR = outR(1, :);
-            end
-        end
-
+        % ======================================================================
+        %>@brief databaseUtility.SelectDatabaseSamples returns indexes from the database table ignoring incorrect samples.
+        %>
+        %> It is used in @c function databaseUtility.Query
+        %>
+        %> YOU CAN UPDATE IT ACCORDING TO YOUR SPECIFICATIONS.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [setId] = databaseUtility.SelectDatabaseSamples(dataTable, setId);
+        %> @endcode
+        %>
+        %> @param dataTable [table] | The database table
+        %> @param setId [numeric array] | The currently selected indexes from the database table
+        %>
+        %> @retval setId [numeric array] | The currently selected indexes from the database table
+        % ======================================================================
         function [setId] = SelectDatabaseSamples(dataTable, setId)
-            %SelectDatabaseSamples from DataInfo table in order to ignore incorrect
-            %samples inside Query.m
-            %
-            %   Usage:
-            %   [setId] = SelectDatabaseSamples(dataTable, setId)
-            if strcmpi(config.GetSetting('database'), 'psl')
+            if strcmpi(config.GetSetting('Database'), 'psl')
                 setId = setId & ~contains(lower(dataTable.SampleID), 'b');
             end
         end
 
+        % ======================================================================
+        %>@brief databaseUtility.GetFileConditions returns file conditions according to the input arguments.
+        %>
+        %> To be used as input argments in databaseUtility.Query.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> fileConditions = databaseUtility.GetFileConditions(content, target, id);
+        %> @endcode
+        %>
+        %> @param content [string or cell array] | The condition for Concent property
+        %> @param target [string] | The condition for Target property
+        %> @param id [string] | The condition for ID property
+        %>
+        %> @retval fileConditions [cell array] | The file conditions
+        % ======================================================================
         function [fileConditions] = GetFileConditions(content, target, id)
-
-            %% GETFILECONDITIONS returns the conditions necessary for finding the
-            %%filename of the file to be read
-            %
-            %   Usage:
-            %   fileConditions = GetFileConditions(content, target)
-
             if nargin < 2
                 target = [];
             end
@@ -228,13 +170,73 @@ classdef databaseUtility
                 id = [];
             end
 
-            if config.GetSetting('isTest')
-                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
-                    config.GetSetting('integrationTime'), target, config.GetSetting('configuration')};
+            if config.GetSetting('IsTest')
+                fileConditions = {content, [], config.GetSetting('DataDate'), id, ...
+                    config.GetSetting('IntegrationTime'), target, config.GetSetting('Configuration')};
             else
-                fileConditions = {content, [], config.GetSetting('dataDate'), id, ...
-                    config.GetSetting('integrationTime'), target, []};
+                fileConditions = {content, [], config.GetSetting('DataDate'), id, ...
+                    config.GetSetting('IntegrationTime'), target, []};
             end
         end
+
+        % ======================================================================
+        %>@brief databaseUtility.GetDiagnosisTable gets the database table.
+        %>
+        %> The table is recovered from
+        %> config::[ImportDir]\\[Database]\\[DiagnosisInfoTableName] file and sheet
+        %> 'Sheet1'.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> dataTable = databaseUtility.GetDiagnosisTable();
+        %> @endcode
+        %>
+        % ======================================================================
+        function [dataTable] = GetDiagnosisTable()
+            filename = fullfile(config.GetSetting('ImportDir'), strcat(config.GetSetting('Database'), ...
+                config.GetSetting('DiagnosisInfoTableName')));
+            if exist(filename, 'file') > 0
+                dataTable = readtable(filename, 'Sheet', 'Sheet1');
+            else
+                fprintf('File %s does not exist. Proceeding without it.\n', filename);
+                dataTable = [];
+            end
+        end
+
+        % ======================================================================
+        %>@brief databaseUtility.GetDiagnosisQuery gets query result from the diagnosis table.
+        %>
+        %> @b Usage
+        %>
+        %> @code
+        %> [filenames, targetIDs, outRows, diagnosis, sampleType] = databaseUtility.GetDiagnosisQuery({'tissue', true});
+        %> @endcode
+        %>
+        %> @param condition [cell array] | The condition for the query
+        %>
+        %> @retval filenames [cell array] | The filenames of result hsi images
+        %> @retval tableIds [cell array] | The table IDs of result hsi images
+        %> @retval outRows [struct array] | The entire information rows of result hsi images
+        %> @retval diagnosis [cell array] | The diagnosis of result hsi images
+        %> @retval sampleType [cell array] | The sample type of result hsi images
+        % ======================================================================
+        function [filenames, targetIDs, outRows, diagnosis, sampleType] = GetDiagnosisQuery(condition)
+            [filenames, targetIDs, outRows] = databaseUtility.Query(condition);
+            dataTable = databaseUtility.GetDiagnosisTable();
+            diagnosis = cell(length(filenames), 1);
+            sampleType = cell(length(filenames), 1);
+            for i = 1:length(filenames)
+                idx = find(strcmp(dataTable.SampleID, outRows{i, 'SampleID'}));
+                if ~isempty(idx)
+                    diagnosis{i} = dataTable{idx, 'Diagnosis'};
+                    sampleType{i} = dataTable{idx, 'Type'};
+                else
+                    diagnosis{i} = nan;
+                    sampleType{i} = nan;
+                end
+            end
+        end
+
     end
 end

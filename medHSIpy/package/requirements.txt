@@ -1,3 +1,0 @@
-mat73
-scipy
-configparser 

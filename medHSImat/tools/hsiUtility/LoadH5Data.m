@@ -1,26 +1,45 @@
+%======================================================================
+%> @brief LoadH5Data loads the hyperspectral cube from an .h5 file.
+%>
+%> The .h5 data are assumed to be saved in config::[DataDir]\\*.h5
+%> After reading, the image is saved in config::[MatDir]\\[Database]\\*.mat.
+%>
+%> @ Usage
+%>
+%> @code
+%> [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename);
+%> @endcode
+%>
+%> @param filename [char] | The filename of the file to read
+%>
+%> @retval spectralData [numeric array] | The hyperspectral image
+%> @retval imageXYZ [numeric array] | The XYZ image
+%> @retval wavelengths [numeric array] | The spectral wavelengths
+%======================================================================
 function [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
-%LOADH5DATA loads info from h5 file
-%
-%   Usage:
-%   [spectralData, imageXYZ, wavelengths] = LoadH5Data(filename)
-%   returns spectralData, XYZ image and capture wavelengths
 
-database = config.GetSetting('database');
 filename = strrep(filename, '.hsm', '.h5');
-saveFilename = config.DirMake(config.GetSetting('matDir'), database, strcat(filename, '.mat'));
+saveFilename = commonUtility.GetFilename('h5', filename);
 
 if ~exist(saveFilename, 'file')
     currentFile = AdjustFilename(filename);
     %h5disp(currentFile);
     %h5info(currentFile);
 
-    spectralData = double(h5read(currentFile, '/SpectralImage'));
+    if exist(currentFile) > 0
+        spectralData = double(h5read(currentFile, '/SpectralImage'));
 
-    wavelengths = h5read(currentFile, '/Wavelengths');
-    imageX = h5read(currentFile, '/MeasurementImages/Tristimulus_X');
-    imageY = h5read(currentFile, '/MeasurementImages/Tristimulus_Y');
-    imageZ = h5read(currentFile, '/MeasurementImages/Tristimulus_Z');
-    imageXYZ = cat(3, imageX, imageY, imageZ);
+        wavelengths = h5read(currentFile, '/Wavelengths');
+        imageX = h5read(currentFile, '/MeasurementImages/Tristimulus_X');
+        imageY = h5read(currentFile, '/MeasurementImages/Tristimulus_Y');
+        imageZ = h5read(currentFile, '/MeasurementImages/Tristimulus_Z');
+        imageXYZ = cat(3, imageX, imageY, imageZ);
+    else
+        spectralData = [];
+        imageXYZ = [];
+        wavelengths = [];
+        fprintf('File does not exist.\nDirectory %s\n', currentFile);
+    end
 
     save(saveFilename, 'spectralData', 'imageXYZ', 'wavelengths', '-v7.3');
 else
@@ -29,8 +48,15 @@ end
 
 end
 
+%======================================================================
+%> @brief AdjustFilename adjusts the filename if a different naming convention is used.
+%>
+%> @param filename [char] | The filename of the file to read
+%>
+%> @retval currentFile [char] | The adjusted filename
+%======================================================================
 function currentFile = AdjustFilename(filename)
-inDir = config.GetSetting('dataDir');
+inDir = fullfile(config.GetSetting('DataDir'), config.GetSetting('DataFolderName'));
 
 % filenameParts = strsplit(filename, '_');
 % dataDate = filenameParts{1};

@@ -1,9 +1,26 @@
+% ======================================================================
+%> @brief GetDisplayImageInternal returns an RGB image from the hyperspectral data.
+%>
+%> Parameters are saved in medHSI\\parameters\\[ParametersFileName]
+%>
+%> @b Usage
+%>
+%> @code
+%> dispImage =  GetDisplayImageInternal(hsIm, superixelNumber);
+%>
+%> dispImage =  GetDisplayImageInternal(hsIm, 'rgb');
+%>
+%> dispImage =  GetDisplayImageInternal(hsIm, 'channel', 200);
+%> @endcode
+%>
+%> @param obj [hsi] | An instance of the hsi class
+%> @param method [string] | The method for display image creation
+%> ('rgb' or 'channel')
+%> @param channelNumber [int] | The target channel number
+%>
+%> @retval dispImage [numeric array] | The display image
+% ======================================================================
 function dispImage = GetDisplayImageInternal(hsIm, method, channel)
-%GetDisplayImage returns the display image from an HSI image
-%
-%   Usage:
-%   dispImage = GetDisplayImage(hsIm, 'rgb')
-%   dispImage = GetDisplayImage(hsIm, 'channel', 200)
 
 if nargin < 2
     method = 'rgb';
@@ -64,7 +81,7 @@ end
 end
 
 function [xyz, illumination] = PrepareParams(z)
-filename = fullfile(config.GetRunBaseDir(), config.GetSetting('paramDir'), 'displayParam.mat');
+filename = commonUtility.GetFilename('Param', config.GetSetting('ParametersFileName'));
 if ~exist(filename, 'file')
     lambdaIn = hsiUtility.GetWavelengths(z, 'raw');
     [lambdaMatch, xFcn, yFcn, zFcn] = colorMatchFcn('1964_FULL');
