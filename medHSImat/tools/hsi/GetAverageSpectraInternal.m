@@ -19,24 +19,7 @@
 %> submask.
 % ======================================================================
 function spectrumCurves = GetAverageSpectraInternal(hsi, subMasks)
-% GetAverageSpectraInternal returns average spectra for different masks.
-%
-% The target masks are set in an 3D array where the last dimension is the mask counter.
-% If the mask is missing, then the average of the entire image is
-% calculated.
-%
-% @b Usage
-%
-% @code
-% averages = GetAverageSpectraInternal(spectralData, subMasks);
-% @endcode
-%
-% @param obj [hsi] | An instance of the hsi class
-% @param subMasks [numeric array] | Optional: Array of submasks
-%
-% @retval averages [numeric array] | A stack of average spectra
-% for each mask. Each row is the average corresponding to a
-% submask.
+
 hasMasks = nargin > 1;
 
 [~, ~, w] = size(hsi);

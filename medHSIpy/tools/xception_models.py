@@ -999,7 +999,7 @@ def get_xception_model(framework, x_train_raw, ytrain, x_test_raw, ytest, height
         # learning_rate = 0.0000005 #0.0000001
 
     elif 'xception3d_10n' in framework:
-        model = get_xception3d_20('max', width, height, numChannels, numClasses)
+        model = get_xception3d_10('max', width, height, numChannels, numClasses)
         batchSize = 16
         learning_rate = 0.000001 #0.0000001
 

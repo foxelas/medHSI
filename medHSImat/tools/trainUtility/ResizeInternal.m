@@ -27,32 +27,6 @@
 %> @param splitToPatches [logical] | Optional: Flag to enable split to patches. Default: config:[SplitToPatches].
 % ======================================================================
 function ResizeInternal(baseDataset, targetDataset, hasResizeOptions, imageDimension, splitToPatches)
-% ResizeInternal applies resizing on the dataset.
-%
-% The base dataset should be already saved with @c hsiUtility.PrepareDataset before running ResizeInternal.
-%
-% If all arguments are not provided, they are fetched from the config file.
-% Target settings are: config::[HasResizeOptions], config::[ImageDimension] and config::[SplitToPatches].
-%
-% When splitting in patches all black patches are ignored.
-%
-% @b Usage
-%
-% @code
-% baseDataset = 'pslData';
-% hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
-% config.SetSetting('HasResizeOptions', true);
-% config.SetSetting('ImageDimension', 512);
-% config.SetSetting('SplitToPatches', false);
-% resizedDataset = 'psl512';
-% ResizeInternal(baseDataset, resizedDataset);
-% @endcode
-%
-% @param baseDataset [char] | The base dataset
-% @param targetDataset [char] | The target dataset
-% @param hasResizeOptions [logical] | Optional: Flag to enable resizing. Default: config:[HasResizeOptions].
-% @param imageDimension [int] | Optional: The target image size. Default: config:[ImageDimension].
-% @param splitToPatches [logical] | Optional: Flag to enable split to patches. Default: config:[SplitToPatches].
 
 if nargin > 2
     config.SetSetting('HasResizeOptions', hasResizeOptions);

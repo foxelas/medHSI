@@ -30,11 +30,11 @@ def not_supported(varname):
 ######################### Config #########################
 import configparser
 
-dirSep = '\\'
+dirSep = "\\"
 
 def get_base_dir():
     cwd = os.getcwd()
-    parts = cwd.split("\\")
+    parts = cwd.split(dirSep)
     parts = parts[0: parts.index('medHSI')+1]
     parts.insert(1, os.sep)
     base_dir = os.path.join(*parts)

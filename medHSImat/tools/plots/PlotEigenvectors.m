@@ -5,6 +5,8 @@
 %>
 %> @code
 %> Eigenvectors(coeff, xValues, pcNum, [], fig);
+%>
+%> PlotEigenvectors(eigenvec, xValues, pcNum, figTitle, fig);
 %> @endcode
 %>
 %> @param eigenvec [numeric array] | The eigenvectors
@@ -14,19 +16,6 @@
 %> @param fig [int] | The figure handle
 %======================================================================
 function [] = PlotEigenvectors(eigenvec, xValues, pcNum, figTitle, fig)
-% PlotEigenvectors plots the eigenvectors of a decomposition.
-%
-% @b Usage
-%
-% @code
-% Eigenvectors(coeff, xValues, pcNum, [], fig);
-% @endcode
-%
-% @param eigenvec [numeric array] | The eigenvectors
-% @param xValues [numeric vector] | The x-axis values
-% @param pcNum [int] | Optional: The number of components. Default: 3.
-% @param figTitle [char] | The figure title
-% @param fig [int] | The figure handle
 
 if nargin < 3
     pcNum = 3;

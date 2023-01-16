@@ -12,17 +12,19 @@
 %>
 % ======================================================================
 function [] = SetOpt()
-% SetOpt sets parameters for running from config.ini
-%
-% The values are recovered from MedHSIMat\\conf\\config.ini.
-% Values are saved in an .ini format.
-%
-% @b Usage
-%
-% @code
-% SetOpt();
-% @endcode
-%
+% ======================================================================
+%> @brief SetOpt sets parameters for running from config.ini
+%>
+%> The values are recovered from MedHSIMat\\conf\\config.ini.
+%> Values are saved in an .ini format.
+%>
+%> @b Usage
+%>
+%> @code
+%> SetOpt();
+%> @endcode
+%>
+% ======================================================================
 
 disp('Reading configuration file [config.ini] ...');
 inputSettingsFile = fullfile(config.GetConfDir(), 'config.ini');
@@ -66,7 +68,6 @@ end
 fprintf('Data directory is set to %s.\n', DataDir);
 fprintf('Import directory is set to %s.\n', ImportDir);
 fprintf('Output directory is set to %s.\n', OutputDir);
-fprintf('Parameter directory is set to %s.\n', ParamDir);
 fprintf('Matfile directory is set to %s.\n', MatDir);
 
 clear parts row varName rawValue varValue i tmp;

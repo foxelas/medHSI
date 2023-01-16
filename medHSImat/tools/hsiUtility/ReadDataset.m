@@ -6,7 +6,7 @@
 %> montage previews of the results. It also prepares labels, when
 %> available.
 %>
-%>  Data samples are saved in .mat files so that one contains a
+%> Data samples are saved in .mat files so that one contains a
 %> 'spectralData' (class hsi) and another contains a 'labelInfo' (class
 %> hsiInfo) variable.
 %> The save location is config::[Matdir]\\[Dataset]\\*.mat.
@@ -32,37 +32,6 @@
 %> @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none.
 %======================================================================
 function [] = ReadDataset(dataset, contentConditions, readForeground, targetConditions)
-% ReadDataset reads the dataset.
-%
-% ReadDataset reads a group of hsi data according to condition, prepares
-% .mat files for the raw spectral data, applies preprocessing and returns
-% montage previews of the results. It also prepares labels, when
-% available.
-%
-%  Data samples are saved in .mat files so that one contains a
-% 'spectralData' (class hsi) and another contains a 'labelInfo' (class
-% hsiInfo) variable.
-% The save location is config::[Matdir]\\[Dataset]\\*.mat.
-% Snapshot images are saved in config::[OutputDir]\\[SnapshotsFolderName]\\[Dataset]\\.
-%
-% If it fails during writing in config.mat, consider running MATLAB as administrator.
-% Alternatively, in Windows 10 go to Settings > Update & Security > Windows Security >
-% Virus and Threat protection > Manage Ransomware Protection > Allow an app through controlled folder access > Add Matlab.
-%
-% @b Usage
-%
-% @code
-% ReadDataset('handsDataset',{'hand', false});
-%
-% ReadDataset('pslData', {'tissue', true});
-%
-% ReadDataset('pslData', {'tissue', true}, true, {'raw', false});
-% @endcode
-%
-% @param dataset [char] | The dataset
-% @param contentConditions [cell array] | The content conditions for reading files
-% @param readForeground [boolean] | Optional: Flag to read the foreground mask for an hsi instance. Default: true.
-% @param targetConditions [cell array] | Optional: The target conditions for reading files. Default: none.
 
 if nargin < 3
     readForeground = true;
@@ -77,6 +46,7 @@ experiment = dataset;
 config.SetSetting('Experiment', experiment);
 config.SetSetting('CropBorders', true);
 isTest = config.GetSetting('IsTest');
+config.SetSetting('DisableNormalizationCheck', true);
 
 basedir = commonUtility.GetFilename('output', config.GetSetting('SnapshotsFolderName'), '');
 
@@ -139,11 +109,6 @@ for i = 1:length(targetIDs)
         save(filename, 'spectralData', '-v7.3');
 
         %% Read Label
-        % TO REMOVE
-        labeldir = fullfile(config.GetSetting('DataDir'), config.GetSetting('LabelsFolderName'), spectralData.TissueType, strcat(spectralData.ID, '.png'));
-        if ~exist(labeldir)
-            Basics_GetLabelFromLabelMe(spectralData);
-        end
         labelInfo = hsiInfo.ReadHsiInfoFromHsi(spectralData);
 
         %% Save data info in a file
@@ -160,7 +125,8 @@ for i = 1:length(targetIDs)
         plots.Show(1, dispImageRawPath, dispImageRaw);
 
         dispImageRgbPath = config.DirMake(basedir, 'preprocessed', saveName);
-        plots.Show(2, dispImageRgbPath, dispImageRgb);
+        % To preserve dimensions
+        plots.Export(2, dispImageRgbPath, dispImageRgb);
 
         subImagePath = config.DirMake(basedir, 'preprocessed_channels', saveName);
         spectralData.SubimageMontage(3, subImagePath);

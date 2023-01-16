@@ -109,15 +109,12 @@ def compile_and_save_structure(framework, model, optimizer, learning_rate, targe
 
 def compile_custom(framework, model, optimizerName = "Adam", learning_rate = 0.0001, decay=1e-06, lossFunction = "BCE+JC"):
     if optimizerName == "Adam":
-        print('mpike1')
         if decay == 0:
             optimizer = Adam(learning_rate=learning_rate, decay = decay)
         else:
             optimizer = Adam(learning_rate=learning_rate)
     elif optimizerName == "RMSProp":
-        print('mpike2')
         if decay == 0:
-            print('mpike 3')
             optimizer = RMSprop(learning_rate=learning_rate, decay=decay) 
         else:
             optimizer = RMSprop(learning_rate=learning_rate)
@@ -304,6 +301,7 @@ def save_evaluate_model(model, history, framework, folder, x_test, y_test):
     mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history, "trainEval": trainEval, "testEval": testEval}
     savemat(filename, mdic)
 
+    print("Saved 0_performance.mat file.")
     return fpr_, tpr_, auc_val_
 
 

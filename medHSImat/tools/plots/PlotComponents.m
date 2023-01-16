@@ -5,6 +5,8 @@
 %>
 %> @code
 %> plots.Components(fig, hsIm, pcNum, 1, '\temp\folder\img');
+%>
+%> PlotComponents(hsIm, pcNum, 1, '\temp\folder\img');
 %> @endcode
 %>
 %> @param hsIm [hsi] | An instance of the hsi class
@@ -13,18 +15,6 @@
 %> @param plotBasePath [char] | The base path for saving plot figures
 %======================================================================
 function [] = PlotComponents(hsIm, pcNum, figStart, plotBasePath)
-% PlotComponents plots the components of a hyperspectral image.
-%
-% @b Usage
-%
-% @code
-% plots.Components(fig, hsIm, pcNum, 1, '\temp\folder\img');
-% @endcode
-%
-% @param hsIm [hsi] | An instance of the hsi class
-% @param pcNum [int] | The number of components
-% @param fig [int] | The figure handle
-% @param plotBasePath [char] | The base path for saving plot figures
 
 if isempty(figStart)
     figStart = 1;

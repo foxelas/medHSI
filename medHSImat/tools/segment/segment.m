@@ -1,51 +1,13 @@
 % ======================================================================
 %> @brief segment is a class that handles segmentation of hyperspectral data.
-%>
+%
+% For details check https://foxelas.github.io/medHSIdocs/classsegment.html
 % ======================================================================
 classdef segment
     methods (Static)
 
         % ======================================================================
-        %> @brief Apply implements segmentation according to options.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> segopt = segopt.GetOptions('Leon2020');
-        %> labels = segment.Apply(hsIm, segopt);
-        %> @endcode
-        %>
-        %> @param hsIm [hsi] | An instance of the hsi class
-        %> @param segopt [struct] | The segmentation options
-        %>
-        %> @retval labels [numeric array] | The segmented labels
-        % ======================================================================
-        function [labels] = ApplyOld(hsIm, segopt)
-            % Apply implements segmentation according to options.
-            %
-            % @b Usage
-            %
-            % @code
-            % segopt = segopt.GetOptions('Leon2020');
-            % labels = segment.Apply(hsIm, segopt);
-            % @endcode
-            %
-            % @param hsIm [hsi] | An instance of the hsi class
-            % @param segopt [struct] | The segmentation options
-            %
-            % @retval labels [numeric array] | The segmented labels
-            config.SetSetting('FileName', hsIm.ID);
-
-            labels = mainSegFun(hsiIm, segopt);
-
-            if segopt.HasPostProcessing
-                postProcFun = segopt.PostProcessingScheme;
-                labels = postProcFun(labels);
-            end
-        end
-
-        % ======================================================================
-        %> @brief MorphologicalOps applies morpholigical operators on the
+        %> @brief segment.segment.MorphologicalOps applies morphological operators on the
         %> segmented labels.
         %>
         %> This function closes holes in the segmented mask.
@@ -53,184 +15,131 @@ classdef segment
         %> @b Usage
         %>
         %> @code
-        %> outLabels = segment.MorphologicalOps(inLabels);
+        %> postMaskPredict = segment.MorphologicalOps(maskPredict);
         %> @endcode
         %>
-        %> @param inLabels [numeric array] | The input labels
+        %> @param maskPredict [numeric array] | The input labels
         %>
-        %> @retval outLabels [numeric array] | The output labels
-        %>
+        %> @retval postMaskPredict [numeric array] | The output labels
         % ======================================================================
-        function [outLabels] = MorphologicalOps(inLabels)
-            % MorphologicalOps applies morpholigical operators on the
-            % segmented labels.
-            %
-            % This function closes holes in the segmented mask.
-            %
-            % @b Usage
-            %
-            % @code
-            % outLabels = segment.MorphologicalOps(inLabels);
-            % @endcode
-            %
-            % @param inLabels [numeric array] | The input labels
-            %
-            % @retval outLabels [numeric array] | The output labels
-            %
-            BW = imbinarize(inLabels);
+        function [postMaskPredict] = MorphologicalOps(maskPredict)
+            BW = imbinarize(maskPredict);
             BW2 = imfill(BW, 'holes');
             se = strel('disk', 5);
-            outLabels = imclose(BW2, se);
+            postMaskPredict = imclose(BW2, se);
         end
 
         % ======================================================================
-        %> @brief BySAM applies SAM-based clustering.
+        %> @brief segment.segment.Apply segments an hsi cube according to a method.
         %>
-        %> The method is applied on each image in the dataset. The results are saved in the output folder.
+        %> For more information refer to @c SegmentLeon, @c SegmentSAM, @c SegmentKmeans and @c SegmentHypercubeToolbox.
         %>
         %> @b Usage
         %>
         %> @code
-        %> segment.BySAM();
-        %> @endcode
-        % ======================================================================
-        function BySAM()
-            % BySAM applies SAM-based clustering.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % segment.BySAM();
-            % @endcode
-
-            experiment = strcat('segmentation-BCC&MCC');
-            Basics_Init(experiment);
-
-            apply.ToEach(@SAMAnalysis);
-            plots.GetMontagetCollection(1, 'predLabel');
-        end
-        
-        function BySAM2()
-            % BySAM2 applies SAM-based clustering.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % segment.BySAM2();
-            % @endcode
-
-            experiment = strcat('SAM segmentation-Healthy');
-            Basics_Init(experiment);
-
-            threshold = 13;
-            apply.ToEach(@SAMAnalysis, 'healthy', threshold);
-            plots.GetMontagetCollection(1, 'predLabel');
-        end
-
-        % ======================================================================
-        %> @brief ByKmeans applies Kmeans-based clustering.
+        %> prediction = segment.Apply(hsiIm, 'Leon');
         %>
-        %> The method is applied on each image in the dataset. The results are saved in the output folder.
+        %> prediction = segment.Apply(hsiIm, 'SAM', 'healthy', 13);
+        %> @endcode
+        %>
+        %> @param hsIm [hsi] | An instance of the hsi class
+        %> @param method [char] | The segmentation method. Optional: ['Leon', 'SAM', 'Kmeans', 'HypercubeToolbox'].
+        %> @param varargin [cell array] | The arguments necessary for the target method
+        %>
+        %> @retval prediction [numeric array] | The predicted labels
+        % ======================================================================
+        function [prediction] = Apply(hsiIm, method, varargin)
+            switch method
+                case lower('Leon')
+                    %Leon, R., Martinez-Vega, B., Fabelo, H., Ortega, S., Melian, V., Castaño, I., Carretero, G., Almeida, P., Garcia, A., Quevedo, E., Hernandez, J. A., Clavo, B., & M. Callico, G. (2020). Non-Invasive Skin Cancer Diagnosis Using Hyperspectral Imaging for In-Situ Clinical Support. Journal of Clinical Medicine, 9(6), 1662. https://doi.org/10.3390/jcm9061662
+                    prediction = SegmentLeon(hsiIm);
+
+                case lower('SAM')
+                    [prediction, ~, ~] = SegmentSAM(hsiIm, varargin{:});
+
+                case lower('Kmeans')
+                    [prediction, ~] = SegmentKmeans(hsiIm, varargin{:});
+
+                case lower('HypercubeToolbox')
+                    prediction = SegmentHypercubeToolbox(hsiIm, varargin{:});
+
+                otherwise
+                    error('Incorrect method');
+            end
+        end
+
+        % ======================================================================
+        %> @brief segment.segment.ApplyAndShow segments an hsi cube according to a method and shows figures with the results.
+        %>
+        %> If a label hsiInfo exists, then comparison with labels is performed.
+        %>
+        %> For more information refer to @c segment.Apply.
         %>
         %> @b Usage
         %>
         %> @code
-        %> segment.ByKmeans();
+        %> segment.ApplyAndShow('Leon');
         %> @endcode
+        %>
+        %> @param method [char] | The segmentation method. Optional: ['Leon', 'SAM-library', 'SAM-healthy', 'Kmeans', 'HypercubeToolbox'].
+        %> @param varargin [cell array] | The arguments necessary for the target method
         % ======================================================================
-        function ByKmeans()
-            % ByKmeans applies Kmeans-based clustering.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % segment.ByKmeans();
-            % @endcode
-            experiment = 'Kmeans';
-            Basics_Init(experiment);
+        function [] = ApplyAndShow(method, varargin)
+            switch lower(method)
+                case lower('Leon')
+                    experiment = 'ByLeon';
+                    initUtility.InitExperiment(experiment);
 
-            apply.ToEach(@CustomKmeans, 5);
-            plots.GetMontagetCollection(1, 'kmeans-clustering');
-            plots.GetMontagetCollection(2, 'kmeans-centroids');
+                    apply.ToEach(@LeonAndShow);
+                    plots.GetMontagetCollection(1, 'clusters');
+                    plots.GetMontagetCollection(2, 'leon');
+
+                case lower('SAM-library')
+                    experiment = 'SAM-BCC&MCC';
+                    initUtility.InitExperiment(experiment);
+
+                    apply.ToEach(@SAMAndShow);
+                    plots.GetMontagetCollection(1, 'predLabel');
+
+                case lower('SAM-healthy')
+                    experiment = 'SAM-Healthy';
+                    initUtility.InitExperiment(experiment);
+
+                    threshold = 13;
+                    apply.ToEach(@SAMAndShow, 'healthy', threshold);
+                    plots.GetMontagetCollection(1, 'predLabel');
+
+                case lower('Kmeans')
+                    experiment = 'Kmeans';
+                    initUtility.InitExperiment(experiment);
+
+                    apply.ToEach(@KmeansAndShow, 5);
+                    plots.GetMontagetCollection(1, 'kmeans-clustering');
+                    plots.GetMontagetCollection(2, 'kmeans-centroids');
+
+                case lower('HypercubeToolbox')
+                    if isempty(varargin)
+                        reductionMethod = 'MNF';
+                        referenceMethod = 'Nfindr';
+                        similarityMethod = 'SID';
+                    else
+                        reductionMethod = varargin{1};
+                        referenceMethod = varargin{2};
+                        similarityMethod = varargin{3};
+                    end
+
+                    experiment = strcat('HStoolbox', '-', reductionMethod, '-', referenceMethod, '-', similarityMethod);
+                    initUtility.InitExperiment(experiment);
+
+                    apply.ToEach(@HypercubeToolboxAndShow, reductionMethod, referenceMethod, similarityMethod);
+                    plots.GetMontagetCollection(1, 'endmembers');
+                    plots.GetMontagetCollection(2, 'clustering');
+
+                otherwise
+                    error('Incorrect method');
+            end
         end
 
-        % ======================================================================
-        %> @brief ByHyperspectralToolbox applies Endmember-based clustering.
-        %>
-        %> The method is applied on each image in the dataset. The results are saved in the output folder.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> segment.ByHyperspectralToolbox();
-        %> @endcode
-        % ======================================================================
-        function ByHyperspectralToolbox()
-            % ByHyperspectralToolbox applies Endmember-based clustering.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % segment.ByHyperspectralToolbox();
-            % @endcode
-
-            reductionMethod = 'MNF';
-            experiment = strcat('HStoolbox', '-', reductionMethod, '-8');
-            Basics_Init(experiment);
-            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, 'nfindr');
-
-            reductionMethod = 'PCA';
-            experiment = strcat('HStoolbox', '-', reductionMethod, '-8');
-            Basics_Init(experiment);
-            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, 'nfindr');
-
-            reductionMethod = 'MNF';
-            referenceMethod = 'ppi';
-            experiment = strcat('HStoolbox', '-', reductionMethod, '-', referenceMethod, '-8');
-            Basics_Init(experiment);
-            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, referenceMethod);
-
-            reductionMethod = 'MNF';
-            referenceMethod = 'fippi';
-            experiment = strcat('HStoolbox', '-', reductionMethod, '-', referenceMethod, '-8');
-            Basics_Init(experiment);
-            apply.ToEach(@HypercubeToolboxAnalysis, reductionMethod, referenceMethod);
-        end
-
-        % ======================================================================
-        %> @brief ByCustomDistances applies Distance-based clustering.
-        %>
-        %> The method is applied on each image in the dataset. The results are saved in the output folder.
-        %>
-        %> @b Usage
-        %>
-        %> @code
-        %> segment.ByCustomDistances();
-        %> @endcode
-        % ======================================================================
-        function ByCustomDistances()
-            % ByCustomDistances applies Distance-based clustering.
-            %
-            % The method is applied on each image in the dataset. The results are saved in the output folder.
-            %
-            % @b Usage
-            %
-            % @code
-            % segment.ByCustomDistances();
-            % @endcode
-            reductionMethod = 'MNF';
-            experiment = strcat('CustomDistances', '-', reductionMethod, '-8');
-            Basics_Init(experiment);
-            apply.ToEach(@CustomDistancesSegmentation, reductionMethod, 'nfindr');
-        end
     end
 
 end

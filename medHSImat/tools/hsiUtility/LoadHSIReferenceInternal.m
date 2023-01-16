@@ -14,33 +14,12 @@
 %> @endcode
 %>
 %> @param targetId [char] | The unique ID of the target sample
-%> @param refType [char] | The reference type, either 'white' or
-%> 'black'
+%> @param refType [char] | The reference type, either 'white' or 'black'
 %>
-%> @retval spectralData [numeric array] | A 3D array of the
-%> hyperspectral image reference
+%> @retval spectralData [numeric array] | A 3D array of the hyperspectral image reference
 %======================================================================
 function [spectralData] = LoadHSIReferenceInternal(targetName, refType)
-% LoadHSIReferenceInternal reads the reference hyperspectral image (white or black).
-%
-% It is valid for hyperspectral data already saved as .mat files
-% in config::[Matdir]\[TripletsName]\*_white.mat or *_black.mat.
-% The returned reference image is a 3D array, not an hsi instance.
-%
-% @b Usage
-%
-% @code
-% [spectralData] = LoadHSIReferenceInternal('150', 'white');
-%
-% [spectralData] = LoadHSIReferenceInternal('150', 'black');
-% @endcode
-%
-% @param targetId [char] | The unique ID of the target sample
-% @param refType [char] | The reference type, either 'white' or
-% 'black'
-%
-% @retval spectralData [numeric array] | A 3D array of the
-% hyperspectral image reference
+
 
 if isnumeric(targetName)
     targetName = num2str(targetName);

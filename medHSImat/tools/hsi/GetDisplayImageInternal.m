@@ -1,7 +1,7 @@
 % ======================================================================
 %> @brief GetDisplayImageInternal returns an RGB image from the hyperspectral data.
 %>
-%> Parameters are saved in config::[ParamDir]\\[ParametersFileName]
+%> Parameters are saved in medHSI\\parameters\\[ParametersFileName]
 %>
 %> @b Usage
 %>
@@ -21,26 +21,6 @@
 %> @retval dispImage [numeric array] | The display image
 % ======================================================================
 function dispImage = GetDisplayImageInternal(hsIm, method, channel)
-% GetDisplayImageInternal returns an RGB image from the hyperspectral data.
-%
-% Parameters are saved in config::[ParamDir]\\[ParametersFileName]
-%
-% @b Usage
-%
-% @code
-% dispImage =  GetDisplayImageInternal(hsIm, superixelNumber);
-%
-% dispImage =  GetDisplayImageInternal(hsIm, 'rgb');
-%
-% dispImage =  GetDisplayImageInternal(hsIm, 'channel', 200);
-% @endcode
-%
-% @param obj [hsi] | An instance of the hsi class
-% @param method [string] | The method for display image creation
-% ('rgb' or 'channel')
-% @param channelNumber [int] | The target channel number
-%
-% @retval dispImage [numeric array] | The display image
 
 if nargin < 2
     method = 'rgb';

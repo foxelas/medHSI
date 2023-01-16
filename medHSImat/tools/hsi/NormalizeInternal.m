@@ -18,23 +18,6 @@
 %> @return instance of the hsi class
 % ======================================================================
 function hsInorm = NormalizeInternal(hsIm, Iwhite, Iblack, method)
-% NormalizeInternal a given hyperspectral image.
-%
-% The setting config::[Normalization] needs to be set beforehand.
-%
-% @b Usage
-%
-% @code
-% config.SetSetting('Normalization', 'byPixel');
-% [newI, idxs] = NormalizeInternal(I, Iwhite, Iblack, method);
-% @endcode
-%
-% @param obj [hsi] | An instance of the hsi class
-% @param white [numeric array] | The white reference image
-% @param black [numeric array] | The black reference image
-% @param method [string] | Optional: The normalization method ('scaling' or 'raw'). Default: 'scaling'
-%
-% @return instance of the hsi class
 
 if nargin < 4
     method = 'scaling';
@@ -80,7 +63,8 @@ hsInorm = hsIm;
 hsInorm.Value = Inorm;
 
 if ~config.GetSetting('DisableNormalizationCheck')
-    plots.NormalizationCheck(1, hsIm, Iblack, Iwhite, hsInorm);
+    plotPath = commonUtility.GetFilename('output', fullfile(config.GetSetting('NormCheckFolderName'), strcat(hsIm.ID, '_curves')), 'png');
+    plots.NormalizationCheck(1, plotPath, hsIm, Iblack, Iwhite, hsInorm);
 end
 
 hsInorm = hsInorm.Max(0);

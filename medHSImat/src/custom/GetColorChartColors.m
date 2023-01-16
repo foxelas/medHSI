@@ -15,20 +15,6 @@
 %> @retval c [array] | Colour triplets accoring to the colorchart color patch order
 % ======================================================================
 function [c] = GetColorChartColors(colorNames)
-% GetColorChartColors returns the colors of the colorchart.
-%
-% Returns double RGB color tripels that describe the colors in the order of BABEL Colors colorimetric data.
-% color triplets that can be used e.g for plotting color spectra for the different color patches.
-%
-% @b Usage
-%
-% @code
-% c = GetColorChartColors();
-% @endcode
-%
-% @param colorNames [string array] | Optional: list of color names required
-%
-% @retval c [array] | Colour triplets accoring to the colorchart color patch order
 
 if nargin < 1
     colorNames = {'dark skin'; 'light skin'; 'blue sky'; 'foliage'; 'blue flower'; 'bluish green'; 'orange'; ...

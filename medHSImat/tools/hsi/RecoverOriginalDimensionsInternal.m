@@ -19,24 +19,7 @@
 %> @retval obj [hsi] | The reconstructed hsi instance
 %======================================================================
 function [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask)
-% RecoverOriginalDimensionsInternal recovers the original spatial dimension
-% from masked pixels.
-%
-% Data with original spatial dimensions and reduced spectral dimensions
-%
-% @b Usage
-%
-% @code
-% [recHsi] = RecoverOriginalDimensionsInternal(redIm, origSize, mask);
-%
-% [recHsi] = RecoverOriginalDimensionsInternal(scores, imgSizes, masks);
-% @endcode
-%
-% @param obj [hsi] | An hsi instance
-% @param origSize [cell array] | Original sizes of input data (array or cell of arrays)
-% @param mask [cell array] | Optional: Masks per data sample (array or cell of arrays)
-%
-% @retval obj [hsi] | The reconstructed hsi instance
+
 if iscell(origSize)
     imgSizes = origSize;
     scores = redIm;

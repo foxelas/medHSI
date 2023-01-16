@@ -22,30 +22,10 @@
 %>
 % ======================================================================
 function [] = AugmentInternal(baseDataset, targetDataset, augType)
-% AugmentInternal applies augmentation on the dataset
-%
-% The base dataset should be already saved before running augmentation.
-%
-% 'set1': applies vertical and horizontal flipping.
-% 'set2': applies random rotation.
-%
-% @b Usage
-%
-% @code
-% baseDataset = 'pslData';
-% hsiUtility.PrepareDataset(baseDataset, {'tissue', true});
-% augType = 'set1';
-% targetDataset = 'pslDataAug';
-% AugmentInternal(baseDataset, targetDataset, augType);
-% @endcode
-%
-% @param baseDataset [char] | The base dataset
-% @param targetDataset [char] | The augmented dataset
-% @param augType [char] | Optional: The augmentation type ('set1' or 'set2'). Default: 'set1'
-%
-if nargin < 2 
+
+if nargin < 2
     targetDataset = strcat(baseDataset, 'Augmented');
-end 
+end
 
 if nargin < 3
     augType = 'set1';

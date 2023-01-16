@@ -10,6 +10,8 @@
 %>       'TargetName', strcat(target, '.png'), ...
 %>       'TargetType', 'fix');
 %> plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
+%>
+%> PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig);
 %> @endcode
 %>
 %> @param fig [int] | The figure handle
@@ -20,25 +22,6 @@
 %> @param imageLimit [int] | The maximum number of subimages to be montaged
 %======================================================================
 function [] = PlotMontageFolderContents(path, criteria, figTitle, standardDim, imageLimit, fig)
-% PlotMontageFolderContents plots contents of a folder as a montage.
-%
-% Need to set config::[SaveFolder] for image output.
-%
-% @b Usage
-%
-% @code
-%   criteria = struct('TargetDir', 'subfolders', ...
-%       'TargetName', strcat(target, '.png'), ...
-%       'TargetType', 'fix');
-% plots.MontageFolderContents(1, [], criteria, [500, 500], 20);
-% @endcode
-%
-% @param fig [int] | The figure handle
-% @param path [char] | The path to image folder
-% @param criteria [struct] | The montage options
-% @param figTitle [char] | The figure title
-% @param standardDim [int vector] | The dimensions for subimage resizing
-% @param imageLimit [int] | The maximum number of subimages to be montaged
 
 if isempty(path)
     path = commonUtility.GetFilename('output', config.GetSetting('SaveFolder'), '');
