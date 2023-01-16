@@ -16,7 +16,7 @@ def load_data(name = None, fold = None):
         name = 'full'
 
     conf = hsi_utils.parse_config()
-    outputDir = conf['Directories']['OutputDir']
+    outputDir = "/home/nfs/ealoupogianni/mspi/output/"
     datasetName = conf['Data Settings']['Dataset']
     #datasetName = 'pslRaw-Denoisesmoothen32Augmented'
     fileName = 'hsi_'+ datasetName + '_' + name +'.h5'

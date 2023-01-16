@@ -31,7 +31,7 @@ def get_model_filename(suffix='', extension='txt', folder = None):
     #     today = date.today()
     #     model_name = str(today) + '_'
     
-    savedir = join(hsi_utils.conf['Directories']['OutputDir'],
+    savedir = join("/home/nfs/ealoupogianni/mspi/output/",
         hsi_utils.conf['Data Settings']['Dataset'], hsi_utils.conf['Folder Names']['PythonTestFolderName'])
     if folder is not None:
         savedir = join(savedir, folder)
@@ -298,7 +298,8 @@ def save_evaluate_model(model, history, framework, folder, x_test, y_test):
     save_text(testEval, 'results_test', folder)
     
     filename = get_model_filename('0_performance', 'mat', folder)
-    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history, "trainEval": trainEval, "testEval": testEval}
+    
+    mdic = {"fpr_": fpr_, "tpr_": tpr_, "auc_val_": auc_val_, "history": history.history, "trainEval": trainEval, "testEval": testEval}
     savemat(filename, mdic)
 
     print("Saved 0_performance.mat file.")
