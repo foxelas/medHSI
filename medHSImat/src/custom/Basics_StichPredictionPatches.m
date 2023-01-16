@@ -1,12 +1,12 @@
 database = 'pslRaw32Augmented'; %'pslRaw-Denoisesmoothen32Augmented'; %'pslRaw32Augmented';
+
 fullDatabase = 'pslRaw';
 isAugmented = contains(lower(database), 'augmented');
 
 config.SetSetting('Dataset', database);
-dirName = fullfile('python-test', 'cnn3d_2022-06-15\');
-baseDir = commonUtility.GetFilename('output', dirName, '');
+dirName = fullfile('python-test', 'cnn3d_2022-06-15\ ');
 
-baseDir = 'D:\elena\mspi\output\pslRaw32Augmented\python-test\validation\xception3d5_max_2022-06-25';
+baseDir = commonUtility.GetFilename('output', dirName, '');
 
 folderList = dir(baseDir);
 folderNames = {folderList([folderList.isdir]).name};
