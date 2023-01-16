@@ -1,3 +1,7 @@
 
 *.mat
 *.asv
+.idea/
+.idea/*
+medhsi.egg-info/
+medhsi.egg-info/*

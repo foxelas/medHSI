@@ -24,5 +24,10 @@ setuptools.setup(
                       'h5py',
                       'scipy',
                       'scikit-image',
-                      'mat73']
+                      'mat73',
+                      'configparser',
+                      'keras',
+                      'tensorflow',
+                      'segmentation_models',
+                      ]
 )
