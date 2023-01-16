@@ -29,5 +29,6 @@ setuptools.setup(
                       'keras',
                       'tensorflow',
                       'segmentation_models',
+                      'opencv-python',
                       ]
 )
