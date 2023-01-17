@@ -5,9 +5,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="medhsi",
-    version="0.0.1",
+    version="1.0.0",
     author="foxelas",
-    author_email="foxeln@outlook.com",
+    author_email="foxelas@outlook.com",
     description="Tools for Macropathology Hyper-Spectral Image Processing",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -15,6 +15,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
+		"License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
